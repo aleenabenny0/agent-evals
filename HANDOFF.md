@@ -87,7 +87,7 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Current status (2026-10-10, end of day)
 
-- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 88 passed. Published
+- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 89 passed. Published
   at https://github.com/aleenabenny0/agent-evals (public). CI (`.github/workflows/ci.yml`, Ubuntu)
   was green on the first push.
 - Docs snapshot built: 8 pages in `data/snapshots/aws-docs` (S3 x5, Lambda, DynamoDB, IAM).
@@ -118,6 +118,10 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
     graders no longer import from the agent package.
   - `evals compare` honors metric direction (verdict and newly passing/failing labels) and says
     so when a metric is missing from one of the runs.
+- One definition of the checks: `uv run python scripts/check.py` (Makefile `check` and CI both
+  call it; `--fix` auto-formats first). `.vscode/settings.json` no longer hard-codes a Linux
+  interpreter path; VS Code discovers `.venv` on any OS. Non-breaking spaces in snapshot text
+  were already handled by `normalize()` (NFKC) and the search tokenizer; a test now pins that.
 - Pass/fail metrics now get Wilson score intervals (ADR 0004,
   `docs/walkthroughs/2026-10-10-wilson-intervals.md`); the report table shows the method per
   row. 7/7 on `correct` reads 0.646 to 1.000 instead of 1.000 to 1.000. Counts, fractions,
@@ -125,15 +129,10 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Next tasks, in order
 
-1. **Windows developer experience:** AGENTS.md says `make check`; on this machine use
-   `uv run ruff check . ; uv run ruff format --check . ; uv run mypy ; uv run pytest`. Consider
-   a cross-platform `scripts/check.py`. `.vscode/settings.json` points the interpreter at
-   `.venv/bin/python`; on Windows it is `.venv\Scripts\python.exe`. Snapshot text contains
-   non-breaking spaces (e.g. "Amazon S3"); consider normalizing them at snapshot time.
-2. **Phase 2 (Measurement)** as described in the roadmap. Agent-drafted cases go in
+1. **Phase 2 (Measurement)** as described in the roadmap. Agent-drafted cases go in
    `*.drafts.jsonl` with `"provenance": "synthetic"`; Aleena verifies each against its page.
 
-3. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
+2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
    `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of
    the whole output shape against a shared typed contract as its own metric. Decide where shared
    output types live when the code agent (phase 3) arrives, so the decision is made once; ADR.

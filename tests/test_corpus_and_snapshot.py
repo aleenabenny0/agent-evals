@@ -5,7 +5,7 @@ from pathlib import Path
 import httpx
 
 from agent_evals.agents.docs.snapshot import build_snapshot, html_to_page, read_url_list
-from agent_evals.corpus import Corpus, normalize
+from agent_evals.corpus import Corpus, normalize, tokenize
 from conftest import BUCKETS_URL, LAMBDA_URL
 
 HTML = """<html><head><title>Bucket naming rules - Amazon S3</title></head>
@@ -78,3 +78,11 @@ def test_failed_snapshot_keeps_the_previous_one(tmp_path: Path) -> None:
     report = build_snapshot(["https://x.test/a.html"], tmp_path, client=client, delay_s=0)
     assert report.pages == 0
     assert (tmp_path / "pages.jsonl").read_text() == "previous\n"
+
+
+def test_non_breaking_spaces_match_and_tokenize(corpus: Corpus) -> None:
+    # AWS pages put U+00A0 inside product names ("Amazon S3"). A quote typed with a plain space
+    # must still match, and search must see two tokens, not one glued word.
+    assert normalize("Bucket\u00a0names") == "bucket names"
+    assert tokenize("Bucket\u00a0names") == ["bucket", "names"]
+    assert corpus.contains_quote(BUCKETS_URL, "between 3 and\u00a063 characters")
