@@ -1,0 +1,25 @@
+# Default configuration. Copy and edit for experiments: `evals run ... -c configs/my.yaml`.
+
+paths:
+  corpus_dir: data/snapshots/aws-docs
+  cache_dir: .cache/llm
+  db: results/evals.duckdb
+
+run:
+  workers: 4         # parallel cases; lower this if you hit rate limits
+  budget_usd: 5.0    # stop a run once uncached spend passes this (needs pricing below)
+
+docs_agent:
+  model:
+    name: claude-haiku-5-5
+    max_tokens: 2048
+    temperature: null      # null = API default
+    pricing:
+      # USD per million tokens. Check https://platform.claude.com/docs/en/about-claude/pricing
+      # and fill these in; until then reports show tokens but no dollar cost.
+      input_per_mtok: null
+      output_per_mtok: null
+  max_steps: 12
+  search_k: 5
+  page_chars: 8000
+  strict_tools: true       # set false if the API rejects strict tool schemas for this model

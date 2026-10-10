@@ -1,0 +1,18 @@
+# Pages in the AWS docs snapshot. One URL per line; '#' starts a comment.
+# Start small, then grow this to 50-100 pages across S3, Lambda, DynamoDB and IAM.
+
+# Amazon S3
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
+
+# AWS Lambda
+https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+
+# Amazon DynamoDB
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html
+
+# IAM
+https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
