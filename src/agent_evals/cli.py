@@ -223,7 +223,7 @@ def run(
 
     cfg = _config(config)
     cases = load_suite(suite)[:limit]
-    blocked = unverified_drafts(cases) + unassigned(cases)
+    blocked = list(dict.fromkeys(unverified_drafts(cases) + unassigned(cases)))
     if blocked and not allow_drafts:
         console.print(
             f"[red]{len(blocked)} case(s) are unverified drafts or have no split (e.g. "

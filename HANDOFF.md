@@ -122,6 +122,23 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   call it; `--fix` auto-formats first). `.vscode/settings.json` no longer hard-codes a Linux
   interpreter path; VS Code discovers `.venv` on any OS. Non-breaking spaces in snapshot text
   were already handled by `normalize()` (NFKC) and the search tokenizer; a test now pins that.
+- Fourth smoke run, on the 333-page snapshot: `docs-20261010-224316-1efb7b` (agent
+  `ef8b253524b8`, corpus `9a1e3a9463da`). 7/7 correct, 0 fabricated, 0 rejected submissions,
+  evidence_recall 5/6 (005 answered the Lambda timeout correctly from a different Lambda page
+  than the one listed as evidence), model_calls 5.3 per case (was 3.9 on 8 pages), 37 calls,
+  287k input tokens. `evals compare` against run 3 says "no detectable change" and flags that
+  the snapshots differ.
+- Open grader decision from that run: `gold.evidence` is a flat list and `evidence_recall`
+  counts every URL, so a fact stated on several pages penalizes the agent for reading the
+  "wrong" one. Proposal: make `evidence` a list of groups of alternative URLs, like
+  `must_include`, and count groups hit. Needs Aleena's agreement (graders/).
+- Phase 2 step 3 done (ADR 0006): `area`, `verified_by`, `gold.support` on cases; `split`
+  `unassigned`; `evals run` refuses drafts/unassigned without `--allow-drafts`; `evals validate`
+  with a snapshot errors on missing evidence pages and unfound support quotes, warns on absent
+  must_include phrases and missing area; `evals split --dev N --test M --seed S` assigns splits
+  within (type, area) strata. Drafting workflow: drafts in `suites/docs/<name>.drafts.jsonl`
+  with `provenance: synthetic`, `split: unassigned`, a verbatim `support` quote; Aleena verifies
+  and sets `verified_by`; then `evals split`.
 - Docs drift check (ADR 0005): `evals snapshot` writes `configs/docs_pages.lock.json` (page
   hashes, committed); `evals snapshot --check [--report f.md]` fetches and compares, exit 1 on
   drift, listing cases whose evidence pages changed; `.github/workflows/docs-drift.yml` runs it
