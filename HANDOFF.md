@@ -139,6 +139,15 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   within (type, area) strata. Drafting workflow: drafts in `suites/docs/<name>.drafts.jsonl`
   with `provenance: synthetic`, `split: unassigned`, a verbatim `support` quote; Aleena verifies
   and sets `verified_by`; then `evals split`.
+- Pilot draft batch: `suites/docs/ai-ml.drafts.jsonl`, 49 cases (40 lookup, 2 false_premise,
+  2 multi_step, 1 changed_default, 4 unanswerable) drafted from 13 AI/ML pages (Bedrock
+  cross-Region inference, inference profiles, quotas, model access, batch inference, Provisioned
+  Throughput, Guardrails, Knowledge Bases; SageMaker serverless and async inference; Comprehend,
+  Rekognition and Polly quotas). All pass `evals validate` against the snapshot. **Aleena's
+  step:** for each case open the evidence page, read the question, gold answer and `support`
+  quote, then add `"verified_by": "aleena"`; change a gold answer only if the page says
+  otherwise. Next batches should lean to multi_step and changed_default (Lambda runtime
+  deprecations, S3 and IAM defaults, Kubernetes versions, CodeCommit/Cloud9 closure).
 - Docs drift check (ADR 0005): `evals snapshot` writes `configs/docs_pages.lock.json` (page
   hashes, committed); `evals snapshot --check [--report f.md]` fetches and compares, exit 1 on
   drift, listing cases whose evidence pages changed; `.github/workflows/docs-drift.yml` runs it
@@ -163,8 +172,11 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Next tasks, in order
 
-1. **Phase 2 (Measurement)** as described in the roadmap. Agent-drafted cases go in
-   `*.drafts.jsonl` with `"provenance": "synthetic"`; Aleena verifies each against its page.
+1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Remaining, in order:
+   (a) Aleena verifies the pilot batch; (b) decide whether `gold.evidence` becomes groups of
+   alternative URLs (graders/); (c) draft the remaining ~200 cases across areas per the mix,
+   leaning to multi_step and changed_default; (d) `evals split <verified> --dev 100 --test 150
+   --seed <record it>`; (e) paraphrase robustness suite; (f) LLM judge and its validation.
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
    `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of
