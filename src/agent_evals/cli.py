@@ -203,14 +203,21 @@ def review(
         if c.notes:
             console.print(f"notes: {c.notes}")
 
-        choice = Prompt.ask("[a]ccept  [r]eject  [s]kip  [q]uit", choices=["a", "r", "s", "q"])
+        try:
+            choice = Prompt.ask("(a)ccept, (r)eject, (s)kip, (q)uit", choices=["a", "r", "s", "q"])
+        except EOFError:
+            console.print("[yellow]No interactive input; stopping.[/yellow]")
+            break
         if choice == "q":
             break
         if choice == "a":
             cases = [accept(x, reviewer) if x.id == c.id else x for x in cases]
             tally["accepted"] += 1
         elif choice == "r":
-            reason = Prompt.ask("reason")
+            try:
+                reason = Prompt.ask("reason")
+            except EOFError:
+                reason = ""
             rejected.append(reject(c, reviewer, reason))
             cases = [x for x in cases if x.id != c.id]
             tally["rejected"] += 1
