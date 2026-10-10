@@ -122,6 +122,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   call it; `--fix` auto-formats first). `.vscode/settings.json` no longer hard-codes a Linux
   interpreter path; VS Code discovers `.venv` on any OS. Non-breaking spaces in snapshot text
   were already handled by `normalize()` (NFKC) and the search tokenizer; a test now pins that.
+- Docs drift check (ADR 0005): `evals snapshot` writes `configs/docs_pages.lock.json` (page
+  hashes, committed); `evals snapshot --check [--report f.md]` fetches and compares, exit 1 on
+  drift, listing cases whose evidence pages changed; `.github/workflows/docs-drift.yml` runs it
+  monthly and opens a `docs-drift` issue. When that issue appears: run `uv run evals snapshot`,
+  re-verify the listed cases against their pages, commit the lock. `evals compare` warns when
+  two runs used different snapshots.
 - Phase 2 started (plan: `docs/plans/phase-2-measurement.md`). Step 1 done: `stats/power.py`
   and `evals power` (McNemar normal approximation, simulation-tested against the paired
   bootstrap); 150 test cases detect a 10-point change at discordance up to ~19%. Step 2 drafted:

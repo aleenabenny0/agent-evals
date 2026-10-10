@@ -1,0 +1,48 @@
+name: Docs drift
+
+# Monthly: fetch every page in configs/docs_pages.txt, compare with the committed lock file,
+# and open (or update) an issue listing changed pages and the cases that cite them. Nothing is
+# edited automatically: a human re-verifies the cases (docs/adr/0005).
+
+on:
+  schedule:
+    - cron: "0 6 1 * *" # 06:00 UTC on the first day of each month
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.3.0
+      - name: Install
+        run: uv sync --locked
+      - name: Fetch pages and compare with the lock file
+        id: drift
+        run: |
+          set +e
+          uv run evals snapshot --check --report drift.md
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+      - name: Open or update the drift issue
+        if: steps.drift.outputs.exit == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create docs-drift --color D93F0B --force \
+            --description "Documentation pages in the snapshot changed; cases need re-verification"
+          existing=$(gh issue list --label docs-drift --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh issue comment "$existing" --body-file drift.md
+          else
+            gh issue create --label docs-drift --body-file drift.md \
+              --title "Docs drift: snapshot pages changed ($(date -u +%Y-%m-%d))"
+          fi
+      - name: Fail on anything other than "no drift" or "drift reported"
+        if: steps.drift.outputs.exit != '0' && steps.drift.outputs.exit != '1'
+        run: |
+          echo "evals snapshot --check exited with ${{ steps.drift.outputs.exit }}"
+          exit 1

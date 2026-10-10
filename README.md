@@ -30,7 +30,7 @@ The platform evaluates two agents that engineers use every day:
 
 ## Quickstart
 
-Requires [uv](https://docs.astral.sh/uv/). On Windows, run inside WSL2 (Ubuntu).
+Requires [uv](https://docs.astral.sh/uv/). Works natively on Windows, macOS and Linux.
 
 ```bash
 uv sync                       # install dependencies
@@ -38,6 +38,7 @@ cp .env.example .env          # then paste your Claude API key into .env
 uv run python scripts/check.py   # lint, format, types, tests, suites (offline; = make check)
 
 uv run evals snapshot         # fetch the AWS docs pages in configs/docs_pages.txt
+uv run evals snapshot --check # has the documentation drifted since the snapshot? (monthly in CI)
 uv run evals validate suites/docs/smoke.jsonl
 uv run evals run suites/docs/smoke.jsonl            # costs a few cents
 uv run evals report                                  # summary of the latest run

@@ -31,19 +31,72 @@ def snapshot(
     pages: Annotated[Path, typer.Option(help="File with one URL per line.")] = Path(
         "configs/docs_pages.txt"
     ),
+    check: Annotated[
+        bool,
+        typer.Option(
+            "--check",
+            help="Fetch and compare with the lock file instead of writing; exit 1 on drift.",
+        ),
+    ] = False,
+    report: Annotated[
+        Path | None, typer.Option(help="With --check: also write the markdown report here.")
+    ] = None,
+    relock: Annotated[
+        bool,
+        typer.Option("--relock", help="Write the lock file from the local snapshot; no fetch."),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Fetch AWS documentation pages into a dated local snapshot."""
-    from agent_evals.agents.docs.snapshot import build_snapshot, read_url_list
+    """Fetch AWS documentation pages into a dated local snapshot, or check it for drift."""
+    from agent_evals.agents.docs.snapshot import (
+        SnapshotLock,
+        build_snapshot,
+        diff_snapshot,
+        drift_report,
+        fetch_pages,
+        read_url_list,
+    )
 
     cfg = _config(config)
+    lock_path = cfg.paths.docs_lock
+    if check and relock:
+        console.print("[red]--check and --relock are exclusive.[/red]")
+        raise typer.Exit(code=2)
+
+    if relock:
+        from agent_evals.corpus import Corpus
+
+        corpus = Corpus.load(cfg.paths.corpus_dir)
+        created_at = next(iter(corpus.pages.values())).fetched_at
+        SnapshotLock.from_pages(corpus.pages.values(), created_at).save(lock_path)
+        console.print(f"[green]Wrote {lock_path} for {len(corpus.pages)} pages.[/green]")
+        return
+
     urls = read_url_list(pages)
+    if check:
+        from agent_evals.suites import evidence_index
+
+        if not lock_path.exists():
+            console.print(f"[red]No lock file at {lock_path}. Run `evals snapshot` first.[/red]")
+            raise typer.Exit(code=2)
+        lock = SnapshotLock.load(lock_path)
+        console.print(f"Checking {len(urls)} pages against {lock_path} ...")
+        fetched, failures, checked_at = fetch_pages(urls)
+        diff = diff_snapshot(fetched, failures, lock, checked_at=checked_at)
+        cited = evidence_index(sorted(cfg.paths.suites_dir.rglob("*.jsonl")))
+        affected = {u: cited[u] for u in diff.changed + diff.missing if u in cited}
+        text = drift_report(diff, lock, affected)
+        if report is not None:
+            report.write_text(text, encoding="utf-8")
+        console.print(text, markup=False, highlight=False)
+        raise typer.Exit(code=1 if diff.drifted else 0)
+
     console.print(f"Fetching {len(urls)} pages into {cfg.paths.corpus_dir} ...")
-    report = build_snapshot(urls, cfg.paths.corpus_dir)
-    console.print(f"[green]Saved {report.pages} pages.[/green]")
-    for f in report.failures:
+    result = build_snapshot(urls, cfg.paths.corpus_dir, lock_path=lock_path)
+    console.print(f"[green]Saved {result.pages} pages; lock written to {lock_path}.[/green]")
+    for f in result.failures:
         console.print(f"[yellow]Failed[/yellow] {f['url']}: {f['error']}")
-    if report.failures:
+    if result.failures:
         raise typer.Exit(code=1)
 
 
@@ -176,6 +229,11 @@ def compare_cmd(
     console.print(f"  difference {d.mean:+.3f}  (95% CI {d.low:+.3f} to {d.high:+.3f})")
     console.print(f"  McNemar p = {c.p_value:.3g}")
     console.print(f"  verdict: [bold]{c.verdict}[/bold]")
+    if c.same_snapshot is False:
+        console.print(
+            "  [yellow]note: the runs used different docs snapshots; scores are not strictly "
+            "comparable (ADR 0005)[/yellow]"
+        )
     if c.only_baseline_passed:
         console.print(f"  newly failing: {', '.join(c.only_baseline_passed)}")
     if c.only_candidate_passed:

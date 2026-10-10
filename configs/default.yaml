@@ -2,6 +2,8 @@
 
 paths:
   corpus_dir: data/snapshots/aws-docs
+  docs_lock: configs/docs_pages.lock.json   # page hashes, committed; see evals snapshot --check
+  suites_dir: suites
   cache_dir: .cache/llm
   db: results/evals.duckdb
 

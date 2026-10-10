@@ -63,6 +63,11 @@ fetches them; the snapshot stays out of git.
 More pages than cases is intended. Retrieval must find the right page among hundreds, which is
 the realistic setting, and cases sample the pages rather than cover them.
 
+**Freshness.** `evals snapshot` writes a committed lock file of page hashes; `evals snapshot
+--check` compares the live pages with it and lists the cases citing changed pages; a monthly
+GitHub Actions workflow runs the check and opens an issue. Humans re-verify; nothing is edited
+automatically (ADR 0005).
+
 Unanswerable cases need material that is **not** in the snapshot. Since the mainstream services
 are now in, the held-out set is deliberately niche: GameLift, Ground Station, Braket, RoboMaker,
 Snow Family, Chime SDK, IoT Greengrass, WorkSpaces, Elemental MediaConvert, Managed Blockchain,

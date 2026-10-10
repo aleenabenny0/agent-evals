@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Iterable
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -35,3 +36,20 @@ def load_suite(path: Path) -> list[Case]:
     if errors:
         raise SuiteError(f"{path} has {len(errors)} problem(s):\n" + "\n".join(errors))
     return cases
+
+
+def evidence_index(paths: Iterable[Path]) -> dict[str, list[tuple[str, str]]]:
+    """url -> [(suite file, case id)] for every case that lists the url as evidence.
+
+    A lookup aid for the docs drift check, not a validator: files that fail to load are skipped.
+    """
+    index: dict[str, list[tuple[str, str]]] = {}
+    for path in paths:
+        try:
+            cases = load_suite(path)
+        except (SuiteError, OSError):
+            continue
+        for case in cases:
+            for url in case.gold.evidence:
+                index.setdefault(url, []).append((path.as_posix(), case.id))
+    return index

@@ -77,6 +77,7 @@ class Comparison:
     only_baseline_passed: list[str]
     only_candidate_passed: list[str]
     p_value: float
+    same_snapshot: bool | None  # None when a manifest doesn't record a fingerprint
 
     @property
     def verdict(self) -> str:
@@ -101,6 +102,9 @@ def compare(
 ) -> Comparison:
     a = store.metric_by_case(baseline_id, metric)
     b = store.metric_by_case(candidate_id, metric)
+    fp_a = store.run_info(baseline_id)["manifest"].get("corpus_fingerprint")
+    fp_b = store.run_info(candidate_id)["manifest"].get("corpus_fingerprint")
+    same_snapshot = (fp_a == fp_b) if fp_a is not None and fp_b is not None else None
     shared = sorted(set(a) & set(b))
     if not shared:
         raise ValueError(f"the two runs share no cases graded on {metric!r}")
@@ -121,4 +125,5 @@ def compare(
         only_baseline_passed=only_a,
         only_candidate_passed=only_b,
         p_value=mcnemar_exact(len(only_a), len(only_b)),
+        same_snapshot=same_snapshot,
     )

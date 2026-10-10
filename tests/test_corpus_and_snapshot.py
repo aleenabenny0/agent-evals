@@ -4,7 +4,14 @@ from pathlib import Path
 
 import httpx
 
-from agent_evals.agents.docs.snapshot import build_snapshot, html_to_page, read_url_list
+from agent_evals.agents.docs.snapshot import (
+    SnapshotLock,
+    build_snapshot,
+    diff_snapshot,
+    drift_report,
+    html_to_page,
+    read_url_list,
+)
 from agent_evals.corpus import Corpus, normalize, tokenize
 from conftest import BUCKETS_URL, LAMBDA_URL
 
@@ -86,3 +93,47 @@ def test_non_breaking_spaces_match_and_tokenize(corpus: Corpus) -> None:
     assert normalize("Bucket\u00a0names") == "bucket names"
     assert tokenize("Bucket\u00a0names") == ["bucket", "names"]
     assert corpus.contains_quote(BUCKETS_URL, "between 3 and\u00a063 characters")
+
+
+def test_build_snapshot_writes_a_lock_without_content(tmp_path: Path) -> None:
+    client = httpx.Client(transport=httpx.MockTransport(lambda r: httpx.Response(200, text=HTML)))
+    lock_path = tmp_path / "lock.json"
+    build_snapshot(
+        ["https://x.test/a.html"], tmp_path, client=client, delay_s=0, lock_path=lock_path
+    )
+    lock = SnapshotLock.load(lock_path)
+    assert list(lock.pages) == ["https://x.test/a.html"]
+    assert (
+        lock.pages["https://x.test/a.html"].sha256
+        == Corpus.load(tmp_path).pages["https://x.test/a.html"].sha256
+    )
+    assert "63 (max)" not in lock_path.read_text(encoding="utf-8")  # hashes only, no page text
+
+
+def test_diff_classifies_changed_missing_and_new_pages() -> None:
+    old = html_to_page("https://x.test/a.html", HTML, "2026-10-10")
+    gone = html_to_page("https://x.test/gone.html", HTML, "2026-10-10")
+    lock = SnapshotLock.from_pages([old, gone], "2026-10-10")
+    edited = html_to_page(
+        "https://x.test/a.html", HTML.replace("63 (max)", "64 (max)"), "2026-11-01"
+    )
+    added = html_to_page("https://x.test/new.html", HTML, "2026-11-01")
+    failures = [{"url": "https://x.test/gone.html", "error": "HTTPStatusError: 404"}]
+    diff = diff_snapshot([edited, added], failures, lock, checked_at="2026-11-01")
+    assert diff.changed == ["https://x.test/a.html"]
+    assert diff.missing == ["https://x.test/gone.html"]
+    assert diff.new == ["https://x.test/new.html"]
+    assert diff.unchanged == [] and diff.drifted
+    same = diff_snapshot([old, gone], [], lock, checked_at="2026-11-01")
+    assert not same.drifted and len(same.unchanged) == 2
+
+
+def test_drift_report_names_pages_and_cases() -> None:
+    page = html_to_page("https://x.test/a.html", HTML, "2026-10-10")
+    lock = SnapshotLock.from_pages([page], "2026-10-10")
+    edited = html_to_page("https://x.test/a.html", HTML.replace("63", "64"), "2026-11-01")
+    diff = diff_snapshot([edited], [], lock, checked_at="2026-11-01T06:00:00+00:00")
+    text = drift_report(diff, lock, {"https://x.test/a.html": [("suites/docs/dev.jsonl", "c-1")]})
+    assert "## Changed pages (1)" in text and "Bucket naming rules" in text
+    assert "suites/docs/dev.jsonl: c-1" in text and "## What to do" in text
+    assert "No drift" in drift_report(diff_snapshot([page], [], lock, checked_at="x"), lock, {})

@@ -11,7 +11,7 @@ from agent_evals.harness.cache import CallCache
 from agent_evals.harness.runner import run_suite
 from agent_evals.report import compare, summarize
 from agent_evals.store.db import ResultsStore
-from agent_evals.suites import SuiteError, load_suite
+from agent_evals.suites import SuiteError, evidence_index, load_suite
 from agent_evals.types import AgentResult, Case, RunContext, Usage
 from conftest import make_case
 
@@ -63,6 +63,7 @@ def _run(
     cases: list[Case],
     attempts: int,
     budget: float | None = None,
+    manifest: dict[str, Any] | None = None,
 ) -> str:
     return run_suite(
         agent=agent,
@@ -74,7 +75,7 @@ def _run(
         workers=2,
         pricing=Pricing(input_per_mtok=1.0, output_per_mtok=1.0),
         budget_usd=budget,
-        manifest={"test": True},
+        manifest=manifest or {"test": True},
         show_progress=False,
     )
 
@@ -106,7 +107,28 @@ def test_run_report_and_compare(tmp_path: Path) -> None:
     assert wa.diff.mean < 0 and wa.verdict == "improved"
     with pytest.raises(ValueError, match="no cases graded on 'nope'"):
         compare(store, base, cand, metric="nope")
+    assert cmp.same_snapshot is None  # these manifests record no fingerprint
     store.close()
+
+
+def test_compare_notices_a_different_snapshot(tmp_path: Path) -> None:
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id=f"c{i}") for i in range(3)]
+    a = _run(store, FakeAgent({}), cases, attempts=1, manifest={"corpus_fingerprint": "aaa"})
+    b = _run(store, FakeAgent({}), cases, attempts=1, manifest={"corpus_fingerprint": "bbb"})
+    c = _run(store, FakeAgent({}), cases, attempts=1, manifest={"corpus_fingerprint": "bbb"})
+    assert compare(store, a, b).same_snapshot is False
+    assert compare(store, b, c).same_snapshot is True
+    store.close()
+
+
+def test_evidence_index_maps_pages_to_cases(tmp_path: Path) -> None:
+    good = tmp_path / "dev.jsonl"
+    good.write_text(make_case(id="d-1").model_dump_json() + "\n")
+    broken = tmp_path / "broken.jsonl"
+    broken.write_text("not json\n")
+    index = evidence_index([good, broken])
+    assert index == {make_case().gold.evidence[0]: [(good.as_posix(), "d-1")]}
 
 
 def test_single_attempt_pass_rates_get_wilson_intervals(tmp_path: Path) -> None:

@@ -40,6 +40,9 @@ class DocsAgentConfig(_Strict):
 
 class Paths(_Strict):
     corpus_dir: Path = Path("data/snapshots/aws-docs")
+    # Committed hash-per-page record of the snapshot, for the monthly drift check (ADR 0005).
+    docs_lock: Path = Path("configs/docs_pages.lock.json")
+    suites_dir: Path = Path("suites")
     cache_dir: Path = Path(".cache/llm")
     db: Path = Path("results/evals.duckdb")
 
