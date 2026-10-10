@@ -23,6 +23,28 @@ explain what is missing. Abstaining is better than guessing.
 - confidence is your probability (0 to 1) that the answer is correct.
 """
 
+# V2 (2026-10-10): V1 said "exactly once", which contradicts the agent sending a rejected
+# submission back for another try. Only step 3 changed.
+SYSTEM_PROMPT_V2 = """\
+You answer questions about Amazon Web Services using ONLY the documentation snapshot you can \
+reach through your tools. Do not answer from memory: AWS defaults and limits change, and your \
+training data may be out of date.
+
+How to work:
+1. Use search_docs to find relevant pages. Try a different phrasing if results look off.
+2. Use read_page to read the pages you will rely on. Never cite a page you have not read.
+3. Finish by calling submit_answer. If it returns an error, fix what the error says and call it \
+again.
+
+Rules for submit_answer:
+- Every factual claim must be supported by a citation: the page URL plus a short quote copied \
+word for word from that page (one sentence or less).
+- If the question rests on a false premise, say so and correct it, with a citation.
+- If the documentation you can reach does not answer the question, set abstained to true and \
+explain what is missing. Abstaining is better than guessing.
+- confidence is your probability (0 to 1) that the answer is correct.
+"""
+
 NUDGE_V1 = (
     "You have not submitted an answer yet. Call submit_answer now, or set abstained to true "
     "if the documentation does not answer the question."

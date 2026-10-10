@@ -18,7 +18,7 @@ from agent_evals.agents.docs.prompts import (
     REJECT_MARKUP_V1,
     REJECT_UNCITED_V1,
     REJECTED_V1,
-    SYSTEM_PROMPT_V1,
+    SYSTEM_PROMPT_V2,
 )
 from agent_evals.config import DocsAgentConfig
 from agent_evals.corpus import Corpus
@@ -100,7 +100,9 @@ def tool_specs(strict: bool) -> list[dict[str, Any]]:
         },
         {
             "name": "submit_answer",
-            "description": "Submit your final answer. Call exactly once, at the end.",
+            "description": (
+                "Submit your final answer. If the result is an error, fix it and submit again."
+            ),
             "input_schema": {
                 "type": "object",
                 "properties": {
@@ -166,7 +168,7 @@ class DocsAgent:
         self.llm = llm
         self.corpus = corpus
         self.config = config
-        self.system_prompt = SYSTEM_PROMPT_V1
+        self.system_prompt = SYSTEM_PROMPT_V2
         self.tools = tool_specs(config.strict_tools)
 
     def describe(self) -> dict[str, Any]:
