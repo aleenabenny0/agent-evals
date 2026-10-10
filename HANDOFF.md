@@ -87,8 +87,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Current status (2026-10-10, end of day)
 
-- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 83 passed. No git
-  remote yet: create the GitHub repository and push `main`.
+- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 83 passed. Published
+  at https://github.com/aleenabenny0/agent-evals (public). CI (`.github/workflows/ci.yml`, Ubuntu)
+  was green on the first push.
 - Docs snapshot built: 8 pages in `data/snapshots/aws-docs` (S3 x5, Lambda, DynamoDB, IAM).
 - Three smoke runs, all 7/7 correct, 0 fabricated citations, correct abstention on Kinesis:
   - `docs-20261010-174408-ae0812` (agent `3960330eeb86`, prompt v1). Case 003 leaked its
@@ -153,5 +154,8 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 - Claude Code builds; Codex reviews diffs as a second opinion. Don't have both edit the same
   branch at once.
+- GitHub CLI is installed at `C:\Program Files\GitHub CLI\gh.exe` and logged in as
+  `aleenabenny0`; a shell opened before the install may not have it on PATH, so call it by full
+  path. Git pushes over HTTPS use Windows Credential Manager.
 - Pricing in `configs/default.yaml` is unset, so reports show tokens but no dollar cost and the
   per-run budget cap can't trigger until it is filled in from Anthropic's pricing page.
