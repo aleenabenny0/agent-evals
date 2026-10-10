@@ -372,3 +372,57 @@ Answer these specifically:
    settings as constants in code, graders raising on bad output.
 7. Anything a careful reader would flag that mypy --strict and ruff would not.
 ```
+
+## 7. After the Codex review (commits eacb715 to 742d494)
+
+Codex's second-opinion review is saved in `2026-10-10-codex-review.md`. Every concrete claim in
+it reproduced. What changed in response, and why:
+
+**Detector v2** (`tool_markup.py`). The first pattern matched `<parameter-name>`, a real AWS
+placeholder, because `\b` treats a hyphen as a word boundary, and it matched `<Parameter>` XML
+because it ignored case. It also missed `</answer >` with a space. The new pattern is
+case-sensitive (Claude's syntax is lowercase, AWS XML is PascalCase), requires a `name=`
+attribute on opening `invoke` and `parameter` tags, allows whitespace before `>` and an optional
+namespace prefix, and recognises `<tool_call>` wrappers. `tests/test_tool_markup.py` now holds
+two labeled lists, LEAKED and LEGITIMATE, including every example from the review.
+`FormatGrader.version` is 2.
+
+**Fingerprint v2** (`DocsAgent.version`). The old fingerprint missed the detector pattern, the
+nudge and the tool-error wrapper texts. It now hashes the whole agent config except pricing,
+every text the model can read (all of `prompts.py`), the detector pattern and the tool specs.
+`test_version_changes_with_the_detector` proves a pattern change is visible.
+
+**`_check_submission`** replaces the try/except/else inside the loop: shape check, then content
+rules, returning `(answer or None, text, is_error)`. The loop body shrank to a few lines.
+
+**Rejection cap** (`docs_agent.max_submission_rejections`, default 3). After that many rejected
+submissions the attempt fails as `malformed_submission: <last reason>` instead of running out of
+steps and being labelled `max_steps`. The new trajectory metric `rejected_submissions` counts how
+many times the final answer was sent back, whether or not the model recovered, so formatting
+reliability is measured even when the final output is clean.
+
+**Prompt v2.** Step 3 of the system prompt said "call submit_answer exactly once", which
+contradicts asking for a resubmission. Only that step and the tool description changed. The
+system prompt is in every request, so the call cache no longer applies and the next smoke run is
+fully paid.
+
+**Tests that prove markup alone is rejected.** Codex showed by mutation that a guard which only
+checked markup when citations were empty passed every test, because the leaked fixture had no
+citations. Added: markup with valid citations, markup inside an abstention, three rejections
+ending in `malformed_submission`, and tool results matched by `tool_use_id` instead of position.
+
+**Graders never raise.** A citation entry that was not an object made `CitationGrader` and
+`TrajectoryGrader` throw `AttributeError`; the runner caught it as `grader_error`, but the rule
+is that graders return grades. Such entries now count as fabricated, and a non-list `citations`
+field counts as none. `MIN_QUOTE_CHARS` moved to `graders.min_quote_chars` in the config, and
+the run manifest records every grader's name and version.
+
+**Corpus moved** from `agents/docs/corpus.py` to `agent_evals/corpus.py`, so graders no longer
+import from the agent package. Imports only, no logic changed.
+
+**`evals compare` direction.** `Comparison` now knows whether lower is better, decides pass per
+case accordingly, and exposes `verdict`. For `uncited_answer` the earlier comparison now prints
+"newly passing: docs-smoke-003".
+
+**Not done, recorded in HANDOFF.md:** a full output-contract check (Codex P3). It needs a
+decision on where shared output types live, which is best taken when a second agent exists.

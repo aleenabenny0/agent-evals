@@ -36,3 +36,14 @@ markup (`src/agent_evals/tool_markup.py`). The rejection messages are versioned 
 `prompts.py` and part of the agent version. A deterministic `malformed_output` metric
 (`FormatGrader`) checks the final answer for markup, so it should read zero while the guard
 works and flags any agent that drops it.
+
+## Amendment 2 (2026-10-10): rejection cap, resubmission wording, narrower detector
+
+After a second-opinion review (docs/walkthroughs/2026-10-10-codex-review.md): the detector is
+case-sensitive and requires a `name=` attribute on opening tags, so AWS placeholders such as
+`<parameter-name>` and XML such as `<Parameter>` never trigger it; rejected submissions are
+capped by `docs_agent.max_submission_rejections`, after which the attempt fails as
+`malformed_submission` with the last reason, so a formatting failure is never recorded as
+`max_steps`; the trajectory grader counts `rejected_submissions`; the system prompt (v2) and the
+tool description tell the model it may resubmit after an error; and the agent version
+fingerprint covers the whole config, every model-facing text and the detector pattern.

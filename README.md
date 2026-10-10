@@ -72,9 +72,11 @@ Before your first real run, set a monthly spend limit in the Claude Console and 
 src/agent_evals/
   types.py              Case, AgentResult, Step, Grade, Agent and Grader protocols
   config.py             typed YAML config
+  corpus.py             documentation snapshot: BM25 search, page reads, quote checks
+  tool_markup.py        detects tool-call syntax leaked into an answer
   harness/              call cache, cached Claude client, runner, run manifests
-  agents/docs/          snapshot builder, BM25 corpus, prompts, tool-use loop
-  graders/              deterministic graders (answer, citations, trajectory)
+  agents/docs/          snapshot builder, prompts, tool-use loop
+  graders/              deterministic graders (answer, citations, output format, trajectory)
   stats/                bootstrap CIs, paired differences, pass^k, McNemar
   store/                DuckDB results store
   report.py             run summaries and paired comparisons
