@@ -85,54 +85,57 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 5. Learning loops (above).
 6. Red team (prompt injection planted in doc pages and tasks) and technical report.
 
-## Current status (2026-10-10)
+## Current status (2026-10-10, end of day)
 
-- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 56 passed.
+- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 83 passed. No git
+  remote yet: create the GitHub repository and push `main`.
 - Docs snapshot built: 8 pages in `data/snapshots/aws-docs` (S3 x5, Lambda, DynamoDB, IAM).
-  Quote matching verified on a real page.
-- First real smoke run: `docs-20261010-174408-ae0812` (agent `3960330eeb86`). 7/7 correct,
-  0 fabricated citations, correct abstention on the out-of-snapshot Kinesis question, evidence
-  recall 1.0, ~3.3 model calls per case, 87k input / 6.7k output tokens total. `strict: true`
-  tool schemas were accepted by the API for Haiku 5.5.
-- Finding (fixed, see next bullet): on `docs-smoke-003` the model wrote its citations inside
-  the `answer` string (the answer ends with `</answer>` then `<parameter name="citations">[...]`)
-  and submitted an empty `citations` list, so it was graded `uncited_answer`.
-- Leaked-citations fix landed (commits `f081f42`, `08ca110`). After the schema check,
-  `submission_problems` in the docs agent rejects a non-abstained answer with no citations, or
-  an answer containing tool-call markup, and returns the reason as a tool error so the model
-  resubmits. The detector is `src/agent_evals/tool_markup.py`, shared with the new
-  `FormatGrader` (`malformed_output` metric). Rejection messages live in `prompts.py` and are
-  part of the agent version. ADR 0002 has an amendment.
-- Second smoke run: `docs-20261010-182430-a355c7` (agent `59e86eb5ebdc`). 7/7 correct,
-  `uncited_answer` 0/6, `malformed_output` 0/7, 25 model calls of which 23 came from the cache
-  (2 paid). On 003 the first resubmission still contained `</answer>`; the second was clean with
-  3 verbatim citations. `evals compare` against the baseline: `correct` +0.000 (CI 0 to 0),
-  `uncited_answer` -0.167 (CI -0.50 to 0.00), both "no detectable change". Expected at n=7:
-  about 3 of 7 cases must move the same way before the paired bootstrap CI excludes zero.
-- Finding: `evals compare` assumes higher is better. For `uncited_answer` it printed
-  "newly failing: docs-smoke-003" for a case that improved from 1 to 0, and a CI entirely below
-  zero would read "regressed". The direction set `LOWER_IS_BETTER` in `report.py` is only used
-  by the summary table.
-- Finding: submission rejections count toward `tool_errors` and `model_calls` (003: 5 calls,
-  2 errors). This is intended, they measure error recovery, but read those metrics with it in
-  mind.
+- Three smoke runs, all 7/7 correct, 0 fabricated citations, correct abstention on Kinesis:
+  - `docs-20261010-174408-ae0812` (agent `3960330eeb86`, prompt v1). Case 003 leaked its
+    citations as tool-call markup inside `answer` and was graded `uncited_answer`.
+  - `docs-20261010-182430-a355c7` (agent `59e86eb5ebdc`), after the submission guard. 003 was
+    rejected twice, then submitted cleanly with 3 verbatim citations. 23 of 25 calls from cache.
+  - `docs-20261010-205341-14beef` (agent `ef8b253524b8`, prompt v2; graders citations 2,
+    output_format 2, trajectory 2). 0 rejected submissions, 0 tool errors, 27 calls, none cached
+    because the prompt changed, 116k in / 7.5k out tokens. `evals compare` against both earlier
+    runs: "no detectable change" on every metric, as expected at n=7 (about 3 of 7 cases must
+    move the same way before the paired bootstrap CI excludes zero).
+- Task 1 (leaked citations) is done and was reviewed by Codex. The review and the responses to
+  it are in `docs/walkthroughs/2026-10-10-codex-review.md` and section 7 of
+  `docs/walkthroughs/2026-10-10-leaked-citations-fix.md`. What exists now:
+  - Docs agent: `_check_submission` (Pydantic shape check, then `submission_problems` content
+    rules: cite or abstain, no tool-call markup). Rejections go back as tool errors; after
+    `docs_agent.max_submission_rejections` (3) the attempt fails as `malformed_submission` with
+    the last reason. System prompt v2 tells the model it may resubmit. The agent version hashes
+    the whole config, every model-facing text in `prompts.py`, the detector pattern and tools.
+  - `src/agent_evals/tool_markup.py`: case-sensitive detector that requires `name=` on opening
+    tags, so AWS placeholders and XML never trigger it; labeled fixtures in
+    `tests/test_tool_markup.py`.
+  - Graders: `FormatGrader` (`malformed_output`), `rejected_submissions` in the trajectory
+    grader, graders never raise on malformed citations, `graders.min_quote_chars` in config,
+    grader versions recorded in the run manifest. Corpus moved to `agent_evals/corpus.py` so
+    graders no longer import from the agent package.
+  - `evals compare` honors metric direction (verdict and newly passing/failing labels) and says
+    so when a metric is missing from one of the runs.
 - Finding: the bootstrap CI collapses to [1.0, 1.0] when every case passes, which overstates
-  certainty. For 7/7 a Wilson interval gives about [0.65, 1.00].
+  certainty. For 7/7 a Wilson interval gives about [0.65, 1.00]. Task 1 below.
 
 ## Next tasks, in order
 
-1. **Fix `evals compare` for lower-is-better metrics** (small). In `report.compare` and
-   `cli.compare_cmd`, use `LOWER_IS_BETTER` to flip the newly passing / newly failing labels
-   and the improved / regressed verdict. Add a test with a lower-is-better metric.
-2. **Wilson score intervals for pass/fail metrics** in reports (keep bootstrap for continuous
+1. **Wilson score intervals for pass/fail metrics** in reports (keep bootstrap for continuous
    metrics and paired differences). Explain the math to Aleena first.
-3. **Windows developer experience:** AGENTS.md says `make check`; on this machine use
+2. **Windows developer experience:** AGENTS.md says `make check`; on this machine use
    `uv run ruff check . ; uv run ruff format --check . ; uv run mypy ; uv run pytest`. Consider
    a cross-platform `scripts/check.py`. `.vscode/settings.json` points the interpreter at
    `.venv/bin/python`; on Windows it is `.venv\Scripts\python.exe`. Snapshot text contains
    non-breaking spaces (e.g. "Amazon S3"); consider normalizing them at snapshot time.
-4. **Phase 2 (Measurement)** as described in the roadmap. Agent-drafted cases go in
+3. **Phase 2 (Measurement)** as described in the roadmap. Agent-drafted cases go in
    `*.drafts.jsonl` with `"provenance": "synthetic"`; Aleena verifies each against its page.
+
+4. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
+   `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of
+   the whole output shape against a shared typed contract as its own metric. Decide where shared
+   output types live when the code agent (phase 3) arrives, so the decision is made once; ADR.
 
 ## Verified facts for writing cases (checked against AWS docs on 2026-10-10)
 

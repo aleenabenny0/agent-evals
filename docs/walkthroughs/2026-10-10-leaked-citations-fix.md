@@ -426,3 +426,9 @@ case accordingly, and exposes `verdict`. For `uncited_answer` the earlier compar
 
 **Not done, recorded in HANDOFF.md:** a full output-contract check (Codex P3). It needs a
 decision on where shared output types live, which is best taken when a second agent exists.
+
+**Run 3 result** (`docs-20261010-205341-14beef`, agent `ef8b253524b8`): 7/7 correct,
+`rejected_submissions` 0, `tool_errors` 0, `malformed_output` 0, 27 model calls all paid because
+the prompt changed. Case 003 submitted cleanly on its first try this time. Every comparison
+against the two earlier runs reads "no detectable change", which at seven cases is the only
+possible outcome for a one-case effect.
