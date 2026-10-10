@@ -184,7 +184,7 @@ https://docs.aws.amazon.com/sagemaker/latest/dg/distributed-training.html
 https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html
 https://docs.aws.amazon.com/general/latest/gr/sagemaker.html
 
-# AI and ML: language, vision, speech, search, assistants (35)
+# AI and ML: language, vision, speech, search, assistants (34)
 https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html
 https://docs.aws.amazon.com/comprehend/latest/dg/guidelines-and-limits.html
 https://docs.aws.amazon.com/comprehend/latest/dg/how-it-works.html
