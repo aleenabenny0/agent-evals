@@ -13,13 +13,5 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Install
         run: uv sync --locked
-      - name: Lint
-        run: |
-          uv run ruff check .
-          uv run ruff format --check .
-      - name: Type check
-        run: uv run mypy
-      - name: Tests
-        run: uv run pytest
-      - name: Validate suites
-        run: uv run evals validate suites/docs/smoke.jsonl
+      - name: Check (lint, format, types, tests, suites)
+        run: uv run python scripts/check.py

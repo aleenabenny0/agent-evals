@@ -3,7 +3,8 @@
 setup:            ## install everything (run once)
 	uv sync
 
-check: lint typecheck test   ## everything CI runs
+check:            ## everything CI runs; one definition shared with CI (scripts/check.py)
+	uv run python scripts/check.py
 
 lint:
 	uv run ruff check .

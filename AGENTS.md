@@ -7,8 +7,9 @@ the roadmap; docs/adr/ explains past decisions.
 ## Commands
 
 - Install: `uv sync`
-- Everything CI runs: `make check` (ruff, ruff format, mypy --strict, pytest). Run it before
-  saying a task is done, and fix what it reports.
+- Everything CI runs: `uv run python scripts/check.py` (ruff, ruff format, mypy --strict,
+  pytest, suite validation). `make check` is the same thing; `--fix` auto-formats first. Run it
+  before saying a task is done, and fix what it reports.
 - One test file: `uv run pytest tests/test_graders.py -q`
 - Validate a suite: `uv run evals validate suites/docs/smoke.jsonl`
 - **Costs money, ask first:** `uv run evals run ...` and `make smoke` call the Claude API.

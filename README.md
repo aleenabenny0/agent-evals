@@ -35,7 +35,7 @@ Requires [uv](https://docs.astral.sh/uv/). On Windows, run inside WSL2 (Ubuntu).
 ```bash
 uv sync                       # install dependencies
 cp .env.example .env          # then paste your Claude API key into .env
-make check                    # lint, type check, tests (offline, no API key needed)
+uv run python scripts/check.py   # lint, format, types, tests, suites (offline; = make check)
 
 uv run evals snapshot         # fetch the AWS docs pages in configs/docs_pages.txt
 uv run evals validate suites/docs/smoke.jsonl
