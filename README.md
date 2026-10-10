@@ -39,7 +39,7 @@ uv run python scripts/check.py   # lint, format, types, tests, suites (offline; 
 
 uv run evals snapshot         # fetch the AWS docs pages in configs/docs_pages.txt
 uv run evals snapshot --check # has the documentation drifted since the snapshot? (monthly in CI)
-uv run evals validate suites/docs/smoke.jsonl
+uv run evals validate suites/docs/smoke.jsonl   # with a snapshot: checks evidence pages and quotes too
 uv run evals run suites/docs/smoke.jsonl            # costs a few cents
 uv run evals report                                  # summary of the latest run
 ```

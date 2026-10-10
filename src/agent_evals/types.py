@@ -13,6 +13,22 @@ from pydantic import BaseModel, ConfigDict, Field
 from agent_evals.config import Pricing
 
 CaseType = Literal["lookup", "multi_step", "changed_default", "unanswerable", "false_premise"]
+# Service area, for the case mix and per-area reporting (docs/plans/phase-2-measurement.md).
+Area = Literal[
+    "ai_ml",
+    "compute",
+    "storage",
+    "databases",
+    "networking",
+    "security",
+    "analytics",
+    "integration",
+    "management",
+    "devtools",
+    "migration",
+]
+# "unassigned" is for drafts: `evals split` assigns dev/test, and runs refuse unassigned cases.
+Split = Literal["smoke", "dev", "test", "unassigned"]
 
 
 class Gold(BaseModel):
@@ -24,6 +40,9 @@ class Gold(BaseModel):
     must_include: list[list[str]] = Field(default_factory=list)
     # URLs of the pages that support the gold answer.
     evidence: list[str] = Field(default_factory=list)
+    # The sentence on an evidence page that the answer rests on, copied word for word. Lets a
+    # reviewer verify a draft in one read, and lets `evals validate` prove the quote exists.
+    support: str | None = None
 
 
 class Case(BaseModel):
@@ -35,13 +54,21 @@ class Case(BaseModel):
     type: CaseType
     question: str
     gold: Gold
-    split: Literal["smoke", "dev", "test"]
+    split: Split
     provenance: Literal["hand", "synthetic"]
+    area: Area | None = None
+    # Who checked this case against its page. A synthetic case without it is a draft and is
+    # never scored by accident (see `evals run --allow-drafts`).
+    verified_by: str | None = None
     notes: str | None = None
 
     @property
     def answerable(self) -> bool:
         return self.type != "unanswerable"
+
+    @property
+    def is_draft(self) -> bool:
+        return self.provenance == "synthetic" and not self.verified_by
 
 
 class Usage(BaseModel):

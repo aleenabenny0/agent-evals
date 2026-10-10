@@ -137,7 +137,8 @@ All judge calls go through `LLMClient`, so they are cached and counted like agen
 
 1. Agree the power-analysis approach above (step 1).
 2. Approve the snapshot page list (step 2).
-3. `verified_by` and `area` on `Case`, and the `--allow-drafts` guard (step 3).
+3. Done: `verified_by`, `area` and `gold.support` on cases, the `--allow-drafts` guard,
+   snapshot-backed `evals validate`, and seeded `evals split` (ADR 0006).
 4. NLI option (a), (b) or (c) (step 5), can wait until step 6 is underway.
 
 ## What does not change

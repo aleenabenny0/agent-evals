@@ -101,9 +101,16 @@ def snapshot(
 
 
 @app.command()
-def validate(suite: Path) -> None:
-    """Check a suite file for schema errors, duplicate ids and missing gold answers."""
-    from agent_evals.suites import SuiteError, load_suite
+def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
+    """Check a suite: schema, duplicate ids, gold answers; with a snapshot, evidence and quotes."""
+    from agent_evals.corpus import Corpus
+    from agent_evals.suites import (
+        SuiteError,
+        check_against_corpus,
+        load_suite,
+        unassigned,
+        unverified_drafts,
+    )
 
     try:
         cases = load_suite(suite)
@@ -114,6 +121,67 @@ def validate(suite: Path) -> None:
     for c in cases:
         by_type[c.type] = by_type.get(c.type, 0) + 1
     console.print(f"[green]{len(cases)} valid cases[/green] " + str(by_type))
+    if drafts := unverified_drafts(cases):
+        console.print(f"{len(drafts)} unverified drafts; runs refuse them without --allow-drafts")
+    if open_split := unassigned(cases):
+        console.print(f"{len(open_split)} cases with split 'unassigned'; use `evals split`")
+
+    corpus_dir = _config(config).paths.corpus_dir
+    if not (corpus_dir / "pages.jsonl").exists():
+        console.print(
+            "[yellow]No snapshot here, so evidence and quote checks were skipped.[/yellow]"
+        )
+        return
+    errors, warnings = check_against_corpus(cases, Corpus.load(corpus_dir))
+    for w in warnings:
+        console.print(f"[yellow]warning[/yellow] {w}")
+    for e in errors:
+        console.print(f"[red]error[/red] {e}")
+    if errors:
+        raise typer.Exit(code=1)
+
+
+@app.command()
+def split(
+    source: Path,
+    dev: Annotated[int, typer.Option(min=0, help="Cases for the dev split.")],
+    test: Annotated[int, typer.Option(min=0, help="Cases for the held-out test split.")],
+    seed: Annotated[int, typer.Option(help="Random seed. Record it in HANDOFF.md.")] = 0,
+    out_dir: Annotated[Path, typer.Option(help="Writes dev.jsonl and test.jsonl here.")] = Path(
+        "suites/docs"
+    ),
+    allow_drafts: Annotated[
+        bool, typer.Option("--allow-drafts", help="Split unverified drafts too (not for real).")
+    ] = False,
+    force: Annotated[bool, typer.Option("--force", help="Overwrite existing files.")] = False,
+) -> None:
+    """Assign verified cases to dev/test at random within each (type, area) stratum."""
+    from agent_evals.suites import load_suite, stratified_split, unverified_drafts, write_suite
+
+    cases = load_suite(source)
+    drafts = unverified_drafts(cases)
+    if drafts and not allow_drafts:
+        console.print(
+            f"[red]{len(drafts)} unverified drafts (e.g. {drafts[0]!r}); verify first.[/red]"
+        )
+        raise typer.Exit(code=2)
+    try:
+        dev_cases, test_cases = stratified_split(cases, dev=dev, test=test, seed=seed)
+    except ValueError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    targets = {out_dir / "dev.jsonl": dev_cases, out_dir / "test.jsonl": test_cases}
+    for path in targets:
+        if path.exists() and not force:
+            console.print(f"[red]{path} exists; pass --force to overwrite.[/red]")
+            raise typer.Exit(code=2)
+    for path, group in targets.items():
+        write_suite(path, group)
+        mix: dict[str, int] = {}
+        for c in group:
+            mix[c.type] = mix.get(c.type, 0) + 1
+        console.print(f"[green]{path}[/green] {len(group)} cases {mix}")
+    console.print(f"seed={seed}; record it with the suite in HANDOFF.md")
 
 
 @app.command()
@@ -122,6 +190,13 @@ def run(
     agent: Annotated[str, typer.Option(help="Agent to evaluate.")] = "docs",
     attempts: Annotated[int, typer.Option(min=1, help="Attempts per case (for pass^k).")] = 1,
     limit: Annotated[int | None, typer.Option(help="Only run the first N cases.")] = None,
+    allow_drafts: Annotated[
+        bool,
+        typer.Option(
+            "--allow-drafts",
+            help="Score unverified drafts and unassigned cases too. Never for a release decision.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Run an agent on a suite, grade every attempt, and store the results."""
@@ -139,7 +214,7 @@ def run(
     from agent_evals.harness.manifest import build_manifest
     from agent_evals.harness.runner import run_suite
     from agent_evals.store.db import ResultsStore
-    from agent_evals.suites import load_suite
+    from agent_evals.suites import load_suite, unassigned, unverified_drafts
     from agent_evals.types import Grader
 
     if agent != "docs":
@@ -148,6 +223,14 @@ def run(
 
     cfg = _config(config)
     cases = load_suite(suite)[:limit]
+    blocked = unverified_drafts(cases) + unassigned(cases)
+    if blocked and not allow_drafts:
+        console.print(
+            f"[red]{len(blocked)} case(s) are unverified drafts or have no split (e.g. "
+            f"{blocked[0]!r}). Verify and `evals split` them, or pass --allow-drafts for a "
+            "throwaway run.[/red]"
+        )
+        raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
     llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
     docs_agent = DocsAgent(llm, corpus, cfg.docs_agent)
