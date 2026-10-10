@@ -7,6 +7,7 @@ settle; these checks stay as the first line because they never drift.
 from __future__ import annotations
 
 from agent_evals.agents.docs.corpus import Corpus, normalize
+from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, Grade
 
 MIN_QUOTE_CHARS = 12
@@ -113,6 +114,26 @@ class CitationGrader:
                 passed=not problems,
                 reason="; ".join(problems),
             ),
+        ]
+
+
+class FormatGrader:
+    """The answer must be plain prose: no tool-call markup leaked into it."""
+
+    name = "output_format"
+    version = "1"
+
+    def grade(self, case: Case, result: AgentResult) -> list[Grade]:
+        if result.error:
+            return []
+        snippet = find_tool_markup(str(result.output.get("answer", "")))
+        return [
+            Grade(
+                metric="malformed_output",
+                value=float(snippet is not None),
+                passed=snippet is None,
+                reason="" if snippet is None else f"tool-call markup in answer: {snippet!r}",
+            )
         ]
 
 

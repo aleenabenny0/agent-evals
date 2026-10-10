@@ -19,6 +19,7 @@ NEUTRAL = {"abstained"}  # depends on the case type; see wrong/missed_abstention
 LOWER_IS_BETTER = {
     "fabricated_citation",
     "uncited_answer",
+    "malformed_output",
     "missed_abstention",
     "wrong_abstention",
     "tool_errors",

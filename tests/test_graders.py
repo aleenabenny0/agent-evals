@@ -1,7 +1,12 @@
 from __future__ import annotations
 
 from agent_evals.agents.docs.corpus import Corpus
-from agent_evals.graders.deterministic import AnswerGrader, CitationGrader, TrajectoryGrader
+from agent_evals.graders.deterministic import (
+    AnswerGrader,
+    CitationGrader,
+    FormatGrader,
+    TrajectoryGrader,
+)
 from agent_evals.types import AgentResult, Gold, Grade, Step
 from conftest import BUCKETS_URL, LAMBDA_URL, make_case
 
@@ -88,6 +93,28 @@ def test_uncited_answer_is_flagged(corpus: Corpus) -> None:
 
 def test_abstention_without_citations_is_fine(corpus: Corpus) -> None:
     assert CitationGrader(corpus).grade(make_case(), answer("", abstained=True)) == []
+
+
+# ---- FormatGrader --------------------------------------------------------------------
+
+
+def test_malformed_output_flags_tool_markup() -> None:
+    leaked = 'Up to 5 GB.</answer>\n<parameter name="citations">[]'
+    g = by_metric(FormatGrader().grade(make_case(), answer(leaked)))
+    assert not g["malformed_output"].passed
+    assert g["malformed_output"].value == 1.0
+    assert "</answer>" in g["malformed_output"].reason
+
+
+def test_plain_answer_is_well_formed() -> None:
+    plain = "Replace <bucket-name> with your bucket; a PUT is 5 GB, and 5 GB < 50 TB."
+    g = by_metric(FormatGrader().grade(make_case(), answer(plain)))
+    assert g["malformed_output"].passed
+    assert g["malformed_output"].value == 0.0
+
+
+def test_format_grader_skips_agent_errors() -> None:
+    assert FormatGrader().grade(make_case(), AgentResult(error="max_steps")) == []
 
 
 # ---- TrajectoryGrader ----------------------------------------------------------------

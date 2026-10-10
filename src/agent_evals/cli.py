@@ -75,7 +75,12 @@ def run(
     load_dotenv()
     from agent_evals.agents.docs.agent import DocsAgent
     from agent_evals.agents.docs.corpus import Corpus
-    from agent_evals.graders.deterministic import AnswerGrader, CitationGrader, TrajectoryGrader
+    from agent_evals.graders.deterministic import (
+        AnswerGrader,
+        CitationGrader,
+        FormatGrader,
+        TrajectoryGrader,
+    )
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.manifest import build_manifest
@@ -93,7 +98,12 @@ def run(
     corpus = Corpus.load(cfg.paths.corpus_dir)
     llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
     docs_agent = DocsAgent(llm, corpus, cfg.docs_agent)
-    graders: list[Grader] = [AnswerGrader(), CitationGrader(corpus), TrajectoryGrader()]
+    graders: list[Grader] = [
+        AnswerGrader(),
+        CitationGrader(corpus),
+        FormatGrader(),
+        TrajectoryGrader(),
+    ]
     manifest = build_manifest(
         agent=docs_agent,
         suite_path=suite,
