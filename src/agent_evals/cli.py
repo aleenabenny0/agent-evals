@@ -182,6 +182,36 @@ def compare_cmd(
         console.print(f"  newly passing: {', '.join(c.only_candidate_passed)}")
 
 
+@app.command()
+def power(
+    delta: Annotated[float, typer.Option(help="Pass-rate change to detect, e.g. 0.10.")] = 0.10,
+    cases: Annotated[
+        int | None, typer.Option(help="Also show the smallest change this many cases detect.")
+    ] = None,
+) -> None:
+    """How many paired test cases detect a change in pass rate (80% power, 5% two-sided)."""
+    from agent_evals.stats.power import cases_for_paired_delta, detectable_delta
+
+    table = Table(show_header=True, header_style="bold")
+    table.add_column("discordance", justify="right")
+    table.add_column(f"cases to detect {delta:+.2f}", justify="right")
+    if cases is not None:
+        table.add_column(f"detectable with {cases} cases", justify="right")
+    for d in (0.10, 0.15, 0.20, 0.25, 0.30, 0.40, 0.50):
+        if d < delta:
+            continue
+        row = [f"{d:.0%}", str(cases_for_paired_delta(delta, d))]
+        if cases is not None:
+            smallest = detectable_delta(cases, d)
+            row.append(f"{smallest:+.3f}" if smallest <= d else "nothing: needs more cases")
+        table.add_row(*row)
+    console.print(table)
+    console.print(
+        "Discordance: share of cases where exactly one of the two agents passes. Unknown until "
+        "two agents are compared; 15-25% is typical for two prompt versions of one model."
+    )
+
+
 def _print_summary(store: ResultsStore, run_id: str) -> None:
     from agent_evals.report import LOWER_IS_BETTER, NEUTRAL, summarize
 

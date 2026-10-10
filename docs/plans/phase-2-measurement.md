@@ -35,7 +35,7 @@ n = 2.80^2 * d / delta^2  =  7.84 * d / delta^2
 |---|---|
 | 0.15 | 118 |
 | 0.20 | 157 |
-| 0.30 | 235 |
+| 0.30 | 236 |
 
 Discordance is unknown until two real agents are compared, but 15 to 25% is typical for two
 prompt versions of the same model. **150 test cases** gives 80% power at d <= 0.19, which
