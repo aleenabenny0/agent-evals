@@ -128,7 +128,7 @@ def test_evidence_index_maps_pages_to_cases(tmp_path: Path) -> None:
     broken = tmp_path / "broken.jsonl"
     broken.write_text("not json\n")
     index = evidence_index([good, broken])
-    assert index == {make_case().gold.evidence[0]: [(good.as_posix(), "d-1")]}
+    assert index == {make_case().gold.evidence_urls[0]: [(good.as_posix(), "d-1")]}
 
 
 def test_single_attempt_pass_rates_get_wilson_intervals(tmp_path: Path) -> None:

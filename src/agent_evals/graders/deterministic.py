@@ -175,7 +175,9 @@ class TrajectoryGrader:
                 if s.name == "read_page" and not s.is_error and isinstance(s.input, dict)
             }
             cited = {str(c.get("url")) for c in _citations(result) if isinstance(c, dict)}
-            found = sum(url in read | cited for url in case.gold.evidence)
+            seen = read | cited
+            # One hit per group of alternatives; a group with any URL seen counts as found.
+            found = sum(any(url in seen for url in group) for group in case.gold.evidence)
             recall = found / len(case.gold.evidence)
             grades.append(Grade(metric="evidence_recall", value=recall, passed=recall == 1.0))
         return grades

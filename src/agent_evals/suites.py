@@ -52,7 +52,7 @@ def evidence_index(paths: Iterable[Path]) -> dict[str, list[tuple[str, str]]]:
         except (SuiteError, OSError):
             continue
         for case in cases:
-            for url in case.gold.evidence:
+            for url in case.gold.evidence_urls:
                 index.setdefault(url, []).append((path.as_posix(), case.id))
     return index
 
@@ -86,8 +86,8 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
     errors: list[str] = []
     warnings: list[str] = []
     for c in cases:
-        present = [u for u in c.gold.evidence if u in corpus.pages]
-        for url in c.gold.evidence:
+        present = [u for u in c.gold.evidence_urls if u in corpus.pages]
+        for url in c.gold.evidence_urls:
             if url not in corpus.pages:
                 errors.append(f"{c.id}: evidence page not in snapshot: {url}")
         if c.gold.support is not None and not any(

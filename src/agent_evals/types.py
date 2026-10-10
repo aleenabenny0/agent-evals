@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from agent_evals.config import Pricing
 
@@ -38,11 +38,25 @@ class Gold(BaseModel):
     # Each inner list is a group of acceptable alternatives; every group must match.
     # Example: [["50 TB", "50TB"], ["5 GB", "5GB"]]
     must_include: list[list[str]] = Field(default_factory=list)
-    # URLs of the pages that support the gold answer.
-    evidence: list[str] = Field(default_factory=list)
+    # Pages that support the gold answer, as groups of alternatives: every group must be read
+    # or cited, and any URL inside a group satisfies it. A flat list is shorthand for one group
+    # per URL (all required). The same fact often sits on several pages, and the agent must not
+    # be penalized for grounding on one of them rather than another (ADR 0006).
+    evidence: list[list[str]] = Field(default_factory=list)
     # The sentence on an evidence page that the answer rests on, copied word for word. Lets a
     # reviewer verify a draft in one read, and lets `evals validate` prove the quote exists.
     support: str | None = None
+
+    @field_validator("evidence", mode="before")
+    @classmethod
+    def _wrap_flat_evidence(cls, value: object) -> object:
+        if isinstance(value, list) and all(isinstance(u, str) for u in value):
+            return [[u] for u in value]
+        return value
+
+    @property
+    def evidence_urls(self) -> list[str]:
+        return [url for group in self.evidence for url in group]
 
 
 class Case(BaseModel):

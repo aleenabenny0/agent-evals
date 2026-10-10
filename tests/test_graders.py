@@ -182,3 +182,21 @@ def test_quote_threshold_comes_from_the_caller(corpus: Corpus) -> None:
     )
     assert not strict["fabricated_citation"].passed
     assert lenient["fabricated_citation"].passed
+
+
+def test_evidence_groups_accept_any_alternative() -> None:
+    case = make_case(
+        gold=Gold(
+            answer="",
+            must_include=[["63"]],
+            evidence=[[BUCKETS_URL, LAMBDA_URL], ["https://docs.example.test/other.html"]],
+        )
+    )
+    result = AgentResult(
+        trajectory=[
+            Step(index=0, kind="tool", name="read_page", input={"url": LAMBDA_URL, "start": 0})
+        ]
+    )
+    g = by_metric(TrajectoryGrader().grade(case, result))
+    assert g["evidence_recall"].value == 0.5  # first group met by an alternative, second not
+    assert make_case().gold.evidence == [[BUCKETS_URL]]  # a flat list wraps to one group per URL
