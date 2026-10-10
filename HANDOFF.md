@@ -87,27 +87,43 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Current status (2026-10-10)
 
-- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 38 passed.
+- Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 56 passed.
 - Docs snapshot built: 8 pages in `data/snapshots/aws-docs` (S3 x5, Lambda, DynamoDB, IAM).
   Quote matching verified on a real page.
-- First real smoke run: `docs-20261010-174408-ae0812`. 7/7 correct, 0 fabricated citations,
-  correct abstention on the out-of-snapshot Kinesis question, evidence recall 1.0,
-  ~3.3 model calls per case, 87k input / 6.7k output tokens total. `strict: true` tool
-  schemas were accepted by the API for Haiku 5.5.
-- Finding: on `docs-smoke-003` the model wrote its citations inside the `answer` string
-  (the answer ends with `</answer>` then `<parameter name="citations">[...]`) and submitted an
-  empty `citations` list, so it was correctly graded `uncited_answer`.
+- First real smoke run: `docs-20261010-174408-ae0812` (agent `3960330eeb86`). 7/7 correct,
+  0 fabricated citations, correct abstention on the out-of-snapshot Kinesis question, evidence
+  recall 1.0, ~3.3 model calls per case, 87k input / 6.7k output tokens total. `strict: true`
+  tool schemas were accepted by the API for Haiku 5.5.
+- Finding (fixed, see next bullet): on `docs-smoke-003` the model wrote its citations inside
+  the `answer` string (the answer ends with `</answer>` then `<parameter name="citations">[...]`)
+  and submitted an empty `citations` list, so it was graded `uncited_answer`.
+- Leaked-citations fix landed (commits `f081f42`, `08ca110`). After the schema check,
+  `submission_problems` in the docs agent rejects a non-abstained answer with no citations, or
+  an answer containing tool-call markup, and returns the reason as a tool error so the model
+  resubmits. The detector is `src/agent_evals/tool_markup.py`, shared with the new
+  `FormatGrader` (`malformed_output` metric). Rejection messages live in `prompts.py` and are
+  part of the agent version. ADR 0002 has an amendment.
+- Second smoke run: `docs-20261010-182430-a355c7` (agent `59e86eb5ebdc`). 7/7 correct,
+  `uncited_answer` 0/6, `malformed_output` 0/7, 25 model calls of which 23 came from the cache
+  (2 paid). On 003 the first resubmission still contained `</answer>`; the second was clean with
+  3 verbatim citations. `evals compare` against the baseline: `correct` +0.000 (CI 0 to 0),
+  `uncited_answer` -0.167 (CI -0.50 to 0.00), both "no detectable change". Expected at n=7:
+  about 3 of 7 cases must move the same way before the paired bootstrap CI excludes zero.
+- Finding: `evals compare` assumes higher is better. For `uncited_answer` it printed
+  "newly failing: docs-smoke-003" for a case that improved from 1 to 0, and a CI entirely below
+  zero would read "regressed". The direction set `LOWER_IS_BETTER` in `report.py` is only used
+  by the summary table.
+- Finding: submission rejections count toward `tool_errors` and `model_calls` (003: 5 calls,
+  2 errors). This is intended, they measure error recovery, but read those metrics with it in
+  mind.
 - Finding: the bootstrap CI collapses to [1.0, 1.0] when every case passes, which overstates
   certainty. For 7/7 a Wilson interval gives about [0.65, 1.00].
 
 ## Next tasks, in order
 
-1. **Fix the leaked-citations bug.** In the docs agent, reject a `submit_answer` that is not
-   abstained but has no citations, or whose answer contains tool-call markup, and return it to
-   the model as a tool error so it resubmits. Add a deterministic `malformed_output` metric
-   that flags tool-call markup inside the answer. Tests with `ScriptedLLM`. Then (with
-   permission) re-run the smoke suite and `uv run evals compare` against
-   `docs-20261010-174408-ae0812`; expect "no detectable change" at n=7 and say why.
+1. **Fix `evals compare` for lower-is-better metrics** (small). In `report.compare` and
+   `cli.compare_cmd`, use `LOWER_IS_BETTER` to flip the newly passing / newly failing labels
+   and the improved / regressed verdict. Add a test with a lower-is-better metric.
 2. **Wilson score intervals for pass/fail metrics** in reports (keep bootstrap for continuous
    metrics and paired differences). Explain the math to Aleena first.
 3. **Windows developer experience:** AGENTS.md says `make check`; on this machine use
