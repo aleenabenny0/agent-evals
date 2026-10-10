@@ -7,7 +7,8 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 from dataclasses import dataclass
-from math import comb
+from math import comb, sqrt
+from statistics import NormalDist
 
 import numpy as np
 
@@ -18,6 +19,7 @@ class Estimate:
     low: float
     high: float
     n: int
+    method: str = "bootstrap"  # how the interval was computed: "bootstrap" or "wilson"
 
 
 def bootstrap_ci(
@@ -40,6 +42,28 @@ def bootstrap_ci(
     alpha = (1 - confidence) / 2
     low, high = np.quantile(means, [alpha, 1 - alpha])
     return Estimate(float(arr.mean()), float(low), float(high), int(arr.size))
+
+
+def wilson_ci(successes: int, n: int, *, confidence: float = 0.95) -> Estimate:
+    """Wilson score interval for a proportion: the true rates under which `successes` of `n`
+    would not be surprising at this confidence.
+
+    Unlike the bootstrap it keeps its width when every case agrees (7/7 -> about 0.65 to 1.00)
+    and it never leaves [0, 1]. `mean` is the observed proportion, not the interval's centre.
+    """
+    if n <= 0:
+        raise ValueError("need n > 0")
+    if not 0 <= successes <= n:
+        raise ValueError("need 0 <= successes <= n")
+    z = NormalDist().inv_cdf(0.5 + confidence / 2)  # 1.96 for 95%
+    p = successes / n
+    denom = 1 + z * z / n
+    centre = (p + z * z / (2 * n)) / denom
+    half = z / denom * sqrt(p * (1 - p) / n + z * z / (4 * n * n))
+    # The ends are exactly 0 and 1 when p is; spell that out so rounding can't drift them.
+    low = 0.0 if successes == 0 else max(0.0, centre - half)
+    high = 1.0 if successes == n else min(1.0, centre + half)
+    return Estimate(p, low, high, n, method="wilson")
 
 
 def paired_bootstrap_diff(

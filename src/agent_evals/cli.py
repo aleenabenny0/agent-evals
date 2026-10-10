@@ -192,13 +192,14 @@ def _print_summary(store: ResultsStore, run_id: str) -> None:
         f"suite={info['suite']}  status={info['status']}"
     )
     table = Table(show_header=True, header_style="bold")
-    for col in ("metric", "mean", "95% CI", "cases", "better"):
+    for col in ("metric", "mean", "95% CI", "interval", "cases", "better"):
         table.add_column(col, justify="right" if col != "metric" else "left")
     for name, est in s.metrics.items():
         table.add_row(
             name,
             f"{est.mean:.3f}",
             f"{est.low:.3f} to {est.high:.3f}",
+            est.method,
             str(est.n),
             "-" if name in NEUTRAL else "lower" if name in LOWER_IS_BETTER else "higher",
         )

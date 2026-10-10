@@ -89,6 +89,7 @@ def test_run_report_and_compare(tmp_path: Path) -> None:
     assert s.totals["attempts"] == 10 and s.totals["errors"] == 2
     # Per-case means: c0=1, c1=.5, others 0 -> mean .3
     assert abs(s.metrics["correct"].mean - 0.3) < 1e-9
+    assert s.metrics["correct"].method == "bootstrap"  # 2 attempts: per-case means can be 0.5
     assert s.pass_hat_k[2] == 0.2  # only c0 passed both attempts
     assert any(f[0] == "boom" and "kaboom" in f[2] for f in s.failures)
 
@@ -105,6 +106,16 @@ def test_run_report_and_compare(tmp_path: Path) -> None:
     assert wa.diff.mean < 0 and wa.verdict == "improved"
     with pytest.raises(ValueError, match="no cases graded on 'nope'"):
         compare(store, base, cand, metric="nope")
+    store.close()
+
+
+def test_single_attempt_pass_rates_get_wilson_intervals(tmp_path: Path) -> None:
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id=f"c{i}") for i in range(4)]
+    run = _run(store, FakeAgent({c.id: {1} for c in cases}), cases, attempts=1)
+    est = summarize(store, run).metrics["correct"]
+    assert est.method == "wilson" and est.mean == 1.0
+    assert 0.4 < est.low < 1.0 == est.high  # 4/4 is not certainty; the bootstrap said [1, 1]
     store.close()
 
 

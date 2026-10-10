@@ -11,6 +11,7 @@ from agent_evals.stats.core import (
     mcnemar_exact,
     paired_bootstrap_diff,
     pass_hat_k,
+    wilson_ci,
 )
 
 unit_values = st.lists(st.floats(0, 1), min_size=2, max_size=60)
@@ -63,3 +64,32 @@ def test_mcnemar() -> None:
     assert mcnemar_exact(5, 5) == 1.0
     assert mcnemar_exact(0, 10) < 0.01
     assert mcnemar_exact(3, 10) == mcnemar_exact(10, 3)
+
+
+def test_wilson_known_values() -> None:
+    seven = wilson_ci(7, 7)
+    assert seven.method == "wilson" and seven.mean == 1.0 and seven.n == 7
+    assert seven.low == pytest.approx(0.646, abs=1e-3) and seven.high == 1.0
+    three = wilson_ci(3, 10)
+    assert three.low == pytest.approx(0.108, abs=1e-3)
+    assert three.high == pytest.approx(0.603, abs=1e-3)
+
+
+def test_wilson_is_symmetric() -> None:
+    a, b = wilson_ci(2, 9), wilson_ci(7, 9)
+    assert a.low == pytest.approx(1 - b.high) and a.high == pytest.approx(1 - b.low)
+
+
+@given(st.integers(1, 500).flatmap(lambda n: st.tuples(st.just(n), st.integers(0, n))))
+def test_wilson_brackets_the_proportion_with_width(nk: tuple[int, int]) -> None:
+    n, k = nk
+    est = wilson_ci(k, n)
+    assert 0.0 <= est.low <= k / n <= est.high <= 1.0
+    assert est.low < est.high  # never zero width, not even at 0/n or n/n
+
+
+def test_wilson_rejects_impossible_counts() -> None:
+    with pytest.raises(ValueError):
+        wilson_ci(5, 4)
+    with pytest.raises(ValueError):
+        wilson_ci(0, 0)

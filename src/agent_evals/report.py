@@ -11,6 +11,7 @@ from agent_evals.stats.core import (
     mcnemar_exact,
     mean_pass_hat_k,
     paired_bootstrap_diff,
+    wilson_ci,
 )
 from agent_evals.store.db import ResultsStore
 
@@ -39,13 +40,25 @@ class RunSummary:
     failures: list[tuple[str, int, str]]
 
 
+def _interval(case_means: list[float]) -> Estimate:
+    """Wilson for a true proportion (every case exactly 0 or 1), bootstrap for anything else.
+
+    The bootstrap collapses to zero width when every case agrees (7/7 -> [1, 1]); Wilson keeps
+    honest width there. Counts, fractions and per-case means over several attempts are not
+    proportions, so they keep the bootstrap. Paired comparisons always use the bootstrap.
+    """
+    if case_means and all(v in (0.0, 1.0) for v in case_means):
+        return wilson_ci(int(sum(case_means)), len(case_means))
+    return bootstrap_ci(case_means)
+
+
 def summarize(store: ResultsStore, run_id: str) -> RunSummary:
     info = store.run_info(run_id)
     metrics: dict[str, Estimate] = {}
     for metric in store.metrics(run_id):
         per_case = store.metric_by_case(run_id, metric)
         case_means = [sum(v) / len(v) for v in per_case.values()]
-        metrics[metric] = bootstrap_ci(case_means)
+        metrics[metric] = _interval(case_means)
 
     passes = [[v >= 1.0 for v in vals] for vals in store.metric_by_case(run_id, "correct").values()]
     k_max = min((len(p) for p in passes), default=0)
