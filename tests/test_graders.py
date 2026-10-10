@@ -15,6 +15,10 @@ def by_metric(grades: list[Grade]) -> dict[str, Grade]:
     return {g.metric: g for g in grades}
 
 
+def citation_grader(corpus: Corpus) -> CitationGrader:
+    return CitationGrader(corpus, min_quote_chars=12)
+
+
 def answer(
     text: str, citations: list[dict[str, str]] | None = None, abstained: bool = False
 ) -> AgentResult:
@@ -68,7 +72,7 @@ def test_agent_error_is_incorrect() -> None:
 
 def test_valid_quote_survives_markdown_and_spacing(corpus: Corpus) -> None:
     cite = {"url": BUCKETS_URL, "quote": "Bucket names must be between 3 and  63 characters long."}
-    g = by_metric(CitationGrader(corpus).grade(make_case(), answer("63", [cite])))
+    g = by_metric(citation_grader(corpus).grade(make_case(), answer("63", [cite])))
     assert g["fabricated_citation"].passed
     assert g["citation_valid_rate"].value == 1.0
 
@@ -79,7 +83,7 @@ def test_fabricated_quote_and_unknown_page(corpus: Corpus) -> None:
         {"url": "https://docs.example.test/made-up.html", "quote": "anything at all here"},
         {"url": BUCKETS_URL, "quote": "63"},
     ]
-    g = by_metric(CitationGrader(corpus).grade(make_case(), answer("x", cites)))
+    g = by_metric(citation_grader(corpus).grade(make_case(), answer("x", cites)))
     assert not g["fabricated_citation"].passed
     assert g["citation_valid_rate"].value == 0.0
     reason = g["fabricated_citation"].reason
@@ -87,12 +91,12 @@ def test_fabricated_quote_and_unknown_page(corpus: Corpus) -> None:
 
 
 def test_uncited_answer_is_flagged(corpus: Corpus) -> None:
-    g = by_metric(CitationGrader(corpus).grade(make_case(), answer("63")))
+    g = by_metric(citation_grader(corpus).grade(make_case(), answer("63")))
     assert not g["uncited_answer"].passed
 
 
 def test_abstention_without_citations_is_fine(corpus: Corpus) -> None:
-    assert CitationGrader(corpus).grade(make_case(), answer("", abstained=True)) == []
+    assert citation_grader(corpus).grade(make_case(), answer("", abstained=True)) == []
 
 
 # ---- FormatGrader --------------------------------------------------------------------
@@ -145,3 +149,36 @@ def test_rejected_submissions_are_counted() -> None:
     g = by_metric(TrajectoryGrader().grade(make_case(), result))
     assert g["rejected_submissions"].value == 1.0
     assert g["tool_errors"].value == 2.0
+
+
+def test_malformed_citation_entries_are_graded_not_raised(corpus: Corpus) -> None:
+    result = AgentResult(
+        output={"answer": "63", "citations": ["bad", 42], "abstained": False, "confidence": 0.5}
+    )
+    g = by_metric(citation_grader(corpus).grade(make_case(), result))
+    assert not g["fabricated_citation"].passed
+    assert g["citation_valid_rate"].value == 0.0
+    assert "not an object" in g["fabricated_citation"].reason
+    # The trajectory grader reads the same field and must not raise either.
+    t = by_metric(TrajectoryGrader().grade(make_case(), result))
+    assert t["evidence_recall"].value == 0.0
+
+
+def test_citations_that_are_not_a_list_count_as_none(corpus: Corpus) -> None:
+    result = AgentResult(
+        output={"answer": "63", "citations": "nope", "abstained": False, "confidence": 0.5}
+    )
+    g = by_metric(citation_grader(corpus).grade(make_case(), result))
+    assert not g["uncited_answer"].passed
+
+
+def test_quote_threshold_comes_from_the_caller(corpus: Corpus) -> None:
+    cite = {"url": BUCKETS_URL, "quote": "3 and 63"}  # 8 chars after normalizing
+    strict = by_metric(
+        CitationGrader(corpus, min_quote_chars=12).grade(make_case(), answer("x", [cite]))
+    )
+    lenient = by_metric(
+        CitationGrader(corpus, min_quote_chars=5).grade(make_case(), answer("x", [cite]))
+    )
+    assert not strict["fabricated_citation"].passed
+    assert lenient["fabricated_citation"].passed

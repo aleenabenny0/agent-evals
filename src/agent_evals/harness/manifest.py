@@ -4,13 +4,14 @@ from __future__ import annotations
 
 import platform
 import subprocess
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from importlib import metadata
 from pathlib import Path
 from typing import Any
 
 from agent_evals.harness.cache import sha256_text
-from agent_evals.types import Agent
+from agent_evals.types import Agent, Grader
 
 _TRACKED_PACKAGES = ("anthropic", "duckdb", "pydantic", "rank-bm25", "numpy")
 
@@ -42,6 +43,7 @@ def file_sha256(path: Path) -> str:
 def build_manifest(
     *,
     agent: Agent,
+    graders: Sequence[Grader],
     suite_path: Path,
     corpus_fingerprint: str | None,
     config: dict[str, Any],
@@ -55,6 +57,7 @@ def build_manifest(
         "python": platform.python_version(),
         "packages": _package_versions(),
         "agent": {"name": agent.name, "version": agent.version, **agent.describe()},
+        "graders": {g.name: g.version for g in graders},
         "suite": {"path": str(suite_path), "sha256": file_sha256(suite_path)},
         "corpus_fingerprint": corpus_fingerprint,
         "attempts": attempts,

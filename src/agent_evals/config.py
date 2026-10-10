@@ -49,10 +49,16 @@ class RunConfig(_Strict):
     budget_usd: float | None = 5.0
 
 
+class GradersConfig(_Strict):
+    # A quote shorter than this can't be verified against a page and counts as fabricated.
+    min_quote_chars: int = 12
+
+
 class Config(_Strict):
     paths: Paths = Paths()
     run: RunConfig = RunConfig()
     docs_agent: DocsAgentConfig = DocsAgentConfig()
+    graders: GradersConfig = GradersConfig()
 
 
 def load_config(path: Path | None = None) -> Config:

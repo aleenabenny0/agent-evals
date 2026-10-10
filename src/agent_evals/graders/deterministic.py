@@ -6,15 +6,21 @@ settle; these checks stay as the first line because they never drift.
 
 from __future__ import annotations
 
+from typing import Any
+
 from agent_evals.corpus import Corpus, normalize
 from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, Grade
 
-MIN_QUOTE_CHARS = 12
-
 
 def _abstained(result: AgentResult) -> bool:
     return bool(result.output.get("abstained", False))
+
+
+def _citations(result: AgentResult) -> list[Any]:
+    """The citations list, or [] when the output has none or the field is not a list."""
+    cits = result.output.get("citations")
+    return cits if isinstance(cits, list) else []
 
 
 class AnswerGrader:
@@ -73,15 +79,16 @@ class CitationGrader:
     """Every citation must point at a snapshot page and quote it verbatim."""
 
     name = "citations"
-    version = "1"
+    version = "2"  # 2: quote threshold from config; malformed entries graded, not raised
 
-    def __init__(self, corpus: Corpus) -> None:
+    def __init__(self, corpus: Corpus, *, min_quote_chars: int) -> None:
         self.corpus = corpus
+        self.min_quote_chars = min_quote_chars
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         if result.error:
             return []
-        citations = result.output.get("citations", []) or []
+        citations = _citations(result)
         if not citations:
             if _abstained(result):
                 return []
@@ -96,10 +103,13 @@ class CitationGrader:
 
         problems: list[str] = []
         for c in citations:
+            if not isinstance(c, dict):
+                problems.append(f"{c!r}: citation is not an object")
+                continue
             url, quote = str(c.get("url", "")), str(c.get("quote", ""))
             if url not in self.corpus.pages:
                 problems.append(f"{url}: page not in snapshot")
-            elif len(normalize(quote)) < MIN_QUOTE_CHARS:
+            elif len(normalize(quote)) < self.min_quote_chars:
                 problems.append(f"{url}: quote too short to verify")
             elif not self.corpus.contains_quote(url, quote):
                 problems.append(f"{url}: quote not found on page: {quote[:80]!r}")
@@ -164,7 +174,7 @@ class TrajectoryGrader:
                 for s in tool_steps
                 if s.name == "read_page" and not s.is_error and isinstance(s.input, dict)
             }
-            cited = {str(c.get("url")) for c in result.output.get("citations", []) or []}
+            cited = {str(c.get("url")) for c in _citations(result) if isinstance(c, dict)}
             found = sum(url in read | cited for url in case.gold.evidence)
             recall = found / len(case.gold.evidence)
             grades.append(Grade(metric="evidence_recall", value=recall, passed=recall == 1.0))

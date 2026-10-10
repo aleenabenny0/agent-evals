@@ -100,12 +100,13 @@ def run(
     docs_agent = DocsAgent(llm, corpus, cfg.docs_agent)
     graders: list[Grader] = [
         AnswerGrader(),
-        CitationGrader(corpus),
+        CitationGrader(corpus, min_quote_chars=cfg.graders.min_quote_chars),
         FormatGrader(),
         TrajectoryGrader(),
     ]
     manifest = build_manifest(
         agent=docs_agent,
+        graders=graders,
         suite_path=suite,
         corpus_fingerprint=corpus.fingerprint,
         config=cfg.model_dump(mode="json"),
