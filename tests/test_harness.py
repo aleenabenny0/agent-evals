@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import pytest
+
 from agent_evals.config import Pricing
 from agent_evals.graders.deterministic import AnswerGrader
 from agent_evals.harness.cache import CallCache
@@ -101,6 +103,8 @@ def test_run_report_and_compare(tmp_path: Path) -> None:
     assert sorted(wa.only_candidate_passed) == ["c1", "c2", "c3"]
     assert wa.only_baseline_passed == []
     assert wa.diff.mean < 0 and wa.verdict == "improved"
+    with pytest.raises(ValueError, match="no cases graded on 'nope'"):
+        compare(store, base, cand, metric="nope")
     store.close()
 
 

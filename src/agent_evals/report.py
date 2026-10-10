@@ -90,7 +90,7 @@ def compare(
     b = store.metric_by_case(candidate_id, metric)
     shared = sorted(set(a) & set(b))
     if not shared:
-        raise ValueError("the two runs share no cases")
+        raise ValueError(f"the two runs share no cases graded on {metric!r}")
     lower = metric in LOWER_IS_BETTER
     a_means = [sum(a[c]) / len(a[c]) for c in shared]
     b_means = [sum(b[c]) / len(b[c]) for c in shared]

@@ -164,6 +164,9 @@ def compare_cmd(
     store = ResultsStore(_config(config).paths.db)
     try:
         c = compare(store, baseline, candidate, metric)
+    except ValueError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=1) from exc
     finally:
         store.close()
     d = c.diff
