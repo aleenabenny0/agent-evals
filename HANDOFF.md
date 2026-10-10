@@ -122,6 +122,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   call it; `--fix` auto-formats first). `.vscode/settings.json` no longer hard-codes a Linux
   interpreter path; VS Code discovers `.venv` on any OS. Non-breaking spaces in snapshot text
   were already handled by `normalize()` (NFKC) and the search tokenizer; a test now pins that.
+- Phase 2 started (plan: `docs/plans/phase-2-measurement.md`). Step 1 done: `stats/power.py`
+  and `evals power` (McNemar normal approximation, simulation-tested against the paired
+  bootstrap); 150 test cases detect a 10-point change at discordance up to ~19%. Step 2 drafted:
+  `configs/docs_pages.txt` lists 103 pages across S3, Lambda, DynamoDB, IAM/STS, EC2/EBS, VPC,
+  SQS/SNS and CloudWatch, every URL checked to return 200 without redirect; awaiting Aleena's
+  approval before `uv run evals snapshot` fetches them.
 - Pass/fail metrics now get Wilson score intervals (ADR 0004,
   `docs/walkthroughs/2026-10-10-wilson-intervals.md`); the report table shows the method per
   row. 7/7 on `correct` reads 0.646 to 1.000 instead of 1.000 to 1.000. Counts, fractions,

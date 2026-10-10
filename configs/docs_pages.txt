@@ -1,18 +1,127 @@
 # Pages in the AWS docs snapshot. One URL per line; '#' starts a comment.
-# Start small, then grow this to 50-100 pages across S3, Lambda, DynamoDB and IAM.
+#
+# Chosen for dated facts, limits, defaults and things that changed, across the services
+# engineers ask about daily. Every URL below returned 200 with no redirect on 2026-10-10.
+#
+# Deliberately excluded so that unanswerable cases have real material: Kinesis, Redshift, EKS,
+# ECS, Route 53, RDS, API Gateway, Step Functions, CloudFormation. Do not add them without also
+# rewriting the unanswerable cases that rely on their absence.
 
-# Amazon S3
-https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+# Amazon S3 (19)
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/upload-objects.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/storage-class-intro.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/replication.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/WebsiteHosting.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingMetadata.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/intelligent-tiering-overview.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html
+https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html
 
-# AWS Lambda
+# AWS Lambda (16)
 https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html
+https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html
+https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html
+https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html
+https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html
+https://docs.aws.amazon.com/lambda/latest/dg/provisioned-concurrency.html
+https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html
+https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html
+https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html
+https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html
+https://docs.aws.amazon.com/lambda/latest/dg/invocation-retries.html
+https://docs.aws.amazon.com/lambda/latest/dg/configuration-ephemeral-storage.html
+https://docs.aws.amazon.com/lambda/latest/dg/invocation-async-retain-records.html
+https://docs.aws.amazon.com/lambda/latest/dg/lambda-permissions.html
+https://docs.aws.amazon.com/lambda/latest/dg/snapstart.html
 
-# Amazon DynamoDB
+# Amazon DynamoDB (15)
 https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ServiceQuotas.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery_Howitworks.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/backuprestore_HowItWorks.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.Partitions.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html
+https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html
 
-# IAM
+# AWS IAM and STS (13)
+https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_access-keys.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_iam-quotas.html
 https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html
+https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition.html
+https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html
+
+# Amazon EC2 and EBS (11)
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-security-groups.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-purchasing-options.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-lifecycle.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html
+https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html
+https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html
+
+# Amazon VPC (10)
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-security-groups.html
+https://docs.aws.amazon.com/vpc/latest/userguide/security-group-rules.html
+https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html
+https://docs.aws.amazon.com/vpc/latest/userguide/amazon-vpc-limits.html
+https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html
+https://docs.aws.amazon.com/vpc/latest/userguide/default-vpc.html
+https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html
+https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html
+
+# Amazon SQS and SNS (13)
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-quotas.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-types.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html
+https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-message-metadata.html
+https://docs.aws.amazon.com/general/latest/gr/sns.html
+https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html
+https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html
+https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html
+https://docs.aws.amazon.com/sns/latest/dg/sns-message-delivery-retries.html
+https://docs.aws.amazon.com/sns/latest/dg/sns-sqs-as-subscriber.html
+
+# Amazon CloudWatch and CloudWatch Logs (6)
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Alarms.html
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html
+https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html
