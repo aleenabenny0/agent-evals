@@ -142,6 +142,95 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
 
 
 @app.command()
+def review(
+    suite: Path,
+    reviewer: Annotated[str, typer.Option(help="Your name; written to verified_by.")],
+    limit: Annotated[int | None, typer.Option(help="Review at most N drafts this time.")] = None,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Walk through unverified drafts one by one, with the support quote shown in its page."""
+    import sys
+
+    from rich.panel import Panel
+    from rich.prompt import Prompt
+    from rich.text import Text
+
+    from agent_evals.corpus import Corpus
+    from agent_evals.review import accept, quote_context, reject
+    from agent_evals.suites import load_suite, write_suite
+
+    if not sys.stdin.isatty():
+        console.print("[red]evals review needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    cfg = _config(config)
+    corpus = None
+    if (cfg.paths.corpus_dir / "pages.jsonl").exists():
+        corpus = Corpus.load(cfg.paths.corpus_dir)
+    else:
+        console.print("[yellow]No snapshot: quotes are shown without page context.[/yellow]")
+
+    cases = load_suite(suite)
+    drafts = [c for c in cases if c.is_draft][:limit]
+    if not drafts:
+        console.print("Nothing to review: no unverified drafts in this file.")
+        return
+    base = suite.name.removesuffix(".jsonl").removesuffix(".drafts")
+    rejected_path = suite.with_name(f"{base}.rejected.jsonl")
+    rejected = load_suite(rejected_path) if rejected_path.exists() else []
+    tally = {"accepted": 0, "rejected": 0, "skipped": 0}
+
+    for i, c in enumerate(drafts, 1):
+        console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(drafts)}")
+        console.print(Panel(c.question, title="question"))
+        console.print(Panel(c.gold.answer, title="gold answer"))
+        console.print(f"must_include: {c.gold.must_include}")
+        for url in c.gold.evidence_urls:
+            console.print(f"evidence: {url}")
+        if c.gold.support:
+            shown = False
+            if corpus is not None:
+                for url in c.gold.evidence_urls:
+                    page = corpus.pages.get(url)
+                    ctx = quote_context(page.text, c.gold.support) if page else None
+                    if ctx:
+                        before, match, after = ctx
+                        body = Text.assemble(before, (match, "bold yellow"), after)
+                        console.print(Panel(body, title=f"support, in context of {url}"))
+                        shown = True
+                        break
+            if not shown:
+                console.print(Panel(c.gold.support, title="support quote"))
+        if c.notes:
+            console.print(f"notes: {c.notes}")
+
+        choice = Prompt.ask("[a]ccept  [r]eject  [s]kip  [q]uit", choices=["a", "r", "s", "q"])
+        if choice == "q":
+            break
+        if choice == "a":
+            cases = [accept(x, reviewer) if x.id == c.id else x for x in cases]
+            tally["accepted"] += 1
+        elif choice == "r":
+            reason = Prompt.ask("reason")
+            rejected.append(reject(c, reviewer, reason))
+            cases = [x for x in cases if x.id != c.id]
+            tally["rejected"] += 1
+        else:
+            tally["skipped"] += 1
+            continue
+        write_suite(suite, cases)  # saved after every decision, so quitting loses nothing
+        if rejected:
+            write_suite(rejected_path, rejected)
+
+    remaining = sum(1 for x in cases if x.is_draft)
+    console.print(
+        f"\naccepted {tally['accepted']}, rejected {tally['rejected']}, skipped "
+        f"{tally['skipped']}; {remaining} unverified draft(s) remain in {suite}"
+    )
+    if rejected:
+        console.print(f"rejected cases are kept with reasons in {rejected_path}")
+
+
+@app.command()
 def split(
     source: Path,
     dev: Annotated[int, typer.Option(min=0, help="Cases for the dev split.")],

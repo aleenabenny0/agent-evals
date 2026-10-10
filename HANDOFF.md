@@ -128,10 +128,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   than the one listed as evidence), model_calls 5.3 per case (was 3.9 on 8 pages), 37 calls,
   287k input tokens. `evals compare` against run 3 says "no detectable change" and flags that
   the snapshots differ.
-- Open grader decision from that run: `gold.evidence` is a flat list and `evidence_recall`
-  counts every URL, so a fact stated on several pages penalizes the agent for reading the
-  "wrong" one. Proposal: make `evidence` a list of groups of alternative URLs, like
-  `must_include`, and count groups hit. Needs Aleena's agreement (graders/).
+- `gold.evidence` is now a list of groups of alternative URLs (a flat list is shorthand for one
+  group per URL); `evidence_recall` counts groups with at least one URL read or cited. Smoke
+  case 005 lists the three Lambda pages that state the timeout (ADR 0006 amendment).
 - Phase 2 step 3 done (ADR 0006): `area`, `verified_by`, `gold.support` on cases; `split`
   `unassigned`; `evals run` refuses drafts/unassigned without `--allow-drafts`; `evals validate`
   with a snapshot errors on missing evidence pages and unfound support quotes, warns on absent
@@ -146,7 +145,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   Rekognition and Polly quotas). All pass `evals validate` against the snapshot. **Aleena's
   step:** for each case open the evidence page, read the question, gold answer and `support`
   quote, then add `"verified_by": "aleena"`; change a gold answer only if the page says
-  otherwise. Next batches should lean to multi_step and changed_default (Lambda runtime
+  otherwise. Fastest way: `uv run evals review suites/docs/ai-ml.drafts.jsonl --reviewer aleena`
+  shows each draft with the quote highlighted in its page and records accept/reject; rejected
+  cases move to `ai-ml.rejected.jsonl` with the reason. Next batches should lean to multi_step and changed_default (Lambda runtime
   deprecations, S3 and IAM defaults, Kubernetes versions, CodeCommit/Cloud9 closure).
 - Docs drift check (ADR 0005): `evals snapshot` writes `configs/docs_pages.lock.json` (page
   hashes, committed); `evals snapshot --check [--report f.md]` fetches and compares, exit 1 on
@@ -173,8 +174,8 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 ## Next tasks, in order
 
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Remaining, in order:
-   (a) Aleena verifies the pilot batch; (b) decide whether `gold.evidence` becomes groups of
-   alternative URLs (graders/); (c) draft the remaining ~200 cases across areas per the mix,
+   (a) Aleena verifies the pilot batch (`evals review`); (b) done: evidence groups; (c) draft
+   the remaining ~200 cases across areas per the mix,
    leaning to multi_step and changed_default; (d) `evals split <verified> --dev 100 --test 150
    --seed <record it>`; (e) paraphrase robustness suite; (f) LLM judge and its validation.
 
