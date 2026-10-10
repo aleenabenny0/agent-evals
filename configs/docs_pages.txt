@@ -1,11 +1,17 @@
 # Pages in the AWS docs snapshot. One URL per line; '#' starts a comment.
 #
-# Chosen for dated facts, limits, defaults and things that changed, across the services
-# engineers ask about daily. Every URL below returned 200 with no redirect on 2026-10-10.
+# Breadth on purpose: AWS is large and the agent should be measured across it, with AI and ML
+# services as a named focus. Pages are chosen for dated facts, limits, defaults and things that
+# changed. Mostly two to four pages per service: an overview, the quotas page, and one or two
+# fact-dense feature pages. Every URL below returned 200 with no redirect on 2026-10-10.
 #
-# Deliberately excluded so that unanswerable cases have real material: Kinesis, Redshift, EKS,
-# ECS, Route 53, RDS, API Gateway, Step Functions, CloudFormation. Do not add them without also
-# rewriting the unanswerable cases that rely on their absence.
+# Held out on purpose so that unanswerable cases have real material. Do not add these without
+# rewriting the unanswerable cases that rely on their absence:
+#   Amazon GameLift, AWS Ground Station, Amazon Braket, AWS RoboMaker, AWS Snow Family,
+#   Amazon Chime SDK, AWS IoT Greengrass, Amazon WorkSpaces, AWS Elemental MediaConvert,
+#   Amazon Managed Blockchain, AWS Outposts.
+# Also unanswerable from any docs snapshot: prices, and dates of future launches or deprecations
+# that only appear in announcements. Both are good unanswerable material.
 
 # Amazon S3 (19)
 https://docs.aws.amazon.com/AmazonS3/latest/userguide/about-object-ownership.html
@@ -125,3 +131,259 @@ https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html
+
+# AI and ML: Amazon Bedrock, AgentCore, Nova (24)
+https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/models-supported.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/inference-profiles.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-management.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/flows.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/evaluation.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/data-protection.html
+https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html
+https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_Converse.html
+https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModelWithResponseStream.html
+https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html
+https://docs.aws.amazon.com/nova/latest/userguide/what-is-nova.html
+https://docs.aws.amazon.com/general/latest/gr/bedrock.html
+
+# AI and ML: Amazon SageMaker AI (24)
+https://docs.aws.amazon.com/sagemaker/latest/dg/whatis.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/studio.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/how-it-works-training.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/realtime-endpoints.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/async-inference.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/model-registry.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/pipelines.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/feature-store.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-detect-data-bias.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/automatic-model-tuning.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/studio-jumpstart.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/data-wrangler.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/sms.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/canvas.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/inference-recommender.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/distributed-training.html
+https://docs.aws.amazon.com/sagemaker/latest/dg/neo.html
+https://docs.aws.amazon.com/general/latest/gr/sagemaker.html
+
+# AI and ML: language, vision, speech, search, assistants (35)
+https://docs.aws.amazon.com/comprehend/latest/dg/what-is.html
+https://docs.aws.amazon.com/comprehend/latest/dg/guidelines-and-limits.html
+https://docs.aws.amazon.com/comprehend/latest/dg/how-it-works.html
+https://docs.aws.amazon.com/rekognition/latest/dg/what-is.html
+https://docs.aws.amazon.com/rekognition/latest/dg/limits.html
+https://docs.aws.amazon.com/rekognition/latest/dg/faces.html
+https://docs.aws.amazon.com/textract/latest/dg/what-is.html
+https://docs.aws.amazon.com/textract/latest/dg/limits.html
+https://docs.aws.amazon.com/textract/latest/dg/how-it-works.html
+https://docs.aws.amazon.com/transcribe/latest/dg/what-is.html
+https://docs.aws.amazon.com/transcribe/latest/dg/how-it-works.html
+https://docs.aws.amazon.com/transcribe/latest/dg/supported-languages.html
+https://docs.aws.amazon.com/general/latest/gr/transcribe.html
+https://docs.aws.amazon.com/polly/latest/dg/what-is.html
+https://docs.aws.amazon.com/polly/latest/dg/limits.html
+https://docs.aws.amazon.com/polly/latest/dg/available-voices.html
+https://docs.aws.amazon.com/translate/latest/dg/what-is.html
+https://docs.aws.amazon.com/translate/latest/dg/what-is-languages.html
+https://docs.aws.amazon.com/translate/latest/dg/what-is-limits.html
+https://docs.aws.amazon.com/kendra/latest/dg/what-is-kendra.html
+https://docs.aws.amazon.com/kendra/latest/dg/quotas.html
+https://docs.aws.amazon.com/lexv2/latest/dg/what-is.html
+https://docs.aws.amazon.com/lexv2/latest/dg/quotas.html
+https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html
+https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/what-is.html
+https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/quotas-regions.html
+https://docs.aws.amazon.com/personalize/latest/dg/what-is-personalize.html
+https://docs.aws.amazon.com/personalize/latest/dg/limits.html
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/limits.html
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/knn.html
+https://docs.aws.amazon.com/opensearch-service/latest/developerguide/serverless-vector-search.html
+https://docs.aws.amazon.com/dlami/latest/devguide/what-is-dlami.html
+https://docs.aws.amazon.com/ec2/latest/instancetypes/ac.html
+
+# Compute and containers (23)
+https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html
+https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-quotas.html
+https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-configuration.html
+https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definitions.html
+https://docs.aws.amazon.com/AmazonECS/latest/developerguide/AWS_Fargate.html
+https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html
+https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html
+https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html
+https://docs.aws.amazon.com/eks/latest/userguide/fargate.html
+https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html
+https://docs.aws.amazon.com/AmazonECR/latest/userguide/service-quotas.html
+https://docs.aws.amazon.com/AmazonECR/latest/userguide/image-scanning.html
+https://docs.aws.amazon.com/batch/latest/userguide/what-is-batch.html
+https://docs.aws.amazon.com/batch/latest/userguide/service_limits.html
+https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html
+https://docs.aws.amazon.com/lightsail/latest/userguide/what-is-amazon-lightsail.html
+https://docs.aws.amazon.com/apprunner/latest/dg/what-is-apprunner.html
+https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html
+https://docs.aws.amazon.com/autoscaling/ec2/userguide/ec2-auto-scaling-quotas.html
+https://docs.aws.amazon.com/general/latest/gr/ec2-service.html
+https://docs.aws.amazon.com/general/latest/gr/lambda-service.html
+https://docs.aws.amazon.com/general/latest/gr/ecs-service.html
+https://docs.aws.amazon.com/general/latest/gr/eks.html
+
+# Databases (19)
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/CHAP_Limits.html
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html
+https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_WorkingWithAutomatedBackups.html
+https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html
+https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless-v2.html
+https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html
+https://docs.aws.amazon.com/documentdb/latest/devguide/what-is.html
+https://docs.aws.amazon.com/documentdb/latest/devguide/limits.html
+https://docs.aws.amazon.com/neptune/latest/userguide/intro.html
+https://docs.aws.amazon.com/neptune/latest/userguide/limits.html
+https://docs.aws.amazon.com/redshift/latest/mgmt/welcome.html
+https://docs.aws.amazon.com/redshift/latest/mgmt/amazon-redshift-limits.html
+https://docs.aws.amazon.com/redshift/latest/dg/c_redshift_system_overview.html
+https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html
+https://docs.aws.amazon.com/keyspaces/latest/devguide/what-is-keyspaces.html
+https://docs.aws.amazon.com/memorydb/latest/devguide/what-is-memorydb.html
+https://docs.aws.amazon.com/general/latest/gr/ddb.html
+
+# Analytics and streaming (13)
+https://docs.aws.amazon.com/streams/latest/dev/introduction.html
+https://docs.aws.amazon.com/streams/latest/dev/service-sizes-and-limits.html
+https://docs.aws.amazon.com/firehose/latest/dev/what-is-this-service.html
+https://docs.aws.amazon.com/firehose/latest/dev/limits.html
+https://docs.aws.amazon.com/glue/latest/dg/what-is-glue.html
+https://docs.aws.amazon.com/general/latest/gr/glue.html
+https://docs.aws.amazon.com/athena/latest/ug/what-is.html
+https://docs.aws.amazon.com/athena/latest/ug/service-limits.html
+https://docs.aws.amazon.com/emr/latest/ManagementGuide/emr-what-is-emr.html
+https://docs.aws.amazon.com/msk/latest/developerguide/what-is-msk.html
+https://docs.aws.amazon.com/msk/latest/developerguide/limits.html
+https://docs.aws.amazon.com/quick/latest/userguide/what-is.html
+https://docs.aws.amazon.com/lake-formation/latest/dg/what-is-lake-formation.html
+
+# Application integration and messaging (14)
+https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html
+https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html
+https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html
+https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html
+https://docs.aws.amazon.com/step-functions/latest/dg/service-quotas.html
+https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html
+https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html
+https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html
+https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html
+https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/welcome.html
+https://docs.aws.amazon.com/amazon-mq/latest/developer-guide/amazon-mq-limits.html
+https://docs.aws.amazon.com/ses/latest/dg/Welcome.html
+https://docs.aws.amazon.com/ses/latest/dg/quotas.html
+https://docs.aws.amazon.com/general/latest/gr/apigateway.html
+
+# Networking and content delivery (14)
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html
+https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html
+https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html
+https://docs.aws.amazon.com/elasticloadbalancing/latest/application/introduction.html
+https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-limits.html
+https://docs.aws.amazon.com/elasticloadbalancing/latest/network/introduction.html
+https://docs.aws.amazon.com/global-accelerator/latest/dg/what-is-global-accelerator.html
+https://docs.aws.amazon.com/vpc/latest/tgw/what-is-transit-gateway.html
+https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html
+https://docs.aws.amazon.com/vpn/latest/s2svpn/VPC_VPN.html
+
+# Security, identity and compliance (27)
+https://docs.aws.amazon.com/kms/latest/developerguide/overview.html
+https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html
+https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html
+https://docs.aws.amazon.com/kms/latest/developerguide/resource-limits.html
+https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html
+https://docs.aws.amazon.com/secretsmanager/latest/userguide/reference_limits.html
+https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html
+https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html
+https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html
+https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html
+https://docs.aws.amazon.com/acm/latest/userguide/acm-limits.html
+https://docs.aws.amazon.com/acm/latest/userguide/managed-renewal.html
+https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html
+https://docs.aws.amazon.com/waf/latest/developerguide/limits.html
+https://docs.aws.amazon.com/waf/latest/developerguide/shield-chapter.html
+https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html
+https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html
+https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html
+https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html
+https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html
+https://docs.aws.amazon.com/organizations/latest/userguide/orgs_reference_limits.html
+https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html
+https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html
+https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html
+https://docs.aws.amazon.com/awscloudtrail/latest/userguide/WhatIsCloudTrail-Limits.html
+https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html
+https://docs.aws.amazon.com/general/latest/gr/kms.html
+
+# Management and governance (11)
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cloudformation-limits.html
+https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/stacksets-concepts.html
+https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html
+https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html
+https://docs.aws.amazon.com/controltower/latest/userguide/what-is-control-tower.html
+https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html
+https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html
+https://docs.aws.amazon.com/cost-management/latest/userguide/budgets-managing-costs.html
+https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html
+https://docs.aws.amazon.com/tag-editor/latest/userguide/tagging.html
+
+# Developer tools and infrastructure as code (12)
+https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html
+https://docs.aws.amazon.com/codebuild/latest/userguide/limits.html
+https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html
+https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html
+https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html
+https://docs.aws.amazon.com/codecommit/latest/userguide/welcome.html
+https://docs.aws.amazon.com/cdk/v2/guide/home.html
+https://docs.aws.amazon.com/cdk/v2/guide/constructs.html
+https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html
+https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html
+https://docs.aws.amazon.com/cloud9/latest/user-guide/welcome.html
+https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html
+
+# Storage beyond S3 (12)
+https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html
+https://docs.aws.amazon.com/efs/latest/ug/limits.html
+https://docs.aws.amazon.com/efs/latest/ug/performance.html
+https://docs.aws.amazon.com/fsx/latest/LustreGuide/what-is.html
+https://docs.aws.amazon.com/fsx/latest/WindowsGuide/what-is.html
+https://docs.aws.amazon.com/amazonglacier/latest/dev/introduction.html
+https://docs.aws.amazon.com/storagegateway/latest/vgw/WhatIsStorageGateway.html
+https://docs.aws.amazon.com/storagegateway/latest/tgw/WhatIsStorageGateway.html
+https://docs.aws.amazon.com/filegateway/latest/files3/what-is-file-s3.html
+https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html
+https://docs.aws.amazon.com/datasync/latest/userguide/what-is-datasync.html
+https://docs.aws.amazon.com/general/latest/gr/s3.html
+
+# Migration (3)
+https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html
+https://docs.aws.amazon.com/dms/latest/userguide/CHAP_Limits.html
+https://docs.aws.amazon.com/mgn/latest/ug/what-is-mgn.html

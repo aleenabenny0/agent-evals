@@ -125,9 +125,14 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 - Phase 2 started (plan: `docs/plans/phase-2-measurement.md`). Step 1 done: `stats/power.py`
   and `evals power` (McNemar normal approximation, simulation-tested against the paired
   bootstrap); 150 test cases detect a 10-point change at discordance up to ~19%. Step 2 drafted:
-  `configs/docs_pages.txt` lists 103 pages across S3, Lambda, DynamoDB, IAM/STS, EC2/EBS, VPC,
-  SQS/SNS and CloudWatch, every URL checked to return 200 without redirect; awaiting Aleena's
-  approval before `uv run evals snapshot` fetches them.
+  `configs/docs_pages.txt` lists 333 pages across roughly 100 services (AI/ML as the named
+  focus: Bedrock, AgentCore, Nova, SageMaker AI, Comprehend, Rekognition, Textract, Transcribe,
+  Polly, Translate, Kendra, Lex, Amazon Q, Personalize, OpenSearch; plus compute, databases,
+  analytics, integration, networking, security, management, dev tools, storage, migration),
+  every URL checked to return 200 without redirect. Held out for unanswerable cases: GameLift,
+  Ground Station, Braket, RoboMaker, Snow Family, Chime SDK, IoT Greengrass, WorkSpaces,
+  MediaConvert, Managed Blockchain, Outposts. Awaiting Aleena's approval before
+  `uv run evals snapshot` fetches them.
 - Pass/fail metrics now get Wilson score intervals (ADR 0004,
   `docs/walkthroughs/2026-10-10-wilson-intervals.md`); the report table shows the method per
   row. 7/7 on `correct` reads 0.646 to 1.000 instead of 1.000 to 1.000. Counts, fractions,

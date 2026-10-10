@@ -50,18 +50,27 @@ simulation is the proof that the closed form and the actual comparison code agre
 
 ### 2. Expand the snapshot (network only, no API spend)
 
-8 pages cannot support 250 cases. Target about 40 to 50 pages across the services engineers
-ask about daily, each chosen because it holds dated facts, limits, defaults, or things that
-changed: S3 (object ownership, encryption defaults, limits, naming, storage classes, lifecycle,
-versioning, presigned URLs, Block Public Access), Lambda (quotas, runtimes and deprecation,
-timeouts, concurrency, layers, environment variables, URLs), DynamoDB (quotas, item size,
-capacity modes, TTL, streams, GSI vs LSI), IAM (policy evaluation, root user, access keys,
-password policy, roles vs users), plus a few from EC2, VPC, SQS, SNS, CloudWatch and STS. Pages
-go in `configs/docs_pages.txt`; `evals snapshot` fetches them; the snapshot stays out of git.
-Unanswerable cases need services that are **not** in the snapshot, so Kinesis, Redshift, EKS
-and Route 53 stay out on purpose.
+8 pages cannot support 250 cases, and AWS is far wider than the four services the smoke suite
+touches. The snapshot therefore covers the platform broadly, with **AI and ML as a named
+focus**: Bedrock (including AgentCore and Nova), SageMaker AI, and the language, vision, speech,
+search and assistant services, alongside compute and containers, databases, analytics and
+streaming, integration and messaging, networking, security and identity, management, developer
+tools, storage and migration. Mostly two to four pages per service: an overview, the quotas
+page, and one or two fact-dense feature pages. The list is `configs/docs_pages.txt` (333 pages,
+roughly 100 services, every URL checked to return 200 without a redirect); `evals snapshot`
+fetches them; the snapshot stays out of git.
 
-**Decision needed:** the page list. A draft list is the first deliverable of this step.
+More pages than cases is intended. Retrieval must find the right page among hundreds, which is
+the realistic setting, and cases sample the pages rather than cover them.
+
+Unanswerable cases need material that is **not** in the snapshot. Since the mainstream services
+are now in, the held-out set is deliberately niche: GameLift, Ground Station, Braket, RoboMaker,
+Snow Family, Chime SDK, IoT Greengrass, WorkSpaces, Elemental MediaConvert, Managed Blockchain,
+Outposts. Two further unanswerable classes need no held-out service at all: prices, which docs
+pages never state, and dates of future launches or deprecations that only appear in
+announcements.
+
+**Decision needed:** approve the page list, or name services to add or remove.
 
 ### 3. Case authoring workflow (eval integrity)
 
@@ -74,9 +83,13 @@ and Route 53 stay out on purpose.
   `must_include` group should appear, after normalization, on an evidence page. A miss is a
   warning, not an error, since a gold answer may paraphrase, but it catches wrong URLs and
   invented numbers cheaply.
-- Target mix for 250 cases: lookup 35%, multi_step 20%, changed_default 15%, false_premise 15%,
-  unanswerable 15%. Split dev/test by stratified random assignment with a recorded seed, so
-  every type is represented in both and nobody hand-picks which cases land in test.
+- Target mix for 250 cases by type: lookup 35%, multi_step 20%, changed_default 15%,
+  false_premise 15%, unanswerable 15%. By area: AI and ML 30%, core infrastructure (compute,
+  storage, databases, networking, security) 50%, everything else 20%. Record the area on each
+  case (a new `area` field) so per-area accuracy can be reported, with the caveat that at
+  roughly 75 AI cases a per-area interval is wide. Split dev/test by stratified random
+  assignment on type and area with a recorded seed, so nobody hand-picks which cases land in
+  test.
 - Hard rule, unchanged: test cases are never read when writing prompts, lessons or examples.
 
 ### 4. Paraphrase robustness suite
@@ -119,7 +132,7 @@ All judge calls go through `LLMClient`, so they are cached and counted like agen
 
 1. Agree the power-analysis approach above (step 1).
 2. Approve the snapshot page list (step 2).
-3. `verified_by` on `Case` and the `--allow-drafts` guard (step 3).
+3. `verified_by` and `area` on `Case`, and the `--allow-drafts` guard (step 3).
 4. NLI option (a), (b) or (c) (step 5), can wait until step 6 is underway.
 
 ## What does not change
