@@ -1,7 +1,8 @@
 """AWS docs agent: a Claude tool-use loop that must answer with cited, verbatim quotes.
 
 The final answer arrives through a `submit_answer` tool whose input is schema-checked, so the
-harness gets structured output it can grade with code (see docs/adr/0002).
+harness gets structured output it can grade with code (see docs/adr/0002). A schema-valid
+submission must also pass `submission_problems`; failures go back to the model as tool errors.
 """
 
 from __future__ import annotations
@@ -12,10 +13,11 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
 from agent_evals.agents.docs.corpus import Corpus
-from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V1
+from agent_evals.agents.docs.prompts import REJECT_MARKUP_V1, REJECT_UNCITED_V1, SYSTEM_PROMPT_V1
 from agent_evals.config import DocsAgentConfig
 from agent_evals.harness.cache import canonical_json, sha256_text
 from agent_evals.harness.llm import LLMClient, LLMResponse
+from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, RunContext, Step, Usage
 
 NUDGE = (
@@ -48,6 +50,17 @@ class ReadInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     url: str
     start: int = Field(default=0, ge=0)
+
+
+def submission_problems(answer: DocsAnswer) -> list[str]:
+    """Content rules a schema-valid submission must still meet. An empty list means accepted."""
+    problems: list[str] = []
+    snippet = find_tool_markup(answer.answer)
+    if snippet is not None:
+        problems.append(REJECT_MARKUP_V1.format(snippet=snippet))
+    if not answer.abstained and not answer.citations:
+        problems.append(REJECT_UNCITED_V1)
+    return problems
 
 
 def tool_specs(strict: bool) -> list[dict[str, Any]]:
@@ -167,6 +180,7 @@ class DocsAgent:
         fingerprint = {
             "model": self.config.model.model_dump(exclude={"pricing"}),
             "prompt": self.system_prompt,
+            "rejections": [REJECT_UNCITED_V1, REJECT_MARKUP_V1],
             "tools": self.tools,
             "max_steps": self.config.max_steps,
             "search_k": self.config.search_k,
@@ -252,11 +266,17 @@ class DocsAgent:
                 start = time.perf_counter()
                 if tu["name"] == "submit_answer":
                     try:
-                        submission = DocsAnswer.model_validate(tu["input"])
-                        text, is_error = "Answer received.", False
+                        candidate = DocsAnswer.model_validate(tu["input"])
                     except ValidationError as exc:
                         text = f"Invalid answer: {exc.errors(include_url=False)}. Fix and resubmit."
                         is_error = True
+                    else:
+                        problems = submission_problems(candidate)
+                        if problems:
+                            text = "Rejected: " + " ".join(problems) + " Fix and resubmit."
+                            is_error = True
+                        else:
+                            submission, text, is_error = candidate, "Answer received.", False
                 else:
                     text, is_error = self._call_tool(tu["name"], tu["input"])
                 steps.append(

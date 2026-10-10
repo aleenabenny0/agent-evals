@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from agent_evals.agents.docs.agent import NUDGE, DocsAgent, tool_specs
 from agent_evals.agents.docs.corpus import Corpus
 from agent_evals.config import DocsAgentConfig
@@ -10,6 +12,16 @@ CTX = RunContext(run_id="r", case_id="t-1", attempt=1)
 GOOD_ANSWER = {
     "answer": "Bucket names must be 3 to 63 characters.",
     "citations": [{"url": BUCKETS_URL, "quote": "between 3 and 63 characters long"}],
+    "abstained": False,
+    "confidence": 0.9,
+}
+# The shape seen on docs-smoke-003: citations written as tool-call markup inside `answer`.
+LEAKED_ANSWER = {
+    "answer": (
+        "Bucket names must be 3 to 63 characters.</answer>\n"
+        f'<parameter name="citations">[{{"url": "{BUCKETS_URL}", "quote": "3 and 63"}}]'
+    ),
+    "citations": [],
     "abstained": False,
     "confidence": 0.9,
 }
@@ -91,3 +103,59 @@ def test_version_changes_with_behavior(corpus: Corpus) -> None:
 def test_strict_flag() -> None:
     assert all(t["strict"] for t in tool_specs(True))
     assert not any("strict" in t for t in tool_specs(False))
+
+
+def _sent_back(llm: ScriptedLLM, request_index: int) -> dict[str, object]:
+    """The tool_result the agent returned for the submission in the previous model turn."""
+    block: dict[str, object] = llm.requests[request_index]["messages"][-1]["content"][0]
+    return block
+
+
+def test_uncited_submission_is_rejected_then_accepted(corpus: Corpus, case: Case) -> None:
+    uncited = {**GOOD_ANSWER, "citations": []}
+    llm = ScriptedLLM(
+        [
+            [tool_use("submit_answer", uncited, "a")],
+            [tool_use("submit_answer", GOOD_ANSWER, "b")],
+        ]
+    )
+    result = make_agent(llm, corpus).run(case, CTX)
+    assert result.output == GOOD_ANSWER
+    sent_back = _sent_back(llm, 1)
+    assert sent_back["is_error"] and "citations is empty" in str(sent_back["content"])
+
+
+def test_leaked_markup_submission_is_rejected_then_accepted(corpus: Corpus, case: Case) -> None:
+    llm = ScriptedLLM(
+        [
+            [tool_use("submit_answer", LEAKED_ANSWER, "a")],
+            [tool_use("submit_answer", GOOD_ANSWER, "b")],
+        ]
+    )
+    result = make_agent(llm, corpus).run(case, CTX)
+    assert result.output == GOOD_ANSWER
+    assert sum(s.is_error for s in result.trajectory) == 1
+    reason = str(_sent_back(llm, 1)["content"])
+    # Both problems are reported so the model can fix them in one go.
+    assert "</answer>" in reason and "citations is empty" in reason
+
+
+def test_abstention_without_citations_is_accepted(corpus: Corpus, case: Case) -> None:
+    abstention = {
+        "answer": "The snapshot has no page about this.",
+        "citations": [],
+        "abstained": True,
+        "confidence": 0.8,
+    }
+    llm = ScriptedLLM([[tool_use("submit_answer", abstention)]])
+    result = make_agent(llm, corpus).run(case, CTX)
+    assert result.output == abstention
+    assert not any(s.is_error for s in result.trajectory)
+
+
+def test_version_changes_with_rejection_messages(
+    corpus: Corpus, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    before = make_agent(ScriptedLLM([]), corpus).version
+    monkeypatch.setattr("agent_evals.agents.docs.agent.REJECT_UNCITED_V1", "different text")
+    assert make_agent(ScriptedLLM([]), corpus).version != before
