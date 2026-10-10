@@ -167,12 +167,12 @@ def compare_cmd(
     finally:
         store.close()
     d = c.diff
-    console.print(f"[bold]{metric}[/bold] on {c.n_cases} shared cases")
+    better = "lower" if c.lower_is_better else "higher"
+    console.print(f"[bold]{metric}[/bold] on {c.n_cases} shared cases ({better} is better)")
     console.print(f"  baseline  {c.baseline:.3f}\n  candidate {c.candidate:.3f}")
     console.print(f"  difference {d.mean:+.3f}  (95% CI {d.low:+.3f} to {d.high:+.3f})")
     console.print(f"  McNemar p = {c.p_value:.3g}")
-    verdict = "improved" if d.low > 0 else "regressed" if d.high < 0 else "no detectable change"
-    console.print(f"  verdict: [bold]{verdict}[/bold]")
+    console.print(f"  verdict: [bold]{c.verdict}[/bold]")
     if c.only_baseline_passed:
         console.print(f"  newly failing: {', '.join(c.only_baseline_passed)}")
     if c.only_candidate_passed:

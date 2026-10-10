@@ -26,7 +26,7 @@ def test_cache_roundtrip_and_salt(tmp_path: Path) -> None:
 
 
 class FakeAgent:
-    """Passes a case on attempts listed in `passes`; raises on case 'boom'."""
+    """Passes a case on attempts listed in `passes`, abstains otherwise; raises on 'boom'."""
 
     name = "fake"
 
@@ -46,9 +46,9 @@ class FakeAgent:
         ok = ctx.attempt in self.passes.get(case.id, set())
         return AgentResult(
             output={
-                "answer": "63" if ok else "255",
+                "answer": "63" if ok else "",
                 "citations": [],
-                "abstained": False,
+                "abstained": not ok,
                 "confidence": 0.5,
             },
             usage=Usage(input_tokens=1_000_000, output_tokens=0, model_calls=1),
@@ -94,7 +94,13 @@ def test_run_report_and_compare(tmp_path: Path) -> None:
     cmp = compare(store, base, cand)
     assert cmp.n_cases == 5
     assert sorted(cmp.only_candidate_passed) == ["c1", "c2", "c3"]
-    assert cmp.diff.mean > 0
+    assert cmp.diff.mean > 0 and cmp.verdict == "improved"
+    # A lower-is-better metric must read the same improvement, not report a regression.
+    wa = compare(store, base, cand, metric="wrong_abstention")
+    assert wa.lower_is_better and wa.n_cases == 4  # "boom" errored, so it has no abstention grade
+    assert sorted(wa.only_candidate_passed) == ["c1", "c2", "c3"]
+    assert wa.only_baseline_passed == []
+    assert wa.diff.mean < 0 and wa.verdict == "improved"
     store.close()
 
 
