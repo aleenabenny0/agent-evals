@@ -18,7 +18,7 @@ from bs4 import BeautifulSoup
 from markdownify import markdownify
 from pydantic import BaseModel
 
-from agent_evals.agents.docs.corpus import Page
+from agent_evals.corpus import Page
 from agent_evals.harness.cache import sha256_text
 
 USER_AGENT = "agent-evals-snapshot/0.1 (research; +https://github.com/aleenabenny0/agent-evals)"

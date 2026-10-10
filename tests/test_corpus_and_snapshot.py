@@ -4,8 +4,8 @@ from pathlib import Path
 
 import httpx
 
-from agent_evals.agents.docs.corpus import Corpus, normalize
 from agent_evals.agents.docs.snapshot import build_snapshot, html_to_page, read_url_list
+from agent_evals.corpus import Corpus, normalize
 from conftest import BUCKETS_URL, LAMBDA_URL
 
 HTML = """<html><head><title>Bucket naming rules - Amazon S3</title></head>

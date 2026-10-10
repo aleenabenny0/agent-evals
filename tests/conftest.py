@@ -6,7 +6,7 @@ from typing import Any
 
 import pytest
 
-from agent_evals.agents.docs.corpus import Corpus, Page
+from agent_evals.corpus import Corpus, Page
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.llm import LLMResponse
 from agent_evals.types import Case, Gold

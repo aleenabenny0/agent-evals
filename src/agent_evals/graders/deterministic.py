@@ -6,7 +6,7 @@ settle; these checks stay as the first line because they never drift.
 
 from __future__ import annotations
 
-from agent_evals.agents.docs.corpus import Corpus, normalize
+from agent_evals.corpus import Corpus, normalize
 from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, Grade
 

@@ -12,9 +12,9 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from agent_evals.agents.docs.corpus import Corpus
 from agent_evals.agents.docs.prompts import REJECT_MARKUP_V1, REJECT_UNCITED_V1, SYSTEM_PROMPT_V1
 from agent_evals.config import DocsAgentConfig
+from agent_evals.corpus import Corpus
 from agent_evals.harness.cache import canonical_json, sha256_text
 from agent_evals.harness.llm import LLMClient, LLMResponse
 from agent_evals.tool_markup import find_tool_markup

@@ -3,8 +3,8 @@ from __future__ import annotations
 import pytest
 
 from agent_evals.agents.docs.agent import NUDGE, DocsAgent, tool_specs
-from agent_evals.agents.docs.corpus import Corpus
 from agent_evals.config import DocsAgentConfig
+from agent_evals.corpus import Corpus
 from agent_evals.types import Case, RunContext
 from conftest import BUCKETS_URL, ScriptedLLM, text, tool_use
 

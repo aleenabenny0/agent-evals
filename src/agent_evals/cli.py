@@ -74,7 +74,7 @@ def run(
     """Run an agent on a suite, grade every attempt, and store the results."""
     load_dotenv()
     from agent_evals.agents.docs.agent import DocsAgent
-    from agent_evals.agents.docs.corpus import Corpus
+    from agent_evals.corpus import Corpus
     from agent_evals.graders.deterministic import (
         AnswerGrader,
         CitationGrader,
