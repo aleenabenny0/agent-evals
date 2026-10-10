@@ -203,3 +203,13 @@ def test_version_changes_with_the_detector(corpus: Corpus, monkeypatch: pytest.M
     before = make_agent(ScriptedLLM([]), corpus).version
     monkeypatch.setattr("agent_evals.agents.docs.agent.TOOL_MARKUP", re.compile("different"))
     assert make_agent(ScriptedLLM([]), corpus).version != before
+
+
+def test_repeated_rejections_fail_with_their_own_cause(corpus: Corpus, case: Case) -> None:
+    llm = ScriptedLLM([[tool_use("submit_answer", LEAKED_ANSWER, f"t{i}")] for i in range(3)])
+    result = make_agent(llm, corpus, max_submission_rejections=3).run(case, CTX)
+    assert result.error is not None and result.error.startswith("malformed_submission: ")
+    assert "</answer>" in result.error  # the last rejection reason is kept
+    assert result.output == {}
+    assert sum(s.is_error for s in result.trajectory) == 3
+    assert llm.script == []  # exactly three model turns were spent, not max_steps

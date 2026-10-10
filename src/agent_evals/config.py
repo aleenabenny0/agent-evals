@@ -33,6 +33,9 @@ class DocsAgentConfig(_Strict):
     page_chars: int = 8000
     # Ask the API to enforce tool input schemas. Inputs are also validated locally either way.
     strict_tools: bool = True
+    # Rejected submit_answer calls (wrong shape or broken content rules) allowed before the
+    # attempt fails with error `malformed_submission` instead of spending its remaining steps.
+    max_submission_rejections: int = 3
 
 
 class Paths(_Strict):

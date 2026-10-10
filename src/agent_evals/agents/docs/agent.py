@@ -245,6 +245,8 @@ class DocsAgent:
         steps: list[Step] = []
         usage = Usage()
         nudged = False
+        rejections = 0  # rejected submit_answer calls so far, capped by the config
+        last_rejection = ""
 
         def done(output: dict[str, Any] | None = None, error: str | None = None) -> AgentResult:
             return AgentResult(output=output or {}, trajectory=steps, usage=usage, error=error)
@@ -291,7 +293,10 @@ class DocsAgent:
                 start = time.perf_counter()
                 if tu["name"] == "submit_answer":
                     candidate, text, is_error = self._check_submission(tu["input"])
-                    if not is_error:
+                    if is_error:
+                        rejections += 1
+                        last_rejection = text
+                    else:
                         submission = candidate
                 else:
                     text, is_error = self._call_tool(tu["name"], tu["input"])
@@ -317,6 +322,9 @@ class DocsAgent:
 
             if submission is not None:
                 return done(output=submission.model_dump())
+            if rejections >= cfg.max_submission_rejections:
+                # Name the real cause instead of letting the loop run out of steps.
+                return done(error=f"malformed_submission: {last_rejection}")
             messages.append({"role": "user", "content": results})
 
         return done(error="max_steps")

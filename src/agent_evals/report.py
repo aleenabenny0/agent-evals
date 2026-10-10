@@ -20,6 +20,7 @@ LOWER_IS_BETTER = {
     "fabricated_citation",
     "uncited_answer",
     "malformed_output",
+    "rejected_submissions",
     "missed_abstention",
     "wrong_abstention",
     "tool_errors",

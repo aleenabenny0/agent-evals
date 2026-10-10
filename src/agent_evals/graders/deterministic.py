@@ -145,14 +145,18 @@ class TrajectoryGrader:
     """Retrieval and efficiency signals read from the trajectory."""
 
     name = "trajectory"
-    version = "1"
+    version = "2"  # 2: rejected_submissions
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         tool_steps = [s for s in result.trajectory if s.kind == "tool"]
         model_steps = [s for s in result.trajectory if s.kind == "model"]
+        rejected = [s for s in tool_steps if s.name == "submit_answer" and s.is_error]
         grades = [
             Grade(metric="model_calls", value=float(len(model_steps))),
             Grade(metric="tool_errors", value=float(sum(s.is_error for s in tool_steps))),
+            # Formatting reliability: how often the final answer had to be sent back, whether
+            # or not the model recovered afterwards.
+            Grade(metric="rejected_submissions", value=float(len(rejected))),
         ]
         if case.gold.evidence:
             read = {

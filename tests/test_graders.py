@@ -132,3 +132,16 @@ def test_evidence_recall_counts_read_pages() -> None:
     assert g["evidence_recall"].value == 1.0
     assert g["model_calls"].value == 1.0
     assert g["tool_errors"].value == 1.0
+
+
+def test_rejected_submissions_are_counted() -> None:
+    result = AgentResult(
+        trajectory=[
+            Step(index=0, kind="tool", name="submit_answer", is_error=True),
+            Step(index=1, kind="tool", name="read_page", is_error=True),
+            Step(index=2, kind="tool", name="submit_answer"),
+        ]
+    )
+    g = by_metric(TrajectoryGrader().grade(make_case(), result))
+    assert g["rejected_submissions"].value == 1.0
+    assert g["tool_errors"].value == 2.0

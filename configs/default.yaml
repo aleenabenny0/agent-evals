@@ -23,3 +23,4 @@ docs_agent:
   search_k: 5
   page_chars: 8000
   strict_tools: true       # set false if the API rejects strict tool schemas for this model
+  max_submission_rejections: 3   # then the attempt fails as malformed_submission
