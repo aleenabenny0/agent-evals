@@ -118,10 +118,14 @@ class CitationGrader:
 
 
 class FormatGrader:
-    """The answer must be plain prose: no tool-call markup leaked into it."""
+    """The answer must be plain prose: no tool-call markup leaked into it.
+
+    Scope is the `answer` field only. Citation quotes may legitimately contain XML, and the
+    shape of the output is checked by the agent's schema, not here.
+    """
 
     name = "output_format"
-    version = "1"
+    version = "2"  # 2: narrower, case-sensitive detector that ignores AWS placeholders and XML
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         if result.error:

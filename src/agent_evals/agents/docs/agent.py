@@ -12,18 +12,21 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from agent_evals.agents.docs.prompts import REJECT_MARKUP_V1, REJECT_UNCITED_V1, SYSTEM_PROMPT_V1
+from agent_evals.agents.docs.prompts import (
+    INVALID_ANSWER_V1,
+    NUDGE_V1,
+    REJECT_MARKUP_V1,
+    REJECT_UNCITED_V1,
+    REJECTED_V1,
+    SYSTEM_PROMPT_V1,
+)
 from agent_evals.config import DocsAgentConfig
 from agent_evals.corpus import Corpus
 from agent_evals.harness.cache import canonical_json, sha256_text
 from agent_evals.harness.llm import LLMClient, LLMResponse
-from agent_evals.tool_markup import find_tool_markup
+from agent_evals.tool_markup import TOOL_MARKUP, find_tool_markup
 from agent_evals.types import AgentResult, Case, RunContext, Step, Usage
 
-NUDGE = (
-    "You have not submitted an answer yet. Call submit_answer now, or set abstained to true "
-    "if the documentation does not answer the question."
-)
 _TOOL_OUTPUT_LOG_CHARS = 2000
 
 
@@ -176,15 +179,23 @@ class DocsAgent:
 
     @property
     def version(self) -> str:
-        """Changes whenever anything that can change behavior changes."""
+        """Changes whenever anything that can change behavior changes.
+
+        That is every setting, every text the model can read, the tool specs, and the markup
+        detector. Pricing is excluded because it only affects cost reporting.
+        """
         fingerprint = {
-            "model": self.config.model.model_dump(exclude={"pricing"}),
-            "prompt": self.system_prompt,
-            "rejections": [REJECT_UNCITED_V1, REJECT_MARKUP_V1],
+            "config": self.config.model_dump(mode="json", exclude={"model": {"pricing"}}),
+            "prompts": {
+                "system": self.system_prompt,
+                "nudge": NUDGE_V1,
+                "invalid_answer": INVALID_ANSWER_V1,
+                "rejected": REJECTED_V1,
+                "reject_uncited": REJECT_UNCITED_V1,
+                "reject_markup": REJECT_MARKUP_V1,
+            },
+            "tool_markup": TOOL_MARKUP.pattern,
             "tools": self.tools,
-            "max_steps": self.config.max_steps,
-            "search_k": self.config.search_k,
-            "page_chars": self.config.page_chars,
         }
         return sha256_text(canonical_json(fingerprint))[:12]
 
@@ -211,6 +222,20 @@ class DocsAgent:
         except ValidationError as exc:
             return f"Invalid input for {name}: {exc.errors(include_url=False)}", True
         return f"Unknown tool {name!r}.", True
+
+    def _check_submission(self, raw: dict[str, Any]) -> tuple[DocsAnswer | None, str, bool]:
+        """Shape check (Pydantic), then content rules. Returns (answer or None, text, is_error).
+
+        `text` is what goes back to the model as the tool result either way.
+        """
+        try:
+            candidate = DocsAnswer.model_validate(raw)
+        except ValidationError as exc:
+            return None, INVALID_ANSWER_V1.format(errors=exc.errors(include_url=False)), True
+        problems = submission_problems(candidate)
+        if problems:
+            return None, REJECTED_V1.format(problems=" ".join(problems)), True
+        return candidate, "Answer received.", False
 
     # ---- loop -----------------------------------------------------------------------
 
@@ -256,7 +281,7 @@ class DocsAgent:
                     return done(error="max_tokens")
                 if nudged:
                     return done(error="no_submission")
-                messages.append({"role": "user", "content": NUDGE})
+                messages.append({"role": "user", "content": NUDGE_V1})
                 nudged = True
                 continue
 
@@ -265,18 +290,9 @@ class DocsAgent:
             for tu in tool_uses:
                 start = time.perf_counter()
                 if tu["name"] == "submit_answer":
-                    try:
-                        candidate = DocsAnswer.model_validate(tu["input"])
-                    except ValidationError as exc:
-                        text = f"Invalid answer: {exc.errors(include_url=False)}. Fix and resubmit."
-                        is_error = True
-                    else:
-                        problems = submission_problems(candidate)
-                        if problems:
-                            text = "Rejected: " + " ".join(problems) + " Fix and resubmit."
-                            is_error = True
-                        else:
-                            submission, text, is_error = candidate, "Answer received.", False
+                    candidate, text, is_error = self._check_submission(tu["input"])
+                    if not is_error:
+                        submission = candidate
                 else:
                     text, is_error = self._call_tool(tu["name"], tu["input"])
                 steps.append(

@@ -107,7 +107,7 @@ def test_malformed_output_flags_tool_markup() -> None:
 
 
 def test_plain_answer_is_well_formed() -> None:
-    plain = "Replace <bucket-name> with your bucket; a PUT is 5 GB, and 5 GB < 50 TB."
+    plain = "Run aws ssm get-parameter --name <parameter-name>; a PUT is 5 GB, 5 GB < 50 TB."
     g = by_metric(FormatGrader().grade(make_case(), answer(plain)))
     assert g["malformed_output"].passed
     assert g["malformed_output"].value == 0.0

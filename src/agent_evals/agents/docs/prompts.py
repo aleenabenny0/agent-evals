@@ -1,4 +1,8 @@
-"""Versioned prompts. A prompt change is a new version, and a new version must be evaluated."""
+"""Versioned prompts. A prompt change is a new version, and a new version must be evaluated.
+
+Everything the model reads lives here, including tool-error texts, so the agent version
+fingerprint can hash all of it in one place.
+"""
 
 SYSTEM_PROMPT_V1 = """\
 You answer questions about Amazon Web Services using ONLY the documentation snapshot you can \
@@ -19,8 +23,17 @@ explain what is missing. Abstaining is better than guessing.
 - confidence is your probability (0 to 1) that the answer is correct.
 """
 
-# Tool errors sent back when a schema-valid submission breaks a content rule. The model reads
-# them, so they are prompts too and are part of the agent version.
+NUDGE_V1 = (
+    "You have not submitted an answer yet. Call submit_answer now, or set abstained to true "
+    "if the documentation does not answer the question."
+)
+
+# Tool errors returned for a submit_answer call. {errors} is Pydantic's error list for a
+# submission with the wrong shape; {problems} is one or more REJECT_* texts joined by spaces.
+INVALID_ANSWER_V1 = "Invalid answer: {errors}. Fix and resubmit."
+REJECTED_V1 = "Rejected: {problems} Fix and resubmit."
+
+# Content rules a schema-valid submission must still meet (see agent.submission_problems).
 REJECT_UNCITED_V1 = (
     "abstained is false but citations is empty. Every answer that is not an abstention needs "
     "at least one citation (url plus a quote copied word for word) in the citations array."

@@ -5,18 +5,31 @@ the structured fields. Seen on docs-smoke-003: the answer ended with `</answer>`
 `<parameter name="citations">[...]` while the real citations list was empty. The docs agent
 uses this check to reject such a submission and the format grader uses the same check to
 measure what still slips through, so the definition lives here where both can import it.
+
+The pattern is deliberately narrow. AWS documentation is full of angle brackets that are not
+tool markup: placeholders like `<parameter-name>`, XML elements like `<Parameter>`, generics
+like `Value<String>`. Claude's syntax is lowercase and its opening `invoke` and `parameter`
+tags always carry a `name=` attribute, so the pattern is case-sensitive and requires that
+attribute. Whitespace before `>` and an optional namespace prefix such as `antml:` are
+tolerated. Changing this pattern changes agent behavior and grading: it is part of the agent
+version fingerprint, and `FormatGrader.version` must be bumped with it.
 """
 
 from __future__ import annotations
 
 import re
 
-# Claude's native tool-call tags, optionally namespaced (e.g. `antml:invoke`), plus closing
-# tags named after submit_answer fields, which is how the leak looked in practice.
+_NS = r"(?:[a-z]+:)?"  # optional namespace prefix, e.g. `antml:`
+_END = r"\s*>"  # closing bracket, tolerating whitespace such as `</answer >`
+
 TOOL_MARKUP = re.compile(
-    r"</?(?:[a-z]+:)?(?:function_calls|invoke|parameter)\b"
-    r"|</(?:answer|citations|abstained|confidence)>",
-    re.IGNORECASE,
+    # Opening tags of the native syntax. The name attribute is what separates them from
+    # placeholders and XML elements.
+    rf"<{_NS}(?:invoke|parameter)\s+name="
+    # Wrapper tags are distinctive on their own, opening or closing.
+    rf"|</?{_NS}(?:function_calls|tool_call){_END}"
+    # Closing tags of the native syntax, and closing tags named after submit_answer fields.
+    rf"|</{_NS}(?:invoke|parameter|answer|citations|abstained|confidence){_END}"
 )
 
 

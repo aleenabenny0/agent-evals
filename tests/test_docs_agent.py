@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
-from agent_evals.agents.docs.agent import NUDGE, DocsAgent, tool_specs
+from agent_evals.agents.docs.agent import DocsAgent, tool_specs
+from agent_evals.agents.docs.prompts import NUDGE_V1
 from agent_evals.config import DocsAgentConfig
 from agent_evals.corpus import Corpus
 from agent_evals.types import Case, RunContext
@@ -84,7 +87,7 @@ def test_nudges_once_then_gives_up(corpus: Corpus, case: Case) -> None:
     llm = ScriptedLLM([[text("I think it's 63.")], [text("Still 63.")]])
     result = make_agent(llm, corpus).run(case, CTX)
     assert result.error == "no_submission"
-    assert llm.requests[1]["messages"][-1]["content"] == NUDGE
+    assert llm.requests[1]["messages"][-1]["content"] == NUDGE_V1
 
 
 def test_stops_at_max_steps(corpus: Corpus, case: Case) -> None:
@@ -105,10 +108,10 @@ def test_strict_flag() -> None:
     assert not any("strict" in t for t in tool_specs(False))
 
 
-def _sent_back(llm: ScriptedLLM, request_index: int) -> dict[str, object]:
-    """The tool_result the agent returned for the submission in the previous model turn."""
-    block: dict[str, object] = llm.requests[request_index]["messages"][-1]["content"][0]
-    return block
+def _tool_result(llm: ScriptedLLM, request_index: int, tool_use_id: str) -> dict[str, Any]:
+    """The tool_result block for `tool_use_id` in the user turn of request `request_index`."""
+    blocks: list[dict[str, Any]] = llm.requests[request_index]["messages"][-1]["content"]
+    return next(b for b in blocks if b["tool_use_id"] == tool_use_id)
 
 
 def test_uncited_submission_is_rejected_then_accepted(corpus: Corpus, case: Case) -> None:
@@ -121,7 +124,7 @@ def test_uncited_submission_is_rejected_then_accepted(corpus: Corpus, case: Case
     )
     result = make_agent(llm, corpus).run(case, CTX)
     assert result.output == GOOD_ANSWER
-    sent_back = _sent_back(llm, 1)
+    sent_back = _tool_result(llm, 1, "a")
     assert sent_back["is_error"] and "citations is empty" in str(sent_back["content"])
 
 
@@ -135,7 +138,7 @@ def test_leaked_markup_submission_is_rejected_then_accepted(corpus: Corpus, case
     result = make_agent(llm, corpus).run(case, CTX)
     assert result.output == GOOD_ANSWER
     assert sum(s.is_error for s in result.trajectory) == 1
-    reason = str(_sent_back(llm, 1)["content"])
+    reason = str(_tool_result(llm, 1, "a")["content"])
     # Both problems are reported so the model can fix them in one go.
     assert "</answer>" in reason and "citations is empty" in reason
 
@@ -158,4 +161,45 @@ def test_version_changes_with_rejection_messages(
 ) -> None:
     before = make_agent(ScriptedLLM([]), corpus).version
     monkeypatch.setattr("agent_evals.agents.docs.agent.REJECT_UNCITED_V1", "different text")
+    assert make_agent(ScriptedLLM([]), corpus).version != before
+
+
+def test_markup_is_rejected_even_with_citations(corpus: Corpus, case: Case) -> None:
+    cited_markup = {**GOOD_ANSWER, "answer": GOOD_ANSWER["answer"] + "</answer>"}
+    llm = ScriptedLLM(
+        [
+            [tool_use("submit_answer", cited_markup, "a")],
+            [tool_use("submit_answer", GOOD_ANSWER, "b")],
+        ]
+    )
+    result = make_agent(llm, corpus).run(case, CTX)
+    assert result.output == GOOD_ANSWER
+    reason = str(_tool_result(llm, 1, "a")["content"])
+    assert "</answer>" in reason and "citations is empty" not in reason
+
+
+def test_markup_is_rejected_in_an_abstention(corpus: Corpus, case: Case) -> None:
+    leaky = {
+        "answer": "Not covered.</answer>",
+        "citations": [],
+        "abstained": True,
+        "confidence": 0.8,
+    }
+    clean = {**leaky, "answer": "Not covered."}
+    llm = ScriptedLLM(
+        [
+            [tool_use("submit_answer", leaky, "a")],
+            [tool_use("submit_answer", clean, "b")],
+        ]
+    )
+    result = make_agent(llm, corpus).run(case, CTX)
+    assert result.output == clean
+    assert _tool_result(llm, 1, "a")["is_error"]
+
+
+def test_version_changes_with_the_detector(corpus: Corpus, monkeypatch: pytest.MonkeyPatch) -> None:
+    import re
+
+    before = make_agent(ScriptedLLM([]), corpus).version
+    monkeypatch.setattr("agent_evals.agents.docs.agent.TOOL_MARKUP", re.compile("different"))
     assert make_agent(ScriptedLLM([]), corpus).version != before
