@@ -149,6 +149,20 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   shows each draft with the quote highlighted in its page and records accept/reject; rejected
   cases move to `ai-ml.rejected.jsonl` with the reason. Next batches should lean to multi_step and changed_default (Lambda runtime
   deprecations, S3 and IAM defaults, Kubernetes versions, CodeCommit/Cloud9 closure).
+- Pilot review (Aleena, 2026-10-10): two cases assumed a customized Bedrock model needs
+  Provisioned Throughput. `prov-throughput.html` still says so, but the newer
+  `model-customization-use.html` (now in the snapshot) documents on-demand custom model
+  deployments. 022 is rewritten as a changed_default case citing the newer page; 025 is removed.
+  **Two AWS pages disagreeing is a strong interview example.** Keyword rules that passed wrong
+  answers were tightened (011, 012, 024, 031, 036), rules that failed correct phrasings were
+  widened (009), 015's 2-minute wording was fixed, 030 asks for an example instead of a complete
+  list. 007 and 029 carry `hold`: keyword grading cannot tell the right recommendation from the
+  wrong one, so `evals split` keeps them in dev until the judge exists. Pilot now 48 cases, 5
+  verified. Found grader bug: must_include matched substrings ("5 MB" inside "15 MB"); fix
+  pending Aleena's OK (whole-phrase matching shared by grader and validator).
+- Lesson: a review done by Codex is a description, not a change. Codex tests against an
+  in-memory copy and writes nothing; apply its fixes in this session and re-run `evals
+  validate` before trusting them.
 - Batch 2: `suites/docs/core.drafts.jsonl`, 45 drafts leaning to the under-represented types
   (7 changed_default, 5 multi_step, 4 false_premise, 24 lookup, 5 unanswerable) across compute
   (Lambda runtimes, EKS versions), storage (S3 bucket quotas), networking (VPC CIDR and quotas),

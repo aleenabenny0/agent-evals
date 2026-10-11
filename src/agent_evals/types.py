@@ -74,6 +74,10 @@ class Case(BaseModel):
     # Who checked this case against its page. A synthetic case without it is a draft and is
     # never scored by accident (see `evals run --allow-drafts`).
     verified_by: str | None = None
+    # Why this case must stay out of the test split for now, e.g. keyword grading cannot tell
+    # the right recommendation from the wrong one until the judge exists. `evals split` puts
+    # held cases in dev. Clear the field when the reason no longer applies.
+    hold: str | None = None
     notes: str | None = None
 
     @property

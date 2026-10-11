@@ -125,6 +125,8 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
         console.print(f"{len(drafts)} unverified drafts; runs refuse them without --allow-drafts")
     if open_split := unassigned(cases):
         console.print(f"{len(open_split)} cases with split 'unassigned'; use `evals split`")
+    if held := [c.id for c in cases if c.hold]:
+        console.print(f"{len(held)} on hold (never placed in test): {', '.join(held)}")
 
     corpus_dir = _config(config).paths.corpus_dir
     if not (corpus_dir / "pages.jsonl").exists():
@@ -277,6 +279,8 @@ def split(
         for c in group:
             mix[c.type] = mix.get(c.type, 0) + 1
         console.print(f"[green]{path}[/green] {len(group)} cases {mix}")
+    if held := [c.id for c in dev_cases if c.hold]:
+        console.print(f"{len(held)} held case(s) placed in dev: {', '.join(held)}")
     console.print(f"seed={seed}; record it with the suite in HANDOFF.md")
 
 

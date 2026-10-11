@@ -132,7 +132,7 @@ https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concep
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/cloudwatch_limits_cwl.html
 https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html
 
-# AI and ML: Amazon Bedrock, AgentCore, Nova (24)
+# AI and ML: Amazon Bedrock, AgentCore, Nova (25)
 https://docs.aws.amazon.com/bedrock/latest/userguide/what-is-bedrock.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/quotas.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/model-access.html
@@ -144,6 +144,7 @@ https://docs.aws.amazon.com/bedrock/latest/userguide/conversation-inference.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html
+https://docs.aws.amazon.com/bedrock/latest/userguide/model-customization-use.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html
 https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html

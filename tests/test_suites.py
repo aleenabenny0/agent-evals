@@ -97,3 +97,15 @@ def test_write_suite_round_trips(tmp_path: Path) -> None:
     path = tmp_path / "s.jsonl"
     write_suite(path, cases)
     assert load_suite(path) == cases
+
+
+def test_held_cases_never_land_in_test() -> None:
+    cases = [_verified(f"c{i}", "lookup", "storage") for i in range(10)]
+    cases[0] = cases[0].model_copy(update={"hold": "needs the judge"})
+    cases[1] = cases[1].model_copy(update={"hold": "needs the judge"})
+    for seed in range(5):
+        dev, test = stratified_split(cases, dev=5, test=5, seed=seed)
+        assert {c.id for c in dev} >= {"c0", "c1"} and all(c.hold is None for c in test)
+        assert len(dev) == 5 and len(test) == 5
+    with pytest.raises(ValueError):
+        stratified_split(cases, dev=1, test=9, seed=0)  # only 8 cases are free for test

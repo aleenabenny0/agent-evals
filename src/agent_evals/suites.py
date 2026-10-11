@@ -115,19 +115,24 @@ def stratified_split(
 
     Deterministic for a seed. Uses every case: dev + test must equal len(cases). Test slots are
     allocated to strata in proportion to their size, with the largest remainders rounded up.
+    Cases with `hold` set always go to dev.
     """
     if dev < 0 or test < 0 or dev + test != len(cases):
         raise ValueError(f"dev + test must equal the number of cases ({len(cases)})")
+    held = [c.model_copy(update={"split": "dev"}) for c in cases if c.hold]
+    free = [c for c in cases if not c.hold]
+    if test > len(free):
+        raise ValueError(f"only {len(free)} cases are not on hold; the test split needs {test}")
     strata: dict[tuple[str, str], list[Case]] = {}
-    for c in cases:
+    for c in free:
         strata.setdefault((c.type, c.area or ""), []).append(c)
-    frac = test / len(cases) if cases else 0.0
+    frac = test / len(free) if free else 0.0
     quotas = {key: int(len(group) * frac) for key, group in strata.items()}
     remainders = sorted(((len(strata[k]) * frac - quotas[k], k) for k in strata), reverse=True)
     for _, key in remainders[: test - sum(quotas.values())]:
         quotas[key] += 1
     rng = random.Random(seed)
-    dev_cases: list[Case] = []
+    dev_cases: list[Case] = list(held)
     test_cases: list[Case] = []
     for key in sorted(strata):
         group = sorted(strata[key], key=lambda c: c.id)
