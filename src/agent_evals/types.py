@@ -78,6 +78,9 @@ class Case(BaseModel):
     # the right recommendation from the wrong one until the judge exists. `evals split` puts
     # held cases in dev. Clear the field when the reason no longer applies.
     hold: str | None = None
+    # For robustness cases: the id of the source case this question paraphrases. Paraphrases
+    # share the source's gold and live in the dev split; consistency is measured per group.
+    paraphrase_of: str | None = None
     notes: str | None = None
 
     @property

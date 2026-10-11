@@ -168,3 +168,13 @@ def test_suite_validation(tmp_path: Path) -> None:
 def test_repo_smoke_suite_is_valid() -> None:
     cases = load_suite(Path(__file__).parents[1] / "suites/docs/smoke.jsonl")
     assert len(cases) >= 5
+
+
+def test_paraphrase_consistency_counts_groups_that_agree() -> None:
+    from agent_evals.report import paraphrase_consistency
+
+    correct = {"a": [1.0], "a1": [1.0], "a2": [1.0], "b": [1.0], "b1": [0.0], "c": [0.0]}
+    groups = {"a": ["a1", "a2"], "b": ["b1"], "c": ["c1"]}  # c1 was not in the run
+    est = paraphrase_consistency(correct, groups)
+    assert est is not None and est.n == 2 and est.mean == 0.5  # a agrees, b disagrees, c skipped
+    assert paraphrase_consistency(correct, {}) is None

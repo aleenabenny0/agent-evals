@@ -485,6 +485,11 @@ def _print_summary(store: ResultsStore, run_id: str) -> None:
     console.print(table)
     if s.pass_hat_k:
         console.print("pass^k: " + "  ".join(f"k={k}: {v:.3f}" for k, v in s.pass_hat_k.items()))
+    if s.consistency is not None:
+        c = s.consistency
+        console.print(
+            f"paraphrase consistency: {c.mean:.3f} ({c.low:.3f} to {c.high:.3f}, {c.n} groups)"
+        )
     t = s.totals
     console.print(
         f"{t['attempts']} attempts, {t['model_calls']} model calls "

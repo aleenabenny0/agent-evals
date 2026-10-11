@@ -185,3 +185,12 @@ def check_held_out(
                 "date; confirm the snapshot really lacks the answer"
             )
     return errors, warnings
+
+
+def paraphrase_groups(cases: Iterable[Case]) -> dict[str, list[str]]:
+    """source case id -> ids of its paraphrases (not including the source itself)."""
+    groups: dict[str, list[str]] = {}
+    for c in cases:
+        if c.paraphrase_of:
+            groups.setdefault(c.paraphrase_of, []).append(c.id)
+    return groups

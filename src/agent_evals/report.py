@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from agent_evals.stats.core import (
@@ -14,6 +15,7 @@ from agent_evals.stats.core import (
     wilson_ci,
 )
 from agent_evals.store.db import ResultsStore
+from agent_evals.suites import SuiteError, load_suite, paraphrase_groups
 
 # Direction of "better" per metric, shown so the reader doesn't have to guess.
 NEUTRAL = {"abstained"}  # depends on the case type; see wrong/missed_abstention
@@ -38,6 +40,29 @@ class RunSummary:
     pass_hat_k: dict[int, float]
     totals: dict[str, Any]
     failures: list[tuple[str, int, str]]
+    # Paraphrase consistency, when the run's suite has paraphrase groups: the share of groups
+    # whose members (source plus paraphrases) all got the same `correct` outcome.
+    consistency: Estimate | None = None
+
+
+def paraphrase_consistency(
+    correct_by_case: dict[str, list[float]], groups: dict[str, list[str]]
+) -> Estimate | None:
+    """One value per group: 1.0 if every member present in the run agrees on correct, else 0.0.
+
+    A model that answers a question right but its paraphrase wrong is not robust; this measures
+    how often that happens, independent of whether the answers were right.
+    """
+    values: list[float] = []
+    for source, members in groups.items():
+        outcomes = [
+            all(v >= 1.0 for v in correct_by_case[cid])
+            for cid in [source, *members]
+            if cid in correct_by_case
+        ]
+        if len(outcomes) >= 2:
+            values.append(1.0 if len(set(outcomes)) == 1 else 0.0)
+    return _interval(values) if values else None
 
 
 def _interval(case_means: list[float]) -> Estimate:
@@ -60,10 +85,21 @@ def summarize(store: ResultsStore, run_id: str) -> RunSummary:
         case_means = [sum(v) / len(v) for v in per_case.values()]
         metrics[metric] = _interval(case_means)
 
-    passes = [[v >= 1.0 for v in vals] for vals in store.metric_by_case(run_id, "correct").values()]
+    correct_by_case = store.metric_by_case(run_id, "correct")
+    passes = [[v >= 1.0 for v in vals] for vals in correct_by_case.values()]
     k_max = min((len(p) for p in passes), default=0)
     phk = {k: mean_pass_hat_k(passes, k) for k in range(1, k_max + 1)} if passes else {}
-    return RunSummary(run_id, info, metrics, phk, store.totals(run_id), store.failures(run_id))
+    consistency = None
+    suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
+    if suite_path.name and suite_path.exists():
+        try:
+            groups = paraphrase_groups(load_suite(suite_path))
+        except SuiteError:
+            groups = {}
+        consistency = paraphrase_consistency(correct_by_case, groups)
+    return RunSummary(
+        run_id, info, metrics, phk, store.totals(run_id), store.failures(run_id), consistency
+    )
 
 
 @dataclass
