@@ -149,6 +149,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   shows each draft with the quote highlighted in its page and records accept/reject; rejected
   cases move to `ai-ml.rejected.jsonl` with the reason. Next batches should lean to multi_step and changed_default (Lambda runtime
   deprecations, S3 and IAM defaults, Kubernetes versions, CodeCommit/Cloud9 closure).
+- Batch 2: `suites/docs/core.drafts.jsonl`, 45 drafts leaning to the under-represented types
+  (7 changed_default, 5 multi_step, 4 false_premise, 24 lookup, 5 unanswerable) across compute
+  (Lambda runtimes, EKS versions), storage (S3 bucket quotas), networking (VPC CIDR and quotas),
+  databases (DynamoDB capacity mode), security (IAM root and access keys, KMS rotation) and
+  devtools (Cloud9 closure). All pass `evals validate`. Pilot status: 5 of 49 AI/ML cases
+  verified, 0 rejected. Totals so far: 94 drafts, 5 verified, target ~250.
 - Docs drift check (ADR 0005): `evals snapshot` writes `configs/docs_pages.lock.json` (page
   hashes, committed); `evals snapshot --check [--report f.md]` fetches and compares, exit 1 on
   drift, listing cases whose evidence pages changed; `.github/workflows/docs-drift.yml` runs it
