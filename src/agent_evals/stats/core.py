@@ -95,6 +95,39 @@ def mean_pass_hat_k(per_case_passes: Sequence[Sequence[bool]], k: int) -> float:
     return sum(vals) / len(vals)
 
 
+def pass_at_k(n: int, c: int, k: int) -> float:
+    """Unbiased estimate of P(at least one of k attempts passes) from c passes in n attempts.
+
+    The complement of "all k sampled attempts fail": 1 - C(n-c, k) / C(n, k) (Chen et al., 2021).
+    pass@1 is the plain pass rate. As k grows pass@k rises and pass^k falls; the gap between them
+    is the ability the agent has but does not deliver to a user who asks once.
+    """
+    if not 0 <= c <= n:
+        raise ValueError("need 0 <= c <= n")
+    if not 1 <= k <= n:
+        raise ValueError("need 1 <= k <= n")
+    return 1.0 - comb(n - c, k) / comb(n, k)
+
+
+def mean_pass_at_k(per_case_passes: Sequence[Sequence[bool]], k: int) -> float:
+    vals = [pass_at_k(len(p), sum(p), k) for p in per_case_passes]
+    return sum(vals) / len(vals)
+
+
+def flip_rate(per_case_passes: Sequence[Sequence[bool]]) -> Estimate | None:
+    """Share of cases whose repeated attempts disagree on pass/fail, with a Wilson interval.
+
+    This is the noise floor: a difference between two runs no bigger than what identical attempts
+    produce on their own is not evidence of anything. Only cases with at least two attempts
+    count; None when there are none. Attempts carry distinct cache salts, so they are fresh
+    samples, not replays of one answer.
+    """
+    flips = [len(set(p)) > 1 for p in per_case_passes if len(p) >= 2]
+    if not flips:
+        return None
+    return wilson_ci(sum(flips), len(flips))
+
+
 def mcnemar_exact(b: int, c: int) -> float:
     """Two-sided exact McNemar p-value. b: cases only the baseline passed; c: only candidate."""
     n = b + c

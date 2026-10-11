@@ -68,8 +68,19 @@ Before your first real run, set a monthly spend limit in the Claude Console and 
 | `uncited_answer` | Answered without any citation | lower |
 | `wrong_abstention` / `missed_abstention` | Abstained when it shouldn't have / answered when it should have abstained | lower |
 | `evidence_recall` | Share of gold pages the agent actually read or cited | higher |
-| `model_calls`, `tool_errors` | Efficiency and recovery signals from the trajectory | lower |
-| pass^k | Chance that all k attempts at a case pass | higher |
+| `evidence_precision` | Share of the pages the agent read that were gold pages (omitted when it read nothing) | higher |
+| `unsupported_entity` | Answer states a number or URL found in neither the question nor any page the agent read or cited | lower |
+| `repeated_calls` | Identical tool calls (same tool, same input) within one trajectory: loop detection | lower |
+| `model_calls`, `tool_errors`, `rejected_submissions` | Efficiency and recovery signals from the trajectory | lower |
+| pass^k | Chance that all k attempts at a case pass; what a user who asks once gets | higher |
+| pass@k | Chance that at least one of k attempts passes; the gap to pass^k is reliability lost | higher |
+| flip rate | Share of cases whose repeated attempts disagree: the noise floor for any comparison | lower |
+
+In the brief's words: `uncited_answer`, `wrong_abstention` and `missed_abstention` are this agent's
+policy violations. A fabricated-action rate does not apply, because the agent only reads.
+`unsupported_entity` is deliberately not called "fabricated": a converted figure ("15 minutes"
+for a page that says "900 seconds") is flagged too, and the LLM judge settles those (ADR 0007).
+The closed-book baseline scores near 100% on it by construction, which is what a baseline is for.
 
 ## Project layout
 

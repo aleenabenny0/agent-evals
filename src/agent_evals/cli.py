@@ -162,8 +162,23 @@ def review(
     from rich.text import Text
 
     from agent_evals.corpus import Corpus
-    from agent_evals.review import accept, quote_context, reject, restore
+    from agent_evals.review import (
+        accept,
+        answer_terms,
+        quote_context,
+        reject,
+        restore,
+        term_spans,
+        uncovered_terms,
+    )
     from agent_evals.suites import load_suite, write_suite
+
+    def mark(segment: str, terms: list[str]) -> Text:
+        """Page text with every answer fact (number or required phrase) in cyan."""
+        t = Text(segment)
+        for a, b in term_spans(segment, terms):
+            t.stylize("bold cyan", a, b)
+        return t
 
     base = suite.name.removesuffix(".jsonl").removesuffix(".drafts")
     rejected_path = suite.with_name(f"{base}.rejected.jsonl")
@@ -207,6 +222,11 @@ def review(
         console.print(f"must_include: {c.gold.must_include}")
         for url in c.gold.evidence_urls:
             console.print(f"evidence: {url}")
+        terms = answer_terms(c)
+        missing = uncovered_terms(c)
+        if missing:
+            console.print("[cyan]answer facts with no support quote: " + ", ".join(missing) + "[/]")
+        console.print("[dim]yellow = support quote; cyan = other answer facts on the page[/dim]")
         for n, quote in enumerate(c.gold.support, 1):
             shown = False
             if corpus is not None:
@@ -215,7 +235,9 @@ def review(
                     ctx = quote_context(page.text, quote) if page else None
                     if ctx:
                         before, match, after = ctx
-                        body = Text.assemble(before, (match, "bold yellow"), after)
+                        body = Text.assemble(
+                            mark(before, terms), (match, "bold yellow"), mark(after, terms)
+                        )
                         title = f"support {n}/{len(c.gold.support)}, in context of {url}"
                         console.print(Panel(body, title=title))
                         shown = True
@@ -337,6 +359,7 @@ def run(
         AnswerGrader,
         CitationGrader,
         FormatGrader,
+        GroundingGrader,
         TrajectoryGrader,
     )
     from agent_evals.harness.cache import CallCache
@@ -374,6 +397,7 @@ def run(
         CitationGrader(corpus, min_quote_chars=cfg.graders.min_quote_chars),
         FormatGrader(),
         TrajectoryGrader(),
+        GroundingGrader(corpus),
     ]
     manifest = build_manifest(
         agent=docs_agent,
@@ -569,6 +593,14 @@ def _print_summary(store: ResultsStore, run_id: str) -> None:
     console.print(table)
     if s.pass_hat_k:
         console.print("pass^k: " + "  ".join(f"k={k}: {v:.3f}" for k, v in s.pass_hat_k.items()))
+    if len(s.pass_at_k) > 1:
+        console.print("pass@k: " + "  ".join(f"k={k}: {v:.3f}" for k, v in s.pass_at_k.items()))
+    if s.flip_rate is not None:
+        f = s.flip_rate
+        console.print(
+            f"flip rate: {f.mean:.3f} ({f.low:.3f} to {f.high:.3f}, {f.n} cases with repeated "
+            "attempts); differences inside this band are noise"
+        )
     if s.consistency is not None:
         c = s.consistency
         console.print(

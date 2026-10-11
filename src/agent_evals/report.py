@@ -11,7 +11,9 @@ import numpy as np
 from agent_evals.stats.core import (
     Estimate,
     bootstrap_ci,
+    flip_rate,
     mcnemar_exact,
+    mean_pass_at_k,
     mean_pass_hat_k,
     paired_bootstrap_diff,
     wilson_ci,
@@ -26,6 +28,8 @@ LOWER_IS_BETTER = {
     "uncited_answer",
     "malformed_output",
     "rejected_submissions",
+    "repeated_calls",
+    "unsupported_entity",
     "missed_abstention",
     "wrong_abstention",
     "tool_errors",
@@ -51,6 +55,10 @@ class RunSummary:
     cost_per_success: float | None = None
     latency_p50_ms: float | None = None
     latency_p95_ms: float | None = None
+    # P(at least one of k attempts passes), beside pass_hat_k's P(all k pass).
+    pass_at_k: dict[int, float] = field(default_factory=dict)
+    # Share of cases whose repeated attempts disagree; None with a single attempt per case.
+    flip_rate: Estimate | None = None
 
 
 def paraphrase_consistency(
@@ -97,6 +105,7 @@ def summarize(store: ResultsStore, run_id: str) -> RunSummary:
     passes = [[v >= 1.0 for v in vals] for vals in correct_by_case.values()]
     k_max = min((len(p) for p in passes), default=0)
     phk = {k: mean_pass_hat_k(passes, k) for k in range(1, k_max + 1)} if passes else {}
+    pak = {k: mean_pass_at_k(passes, k) for k in range(1, k_max + 1)} if passes else {}
     consistency = None
     by_area: dict[str, Estimate] = {}
     suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
@@ -136,6 +145,8 @@ def summarize(store: ResultsStore, run_id: str) -> RunSummary:
         cost_per_success,
         p50,
         p95,
+        pak,
+        flip_rate(passes),
     )
 
 

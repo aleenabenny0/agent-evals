@@ -10,6 +10,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from agent_evals.corpus import Corpus, normalize, phrase_in
+from agent_evals.entities import numbers_in
 from agent_evals.types import Case
 
 
@@ -80,8 +81,9 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
     Errors: an evidence URL that is not in the snapshot (the agent could never cite it), or a
     `support` quote that does not appear on any evidence page (the contract is verbatim).
     Warnings: an answerable case none of whose must_include phrases appears on an evidence page
-    (a gold answer may paraphrase, but this catches wrong URLs and invented numbers cheaply),
-    and a missing `area`.
+    (a gold answer may paraphrase, but this catches wrong URLs and invented numbers cheaply), a
+    required fact or a number in the gold answer that no support quote states, a number in the
+    gold answer that is on no evidence page at all, and a missing `area`.
     """
     errors: list[str] = []
     warnings: list[str] = []
@@ -108,6 +110,22 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
                         f"{c.id}: required fact not covered by any support quote: "
                         + " | ".join(group)
                     )
+            # Every number the gold answer states should sit in a quote a reviewer can see, and
+            # must at least be on the page: a number on no page is a wrong gold answer.
+            claimed = numbers_in(c.gold.answer) - numbers_in(c.question)
+            on_pages: set[str] = set().union(*(numbers_in(corpus.pages[u].text) for u in present))
+            if off_page := sorted(claimed - on_pages, key=float):
+                warnings.append(
+                    f"{c.id}: number in the gold answer not on any evidence page: "
+                    + ", ".join(off_page)
+                )
+            quoted_numbers = numbers_in(" ".join(c.gold.support))
+            unquoted = sorted((claimed & on_pages) - quoted_numbers, key=float)
+            if c.gold.support and unquoted:
+                warnings.append(
+                    f"{c.id}: number in the gold answer not covered by any support quote: "
+                    + ", ".join(unquoted)
+                )
         if c.area is None:
             warnings.append(f"{c.id}: no area")
     return errors, warnings

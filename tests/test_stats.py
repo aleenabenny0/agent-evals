@@ -8,8 +8,10 @@ from hypothesis import strategies as st
 
 from agent_evals.stats.core import (
     bootstrap_ci,
+    flip_rate,
     mcnemar_exact,
     paired_bootstrap_diff,
+    pass_at_k,
     pass_hat_k,
     wilson_ci,
 )
@@ -93,3 +95,31 @@ def test_wilson_rejects_impossible_counts() -> None:
         wilson_ci(5, 4)
     with pytest.raises(ValueError):
         wilson_ci(0, 0)
+
+
+@given(st.integers(1, 10).flatmap(lambda n: st.tuples(st.just(n), st.integers(0, n))))
+def test_pass_at_k_properties(nc: tuple[int, int]) -> None:
+    n, c = nc
+    assert pass_at_k(n, c, 1) == pytest.approx(c / n)  # one try: the plain pass rate
+    values = [pass_at_k(n, c, k) for k in range(1, n + 1)]
+    assert all(a <= b + 1e-12 for a, b in itertools.pairwise(values))  # more tries only help
+    # "At least one of k passes" can never be rarer than "all k pass".
+    assert all(pass_at_k(n, c, k) >= pass_hat_k(n, c, k) - 1e-12 for k in range(1, n + 1))
+    assert pass_at_k(n, c, n) == (1.0 if c > 0 else 0.0)
+
+
+def test_pass_at_k_known_values() -> None:
+    # 1 of 3 attempts passed: P(at least one of 2 sampled passes) = 1 - C(2,2)/C(3,2) = 2/3
+    assert pass_at_k(3, 1, 2) == pytest.approx(2 / 3)
+    assert pass_at_k(3, 2, 2) == 1.0  # only one failing attempt, so two samples can't both fail
+    with pytest.raises(ValueError):
+        pass_at_k(3, 1, 4)
+
+
+def test_flip_rate_needs_repeated_attempts() -> None:
+    assert flip_rate([[True], [False], []]) is None
+    est = flip_rate([[True, False], [True, True], [False, False], [False, True], [True]])
+    assert est is not None
+    assert est.n == 4 and est.mean == 0.5 and est.method == "wilson"  # the lone attempt is skipped
+    steady = flip_rate([[True, True, True], [False, False, False]])
+    assert steady is not None and steady.mean == 0.0 and steady.high > 0.0  # Wilson keeps width

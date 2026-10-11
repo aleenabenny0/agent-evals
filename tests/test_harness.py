@@ -212,3 +212,19 @@ def test_summary_has_area_breakdown_cost_per_success_and_latency(tmp_path: Path)
     assert rec is not None and rec["output"]["abstained"] is True and rec["grades"]
     assert store.attempt(run, "nope", 1) is None
     store.close()
+
+
+def test_flip_rate_and_pass_at_k_need_repeated_attempts(tmp_path: Path) -> None:
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id="c0"), make_case(id="c1"), make_case(id="c2")]
+    two = _run(store, FakeAgent({"c0": {1, 2}, "c1": {1}}), cases, attempts=2)
+    s = summarize(store, two)
+    assert s.flip_rate is not None
+    assert s.flip_rate.n == 3 and s.flip_rate.mean == pytest.approx(1 / 3)  # only c1 flipped
+    # c0 passes both attempts, c1 one of two, c2 none: at-least-one is 1, 1, 0; all-of is 1, 0, 0.
+    assert s.pass_at_k[2] == pytest.approx(2 / 3) and s.pass_hat_k[2] == pytest.approx(1 / 3)
+    assert s.pass_at_k[1] == s.pass_hat_k[1] == s.metrics["correct"].mean
+    one = _run(store, FakeAgent({"c0": {1}}), cases, attempts=1)
+    s1 = summarize(store, one)
+    assert s1.flip_rate is None and s1.pass_at_k == {1: s1.pass_hat_k[1]}
+    store.close()

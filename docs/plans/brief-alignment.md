@@ -66,8 +66,10 @@ Order follows the briefs' own recommendation.
 
 - Report additions that are pure summaries of stored data: per-area success table, cost per
   successful task, p50/p95 latency, `evals trace` viewer, `CHANGELOG.md` scaffold, gitleaks in CI.
-- Everything marked **(agree first)** waits: flip rate, pass@k, repeated calls, tool precision,
-  fabricated entity. One approval covers them all; each is small and comes with tests.
+  **Done 2026-10-11.**
+- Everything marked **(agree first)**: flip rate, pass@k, repeated calls, tool precision,
+  fabricated entity. **Approved and done 2026-10-11 (ADR 0007):** `flip_rate`, `pass_at_k`,
+  `repeated_calls`, `evidence_precision`, `unsupported_entity`.
 
 ## What needs Aleena
 

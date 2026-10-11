@@ -161,3 +161,23 @@ def test_held_out_services_are_enforced(corpus: Corpus) -> None:
     assert errors == [f"held-out service 'lambda' appears in the snapshot: {LAMBDA_URL}"]
     assert [w.split(":")[0] for w in warnings] == ["v"]
     assert check_held_out([priced], corpus, ["GameLift"]) == ([], [])
+
+
+def test_numbers_in_the_gold_answer_need_a_quote_and_must_be_on_the_page(corpus: Corpus) -> None:
+    case = make_case(
+        id="n",
+        area="storage",
+        gold=Gold(
+            answer="3 to 63 characters; a name may also be up to 255 bytes",
+            must_include=[["63"]],
+            evidence=[BUCKETS_URL],
+            support=["and 63 characters long"],
+        ),
+    )
+    errors, warnings = check_against_corpus([case], corpus)
+    assert errors == []
+    assert "n: number in the gold answer not on any evidence page: 255" in warnings
+    assert "n: number in the gold answer not covered by any support quote: 3" in warnings
+    asked = case.model_copy(update={"id": "q", "question": "Is it 3 to 63 or up to 255 bytes?"})
+    _, quiet = check_against_corpus([asked], corpus)
+    assert not any("number in the gold answer" in w for w in quiet)  # the question's own numbers

@@ -7,6 +7,7 @@ from agent_evals.graders.deterministic import (
     AnswerGrader,
     CitationGrader,
     FormatGrader,
+    GroundingGrader,
     TrajectoryGrader,
 )
 from agent_evals.types import AgentResult, Gold, Grade, Step
@@ -225,3 +226,104 @@ def test_key_phrases_match_whole_words_and_numbers(
 ) -> None:
     case = make_case(gold=Gold(answer="", must_include=[[phrase]]))
     assert by_metric(AnswerGrader().grade(case, answer(answer_text)))["correct"].passed is expected
+
+
+# ---- TrajectoryGrader v3: loops and precision ------------------------------------------------
+
+
+def read(url: str, start: int = 0, index: int = 0) -> Step:
+    return Step(index=index, kind="tool", name="read_page", input={"url": url, "start": start})
+
+
+def test_repeated_calls_count_identical_tool_inputs() -> None:
+    result = AgentResult(
+        trajectory=[
+            Step(index=0, kind="tool", name="search_docs", input={"query": "bucket", "k": 5}),
+            Step(index=1, kind="tool", name="search_docs", input={"k": 5, "query": "bucket"}),
+            Step(index=2, kind="tool", name="search_docs", input={"query": "bucket length"}),
+            read(BUCKETS_URL, 0, 3),
+            read(BUCKETS_URL, 8000, 4),  # the next chunk of the same page is not a repeat
+            read(BUCKETS_URL, 0, 5),
+        ]
+    )
+    g = by_metric(TrajectoryGrader().grade(make_case(), result))
+    assert g["repeated_calls"].value == 2.0  # key order is irrelevant; two exact repeats
+    empty = by_metric(TrajectoryGrader().grade(make_case(), AgentResult()))
+    assert empty["repeated_calls"].value == 0
+
+
+def test_evidence_precision_is_gold_pages_over_distinct_pages_read() -> None:
+    result = AgentResult(
+        trajectory=[read(BUCKETS_URL, 0, 0), read(LAMBDA_URL, 0, 1), read(LAMBDA_URL, 8000, 2)]
+    )
+    g = by_metric(TrajectoryGrader().grade(make_case(), result))
+    assert g["evidence_precision"].value == 0.5  # two distinct pages read, one of them gold
+    assert g["evidence_recall"].value == 1.0
+    nothing_read = by_metric(TrajectoryGrader().grade(make_case(), AgentResult()))
+    assert "evidence_precision" not in nothing_read  # 0/0 is not a rate
+    assert nothing_read["evidence_recall"].value == 0.0
+    unanswerable = make_case(type="unanswerable", gold=Gold(answer=""))
+    assert "evidence_precision" not in by_metric(TrajectoryGrader().grade(unanswerable, result))
+
+
+# ---- GroundingGrader -----------------------------------------------------------------------
+
+
+def grounded(
+    corpus: Corpus,
+    text: str,
+    *,
+    pages: list[str] = (),  # type: ignore[assignment]
+    citations: list[dict[str, str]] | None = None,
+    question: str = "How long can a bucket name be?",
+) -> Grade:
+    result = AgentResult(
+        output=answer(text, citations).output,
+        trajectory=[read(u, 0, i) for i, u in enumerate(pages)],
+    )
+    grades = GroundingGrader(corpus).grade(make_case(question=question), result)
+    assert len(grades) == 1
+    return grades[0]
+
+
+def test_numbers_on_a_page_the_agent_read_are_supported(corpus: Corpus) -> None:
+    g = grounded(corpus, "Between 3 and 63 characters; see S3 docs.", pages=[BUCKETS_URL])
+    assert g.passed and g.value == 0.0  # "S3" is a name, not a number
+
+
+def test_invented_number_and_url_are_flagged(corpus: Corpus) -> None:
+    g = grounded(
+        corpus,
+        "Up to 64 characters, see https://docs.example.test/s3/made-up.html.",
+        pages=[BUCKETS_URL],
+    )
+    assert not g.passed and g.value == 1.0
+    assert "64" in g.reason and "made-up" in g.reason
+
+
+def test_numbers_from_the_question_and_cited_pages_count_as_seen(corpus: Corpus) -> None:
+    asked = grounded(
+        corpus, "Yes, 20 is within 3 to 63.", pages=[BUCKETS_URL], question="Can I use 20 chars?"
+    )
+    assert asked.passed
+    cited_only = grounded(
+        corpus,
+        f"63 characters ({BUCKETS_URL})",
+        citations=[{"url": BUCKETS_URL, "quote": "between 3 and 63 characters long"}],
+    )
+    assert cited_only.passed  # no read_page step, but the cited page was seen
+    nothing_seen = grounded(corpus, "63 characters")
+    assert not nothing_seen.passed  # a closed-book answer is unsupported by construction
+
+
+def test_unit_conversions_are_flagged_as_unsupported_on_purpose(corpus: Corpus) -> None:
+    both = grounded(corpus, "900 seconds, that is 15 minutes.", pages=[LAMBDA_URL])
+    assert both.passed  # the page prints both figures
+    converted = grounded(corpus, "That is 0.25 hours.", pages=[LAMBDA_URL])
+    assert not converted.passed and "0.25" in converted.reason
+
+
+def test_grounding_skips_abstentions_and_errors(corpus: Corpus) -> None:
+    grader = GroundingGrader(corpus)
+    assert grader.grade(make_case(), answer("", abstained=True)) == []
+    assert grader.grade(make_case(), AgentResult(error="max_steps")) == []

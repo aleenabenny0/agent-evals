@@ -6,9 +6,11 @@ settle; these checks stay as the first line because they never drift.
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from agent_evals.corpus import Corpus, normalize, phrase_in
+from agent_evals.entities import normalize_url, numbers_in, urls_in
 from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, Grade
 
@@ -21,6 +23,22 @@ def _citations(result: AgentResult) -> list[Any]:
     """The citations list, or [] when the output has none or the field is not a list."""
     cits = result.output.get("citations")
     return cits if isinstance(cits, list) else []
+
+
+def _pages_read(result: AgentResult) -> set[str]:
+    """URLs of every page the agent read successfully."""
+    return {
+        str(s.input.get("url"))
+        for s in result.trajectory
+        if s.kind == "tool"
+        and s.name == "read_page"
+        and not s.is_error
+        and isinstance(s.input, dict)
+    }
+
+
+def _pages_cited(result: AgentResult) -> set[str]:
+    return {str(c.get("url")) for c in _citations(result) if isinstance(c, dict)}
 
 
 class AnswerGrader:
@@ -155,29 +173,79 @@ class TrajectoryGrader:
     """Retrieval and efficiency signals read from the trajectory."""
 
     name = "trajectory"
-    version = "2"  # 2: rejected_submissions
+    version = "3"  # 3: repeated_calls, evidence_precision
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         tool_steps = [s for s in result.trajectory if s.kind == "tool"]
         model_steps = [s for s in result.trajectory if s.kind == "model"]
         rejected = [s for s in tool_steps if s.name == "submit_answer" and s.is_error]
+        # Loop detection: the same tool called again with exactly the same input. Key order in
+        # the input does not matter. submit_answer counts too: resubmitting an identical
+        # rejected answer is a loop.
+        signatures = [
+            (s.name, json.dumps(s.input, sort_keys=True, default=str)) for s in tool_steps
+        ]
         grades = [
             Grade(metric="model_calls", value=float(len(model_steps))),
             Grade(metric="tool_errors", value=float(sum(s.is_error for s in tool_steps))),
             # Formatting reliability: how often the final answer had to be sent back, whether
             # or not the model recovered afterwards.
             Grade(metric="rejected_submissions", value=float(len(rejected))),
+            Grade(metric="repeated_calls", value=float(len(signatures) - len(set(signatures)))),
         ]
         if case.gold.evidence:
-            read = {
-                str(s.input.get("url"))
-                for s in tool_steps
-                if s.name == "read_page" and not s.is_error and isinstance(s.input, dict)
-            }
-            cited = {str(c.get("url")) for c in _citations(result) if isinstance(c, dict)}
-            seen = read | cited
+            read = _pages_read(result)
+            seen = read | _pages_cited(result)
             # One hit per group of alternatives; a group with any URL seen counts as found.
             found = sum(any(url in seen for url in group) for group in case.gold.evidence)
             recall = found / len(case.gold.evidence)
             grades.append(Grade(metric="evidence_recall", value=recall, passed=recall == 1.0))
+            # Precision: of the distinct pages read, the share that were gold evidence. Recall
+            # asks "did it find the right pages"; this asks "how much else did it read". Left
+            # out when nothing was read (the oracle baseline is handed its pages): 0/0 is not
+            # a rate.
+            if read:
+                on_target = len(read & set(case.gold.evidence_urls)) / len(read)
+                grades.append(Grade(metric="evidence_precision", value=on_target))
         return grades
+
+
+class GroundingGrader:
+    """Every number and URL in the answer must appear somewhere the agent could have read it.
+
+    Sources: the question, the pages the agent read, and the pages it cited. A figure on none of
+    them was either invented or converted (a page's "900 seconds" written as "15 minutes"). The
+    metric is called `unsupported`, not `fabricated`, because this check cannot tell the two
+    apart; the judge's "supported" verdict settles conversions. Reference-free: it needs no gold
+    answer, so it also scores live traffic (phase 7). Numbers written as words are not checked.
+    """
+
+    name = "grounding"
+    version = "1"
+
+    def __init__(self, corpus: Corpus) -> None:
+        self.corpus = corpus
+
+    def grade(self, case: Case, result: AgentResult) -> list[Grade]:
+        if result.error or _abstained(result):
+            return []
+        answer = str(result.output.get("answer", ""))
+        urls = _pages_read(result) | _pages_cited(result)
+        pages = [self.corpus.pages[u] for u in sorted(urls) if u in self.corpus.pages]
+        seen_text = "\n".join([case.question, *(p.text for p in pages)])
+        known_urls = urls_in(seen_text) | {normalize_url(p.url) for p in pages}
+        problems: list[str] = []
+        loose_numbers = sorted(numbers_in(answer) - numbers_in(seen_text), key=float)
+        if loose_numbers:
+            problems.append("numbers on no page read or cited: " + ", ".join(loose_numbers))
+        loose_urls = sorted(urls_in(answer) - known_urls)
+        if loose_urls:
+            problems.append("urls on no page read or cited: " + ", ".join(loose_urls))
+        return [
+            Grade(
+                metric="unsupported_entity",
+                value=float(bool(problems)),
+                passed=not problems,
+                reason="; ".join(problems),
+            )
+        ]

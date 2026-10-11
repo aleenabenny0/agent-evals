@@ -20,3 +20,6 @@ Format:
 ## Unreleased
 
 - Phase 1 and phase 2 scaffolding; no gated iteration yet.
+- 2026-10-11: reliability and grounding metrics (ADR 0007): flip rate, pass@k, `repeated_calls`,
+  `evidence_precision`, `unsupported_entity`. Trajectory grader v3, new grounding grader. No
+  run yet uses them.
