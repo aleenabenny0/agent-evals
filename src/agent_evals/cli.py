@@ -207,20 +207,21 @@ def review(
         console.print(f"must_include: {c.gold.must_include}")
         for url in c.gold.evidence_urls:
             console.print(f"evidence: {url}")
-        if c.gold.support:
+        for n, quote in enumerate(c.gold.support, 1):
             shown = False
             if corpus is not None:
                 for url in c.gold.evidence_urls:
                     page = corpus.pages.get(url)
-                    ctx = quote_context(page.text, c.gold.support) if page else None
+                    ctx = quote_context(page.text, quote) if page else None
                     if ctx:
                         before, match, after = ctx
                         body = Text.assemble(before, (match, "bold yellow"), after)
-                        console.print(Panel(body, title=f"support, in context of {url}"))
+                        title = f"support {n}/{len(c.gold.support)}, in context of {url}"
+                        console.print(Panel(body, title=title))
                         shown = True
                         break
             if not shown:
-                console.print(Panel(c.gold.support, title="support quote"))
+                console.print(Panel(quote, title=f"support {n}/{len(c.gold.support)}"))
         if c.notes:
             console.print(f"notes: {c.notes}")
 

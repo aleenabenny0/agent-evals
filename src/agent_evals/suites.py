@@ -9,7 +9,7 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
-from agent_evals.corpus import Corpus
+from agent_evals.corpus import Corpus, normalize, phrase_in
 from agent_evals.types import Case
 
 
@@ -90,17 +90,22 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
         for url in c.gold.evidence_urls:
             if url not in corpus.pages:
                 errors.append(f"{c.id}: evidence page not in snapshot: {url}")
-        if c.gold.support is not None and not any(
-            corpus.contains_quote(u, c.gold.support) for u in present
-        ):
-            errors.append(
-                f"{c.id}: support quote not found on any evidence page: {c.gold.support[:60]!r}"
-            )
+        for quote in c.gold.support:
+            if not any(corpus.contains_quote(u, quote) for u in present):
+                errors.append(
+                    f"{c.id}: support quote not found on any evidence page: {quote[:60]!r}"
+                )
         if c.answerable and present:
+            quoted = normalize(" ".join(c.gold.support))
             for group in c.gold.must_include:
                 if not any(corpus.contains_phrase(u, alt) for u in present for alt in group):
                     warnings.append(
                         f"{c.id}: no must_include alternative found on its evidence pages: "
+                        + " | ".join(group)
+                    )
+                elif c.gold.support and not any(phrase_in(quoted, alt) for alt in group):
+                    warnings.append(
+                        f"{c.id}: required fact not covered by any support quote: "
                         + " | ".join(group)
                     )
         if c.area is None:

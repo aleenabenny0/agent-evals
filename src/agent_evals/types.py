@@ -43,9 +43,20 @@ class Gold(BaseModel):
     # per URL (all required). The same fact often sits on several pages, and the agent must not
     # be penalized for grounding on one of them rather than another (ADR 0006).
     evidence: list[list[str]] = Field(default_factory=list)
-    # The sentence on an evidence page that the answer rests on, copied word for word. Lets a
-    # reviewer verify a draft in one read, and lets `evals validate` prove the quote exists.
-    support: str | None = None
+    # The sentences on the evidence pages that the answer rests on, copied word for word, one per
+    # fact the answer uses. A reviewer verifies a draft by reading them in place, and `evals
+    # validate` proves each exists on a page and warns when a required fact has no quote. A
+    # single string is accepted as shorthand for a one-item list.
+    support: list[str] = Field(default_factory=list)
+
+    @field_validator("support", mode="before")
+    @classmethod
+    def _wrap_single_support(cls, value: object) -> object:
+        if value is None:
+            return []
+        if isinstance(value, str):
+            return [value]
+        return value
 
     @field_validator("evidence", mode="before")
     @classmethod

@@ -62,6 +62,35 @@ def test_corpus_checks_catch_bad_evidence_and_quotes(corpus: Corpus) -> None:
     assert not any(w.startswith("ok:") for w in warnings)
 
 
+def test_support_is_a_list_and_every_fact_needs_a_quote(corpus: Corpus) -> None:
+    two_facts = make_case(
+        id="two",
+        area="storage",
+        gold=Gold(
+            answer="3 to 63 characters, lowercase",
+            must_include=[["63"], ["lowercase"]],
+            evidence=[BUCKETS_URL],
+            support="between 3 and 63 characters long",  # shorthand for a one-item list
+        ),
+    )
+    assert two_facts.gold.support == ["between 3 and 63 characters long"]
+    _, warnings = check_against_corpus([two_facts], corpus)
+    expected = "two: required fact not covered by any support quote: lowercase"
+    assert expected in warnings
+    covered = two_facts.model_copy(
+        update={
+            "gold": Gold(
+                answer="3 to 63 characters, lowercase",
+                must_include=[["63"], ["lowercase"]],
+                evidence=[BUCKETS_URL],
+                support=["between 3 and 63 characters long", "only lowercase letters"],
+            )
+        }
+    )
+    errors, warnings = check_against_corpus([covered], corpus)
+    assert errors == [] and not any("not covered" in w for w in warnings)
+
+
 def _verified(id_: str, type_: str, area: str) -> Case:
     extra = {"gold": Gold(answer="n/a")} if type_ == "unanswerable" else {}
     return make_case(
