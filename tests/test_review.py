@@ -29,3 +29,13 @@ def test_accept_and_reject_record_the_reviewer() -> None:
     assert bad.is_draft and bad.verified_by is None
     assert bad.notes == "from page X | REJECTED by aleena: gold answer contradicts the page"
     assert reject(make_case(id="e"), "aleena", "").notes == "REJECTED by aleena: no reason given"
+
+
+def test_restore_undoes_a_rejection_and_keeps_earlier_notes() -> None:
+    from agent_evals.review import restore
+
+    plain = make_case(id="d", provenance="synthetic", split="unassigned")
+    assert restore(reject(plain, "aleena", "oops")).notes is None
+    noted = make_case(id="e", provenance="synthetic", split="unassigned", notes="from page X")
+    assert restore(reject(noted, "aleena", "oops")).notes == "from page X"
+    assert restore(reject(noted, "aleena", "oops")).is_draft

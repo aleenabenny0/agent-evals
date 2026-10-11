@@ -148,6 +148,10 @@ def review(
     suite: Path,
     reviewer: Annotated[str, typer.Option(help="Your name; written to verified_by.")],
     limit: Annotated[int | None, typer.Option(help="Review at most N drafts this time.")] = None,
+    restore_id: Annotated[
+        str | None,
+        typer.Option("--restore", help="Move this case id back from the rejected file; no review."),
+    ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Walk through unverified drafts one by one, with the support quote shown in its page."""
@@ -158,8 +162,25 @@ def review(
     from rich.text import Text
 
     from agent_evals.corpus import Corpus
-    from agent_evals.review import accept, quote_context, reject
+    from agent_evals.review import accept, quote_context, reject, restore
     from agent_evals.suites import load_suite, write_suite
+
+    base = suite.name.removesuffix(".jsonl").removesuffix(".drafts")
+    rejected_path = suite.with_name(f"{base}.rejected.jsonl")
+    if restore_id is not None:
+        rejected = load_suite(rejected_path) if rejected_path.exists() else []
+        found = [c for c in rejected if c.id == restore_id]
+        if not found:
+            console.print(f"[red]{restore_id!r} is not in {rejected_path}.[/red]")
+            raise typer.Exit(code=2)
+        write_suite(suite, [*load_suite(suite), restore(found[0])])
+        left = [c for c in rejected if c.id != restore_id]
+        if left:
+            write_suite(rejected_path, left)
+        else:
+            rejected_path.unlink()
+        console.print(f"[green]{restore_id} restored to {suite} as an unverified draft.[/green]")
+        return
 
     if not sys.stdin.isatty():
         console.print("[red]evals review needs an interactive terminal.[/red]")
@@ -176,8 +197,6 @@ def review(
     if not drafts:
         console.print("Nothing to review: no unverified drafts in this file.")
         return
-    base = suite.name.removesuffix(".jsonl").removesuffix(".drafts")
-    rejected_path = suite.with_name(f"{base}.rejected.jsonl")
     rejected = load_suite(rejected_path) if rejected_path.exists() else []
     tally = {"accepted": 0, "rejected": 0, "skipped": 0}
 
@@ -217,12 +236,19 @@ def review(
             tally["accepted"] += 1
         elif choice == "r":
             try:
-                reason = Prompt.ask("reason")
+                reason = Prompt.ask("reason (at least a few words; empty cancels)").strip()
             except EOFError:
                 reason = ""
+            if len(reason) < 4:
+                console.print("[yellow]Rejection cancelled; the case stays a draft.[/yellow]")
+                tally["skipped"] += 1
+                continue
             rejected.append(reject(c, reviewer, reason))
             cases = [x for x in cases if x.id != c.id]
             tally["rejected"] += 1
+            console.print(
+                f"rejected; undo with: evals review {suite} --reviewer {reviewer} --restore {c.id}"
+            )
         else:
             tally["skipped"] += 1
             continue

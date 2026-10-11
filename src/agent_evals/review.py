@@ -38,3 +38,18 @@ def reject(case: Case, reviewer: str, reason: str) -> Case:
     note = f"REJECTED by {reviewer}: {reason.strip() or 'no reason given'}"
     notes = f"{case.notes} | {note}" if case.notes else note
     return case.model_copy(update={"notes": notes})
+
+
+REJECTION_MARK = " | REJECTED by "
+
+
+def restore(case: Case) -> Case:
+    """Undo a rejection: drop the rejection note (keeping any earlier notes), still unverified."""
+    notes = case.notes or ""
+    if notes.startswith("REJECTED by "):
+        kept: str | None = None
+    elif REJECTION_MARK in notes:
+        kept = notes.split(REJECTION_MARK, 1)[0]
+    else:
+        kept = notes or None
+    return case.model_copy(update={"notes": kept, "verified_by": None})
