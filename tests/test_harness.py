@@ -178,3 +178,37 @@ def test_paraphrase_consistency_counts_groups_that_agree() -> None:
     est = paraphrase_consistency(correct, groups)
     assert est is not None and est.n == 2 and est.mean == 0.5  # a agrees, b disagrees, c skipped
     assert paraphrase_consistency(correct, {}) is None
+
+
+def test_summary_has_area_breakdown_cost_per_success_and_latency(tmp_path: Path) -> None:
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [
+        make_case(id="s1", area="storage"),
+        make_case(id="s2", area="storage"),
+        make_case(id="c1", area="compute"),
+    ]
+    suite = tmp_path / "suite.jsonl"
+    suite.write_text("\n".join(c.model_dump_json(exclude_none=True) for c in cases) + "\n")
+    run = run_suite(
+        agent=FakeAgent({"s1": {1}, "c1": {1}}),
+        cases=cases,
+        graders=[AnswerGrader()],
+        store=store,
+        suite_name="t",
+        attempts=1,
+        workers=1,
+        pricing=Pricing(input_per_mtok=1.0, output_per_mtok=1.0),
+        budget_usd=None,
+        manifest={"suite": {"path": str(suite)}},
+        show_progress=False,
+    )
+    s = summarize(store, run)
+    assert set(s.by_area) == {"storage", "compute"}
+    assert s.by_area["storage"].mean == 0.5 and s.by_area["compute"].mean == 1.0
+    # FakeAgent reports 1,000,000 input tokens per attempt at $1/MTok: $3 total over 2 successes.
+    assert s.cost_per_success == 1.5
+    assert s.latency_p50_ms is not None and s.latency_p95_ms is not None
+    rec = store.attempt(run, "s2", 1)
+    assert rec is not None and rec["output"]["abstained"] is True and rec["grades"]
+    assert store.attempt(run, "nope", 1) is None
+    store.close()

@@ -179,6 +179,43 @@ class ResultsStore:
         ).fetchall()
         return [(str(c), int(a), str(r)) for c, a, r in rows]
 
+    def latencies(self, run_id: str) -> list[float]:
+        rows = self.con.execute(
+            "SELECT latency_ms FROM attempts WHERE run_id = ? AND error IS NULL", [run_id]
+        ).fetchall()
+        return [float(r[0]) for r in rows]
+
+    def attempt(self, run_id: str, case_id: str, attempt: int) -> dict[str, Any] | None:
+        """One stored attempt: output, trajectory, usage, error, and its grades."""
+        row = self.con.execute(
+            "SELECT output, trajectory, input_tokens, output_tokens, model_calls, cached_calls, "
+            "cost_usd, latency_ms, error FROM attempts "
+            "WHERE run_id = ? AND case_id = ? AND attempt = ?",
+            [run_id, case_id, attempt],
+        ).fetchone()
+        if row is None:
+            return None
+        grades = self.con.execute(
+            "SELECT grader, metric, value, passed, reason FROM grades "
+            "WHERE run_id = ? AND case_id = ? AND attempt = ? ORDER BY grader, metric",
+            [run_id, case_id, attempt],
+        ).fetchall()
+        return {
+            "output": json.loads(row[0]),
+            "trajectory": json.loads(row[1]),
+            "input_tokens": row[2],
+            "output_tokens": row[3],
+            "model_calls": row[4],
+            "cached_calls": row[5],
+            "cost_usd": row[6],
+            "latency_ms": row[7],
+            "error": row[8],
+            "grades": [
+                {"grader": g, "metric": m, "value": v, "passed": p, "reason": r}
+                for g, m, v, p, r in grades
+            ],
+        }
+
     def totals(self, run_id: str) -> dict[str, Any]:
         row = self.con.execute(
             "SELECT COUNT(*), SUM(input_tokens), SUM(output_tokens), SUM(model_calls), "

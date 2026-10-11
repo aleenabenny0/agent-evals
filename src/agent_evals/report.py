@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+
+import numpy as np
 
 from agent_evals.stats.core import (
     Estimate,
@@ -43,6 +45,12 @@ class RunSummary:
     # Paraphrase consistency, when the run's suite has paraphrase groups: the share of groups
     # whose members (source plus paraphrases) all got the same `correct` outcome.
     consistency: Estimate | None = None
+    # `correct` per service area, when the run's suite records areas.
+    by_area: dict[str, Estimate] = field(default_factory=dict)
+    # Nominal cost divided by successful attempts; None without pricing or without a success.
+    cost_per_success: float | None = None
+    latency_p50_ms: float | None = None
+    latency_p95_ms: float | None = None
 
 
 def paraphrase_consistency(
@@ -90,15 +98,44 @@ def summarize(store: ResultsStore, run_id: str) -> RunSummary:
     k_max = min((len(p) for p in passes), default=0)
     phk = {k: mean_pass_hat_k(passes, k) for k in range(1, k_max + 1)} if passes else {}
     consistency = None
+    by_area: dict[str, Estimate] = {}
     suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
     if suite_path.name and suite_path.exists():
         try:
-            groups = paraphrase_groups(load_suite(suite_path))
+            cases = load_suite(suite_path)
         except SuiteError:
-            groups = {}
-        consistency = paraphrase_consistency(correct_by_case, groups)
+            cases = []
+        consistency = paraphrase_consistency(correct_by_case, paraphrase_groups(cases))
+        area_of = {c.id: c.area for c in cases if c.area}
+        per_area: dict[str, list[float]] = {}
+        for case_id, vals in correct_by_case.items():
+            area = area_of.get(case_id)
+            if area:
+                per_area.setdefault(area, []).append(sum(vals) / len(vals))
+        by_area = {a: _interval(v) for a, v in sorted(per_area.items())}
+
+    totals = store.totals(run_id)
+    successes = sum(sum(1 for v in vals if v >= 1.0) for vals in correct_by_case.values())
+    cost_per_success = (
+        float(totals["cost_usd"]) / successes
+        if totals["cost_usd"] is not None and successes
+        else None
+    )
+    latencies = store.latencies(run_id)
+    p50 = float(np.percentile(latencies, 50)) if latencies else None
+    p95 = float(np.percentile(latencies, 95)) if latencies else None
     return RunSummary(
-        run_id, info, metrics, phk, store.totals(run_id), store.failures(run_id), consistency
+        run_id,
+        info,
+        metrics,
+        phk,
+        totals,
+        store.failures(run_id),
+        consistency,
+        by_area,
+        cost_per_success,
+        p50,
+        p95,
     )
 
 

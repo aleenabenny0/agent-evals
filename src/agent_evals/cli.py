@@ -421,6 +421,63 @@ def report(
         store.close()
 
 
+@app.command()
+def trace(
+    run_id: str,
+    case_id: str,
+    attempt: Annotated[int, typer.Option(min=1, help="Attempt number.")] = 1,
+    chars: Annotated[int, typer.Option(help="Characters of each tool input/output to show.")] = 400,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Print one stored trajectory step by step, then the final output and its grades."""
+    from rich.panel import Panel
+
+    from agent_evals.store.db import ResultsStore
+
+    store = ResultsStore(_config(config).paths.db)
+    try:
+        rec = store.attempt(run_id, case_id, attempt)
+    finally:
+        store.close()
+    if rec is None:
+        console.print(f"[red]No attempt {attempt} for {case_id} in {run_id}.[/red]")
+        raise typer.Exit(code=1)
+    console.rule(f"{run_id}  {case_id}  attempt {attempt}")
+    for step in rec["trajectory"]:
+        if step["kind"] == "model":
+            blocks = step.get("output", {}).get("content", [])
+            kinds = ", ".join(b.get("name") or b.get("type", "?") for b in blocks)
+            cached = " (cache)" if step.get("cache_hit") else ""
+            console.print(f"[bold]{step['index']}. model{cached}[/bold] -> {kinds}")
+            for b in blocks:
+                if b.get("type") == "text" and b.get("text"):
+                    console.print(f"     text: {b['text'][:chars]!r}")
+        else:
+            flag = " [red]error[/red]" if step.get("is_error") else ""
+            console.print(f"[bold]{step['index']}. tool {step['name']}[/bold]{flag}")
+            console.print(f"     input:  {str(step.get('input'))[:chars]}")
+            console.print(f"     output: {str(step.get('output'))[:chars]}")
+    if rec["error"]:
+        console.print(Panel(rec["error"], title="agent error", style="red"))
+    if rec["output"]:
+        out = rec["output"]
+        console.print(Panel(str(out.get("answer", ""))[: chars * 3], title="answer"))
+        for cit in out.get("citations", []) or []:
+            console.print(f"  cite: {cit.get('url')} :: {str(cit.get('quote'))[:chars]!r}")
+        console.print(f"  abstained={out.get('abstained')} confidence={out.get('confidence')}")
+    grades = Table(show_header=True, header_style="bold", title="grades")
+    for col in ("grader", "metric", "value", "passed", "reason"):
+        grades.add_column(col)
+    for g in rec["grades"]:
+        grades.add_row(g["grader"], g["metric"], f"{g['value']:.3g}", str(g["passed"]), g["reason"])
+    console.print(grades)
+    console.print(
+        f"{rec['model_calls']} model calls ({rec['cached_calls']} cached), "
+        f"{rec['input_tokens']} in / {rec['output_tokens']} out tokens, {rec['latency_ms']:.0f} ms"
+        + (f", nominal cost ${rec['cost_usd']:.4f}" if rec["cost_usd"] is not None else "")
+    )
+
+
 @app.command("compare")
 def compare_cmd(
     baseline: str,
@@ -517,6 +574,19 @@ def _print_summary(store: ResultsStore, run_id: str) -> None:
         console.print(
             f"paraphrase consistency: {c.mean:.3f} ({c.low:.3f} to {c.high:.3f}, {c.n} groups)"
         )
+    if s.by_area:
+        areas = Table(show_header=True, header_style="bold", title="correct by area")
+        for col in ("area", "mean", "95% CI", "cases"):
+            areas.add_column(col, justify="right" if col != "area" else "left")
+        for area, est in s.by_area.items():
+            areas.add_row(area, f"{est.mean:.3f}", f"{est.low:.3f} to {est.high:.3f}", str(est.n))
+        console.print(areas)
+    if s.latency_p50_ms is not None and s.latency_p95_ms is not None:
+        console.print(
+            f"latency per attempt: p50 {s.latency_p50_ms:.0f} ms, p95 {s.latency_p95_ms:.0f} ms"
+        )
+    if s.cost_per_success is not None:
+        console.print(f"nominal cost per successful attempt: ${s.cost_per_success:.4f}")
     t = s.totals
     console.print(
         f"{t['attempts']} attempts, {t['model_calls']} model calls "
