@@ -228,6 +228,25 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   `docs/walkthroughs/2026-10-10-wilson-intervals.md`); the report table shows the method per
   row. 7/7 on `correct` reads 0.646 to 1.000 instead of 1.000 to 1.000. Counts, fractions,
   multi-attempt runs and paired comparisons keep the bootstrap.
+- 2026-10-11, approved in one go (ADR 0007, walkthrough `docs/walkthroughs/2026-10-11-reliability-metrics.md`):
+  flip rate and pass@k in the report (`stats/core.py`), `repeated_calls` and `evidence_precision`
+  (trajectory grader v3), `unsupported_entity` from the new `GroundingGrader` (numbers and URLs in
+  the answer that are in neither the question nor any page read or cited; shared extractor in
+  `entities.py`). `evals validate` now also warns when a number in a gold answer has no support
+  quote or is on no evidence page; `evals review` marks every answer fact (required phrase,
+  number, digit-bearing identifier) in cyan around the yellow quote and lists the uncovered ones.
+  The existing drafts carry 11 such warnings (3 ai-ml, 1 core, 2 integration, 5 mixed) to fix in
+  one sweep once Aleena's review pass is committed (editing those files while `evals review`
+  writes them would lose work). 145 tests.
+- 2026-10-11: changed-default batch drafted, `suites/docs/changed-defaults.drafts.jsonl`, 31
+  cases, all `changed_default`, 0 validator errors or warnings: deprecations (Lambda runtimes,
+  Redshift Python UDFs, RDS magnetic, S3 SOAP), closures to new customers (SageMaker Model
+  Monitor, Clarify, Ground Truth, Studio Classic, Bedrock Agents Classic, Q Business, App Runner,
+  Glacier vaults), end-of-support notices (Q Developer IDE plugins, support plans, OpenSearch
+  versions) and moved defaults (new-account Lambda quotas, Fargate vCPU quota and new-Region
+  launch rates, PITR window, public IPv4 charges, Bedrock managed knowledge bases, 90-minute
+  Lambda Managed Instances). With it the drafts are 280 and changed_default is 46 (16%), on the
+  15% plan.
 
 ## Target: the three project briefs
 
@@ -240,16 +259,19 @@ over gated iterations, with a failure taxonomy shrinking beside it.
 ## Next tasks, in order
 
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
-   drafting (249), evidence groups, paraphrase mechanics, validators. **Needs Aleena:**
-   (a) verify the drafts with `evals review` (about 240 remain; rejections carry reasons);
-   (b) decide whether to draft a changed_default-heavy batch first or accept the mix;
+   drafting (280 across six files), evidence groups, paraphrase mechanics, validators, the five
+   reliability/grounding metrics (ADR 0007). **Needs Aleena:**
+   (a) finish `evals review` on the five original draft files, run `evals validate` on each,
+   commit after each file; then review `changed-defaults.drafts.jsonl` (31 cases);
+   (b) say "review committed" so the 11 missing-quote warnings in the existing drafts get fixed
+   in one sweep (no file edits by the agent while her review is in progress);
    (c) when verified cases exist in one file, `evals split <file> --dev 100 --test 150 --seed <N>`
-   and record the seed here; (d) approve `docs/plans/llm-judge.md`, then hand-label 100-200 dev
-   answers split into judge-dev and judge-test; (e) approve the first dev-split run and the two
-   baseline runs (paid); (f) approve the small grader/stats additions from the brief alignment
-   (flip rate, pass@k, repeated calls, tool precision, fabricated entity), one approval covers
-   all five; (g) set a hard monthly spend limit in the Anthropic console; (h) decide whether to
+   and record the seed here; (d) approve `docs/plans/llm-judge.md` and answer its three open
+   questions, then hand-label 100-200 dev answers split into judge-dev and judge-test;
+   (e) approve the first dev-split run and the two baseline runs (paid; cost estimate from smoke
+   first); (f) set a hard monthly spend limit in the Anthropic console; (g) decide whether to
    keep the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now.
+   Done 2026-10-11: the changed_default batch (was (b)) and the five metric additions (was (f)).
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
    `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of
