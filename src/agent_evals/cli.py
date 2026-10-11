@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Any
 
 import typer
 from dotenv import load_dotenv
@@ -760,6 +760,137 @@ def judge_validate(
         "bars (docs/plans/llm-judge.md): kappa at least 0.7 on each verdict on judge-test; "
         "fewer than 30 labeled answers is too few to conclude anything"
     )
+
+
+@app.command("judge-probe")
+def judge_probe(
+    run_id: str,
+    limit: Annotated[int, typer.Option(help="Passed answers to build variants from.")] = 40,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Mutation tests and bias probes for the judge, on answers it passed. Costs money."""
+    import json
+    from concurrent.futures import ThreadPoolExecutor
+
+    from rich.progress import Progress
+
+    from agent_evals.graders.judge import JudgeGrader
+    from agent_evals.harness.cache import CallCache
+    from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.harness.runner import grade_all
+    from agent_evals.judge_probes import MUTANTS, Variant, behaved, variants
+    from agent_evals.stats.core import wilson_ci
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.suites import load_suite
+    from agent_evals.types import AgentResult
+
+    load_dotenv()
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
+    try:
+        info = store.run_info(run_id)
+        suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
+        cases = {c.id: c for c in load_suite(suite_path)}
+        verdicts = store.grades_for(run_id, "judge")
+        answered = store.answered_attempts(run_id)
+    finally:
+        store.close()
+    if not verdicts:
+        console.print("[red]No judge grades on this run yet; run `evals judge` first.[/red]")
+        raise typer.Exit(code=2)
+    passed_both = [
+        a
+        for a in answered
+        if a["case_id"] in cases
+        and verdicts.get((a["case_id"], a["attempt"]), {}).get("judge_supported") == 1.0
+        and verdicts.get((a["case_id"], a["attempt"]), {}).get("judge_responsive") == 1.0
+    ][:limit]
+    pool = [
+        (str(c.get("url", "")), str(c.get("quote", "")))
+        for a in answered
+        for c in (a["output"].get("citations") or [])
+        if isinstance(c, dict)
+    ]
+    llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
+    graders = {
+        "judge": JudgeGrader(llm, cfg.judge, salt="judge"),
+        "probe": JudgeGrader(llm, cfg.judge, salt="probe"),
+    }
+    jobs = [(a, v) for a in passed_both for v in variants(a["output"], pool)]
+
+    def one(job: tuple[dict[str, Any], Variant]) -> tuple[dict[str, Any], Variant, bool, str]:
+        a, v = job
+        graded = grade_all([graders[v.salt]], cases[a["case_id"]], AgentResult(output=v.output))
+        judged = {g.metric: g.value for _, g in graded if g.metric != "grader_error"}
+        ok = behaved(v, verdicts[(a["case_id"], a["attempt"])], judged)
+        reasons = "; ".join(f"{g.metric}={g.value:g} {g.reason}" for _, g in graded)
+        return a, v, ok, reasons
+
+    tally: dict[str, list[bool]] = {}
+    misses: list[dict[str, Any]] = []
+    with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool_, Progress() as progress:
+        task = progress.add_task("Probing the judge", total=len(jobs))
+        for a, v, ok, reasons in pool_.map(one, jobs):
+            tally.setdefault(v.probe, []).append(ok)
+            if not ok:
+                misses.append(
+                    {
+                        "case_id": a["case_id"],
+                        "attempt": a["attempt"],
+                        "probe": v.probe,
+                        "answer": v.output.get("answer"),
+                        "judge": reasons,
+                    }
+                )
+            progress.advance(task)
+
+    table = Table(show_header=True, header_style="bold", title=f"judge probes on {run_id}")
+    for col in ("probe", "kind", "n", "expected", "observed (95% CI)", "bar"):
+        table.add_column(col, justify="right" if col in ("n",) else "left")
+    summary: dict[str, Any] = {}
+    for probe, oks in tally.items():
+        kind = "mutant" if probe in MUTANTS else "probe"
+        est = wilson_ci(sum(oks), len(oks))
+        bar = 0.90 if kind == "mutant" else 0.95
+        colour = "green" if est.mean >= bar else "red"
+        expected = "judge fails it" if kind == "mutant" else "verdicts unchanged"
+        table.add_row(
+            probe,
+            kind,
+            str(est.n),
+            expected,
+            f"[{colour}]{est.mean:.2f}[/{colour}] ({est.low:.2f} to {est.high:.2f})",
+            f"at least {bar:.2f}",
+        )
+        summary[probe] = {
+            "kind": kind,
+            "n": est.n,
+            "rate": est.mean,
+            "low": est.low,
+            "high": est.high,
+            "bar": bar,
+        }
+    console.print(table)
+    u = graders["judge"].usage.add(graders["probe"].usage)
+    console.print(
+        f"{len(passed_both)} passed answers, {len(jobs)} variants, {u.model_calls} judge calls "
+        f"({u.cached_calls} from cache), {u.input_tokens} in / {u.output_tokens} out tokens"
+    )
+    out = Path("results") / f"judge-probes-{run_id}.json"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(
+        json.dumps(
+            {
+                "run_id": run_id,
+                "judge": graders["judge"].version,
+                "summary": summary,
+                "misses": misses,
+            },
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
+    console.print(f"details, including every miss with the judge's reasons: {out}")
 
 
 @app.command("compare")
