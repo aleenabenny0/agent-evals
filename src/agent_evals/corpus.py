@@ -99,6 +99,25 @@ def normalize(text: str) -> str:
     return " ".join(text.split()).lower()
 
 
+def phrase_in(normalized_text: str, phrase: str) -> bool:
+    """Whole-phrase match of a short key phrase in already-normalized text.
+
+    No letter or digit may sit directly before the phrase when it starts with one, nor directly
+    after it when it ends with one. So "5 MB" is not found inside "15 MB" and "10" not inside
+    "100", while "/16" is still found in "10.0.0.0/16", "10%" in "about 10%." and "63" in
+    "3-63". Used by the answer grader and by `evals validate`, so they never disagree.
+    """
+    needle = normalize(phrase)
+    if not needle:
+        return False
+    pattern = re.escape(needle)
+    if needle[0].isalnum():
+        pattern = r"(?<!\w)" + pattern
+    if needle[-1].isalnum():
+        pattern = pattern + r"(?!\w)"
+    return re.search(pattern, normalized_text) is not None
+
+
 def tokenize(text: str) -> list[str]:
     return [t for t in _TOKEN.findall(text.lower()) if t not in _STOPWORDS]
 
@@ -186,3 +205,8 @@ class Corpus:
     def contains_quote(self, url: str, quote: str) -> bool:
         haystack = self._normalized.get(url)
         return haystack is not None and normalize(quote) in haystack
+
+    def contains_phrase(self, url: str, phrase: str) -> bool:
+        """Whole-phrase match of a short key phrase on a page (see `phrase_in`)."""
+        haystack = self._normalized.get(url)
+        return haystack is not None and phrase_in(haystack, phrase)

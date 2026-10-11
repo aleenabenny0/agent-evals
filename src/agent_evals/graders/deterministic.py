@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from agent_evals.corpus import Corpus, normalize
+from agent_evals.corpus import Corpus, normalize, phrase_in
 from agent_evals.tool_markup import find_tool_markup
 from agent_evals.types import AgentResult, Case, Grade
 
@@ -27,7 +27,7 @@ class AnswerGrader:
     """Correctness by required phrases, plus abstention behavior."""
 
     name = "answer_keywords"
-    version = "1"
+    version = "2"  # 2: phrases match whole words and numbers, not substrings
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         if result.error:
@@ -67,7 +67,7 @@ class AnswerGrader:
         missing = [
             group
             for group in case.gold.must_include
-            if not any(normalize(alt) in answer for alt in group)
+            if not any(phrase_in(answer, alt) for alt in group)
         ]
         ok = not missing
         reason = "" if ok else "missing: " + "; ".join(" | ".join(g) for g in missing)

@@ -98,7 +98,7 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
             )
         if c.answerable and present:
             for group in c.gold.must_include:
-                if not any(corpus.contains_quote(u, alt) for u in present for alt in group):
+                if not any(corpus.contains_phrase(u, alt) for u in present for alt in group):
                     warnings.append(
                         f"{c.id}: no must_include alternative found on its evidence pages: "
                         + " | ".join(group)

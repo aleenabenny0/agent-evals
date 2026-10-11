@@ -158,8 +158,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   widened (009), 015's 2-minute wording was fixed, 030 asks for an example instead of a complete
   list. 007 and 029 carry `hold`: keyword grading cannot tell the right recommendation from the
   wrong one, so `evals split` keeps them in dev until the judge exists. Pilot now 48 cases, 5
-  verified. Found grader bug: must_include matched substrings ("5 MB" inside "15 MB"); fix
-  pending Aleena's OK (whole-phrase matching shared by grader and validator).
+  verified. Grader bug found and fixed: must_include matched substrings ("5 MB" inside "15 MB");
+  `phrase_in` in corpus.py now requires whole words and numbers and is shared by
+  `AnswerGrader` (version 2) and `evals validate`.
 - Lesson: a review done by Codex is a description, not a change. Codex tests against an
   in-memory copy and writes nothing; apply its fixes in this session and re-run `evals
   validate` before trusting them.

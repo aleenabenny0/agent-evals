@@ -109,3 +109,13 @@ def test_held_cases_never_land_in_test() -> None:
         assert len(dev) == 5 and len(test) == 5
     with pytest.raises(ValueError):
         stratified_split(cases, dev=1, test=9, seed=0)  # only 8 cases are free for test
+
+
+def test_validator_uses_whole_phrase_matching(corpus: Corpus) -> None:
+    substring_only = make_case(
+        id="sub",
+        area="storage",
+        gold=Gold(answer="x", must_include=[["6"]], evidence=[BUCKETS_URL]),
+    )
+    _, warnings = check_against_corpus([substring_only], corpus)
+    assert any(w.startswith("sub: no must_include") for w in warnings)

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from agent_evals.corpus import Corpus
 from agent_evals.graders.deterministic import (
     AnswerGrader,
@@ -200,3 +202,26 @@ def test_evidence_groups_accept_any_alternative() -> None:
     g = by_metric(TrajectoryGrader().grade(case, result))
     assert g["evidence_recall"].value == 0.5  # first group met by an alternative, second not
     assert make_case().gold.evidence == [[BUCKETS_URL]]  # a flat list wraps to one group per URL
+
+
+@pytest.mark.parametrize(
+    ("answer_text", "phrase", "expected"),
+    [
+        ("15 MB for both", "5 MB", False),
+        ("5 MB as raw bytes, 15 MB from S3", "5 MB", True),
+        ("up to 100 jobs", "10", False),
+        ("a maximum of 10 active jobs", "10", True),
+        ("250 documents per request", "25", False),
+        ("the block is 10.0.0.0/16", "/16", True),
+        ("about 10%.", "10%", True),
+        ("between 3-63 characters", "63", True),
+        ("Bucket names: 3 to 63.", "63", True),
+        ("a 630-character name", "63", False),
+        ("aws-marketplace:Unsubscribe only", "aws-marketplace:Subscribe", False),
+    ],
+)
+def test_key_phrases_match_whole_words_and_numbers(
+    answer_text: str, phrase: str, expected: bool
+) -> None:
+    case = make_case(gold=Gold(answer="", must_include=[[phrase]]))
+    assert by_metric(AnswerGrader().grade(case, answer(answer_text)))["correct"].passed is expected

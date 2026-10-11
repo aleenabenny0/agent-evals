@@ -137,3 +137,10 @@ def test_drift_report_names_pages_and_cases() -> None:
     assert "## Changed pages (1)" in text and "Bucket naming rules" in text
     assert "suites/docs/dev.jsonl: c-1" in text and "## What to do" in text
     assert "No drift" in drift_report(diff_snapshot([page], [], lock, checked_at="x"), lock, {})
+
+
+def test_contains_phrase_is_whole_word(corpus: Corpus) -> None:
+    # The page says "between 3 and 63 characters": 63 and 3 are there, 6 alone is not.
+    assert corpus.contains_phrase(BUCKETS_URL, "63") and corpus.contains_phrase(BUCKETS_URL, "3")
+    assert not corpus.contains_phrase(BUCKETS_URL, "6")
+    assert not corpus.contains_phrase("https://missing.test", "63")
