@@ -312,6 +312,17 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   "supported" rate is the judge failing added context that the cited quotes do not carry; by the
   brief's definition that is the claim-level unsupported rate, and whether a human agrees is what
   kappa on judge-test decides. `docs/judge-validation.md` holds the numbers and the pending bars.
+- **Judge probes, three rounds** (`docs/judge-validation.md`, section 3): round one exposed two
+  weak mutants (dropping "approximately" leaves a true sentence; swapping one of two citations
+  leaves the other carrying the claim), round two one weak flip and one real judge miss ("up to"
+  passed as "at least"), round three: number 15/15, bound flip 11/11, citation 40/40 caught;
+  padding 38/40 and resample 38/40 unchanged (both exactly at the 0.95 bar; the misses are the
+  same three borderline answers each round, the judge's own 5% noise). Probe rounds cost almost
+  nothing after the first thanks to the call cache. Mutants and probes pass; **the judge still
+  does not ship until Aleena's labels give kappa on judge-test.**
+- Observations logged for the skill review: 7 (review highlight = validator set), 8 (escapes in
+  edit scripts), 9 (split must treat linked cases as a unit), 10 (first failures are instrument
+  failures), 11 (a mutant must be wrong).
 
 ## Target: the three project briefs
 

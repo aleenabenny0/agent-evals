@@ -1,7 +1,7 @@
 # Judge validation
 
-**Status:** in progress, 2026-10-11. The judge does not ship until every bar below is met on
-judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
+**Status:** in progress, 2026-10-11: probes passed (round three), hand-label agreement pending.
+The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
 |---|---|
@@ -94,7 +94,31 @@ stability as a number instead of assuming it.
 
 Round three, with the stronger "by default" flip and the same 40 answers, follows below.
 
-PROBE_ROUND_THREE_PLACEHOLDER
+**Round three** (same 40 answers; "by default" flips to "only on request"; earliest bound in the
+text is the one flipped):
+
+| Variant | Kind | n | Expected | Observed (95% CI) | Bar | Met |
+|---|---|---|---|---|---|---|
+| number | mutant | 15 | judge fails it | 1.00 (0.80 to 1.00) | 0.90 | yes |
+| qualifier (bound flipped) | mutant | 11 | judge fails it | 1.00 (0.74 to 1.00) | 0.90 | yes |
+| citation (all swapped) | mutant | 40 | judge fails it | 1.00 (0.91 to 1.00) | 0.90 | yes |
+| padding | probe | 40 | verdicts unchanged | 0.95 (0.83 to 0.99) | 0.95 | at the bar |
+| resample | probe | 40 | verdicts unchanged | 0.95 (0.83 to 0.99) | 0.95 | at the bar |
+
+292 judge calls, 288 from cache. The four probe misses are, again, the same borderline answers.
+Caveats that stay on the record: the qualifier class has n = 11, so its interval reaches down to
+0.74, and round two showed the judge can pass an "at least" where the quote says "up to". The
+mutant set is deterministic text surgery; it does not plant subtle errors (a wrong service name,
+a swapped Region), and those remain for the hand labels and for later rounds.
+
+## 4. Decision
+
+- Mutation tests and bias probes: **passed** on round three, with the caveats above and with the
+  first two rounds kept in this document so the revisions are visible.
+- Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and
+  no judge number appears in a headline, until kappa is reported on judge-test.
+- What the judge is already allowed to do: flag dev answers where code says fail and the judge
+  says responsive, as suspected grader misses for human confirmation (failure taxonomy, A).
 
 ## 4. Decision
 
