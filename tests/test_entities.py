@@ -18,6 +18,7 @@ from agent_evals.entities import normalize_url, numbers_in, urls_in
         ("99.9% durability, 0.5 ACUs, $29/month, 24/7", {"99.9", "0.5", "29", "24", "7"}),
         ("deprecated on Oct 31, 2026.", {"31", "2026"}),
         ("version 1.2.3 of the SDK", set()),
+        ("Steps:\n1. Count them.\n2) Multiply by 4 KB.\n 10. Done", {"4"}),
     ],
 )
 def test_numbers_in(text: str, expected: set[str]) -> None:

@@ -1,8 +1,8 @@
 """Model-facing text for the LLM judge. Versioned: changing a word changes the judge version.
 
 Two verdicts (docs/plans/llm-judge.md, decided 2026-10-11). The "supported" prompt never sees the
-gold answer; the "responsive" prompt does. Each is answered through one strict tool call so the
-verdict is schema-checked, never parsed out of prose.
+gold answer; the "responsive" prompt does. Each is answered through one strict tool call, which
+the prompt asks for, so the verdict is schema-checked, never parsed out of prose.
 """
 
 from __future__ import annotations

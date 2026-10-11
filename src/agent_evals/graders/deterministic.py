@@ -221,7 +221,7 @@ class GroundingGrader:
     """
 
     name = "grounding"
-    version = "1"
+    version = "2"  # 2: list markers ("1.", "2)") and Region codes are not numbers
 
     def __init__(self, corpus: Corpus) -> None:
         self.corpus = corpus

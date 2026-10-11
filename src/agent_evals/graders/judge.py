@@ -79,12 +79,13 @@ class JudgeGrader:
 
     def _ask(self, system: str, message: str, salt: str) -> Verdict:
         cfg = self.config.model
+        # No forced tool_choice: claude-sonnet-5-5 rejects `{"type": "tool"}` (400). The system
+        # prompt asks for the tool, and a reply without the call is a grader_error, never a pass.
         request: dict[str, Any] = {
             "model": cfg.name,
             "max_tokens": cfg.max_tokens,
             "system": system,
             "tools": [self.tool],
-            "tool_choice": {"type": "tool", "name": self.tool["name"]},
             "messages": [{"role": "user", "content": message}],
         }
         if cfg.temperature is not None:
@@ -99,6 +100,12 @@ class JudgeGrader:
                     cached_calls=1 if resp.cache_hit else 0,
                     latency_ms=resp.latency_ms,
                 )
+            )
+        if resp.stop_reason == "max_tokens":
+            # A truncated tool input parses as a partial dict; never grade from one.
+            raise ValueError(
+                f"judge hit max_tokens={cfg.max_tokens} before finishing its verdict; raise "
+                "judge.model.max_tokens in the config"
             )
         for block in resp.content:
             if block.get("type") == "tool_use" and block.get("name") == self.tool["name"]:

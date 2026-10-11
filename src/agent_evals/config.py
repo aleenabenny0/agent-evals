@@ -60,7 +60,8 @@ class GradersConfig(_Strict):
 class JudgeConfig(_Strict):
     """The LLM judge (docs/plans/llm-judge.md). Runs post hoc via `evals judge`, never in `run`."""
 
-    model: ModelConfig = ModelConfig(name="claude-sonnet-5-5", max_tokens=400)
+    # Sonnet 5.5 thinks for a few hundred tokens before the tool call; 400 truncated the verdict.
+    model: ModelConfig = ModelConfig(name="claude-sonnet-5-5", max_tokens=2048)
     strict_tools: bool = True
 
 

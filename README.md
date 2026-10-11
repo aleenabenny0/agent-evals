@@ -58,6 +58,30 @@ uv run evals compare <baseline-run-id> <candidate-run-id>
 Before your first real run, set a monthly spend limit in the Claude Console and fill in
 `pricing` in `configs/default.yaml` so the per-run budget cap can work.
 
+## Results so far (2026-10-11)
+
+Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every number has its
+95% interval and n; the test split is frozen and was run once.
+
+| Run | Split | Cases | Attempts | correct (95% CI) | fabricated_citation | Cost |
+| --- | --- | --- | --- | --- | --- | --- |
+| docs agent | test | 150 | 1 | **0.987** (0.953 to 0.996) | 0.028 | $0.35 |
+| docs agent | dev | 130 | 3 | 0.918 (0.874 to 0.956) | 0.021 | $0.97 |
+| closed-book baseline (no tools) | dev | 130 | 1 | 0.546 (0.460 to 0.629) | n/a | $0.06 |
+| oracle baseline (gold pages given) | dev | 130 | 1 | 0.923 (0.864 to 0.958) | 0.000 | $0.07 |
+
+- Retrieval is worth 37 points: docs agent minus closed-book on the same dev cases is -0.372 for
+  the baseline (95% CI -0.462 to -0.282, McNemar p = 3e-12).
+- Retrieval is not the bottleneck: the oracle, handed the right pages, is +0.005 over the docs
+  agent (95% CI -0.046 to +0.054, no detectable change).
+- Reliability on dev with 3 attempts: pass^3 0.862, pass@3 0.962, **flip rate 0.100** (0.059 to
+  0.164). A change between two prompt versions smaller than that band is noise.
+- Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
+  why its score is below test's.
+- What broke: all 32 failing dev attempts were read. None states a wrong fact. 13 are keyword
+  grader misses, 12 are the agent answering correctly while marking itself abstained, 6 are case
+  defects. Details and two traces per category in [docs/failure-taxonomy.md](docs/failure-taxonomy.md).
+
 ## Metrics so far
 
 | Metric | Meaning | Better |

@@ -17,13 +17,15 @@ import re
 NUMBER = re.compile(r"(?<![\w.])(\d+(?:,\d{3})*(?:\.\d+)?)(?=[A-Za-z]{0,4}(?!\w)(?!\.\d))")
 # Region and Availability Zone codes end in a digit that is a name, not a quantity.
 _REGION_CODE = re.compile(r"\b[a-z]{2}(?:-gov|-iso[a-z]*)?-[a-z]+-\d[a-z]?\b")
+# "1." or "2)" at the start of a line numbers a list item; it is not a claim about anything.
+_LIST_MARKER = re.compile(r"(?m)^\s*\d{1,2}[.)]\s")
 URL = re.compile(r"https?://[^\s<>()\[\]\"']+")
 _TRAILING_PUNCTUATION = ".,;:!?"
 
 
 def numbers_in(text: str) -> set[str]:
     """Every standalone number in `text`, thousands separators removed ("10,240" -> "10240")."""
-    text = _REGION_CODE.sub(" ", text)
+    text = _LIST_MARKER.sub(" ", _REGION_CODE.sub(" ", text))
     return {m.group(1).replace(",", "") for m in NUMBER.finditer(text)}
 
 

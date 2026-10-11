@@ -32,7 +32,8 @@ def test_two_verdicts_and_what_each_prompt_may_see() -> None:
     assert "between 3 and 63" in supported_req["messages"][0]["content"]
     assert "3 to 63 characters" not in supported_req["messages"][0]["content"]
     assert "3 to 63 characters" in responsive_req["messages"][0]["content"]
-    assert supported_req["tool_choice"] == {"type": "tool", "name": "submit_verdict"}
+    assert "tool_choice" not in supported_req  # Sonnet 5.5 rejects a forced tool (400)
+    assert supported_req["tools"][0]["name"] == "submit_verdict"
     assert supported_req["model"] == "claude-sonnet-5-5"
 
 

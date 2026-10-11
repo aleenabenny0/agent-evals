@@ -24,8 +24,10 @@ answer for the "supported" question (it judges answer against citations only) an
 - `graders/judge.py`: `JudgeGrader` uses `LLMClient` like the agent, so every call is cached,
   timed and counted. Model and prompts come from `judge:` in the config (`claude-sonnet-5-5`,
   `JUDGE_SUPPORTED_V1`, `JUDGE_RESPONSIVE_V1` in `graders/judge_prompts.py`). The verdict comes
-  back through a strict `submit_verdict` tool with `tool_choice` forcing it, so parsing is
-  schema-checked; a missing or malformed verdict is a `grader_error`, never a silent pass.
+  back through a strict `submit_verdict` tool the prompt asks for, so parsing is schema-checked;
+  a missing or malformed verdict is a `grader_error`, never a silent pass. (A forced
+  `tool_choice` was tried first; claude-sonnet-5-5 rejects it with a 400, so the first judge run
+  produced 346 grader errors and zero spend before the fix.)
   Metrics: `judge_supported` and `judge_responsive`, each 0/1 with the judge's reason.
 - The judge runs **after** a run, never inside `evals run`: `evals judge RUN_ID` reads the stored
   answers, judges the answered, non-abstained ones (and asks "supported" only when there are

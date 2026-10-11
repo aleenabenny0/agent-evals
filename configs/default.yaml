@@ -37,7 +37,7 @@ judge:
   # `evals judge` reports tokens, not dollars.
   model:
     name: claude-sonnet-5-5
-    max_tokens: 400
+    max_tokens: 2048       # the model thinks before the tool call; 400 truncated verdicts
     temperature: null
     pricing:
       input_per_mtok: null

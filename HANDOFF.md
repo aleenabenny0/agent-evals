@@ -283,6 +283,27 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   price: a case defect to put to Aleena, not a gold edit), docs-ai-002 group missing "no
   additional cost" 5 times, docs-ai-001 group 7 misses (abstentions and a missing negative),
   docs-mix-050 abstained 2/3. Everything else flipped once in three.
+- **All four approved runs done (2026-10-11 evening).** Baselines on dev: closed-book
+  `closed-book-20261011-225242-b58341` correct 0.546 (0.460 to 0.629), $0.06; oracle
+  `oracle-evidence-20261011-225523-da3dc1` correct 0.923 (0.864 to 0.958), $0.07. Paired on dev:
+  docs minus closed-book -0.372 (CI -0.462 to -0.282, p=3e-12); docs vs oracle +0.005 (CI -0.046
+  to +0.054): retrieval is worth 37 points and is not the bottleneck. **Test, run once:**
+  `docs-20261011-225715-b67388`, 150 cases, correct **0.987 (0.953 to 0.996)**,
+  fabricated_citation 0.028, unsupported_entity 0.060, $0.35; its 3 failures were not read.
+  README "Results so far" carries the table.
+- **Failure taxonomy written** (`docs/failure-taxonomy.md`, Brief 02 M5): all 32 failing dev
+  attempts read. 13 keyword-grader false negatives, 12 hedged abstentions (right answer,
+  `abstained: true`, usually after reading a sibling page instead of the top search hit), 3
+  unanswerable-answered-as-false-premise (docs-int-023), 3 case defect (docs-chg-025), 0 wrong
+  facts. Side finding: tool_errors are guessed URLs outside the snapshot. The grounding grader
+  flagged list numerals ("1.", "2.") as unsupported numbers: fixed, grounding grader v2.
+  Improvement candidates for the first gated iteration are listed in the taxonomy; none applied.
+- Judge debugging: first `evals judge` run produced 346 grader errors and zero spend (Sonnet
+  5.5 rejects forced `tool_choice`, 400); second attempt truncated at max_tokens 400 because the
+  model thinks ~300 tokens before the tool call. Fixed both (no forcing; max_tokens 2048;
+  max_tokens is now a named error). Three-answer smoke: verdicts arrive with reasons. Early
+  signal: "supported" is strict and fails answers whose extra context is not in the cited
+  quotes; whether that matches Aleena's reading is what kappa on judge-test will say.
 
 ## Target: the three project briefs
 
@@ -307,9 +328,13 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    --reviewer`-style, exact command `uv run evals label docs-20261011-223111-702e87 --labeler
    aleena --limit 50` per sitting (about two hours for 100); the agent then runs `evals judge`,
    `evals judge-validate` and `evals judge-probe` and writes `docs/judge-validation.md`;
-   (i) decide on docs-chg-025: the question asks only whether PITR is fixed at 35 days but the
-   gold requires the "price does not change" clause; either drop that must_include group or
-   extend the question to ask about price (a case fix, not a gold-to-pass edit).
+   (i) three case decisions from the taxonomy, all dev: docs-chg-025 (gold requires an unasked
+   price clause: drop the group or extend the question), docs-int-023 (reads as a false premise;
+   reclassify, or keep unanswerable and let a prompt rule settle the format), docs-int-017 (a
+   compound question whose second half is outside the snapshot; split it or accept the
+   abstention). Case fixes, never gold-to-pass edits;
+   (j) after labels exist: read `docs/judge-validation.md` (written by the agent from
+   `judge-validate` and `judge-probe`) and decide whether the judge ships or its prompt revises.
    Done 2026-10-11: the changed_default batch (was (b)) and the five metric additions (was (f)).
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
