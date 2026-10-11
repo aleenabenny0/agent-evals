@@ -85,7 +85,7 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 5. Learning loops (above).
 6. Red team (prompt injection planted in doc pages and tasks) and technical report.
 
-## Current status (2026-10-10, end of day)
+## Current status (2026-10-11)
 
 - Repo builds and all checks pass on Windows: `uv sync`, `uv run pytest` -> 89 passed. Published
   at https://github.com/aleenabenny0/agent-evals (public). CI (`.github/workflows/ci.yml`, Ubuntu)
@@ -164,6 +164,30 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 - Lesson: a review done by Codex is a description, not a change. Codex tests against an
   in-memory copy and writes nothing; apply its fixes in this session and re-run `evals
   validate` before trusting them.
+- Batch 4: `suites/docs/mixed.drafts.jsonl`, 94 drafts (11 multi_step, 17 false_premise,
+  12 unanswerable, 3 changed_default, 51 lookup) across databases, networking, storage, the
+  remaining AI services, compute, security and devtools. All pass `evals validate`.
+- **Draft totals (2026-10-11): 249 drafts in five files, 6 verified, 2 on hold.** 234 capability
+  cases: lookup 146 (59% vs 35% planned), false_premise 31, multi_step 29, unanswerable 28,
+  changed_default 15 (6% vs 15% planned). Areas: ai_ml 75 (30%), compute 31, networking 31,
+  security 28, integration 25, storage 23, databases 16, analytics 10, management 7, devtools 3.
+  The mix is lookup-heavy because quota pages yield lookups; changed_default is the scarce kind.
+  Options: accept the mix and let `evals split` stratify it, or draft a small batch mined for
+  changed defaults (runtime deprecations, service closures, default changes) before splitting.
+- Baselines (phase 4, built early): `evals run --agent closed-book` (memory only, nothing to
+  cite) and `--agent oracle-evidence` (gold pages handed over, no search). Not yet run; both cost
+  money. The oracle reads gold evidence by design and never informs a release decision.
+- Paraphrase robustness (phase 2 step 4): `paraphrase_of` on cases, `evals report` prints
+  paraphrase consistency when the suite has groups; `suites/docs/robustness.drafts.jsonl` holds
+  3 paraphrases each of the 5 verified pilot cases (dev split by design).
+- Validator now also enforces `suites.held_out_services` (config): error if a held-out service
+  appears in a snapshot page title or URL; warning if an unanswerable case rests on none of
+  held-out service, price, SLA or date.
+- Pricing for claude-haiku-5-5 is set in `configs/default.yaml` ($0.10 / $0.50 per MTok), so
+  reports show dollars and the $5 per-run budget cap is live. A smoke run costs about $0.03.
+- Judge proposal written: `docs/plans/llm-judge.md` (two verdicts, validation protocol, cost,
+  open questions). Needs Aleena's agreement; touches graders/.
+- Walkthrough of phase 2 so far: `docs/walkthroughs/2026-10-11-phase-2-authoring.md`.
 - Batch 3: `suites/docs/integration.drafts.jsonl`, 47 drafts built hardest-first after the pilot
   review (12 multi_step, 8 false_premise, 7 unanswerable, 3 changed_default, 17 lookup) across
   Step Functions, SQS, API Gateway, EventBridge, Kinesis, Firehose, Secrets Manager, ACM,
@@ -201,11 +225,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 
 ## Next tasks, in order
 
-1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Remaining, in order:
-   (a) Aleena verifies the pilot batch (`evals review`); (b) done: evidence groups; (c) draft
-   the remaining ~200 cases across areas per the mix,
-   leaning to multi_step and changed_default; (d) `evals split <verified> --dev 100 --test 150
-   --seed <record it>`; (e) paraphrase robustness suite; (f) LLM judge and its validation.
+1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
+   drafting (249), evidence groups, paraphrase mechanics, validators. **Needs Aleena:**
+   (a) verify the drafts with `evals review` (about 240 remain; rejections carry reasons);
+   (b) decide whether to draft a changed_default-heavy batch first or accept the mix;
+   (c) when verified cases exist in one file, `evals split <file> --dev 100 --test 150 --seed <N>`
+   and record the seed here; (d) approve `docs/plans/llm-judge.md`, then hand-label ~100 dev
+   answers; (e) approve the first dev-split run and the two baseline runs (paid).
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
    `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of

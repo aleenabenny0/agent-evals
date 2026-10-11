@@ -41,6 +41,9 @@ uv run evals snapshot         # fetch the AWS docs pages in configs/docs_pages.t
 uv run evals snapshot --check # has the documentation drifted since the snapshot? (monthly in CI)
 uv run evals validate suites/docs/smoke.jsonl   # with a snapshot: checks evidence pages and quotes too
 uv run evals review suites/docs/ai-ml.drafts.jsonl --reviewer <you>   # verify drafts one by one
+uv run evals split suites/docs/verified.jsonl --dev 100 --test 150 --seed 1   # stratified dev/test
+uv run evals power --cases 150                       # how many cases detect a 10-point change
+uv run evals run suites/docs/smoke.jsonl --agent closed-book   # baselines: closed-book, oracle-evidence
 uv run evals run suites/docs/smoke.jsonl            # costs a few cents
 uv run evals report                                  # summary of the latest run
 ```
