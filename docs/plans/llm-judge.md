@@ -31,9 +31,11 @@ answer for the "supported" question (it judges answer against citations only) an
 
 ## Validation before any judge number counts (from the roadmap)
 
-1. **Hand labels.** Aleena labels about 100 dev-split answers (supported? responsive?) with
-   `evals review`-style tooling extended for answers. Cohen's kappa between judge and labels must
-   be at least 0.7 on each question.
+1. **Hand labels.** Aleena labels 100 to 200 dev-split answers (supported? responsive?) with
+   `evals review`-style tooling extended for answers. The labels are split into **judge-dev**
+   (for tuning the judge prompt) and **judge-test** (for reporting only; never looked at while
+   tuning). On judge-test, report Cohen's kappa (at least 0.7 on each question), **TPR** (the
+   judge catches real failures) and **TNR** (it does not flag good answers), with n.
 2. **Mutation tests.** Take correct, supported answers and plant one error each (wrong number,
    wrong service, dropped qualifier, citation swapped to an unrelated quote). The judge must flag
    at least 90% of mutants as failing.
@@ -41,7 +43,8 @@ answer for the "supported" question (it judges answer against citations only) an
    move.
 4. **Stability.** Re-judge the same set; agreement with itself must be near total.
 
-Results go in an ADR with the kappa, mutation catch rate and probe outcomes. If a bar is missed,
+Results go in `docs/judge-validation.md` (the brief's artifact) and an ADR: kappa, TPR, TNR,
+the confusion matrix, mutation catch rate and probe outcomes, each with n. If a bar is missed,
 the prompt changes and validation repeats; the judge does not ship on a near miss.
 
 ## Cost

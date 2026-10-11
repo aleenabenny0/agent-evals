@@ -229,6 +229,14 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   row. 7/7 on `correct` reads 0.646 to 1.000 instead of 1.000 to 1.000. Counts, fractions,
   multi-attempt runs and paired comparisons keep the bootstrap.
 
+## Target: the three project briefs
+
+`docs/plans/brief-alignment.md` maps this repo to Brief 02 (Agent Evals) milestone by milestone,
+lists the metric gaps with the smallest action for each, and proposes the order for Briefs 01
+(LLM Ops) and 03 (Routing) as later phases. Read it before planning anything new. The headline
+the briefs want: a chart of holdout success, hallucination rate and cost per success improving
+over gated iterations, with a failure taxonomy shrinking beside it.
+
 ## Next tasks, in order
 
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
@@ -236,8 +244,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
    (a) verify the drafts with `evals review` (about 240 remain; rejections carry reasons);
    (b) decide whether to draft a changed_default-heavy batch first or accept the mix;
    (c) when verified cases exist in one file, `evals split <file> --dev 100 --test 150 --seed <N>`
-   and record the seed here; (d) approve `docs/plans/llm-judge.md`, then hand-label ~100 dev
-   answers; (e) approve the first dev-split run and the two baseline runs (paid).
+   and record the seed here; (d) approve `docs/plans/llm-judge.md`, then hand-label 100-200 dev
+   answers split into judge-dev and judge-test; (e) approve the first dev-split run and the two
+   baseline runs (paid); (f) approve the small grader/stats additions from the brief alignment
+   (flip rate, pass@k, repeated calls, tool precision, fabricated entity), one approval covers
+   all five; (g) set a hard monthly spend limit in the Anthropic console; (h) decide whether to
+   keep the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now.
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
    `answer` field for markup; an output like `{}` or `{"answer": null}` scores 0. Add a check of
