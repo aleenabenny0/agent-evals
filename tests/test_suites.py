@@ -140,6 +140,19 @@ def test_held_cases_never_land_in_test() -> None:
         stratified_split(cases, dev=1, test=9, seed=0)  # only 8 cases are free for test
 
 
+def test_paraphrase_groups_stay_together_in_dev() -> None:
+    cases = [_verified(f"c{i}", "lookup", "storage") for i in range(10)]
+    cases[3] = cases[3].model_copy(update={"paraphrase_of": "c0"})
+    cases[7] = cases[7].model_copy(update={"paraphrase_of": "c0"})
+    for seed in range(5):
+        dev, test = stratified_split(cases, dev=5, test=5, seed=seed)
+        # The source and both paraphrases are in dev together; test never sees any of them.
+        assert {"c0", "c3", "c7"} <= {c.id for c in dev}
+        assert not {"c0", "c3", "c7"} & {c.id for c in test}
+    with pytest.raises(ValueError, match="paraphrase group"):
+        stratified_split(cases, dev=2, test=8, seed=0)  # only 7 cases are free for test
+
+
 def test_validator_uses_whole_phrase_matching(corpus: Corpus) -> None:
     substring_only = make_case(
         id="sub",

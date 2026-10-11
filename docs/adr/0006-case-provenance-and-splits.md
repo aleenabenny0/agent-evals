@@ -48,3 +48,28 @@ pages (a service guide, its quotas page, the General Reference), and `evidence_r
 penalize the agent for grounding an answer on one of them rather than another. Case authors list
 every page that states the fact. Smoke case 005 was the first example: the Lambda timeout
 appears on three pages.
+
+## Amendment (2026-10-11): paraphrase groups never enter test; the split is frozen
+
+`stratified_split` pins every paraphrase group (the source case and its paraphrases) to dev, the
+same way it pins `hold` cases. Two reasons: a paraphrase in dev of a question in test would leak
+that question to anyone tuning on dev, and paraphrase consistency is measured within one run, so
+the group has to be scored together. Robustness is therefore a dev-split measurement; the test
+split measures the headline numbers.
+
+The split ran once, on 2026-10-11, over the 280 cases Aleena verified (249 in the five original
+draft files plus 31 changed-default cases), all drafted synthetically with verbatim support
+quotes and none rejected:
+
+```
+evals split suites/docs/verified.jsonl --dev 130 --test 150 --seed 20261011
+```
+
+Result: `suites/docs/dev.jsonl`, 130 cases (lookup 74, changed_default 20, multi_step 12,
+false_premise 12, unanswerable 12; includes the 2 held cases and the 5 paraphrase groups, 20
+cases). `suites/docs/test.jsonl`, 150 cases (lookup 72, changed_default 26, false_premise 19,
+multi_step 17, unanswerable 16). The seed is the date, chosen before the command ran. The draft
+files and the merged source were then deleted; git history keeps them. `test.jsonl` is frozen:
+nobody reads it to write prompts, lessons, examples or fixes, and new regression cases go to
+dev.
+

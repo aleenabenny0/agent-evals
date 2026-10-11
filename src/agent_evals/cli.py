@@ -303,7 +303,13 @@ def split(
     force: Annotated[bool, typer.Option("--force", help="Overwrite existing files.")] = False,
 ) -> None:
     """Assign verified cases to dev/test at random within each (type, area) stratum."""
-    from agent_evals.suites import load_suite, stratified_split, unverified_drafts, write_suite
+    from agent_evals.suites import (
+        load_suite,
+        paraphrase_groups,
+        stratified_split,
+        unverified_drafts,
+        write_suite,
+    )
 
     cases = load_suite(source)
     drafts = unverified_drafts(cases)
@@ -330,6 +336,9 @@ def split(
         console.print(f"[green]{path}[/green] {len(group)} cases {mix}")
     if held := [c.id for c in dev_cases if c.hold]:
         console.print(f"{len(held)} held case(s) placed in dev: {', '.join(held)}")
+    if groups := paraphrase_groups(cases):
+        n = len(groups) + sum(len(m) for m in groups.values())
+        console.print(f"{n} cases in {len(groups)} paraphrase group(s) placed in dev")
     console.print(f"seed={seed}; record it with the suite in HANDOFF.md")
 
 

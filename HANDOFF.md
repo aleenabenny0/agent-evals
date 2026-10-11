@@ -253,6 +253,16 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   "10GB" are numbers with a unit stuck on; "us-west-2" is a Region name, not a 2). All six suite
   files validate with zero warnings. 156 tests. Only `changed-defaults.drafts.jsonl` (31) is
   still unverified.
+- 2026-10-11, split frozen (ADR 0006 amendment): Aleena verified the changed-default batch
+  (commit `b635efc`, 280 verified in all, 0 rejected). `evals split` was made paraphrase-aware
+  (groups pinned to dev, like `hold`), then run once:
+  `evals split suites/docs/verified.jsonl --dev 130 --test 150 --seed 20261011`. Files now:
+  `suites/docs/smoke.jsonl` (7), `suites/docs/dev.jsonl` (130: lookup 74, changed_default 20,
+  multi_step 12, false_premise 12, unanswerable 12, with the 2 held cases and all 20 paraphrase
+  cases), `suites/docs/test.jsonl` (150: lookup 72, changed_default 26, false_premise 19,
+  multi_step 17, unanswerable 16). The six `*.drafts.jsonl` files and `verified.jsonl` were
+  deleted (git history has them). **`test.jsonl` is frozen: never read it for prompt, lesson,
+  example or fix work.** New cases go in a fresh `*.drafts.jsonl`, get verified, and join dev.
 
 ## Target: the three project briefs
 
@@ -267,16 +277,16 @@ over gated iterations, with a failure taxonomy shrinking beside it.
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
    drafting (280 across six files), evidence groups, paraphrase mechanics, validators, the five
    reliability/grounding metrics (ADR 0007). **Needs Aleena:**
-   (a) review `changed-defaults.drafts.jsonl` (31 cases) with `evals review`, then
-   `evals validate` it and commit; (b) done: the five original files are fully verified and the
-   quote sweep ran;
-   (c) once (a) is committed, the agent merges the 280 verified cases into one file and hands
-   over the command: `evals split <file> --dev 130 --test 150 --seed <N>` (2 held cases go to
-   dev automatically); record the seed here; (d) approve `docs/plans/llm-judge.md` and answer its three open
+   (a) done: all 280 drafts verified; (b) done: quote sweep; (c) done: split frozen, seed
+   20261011 (see status above); (d) approve `docs/plans/llm-judge.md` and answer its three open
    questions, then hand-label 100-200 dev answers split into judge-dev and judge-test;
-   (e) approve the first dev-split run and the two baseline runs (paid; cost estimate from smoke
-   first); (f) set a hard monthly spend limit in the Anthropic console; (g) decide whether to
-   keep the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now.
+   (e) approve the first paid runs, in this order and each with an estimate from the smoke runs
+   (41k input and 1.1k output tokens per case on the 334-page snapshot, so about $0.005 per
+   case-attempt at Haiku prices): docs agent on dev with 3 attempts (390 attempts, about $2),
+   closed-book on dev (no tools, under $0.10), oracle-evidence on dev (pages in the prompt, about
+   $0.50), then docs agent on test once with 1 attempt (about $0.75) for the headline; (f) set a
+   hard monthly spend limit in the Anthropic console before (e); (g) decide whether to keep the
+   Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now.
    Done 2026-10-11: the changed_default batch (was (b)) and the five metric additions (was (f)).
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the

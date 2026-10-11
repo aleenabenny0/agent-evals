@@ -138,14 +138,22 @@ def stratified_split(
 
     Deterministic for a seed. Uses every case: dev + test must equal len(cases). Test slots are
     allocated to strata in proportion to their size, with the largest remainders rounded up.
-    Cases with `hold` set always go to dev.
+    Cases with `hold` set always go to dev, and so does every paraphrase group (the source and
+    its paraphrases): a paraphrase in dev of a test question would leak the question, and
+    paraphrase consistency is measured within one run, so the group must stay together.
     """
     if dev < 0 or test < 0 or dev + test != len(cases):
         raise ValueError(f"dev + test must equal the number of cases ({len(cases)})")
-    held = [c.model_copy(update={"split": "dev"}) for c in cases if c.hold]
-    free = [c for c in cases if not c.hold]
+    groups = paraphrase_groups(cases)
+    in_group = set(groups) | {m for members in groups.values() for m in members}
+    pinned = [c for c in cases if c.hold or c.id in in_group]
+    held = [c.model_copy(update={"split": "dev"}) for c in pinned]
+    free = [c for c in cases if not (c.hold or c.id in in_group)]
     if test > len(free):
-        raise ValueError(f"only {len(free)} cases are not on hold; the test split needs {test}")
+        raise ValueError(
+            f"only {len(free)} cases are neither on hold nor in a paraphrase group; the test "
+            f"split needs {test}"
+        )
     strata: dict[tuple[str, str], list[Case]] = {}
     for c in free:
         strata.setdefault((c.type, c.area or ""), []).append(c)
