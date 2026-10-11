@@ -17,10 +17,11 @@ docs_agent:
     max_tokens: 2048
     temperature: null      # null = API default
     pricing:
-      # USD per million tokens. Check https://platform.claude.com/docs/en/about-claude/pricing
-      # and fill these in; until then reports show tokens but no dollar cost.
-      input_per_mtok: null
-      output_per_mtok: null
+      # USD per million tokens for claude-haiku-5-5, Anthropic first-party rates as of 2026-10-06,
+      # for prompts up to 100K tokens (every request here is far below that). Re-check at
+      # https://platform.claude.com/docs/en/about-claude/pricing when the model changes.
+      input_per_mtok: 0.10
+      output_per_mtok: 0.50
   max_steps: 12
   search_k: 5
   page_chars: 8000
@@ -29,3 +30,21 @@ docs_agent:
 
 graders:
   min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated
+
+suites:
+  # Kept out of the snapshot on purpose so unanswerable cases have real material; `evals
+  # validate` fails if a page about one of these is ever added. Matched case-insensitively
+  # against page titles and URLs, and against unanswerable questions.
+  held_out_services:
+    - GameLift
+    - Ground Station
+    - Braket
+    - RoboMaker
+    - Snowball
+    - Snow Family
+    - Chime
+    - Greengrass
+    - WorkSpaces
+    - MediaConvert
+    - Managed Blockchain
+    - Outposts

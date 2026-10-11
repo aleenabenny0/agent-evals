@@ -107,6 +107,7 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
     from agent_evals.suites import (
         SuiteError,
         check_against_corpus,
+        check_held_out,
         load_suite,
         unassigned,
         unverified_drafts,

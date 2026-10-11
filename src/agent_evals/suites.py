@@ -141,3 +141,47 @@ def stratified_split(
         test_cases += [c.model_copy(update={"split": "test"}) for c in group[:k]]
         dev_cases += [c.model_copy(update={"split": "dev"}) for c in group[k:]]
     return dev_cases, test_cases
+
+
+# Words that mark the unanswerable classes needing no held-out service: prices, SLAs, dates.
+UNANSWERABLE_HINTS = (
+    "price",
+    "pricing",
+    "cost",
+    "charge",
+    "sla",
+    "uptime",
+    "when will",
+    "what date",
+    "which date",
+)
+
+
+def check_held_out(
+    cases: Iterable[Case], corpus: Corpus, held_out: Iterable[str]
+) -> tuple[list[str], list[str]]:
+    """Unanswerable cases rest on an absence; this keeps that absence real. Returns (errors,
+    warnings).
+
+    Errors: a held-out service named in a snapshot page title or URL. Warnings: an unanswerable
+    case whose question names no held-out service and none of the price / SLA / date hints, so
+    its unanswerability should be re-checked by hand.
+    """
+    names = [h.lower() for h in held_out]
+    errors: list[str] = []
+    warnings: list[str] = []
+    for url, page in corpus.pages.items():
+        hay = f"{page.title} {url}".lower()
+        for name in names:
+            if name in hay:
+                errors.append(f"held-out service {name!r} appears in the snapshot: {url}")
+    for c in cases:
+        if c.answerable:
+            continue
+        q = c.question.lower()
+        if not any(n in q for n in names) and not any(h in q for h in UNANSWERABLE_HINTS):
+            warnings.append(
+                f"{c.id}: unanswerable case names no held-out service and no price, SLA or "
+                "date; confirm the snapshot really lacks the answer"
+            )
+    return errors, warnings

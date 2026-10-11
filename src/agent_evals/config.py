@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class _Strict(BaseModel):
@@ -57,11 +57,18 @@ class GradersConfig(_Strict):
     min_quote_chars: int = 12
 
 
+class SuitesConfig(_Strict):
+    # Services deliberately kept out of the snapshot so unanswerable cases have real material.
+    # `evals validate` errors if one of them shows up in a page title or URL (ADR 0006).
+    held_out_services: list[str] = Field(default_factory=list)
+
+
 class Config(_Strict):
     paths: Paths = Paths()
     run: RunConfig = RunConfig()
     docs_agent: DocsAgentConfig = DocsAgentConfig()
     graders: GradersConfig = GradersConfig()
+    suites: SuitesConfig = SuitesConfig()
 
 
 def load_config(path: Path | None = None) -> Config:
