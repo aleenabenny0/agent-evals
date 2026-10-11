@@ -6,10 +6,10 @@ from agent_evals.judge_probes import (
     PADDING,
     Variant,
     behaved,
-    drop_qualifier,
+    flip_bound,
     mutate_number,
     pad_answer,
-    swap_citation,
+    swap_citations,
     variants,
 )
 
@@ -29,21 +29,23 @@ def test_mutate_number(answer: str, expected: str | None) -> None:
     assert mutate_number(answer) == expected
 
 
-def test_drop_qualifier_removes_the_first_bound() -> None:
-    dropped = drop_qualifier("You get 1,000 by default, up to 10,000.")
-    assert dropped == "You get 1,000, up to 10,000."
-    assert drop_qualifier("Only lowercase letters.") is None  # sentence-initial: nothing to drop
-    assert drop_qualifier("Names can be up to 63 characters") == "Names can be 63 characters"
-    assert drop_qualifier("No qualifier here.") is None
+def test_flip_bound_contradicts_the_first_bound() -> None:
+    assert flip_bound("Names can be up to 63 characters") == "Names can be at least 63 characters"
+    assert flip_bound("Enabled by default, up to 10.") == "Enabled only on request, up to 10."
+    assert flip_bound("Approximately 10% cheaper") == "Exactly 10% cheaper"
+    assert flip_bound("About 10% cheaper, per Region") == "Exactly 10% cheaper, per Region"
+    assert flip_bound("Set per account") == "Set per Region"
+    assert flip_bound("No bound stated.") is None
+    assert flip_bound("Roundabout talk, up to a point") == "Roundabout talk, at least a point"
 
 
-def test_swap_citation_uses_an_unrelated_quote() -> None:
+def test_swap_citations_replaces_every_quote_with_unrelated_ones() -> None:
     cits = [{"url": "u1", "quote": "between 3 and 63"}, {"url": "u2", "quote": "lowercase"}]
-    pool = [("u1", "between 3 and 63"), ("u9", "900 seconds (15 minutes)")]
-    swapped = swap_citation(cits, pool)
-    assert swapped == [{"url": "u9", "quote": "900 seconds (15 minutes)"}, cits[1]]
-    assert swap_citation([], pool) is None
-    assert swap_citation(cits, [("u1", "between 3 and 63")]) is None  # nothing unrelated
+    pool = [("u1", "between 3 and 63"), ("u9", "900 seconds"), ("u8", "10 GB"), ("u7", "x")]
+    swapped = swap_citations(cits, pool)
+    assert swapped == [{"url": "u9", "quote": "900 seconds"}, {"url": "u8", "quote": "10 GB"}]
+    assert swap_citations([], pool) is None
+    assert swap_citations(cits, [("u9", "900 seconds")]) is None  # not enough unrelated quotes
 
 
 def test_variants_cover_every_applicable_probe() -> None:
@@ -56,7 +58,7 @@ def test_variants_cover_every_applicable_probe() -> None:
     vs = variants(output, [("u9", "other quote")])
     assert [v.probe for v in vs] == ["number", "qualifier", "citation", "padding", "resample"]
     assert vs[0].output["answer"] == "Up to 126 characters by default."
-    assert vs[1].output["answer"] == "Up to 63 characters."
+    assert vs[1].output["answer"] == "At least 63 characters by default."  # earliest bound flips
     assert vs[2].output["citations"][0]["quote"] == "other quote"
     assert vs[3].output["answer"] == pad_answer(output["answer"])
     assert PADDING in vs[3].output["answer"]

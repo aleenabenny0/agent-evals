@@ -38,10 +38,14 @@ the agent's phrasing.
   `docs-ai-001-p2` #2 ("do not currently support" vs "do not support"), `docs-chg-016` #2 (listed
   the sixteen Regions instead of the "May 20, 2025" cut-off; same fact, other side of the table).
 
-What to do: this is exactly what the judge's "responsive" verdict is for. Once the judge is
-validated, a dev answer with `correct = 0` and both judge verdicts passed is flagged as a
-suspected grader miss for Aleena to confirm; confirmed ones get wider alternatives. The test
-split is never touched this way (its false negatives stay, and are reported as such).
+What to do: this is exactly what the judge's "responsive" verdict is for. The judge pass over
+this run (judge `b23a6c3aef09`, same evening) marked **21 of the 32 failing attempts as
+responsive**: all 13 in this category, the 3 in category C, the 3 in category D, and the two
+`docs-ai-001` attempts that answered without abstaining. The 11 it did not mark are the hedged
+abstentions, which the judge skips by design. Once the judge is validated against Aleena's
+labels, a dev answer with `correct = 0` and `judge_responsive = 1` becomes a suspected grader
+miss for her to confirm; confirmed ones get wider alternatives. The test split is never touched
+this way (its false negatives stay, and are reported as such).
 
 ## B. Hedged abstention (12 attempts, 6 cases)
 
@@ -84,6 +88,23 @@ the agent treated it as one. Note to Aleena: either reclassify the case as `fals
 answered the question asked, correctly, three times. Drafting error (the agent's, 2026-10-11),
 caught by the first run. Fix is Aleena's call: drop that `must_include` group or extend the
 question. It is a case fix, not a gold-to-pass edit, and HANDOFF carries it as item (i).
+
+## What the judge adds on the passing attempts
+
+`judge_responsive` passed 0.997 of judged answers; the one failure it found among code passes is
+`docs-core-028` #3, where the agent confirmed the DynamoDB half and hedged the S3 Block Public
+Access half ("check it yourself") that the reference states outright. A real catch that keywords
+cannot make.
+
+`judge_supported` passed only **0.177** of cited answers. Reading the reasons: the core claim is
+almost always supported; what fails is the agent's added context, drawn from pages it read but
+did not quote ("inference profiles are used to route requests across Regions", "the 10% saving
+belongs to the Global profile", when the cited table row has no headers). By the brief's
+definition that is a claim-level unsupported rate, and 82% of answers carry at least one such
+claim. Whether a human reader agrees that this should fail an answer is exactly what the
+judge-test kappa will tell; if Aleena's labels pass those answers, the judge prompt is too
+strict and is revised on judge-dev. Either way the agent-side fix is the same and belongs to
+phase 5: cite what you state, or do not state it.
 
 ## E. Fabrication and wrong facts: none observed
 

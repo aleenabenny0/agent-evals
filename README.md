@@ -78,6 +78,10 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   0.164). A change between two prompt versions smaller than that band is noise.
 - Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
   why its score is below test's.
+- LLM judge (Sonnet 5.5, two verdicts, run after the fact on the stored answers): responsive
+  0.997, supported 0.177. The judge is not yet validated against hand labels, so these are shown,
+  not trusted; the low "supported" rate is the agent adding context its citations do not carry.
+  Validation status and bars: [docs/judge-validation.md](docs/judge-validation.md).
 - What broke: all 32 failing dev attempts were read. None states a wrong fact. 13 are keyword
   grader misses, 12 are the agent answering correctly while marking itself abstained, 6 are case
   defects. Details and two traces per category in [docs/failure-taxonomy.md](docs/failure-taxonomy.md).

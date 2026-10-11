@@ -5,13 +5,18 @@ everything also "agrees" most of the time. So two more checks, each built from a
 passed on both verdicts:
 
 - **Mutants** plant one known error in a passed answer. The judge must fail the mutant on at least
-  one verdict. Three kinds: a changed number, a dropped qualifier ("by default", "up to"), and a
-  citation whose quote is swapped for an unrelated one.
+  one verdict. Three kinds: a changed number, a flipped bound ("up to" becomes "at least", "by
+  default" becomes "always"), and citations whose quotes are all swapped for unrelated ones.
 - **Probes** change nothing of substance. The judge must return the same verdicts. Two kinds:
   the answer padded with a harmless closing sentence (length bias), and the very same answer
   judged again under a different cache salt (stability).
 
 Everything here is deterministic text surgery, so the same run always yields the same variants.
+
+Round one (2026-10-11) taught two lessons now built in. Dropping a qualifier ("approximately 10%"
+to "10%", "an additional fee" to "a fee") usually leaves the answer true, so the judge was right
+to pass those mutants; bounds are flipped instead. Swapping only the first citation left other
+citations still supporting the claim; every citation is swapped now.
 """
 
 from __future__ import annotations
@@ -25,17 +30,18 @@ from agent_evals.entities import NUMBER
 
 MUTANTS = ("number", "qualifier", "citation")
 PROBES = ("padding", "resample")
-QUALIFIERS = (
-    "by default",
-    "per Region",
-    "per AWS account",
-    "per account",
-    "at most",
-    "up to",
-    "at least",
-    "only",
-    "approximately",
-    "about",
+# A bound and the bound that contradicts it. Order matters: longer phrases first.
+BOUND_FLIPS = (
+    ("by default", "only on request"),
+    ("per AWS account", "per Region"),
+    ("per account", "per Region"),
+    ("per Region", "per account"),
+    ("at most", "at least"),
+    ("at least", "at most"),
+    ("up to", "at least"),
+    ("no more than", "at least"),
+    ("approximately", "exactly"),
+    ("about", "exactly"),
 )
 PADDING = " I hope this helps; let me know if you need anything else about this topic."
 
@@ -62,27 +68,34 @@ def mutate_number(answer: str) -> str | None:
     return answer[: m.start(1)] + new + answer[m.end(1) :]
 
 
-def drop_qualifier(answer: str) -> str | None:
-    """Remove the first qualifier phrase, so a bounded claim becomes an unbounded one."""
-    for q in QUALIFIERS:
-        pattern = re.compile(rf"\s+{re.escape(q)}(?=[\s,.;:)])", re.IGNORECASE)
+def flip_bound(answer: str) -> str | None:
+    """Replace the earliest bounding phrase in the text with the one that contradicts it ("up to
+    63" becomes "at least 63"). None when the answer states no bound."""
+    best: tuple[int, int, str] | None = None  # (start, end, replacement) of the earliest match
+    for old, new in BOUND_FLIPS:
+        pattern = re.compile(rf"(?<!\w){re.escape(old)}(?!\w)", re.IGNORECASE)
         m = pattern.search(answer)
-        if m:
-            return answer[: m.start()] + answer[m.end() :]
-    return None
+        if m and (best is None or m.start() < best[0]):
+            replacement = new.capitalize() if m.group(0)[0].isupper() else new
+            best = (m.start(), m.end(), replacement)
+    if best is None:
+        return None
+    start, end, replacement = best
+    return answer[:start] + replacement + answer[end:]
 
 
-def swap_citation(
+def swap_citations(
     citations: Sequence[dict[str, Any]], pool: Sequence[tuple[str, str]]
 ) -> list[dict[str, Any]] | None:
-    """Replace the first citation's quote with an unrelated quote from another answer."""
+    """Replace every citation's quote with an unrelated quote from another answer, so nothing
+    the answer says is still carried by a citation. None when the pool cannot supply enough."""
     if not citations:
         return None
-    first = citations[0]
-    for url, quote in pool:
-        if quote and quote != first.get("quote"):
-            return [{**first, "url": url, "quote": quote}, *citations[1:]]
-    return None
+    own = {str(c.get("quote", "")) for c in citations}
+    spare = [(u, q) for u, q in pool if q and q not in own]
+    if len(spare) < len(citations):
+        return None
+    return [{**c, "url": u, "quote": q} for c, (u, q) in zip(citations, spare, strict=False)]
 
 
 def pad_answer(answer: str) -> str:
@@ -111,9 +124,9 @@ def variants(
     out: list[Variant] = []
     if (changed := mutate_number(answer)) is not None:
         out.append(Variant("number", "mutant", {**output, "answer": changed}, salt))
-    if (dropped := drop_qualifier(answer)) is not None:
-        out.append(Variant("qualifier", "mutant", {**output, "answer": dropped}, salt))
-    if (swapped := swap_citation(cits, pool)) is not None:
+    if (flipped := flip_bound(answer)) is not None:
+        out.append(Variant("qualifier", "mutant", {**output, "answer": flipped}, salt))
+    if (swapped := swap_citations(cits, pool)) is not None:
         out.append(Variant("citation", "mutant", {**output, "citations": swapped}, salt))
     out.append(Variant("padding", "probe", {**output, "answer": pad_answer(answer)}, salt))
     out.append(Variant("resample", "probe", dict(output), probe_salt))

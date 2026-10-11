@@ -304,6 +304,14 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   max_tokens is now a named error). Three-answer smoke: verdicts arrive with reasons. Early
   signal: "supported" is strict and fails answers whose extra context is not in the cited
   quotes; whether that matches Aleena's reading is what kappa on judge-test will say.
+- **Judge pass over the dev run** (judge `b23a6c3aef09`, Sonnet 5.5): 346 answers, 692 calls,
+  723k in / 161k out tokens. `judge_responsive` 0.997 (0.991 to 1.000); `judge_supported`
+  **0.177** (0.123 to 0.234). Cross-check with code: 21 of the 32 code failures are judge-
+  responsive passes (the taxonomy's A, C, D exactly); the other 11 are hedged abstentions the
+  judge skips. One code pass the judge failed (docs-core-028 #3, a hedged half-answer). The low
+  "supported" rate is the judge failing added context that the cited quotes do not carry; by the
+  brief's definition that is the claim-level unsupported rate, and whether a human agrees is what
+  kappa on judge-test decides. `docs/judge-validation.md` holds the numbers and the pending bars.
 
 ## Target: the three project briefs
 
