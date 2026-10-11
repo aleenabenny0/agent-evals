@@ -263,6 +263,26 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   multi_step 17, unanswerable 16). The six `*.drafts.jsonl` files and `verified.jsonl` were
   deleted (git history has them). **`test.jsonl` is frozen: never read it for prompt, lesson,
   example or fix work.** New cases go in a fresh `*.drafts.jsonl`, get verified, and join dev.
+- 2026-10-11, judge shipped (plan approved by Aleena: two verdicts, review-style labels, Sonnet
+  5.5): `graders/judge.py` + `judge_prompts.py` (strict `submit_verdict` tool, forced), post-hoc
+  `evals judge RUN` (never inside `evals run`), `evals label RUN --labeler aleena` (labels table,
+  judge-dev/judge-test by case-id hash), `evals judge-validate RUN` (kappa, TPR, TNR, confusion),
+  `evals judge-probe RUN` (number / qualifier / citation mutants must fail; padding / resample
+  probes must not move). Walkthrough: `docs/walkthroughs/2026-10-11-llm-judge.md`. 176 tests.
+  Judge pricing in `configs/default.yaml` is null until checked; `evals judge` reports tokens.
+- **First dev run** (Aleena approved all paid runs; $100/month cap set):
+  `docs-20261011-223111-702e87`, docs agent `fbfc5355d106`, dev, 3 attempts, 390 attempts,
+  1568 calls, 7.66M in / 416k out tokens, **$0.97**, 21 minutes. correct **0.918** (0.874 to
+  0.956); pass^2 0.885, pass^3 0.862; pass@3 0.962; **flip rate 0.100** (0.059 to 0.164);
+  fabricated_citation 0.021; uncited 0; malformed 0; unsupported_entity 0.046; evidence_recall
+  0.958, evidence_precision 0.910; tool_errors 0.38 per attempt (to read); model_calls 4.0;
+  p50 7.5 s, p95 17.3 s; cost per success $0.0027. By area: databases 0.76 (7 cases) and
+  management 0.83 (4) lowest, else 0.88 to 1.0. Paraphrase consistency 0.80 (5 groups).
+  Failures worth a trace (dev, so allowed): docs-int-017 abstained 3/3, docs-int-023 answered an
+  unanswerable 3/3, docs-chg-025 missed the price clause 3/3 (the question does not ask about
+  price: a case defect to put to Aleena, not a gold edit), docs-ai-002 group missing "no
+  additional cost" 5 times, docs-ai-001 group 7 misses (abstentions and a missing negative),
+  docs-mix-050 abstained 2/3. Everything else flipped once in three.
 
 ## Target: the three project briefs
 
@@ -280,13 +300,16 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    (a) done: all 280 drafts verified; (b) done: quote sweep; (c) done: split frozen, seed
    20261011 (see status above); (d) approve `docs/plans/llm-judge.md` and answer its three open
    questions, then hand-label 100-200 dev answers split into judge-dev and judge-test;
-   (e) approve the first paid runs, in this order and each with an estimate from the smoke runs
-   (41k input and 1.1k output tokens per case on the 334-page snapshot, so about $0.005 per
-   case-attempt at Haiku prices): docs agent on dev with 3 attempts (390 attempts, about $2),
-   closed-book on dev (no tools, under $0.10), oracle-evidence on dev (pages in the prompt, about
-   $0.50), then docs agent on test once with 1 attempt (about $0.75) for the headline; (f) set a
-   hard monthly spend limit in the Anthropic console before (e); (g) decide whether to keep the
-   Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now.
+   (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
+   single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
+   the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
+   (h) **label 100 to 200 dev answers**: `uv run evals label docs-20261011-223111-702e87
+   --reviewer`-style, exact command `uv run evals label docs-20261011-223111-702e87 --labeler
+   aleena --limit 50` per sitting (about two hours for 100); the agent then runs `evals judge`,
+   `evals judge-validate` and `evals judge-probe` and writes `docs/judge-validation.md`;
+   (i) decide on docs-chg-025: the question asks only whether PITR is fixed at 35 days but the
+   gold requires the "price does not change" clause; either drop that must_include group or
+   extend the question to ask about price (a case fix, not a gold-to-pass edit).
    Done 2026-10-11: the changed_default batch (was (b)) and the five metric additions (was (f)).
 
 2. **Output-contract metric** (Codex P3, deferred). `malformed_output` only checks the
