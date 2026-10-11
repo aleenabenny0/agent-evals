@@ -31,6 +31,19 @@ docs_agent:
 graders:
   min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated
 
+judge:
+  # LLM judge for "supported" and "responsive" (docs/plans/llm-judge.md). Only `evals judge RUN`
+  # calls it; a normal run never does. Pricing left empty until checked on the pricing page, so
+  # `evals judge` reports tokens, not dollars.
+  model:
+    name: claude-sonnet-5-5
+    max_tokens: 400
+    temperature: null
+    pricing:
+      input_per_mtok: null
+      output_per_mtok: null
+  strict_tools: true
+
 suites:
   # Kept out of the snapshot on purpose so unanswerable cases have real material; `evals
   # validate` fails if a page about one of these is ever added. Matched case-insensitively

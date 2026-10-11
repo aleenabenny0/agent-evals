@@ -49,6 +49,18 @@ CREATE TABLE IF NOT EXISTS grades (
     passed   BOOLEAN,
     reason   VARCHAR
 );
+CREATE TABLE IF NOT EXISTS labels (
+    run_id      VARCHAR,
+    case_id     VARCHAR,
+    attempt     INTEGER,
+    labeler     VARCHAR,
+    supported   BOOLEAN,
+    responsive  BOOLEAN,
+    note        VARCHAR,
+    label_split VARCHAR,
+    labeled_at  TIMESTAMP,
+    PRIMARY KEY (run_id, case_id, attempt, labeler)
+);
 """
 
 
@@ -122,7 +134,90 @@ class ResultsStore:
                 [run_id, case_id, attempt, grader_name, g.metric, g.value, g.passed, g.reason],
             )
 
+    def add_grades(
+        self, run_id: str, case_id: str, attempt: int, grades: list[tuple[str, Grade]]
+    ) -> None:
+        """Grades added after the run, e.g. by the LLM judge."""
+        for grader_name, g in grades:
+            self.con.execute(
+                "INSERT INTO grades VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                [run_id, case_id, attempt, grader_name, g.metric, g.value, g.passed, g.reason],
+            )
+
+    def delete_grades(self, run_id: str, grader: str) -> None:
+        self.con.execute("DELETE FROM grades WHERE run_id = ? AND grader = ?", [run_id, grader])
+
+    def annotate_run(self, run_id: str, key: str, value: Any) -> None:
+        """Add one entry to a run's manifest, e.g. which judge version graded it."""
+        manifest = self.run_info(run_id)["manifest"]
+        manifest[key] = value
+        self.con.execute(
+            "UPDATE runs SET manifest = ? WHERE run_id = ?", [json.dumps(manifest), run_id]
+        )
+
+    def record_label(
+        self,
+        run_id: str,
+        case_id: str,
+        attempt: int,
+        labeler: str,
+        *,
+        supported: bool | None,
+        responsive: bool,
+        note: str,
+        label_split: str,
+    ) -> None:
+        """A hand label for one stored answer; relabeling by the same person replaces it."""
+        self.con.execute(
+            "INSERT OR REPLACE INTO labels VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [run_id, case_id, attempt, labeler, supported, responsive, note, label_split, _now()],
+        )
+
     # ---- reads --------------------------------------------------------------------
+
+    def answered_attempts(self, run_id: str) -> list[dict[str, Any]]:
+        """Attempts that produced an answer: no error and not abstained."""
+        rows = self.con.execute(
+            "SELECT case_id, attempt, output FROM attempts WHERE run_id = ? AND error IS NULL "
+            "ORDER BY case_id, attempt",
+            [run_id],
+        ).fetchall()
+        out = []
+        for case_id, attempt, output in rows:
+            data = json.loads(output)
+            if not data.get("abstained", False):
+                out.append({"case_id": str(case_id), "attempt": int(attempt), "output": data})
+        return out
+
+    def grade_count(self, run_id: str, grader: str) -> int:
+        row = self.con.execute(
+            "SELECT COUNT(*) FROM grades WHERE run_id = ? AND grader = ?", [run_id, grader]
+        ).fetchone()
+        return int(row[0]) if row else 0
+
+    def grades_for(self, run_id: str, grader: str) -> dict[tuple[str, int], dict[str, float]]:
+        """(case_id, attempt) -> metric -> value, for one grader."""
+        rows = self.con.execute(
+            "SELECT case_id, attempt, metric, value FROM grades WHERE run_id = ? AND grader = ?",
+            [run_id, grader],
+        ).fetchall()
+        out: dict[tuple[str, int], dict[str, float]] = defaultdict(dict)
+        for case_id, attempt, metric, value in rows:
+            out[(str(case_id), int(attempt))][str(metric)] = float(value)
+        return dict(out)
+
+    def labels(self, run_id: str, labeler: str | None = None) -> list[dict[str, Any]]:
+        sql = (
+            "SELECT case_id, attempt, labeler, supported, responsive, note, label_split "
+            "FROM labels WHERE run_id = ?"
+        )
+        params: list[Any] = [run_id]
+        if labeler is not None:
+            sql += " AND labeler = ?"
+            params.append(labeler)
+        rows = self.con.execute(sql + " ORDER BY case_id, attempt", params).fetchall()
+        keys = ("case_id", "attempt", "labeler", "supported", "responsive", "note", "label_split")
+        return [dict(zip(keys, r, strict=True)) for r in rows]
 
     def latest_run_id(self) -> str | None:
         row = self.con.execute(

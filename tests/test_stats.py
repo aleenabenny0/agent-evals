@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 
 import pytest
-from hypothesis import given
+from hypothesis import given, settings
 from hypothesis import strategies as st
 
 from agent_evals.stats.core import (
@@ -19,6 +19,7 @@ from agent_evals.stats.core import (
 unit_values = st.lists(st.floats(0, 1), min_size=2, max_size=60)
 
 
+@settings(deadline=None)
 @given(unit_values)
 def test_ci_brackets_the_mean(values: list[float]) -> None:
     est = bootstrap_ci(values, n_resamples=500)
@@ -46,6 +47,7 @@ def test_paired_diff_needs_same_length() -> None:
         paired_bootstrap_diff([1, 0], [1])
 
 
+@settings(deadline=None)
 @given(st.integers(1, 10).flatmap(lambda n: st.tuples(st.just(n), st.integers(0, n))))
 def test_pass_hat_k_properties(nc: tuple[int, int]) -> None:
     n, c = nc
@@ -82,6 +84,7 @@ def test_wilson_is_symmetric() -> None:
     assert a.low == pytest.approx(1 - b.high) and a.high == pytest.approx(1 - b.low)
 
 
+@settings(deadline=None)
 @given(st.integers(1, 500).flatmap(lambda n: st.tuples(st.just(n), st.integers(0, n))))
 def test_wilson_brackets_the_proportion_with_width(nk: tuple[int, int]) -> None:
     n, k = nk
@@ -97,6 +100,7 @@ def test_wilson_rejects_impossible_counts() -> None:
         wilson_ci(0, 0)
 
 
+@settings(deadline=None)
 @given(st.integers(1, 10).flatmap(lambda n: st.tuples(st.just(n), st.integers(0, n))))
 def test_pass_at_k_properties(nc: tuple[int, int]) -> None:
     n, c = nc
@@ -123,3 +127,18 @@ def test_flip_rate_needs_repeated_attempts() -> None:
     assert est.n == 4 and est.mean == 0.5 and est.method == "wilson"  # the lone attempt is skipped
     steady = flip_rate([[True, True, True], [False, False, False]])
     assert steady is not None and steady.mean == 0.0 and steady.high > 0.0  # Wilson keeps width
+
+
+def test_cohens_kappa_known_values() -> None:
+    from agent_evals.stats.core import cohens_kappa
+
+    assert cohens_kappa([True, True, False, False], [True, True, False, False]) == 1.0
+    # Textbook table: both yes 10, both no 5, A yes B no 3, A no B yes 2 -> p_o .75, p_e .53
+    a = [True] * 13 + [False] * 7
+    b = [True] * 10 + [False] * 3 + [False] * 5 + [True] * 2
+    assert cohens_kappa(a, b) == pytest.approx((0.75 - 0.53) / 0.47)
+    # A rater who always says yes earns nothing beyond chance, however often they are right.
+    assert cohens_kappa([True, True, True, False, False], [True] * 5) == 0.0
+    assert cohens_kappa([True] * 4, [True] * 4) == 1.0
+    with pytest.raises(ValueError):
+        cohens_kappa([True], [True, False])

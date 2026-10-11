@@ -228,3 +228,32 @@ def test_flip_rate_and_pass_at_k_need_repeated_attempts(tmp_path: Path) -> None:
     s1 = summarize(store, one)
     assert s1.flip_rate is None and s1.pass_at_k == {1: s1.pass_hat_k[1]}
     store.close()
+
+
+def test_store_post_hoc_grades_and_labels(tmp_path: Path) -> None:
+    from agent_evals.types import Grade
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id="a"), make_case(id="b"), make_case(id="boom")]
+    run = _run(store, FakeAgent({"a": {1}}), cases, attempts=1)
+    answered = store.answered_attempts(run)
+    assert [x["case_id"] for x in answered] == ["a"]  # b abstained, boom errored
+    assert store.grade_count(run, "judge") == 0
+    grade = Grade(metric="judge_supported", value=1.0, passed=True)
+    store.add_grades(run, "a", 1, [("judge", grade)])
+    assert store.grade_count(run, "judge") == 1
+    assert store.grades_for(run, "judge") == {("a", 1): {"judge_supported": 1.0}}
+    assert summarize(store, run).metrics["judge_supported"].mean == 1.0
+    store.delete_grades(run, "judge")
+    assert store.grades_for(run, "judge") == {}
+    store.record_label(
+        run, "a", 1, "aleena", supported=True, responsive=False, note="", label_split="judge-dev"
+    )
+    store.record_label(
+        run, "a", 1, "aleena", supported=False, responsive=False, note="x", label_split="judge-dev"
+    )
+    labels = store.labels(run, "aleena")
+    assert len(labels) == 1 and labels[0]["supported"] is False and labels[0]["note"] == "x"
+    store.annotate_run(run, "judge", {"version": "abc"})
+    assert store.run_info(run)["manifest"]["judge"] == {"version": "abc"}
+    store.close()

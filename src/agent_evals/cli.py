@@ -13,7 +13,9 @@ from rich.table import Table
 from agent_evals.config import Config, load_config
 
 if TYPE_CHECKING:
+    from agent_evals.stats.core import Estimate
     from agent_evals.store.db import ResultsStore
+    from agent_evals.types import Grade
 
 app = typer.Typer(add_completion=False, no_args_is_help=True, help=__doc__)
 console = Console()
@@ -508,6 +510,255 @@ def trace(
         f"{rec['model_calls']} model calls ({rec['cached_calls']} cached), "
         f"{rec['input_tokens']} in / {rec['output_tokens']} out tokens, {rec['latency_ms']:.0f} ms"
         + (f", nominal cost ${rec['cost_usd']:.4f}" if rec["cost_usd"] is not None else "")
+    )
+
+
+@app.command()
+def judge(
+    run_id: str,
+    limit: Annotated[int | None, typer.Option(help="Judge at most N answers.")] = None,
+    salt: Annotated[
+        str, typer.Option(help="Cache salt. Change it to re-sample the judge (stability probe).")
+    ] = "judge",
+    replace: Annotated[
+        bool, typer.Option("--replace", help="Overwrite this run's existing judge grades.")
+    ] = False,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Judge a run's stored answers (supported? responsive?) with the LLM judge. Costs money."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from rich.progress import Progress
+
+    from agent_evals.graders.judge import JudgeGrader
+    from agent_evals.harness.cache import CallCache
+    from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.harness.runner import grade_all
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.suites import load_suite
+    from agent_evals.types import AgentResult
+
+    load_dotenv()
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
+    try:
+        info = store.run_info(run_id)
+        suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
+        if not suite_path.exists():
+            console.print(f"[red]The run's suite file {suite_path} is gone; cannot judge.[/red]")
+            raise typer.Exit(code=2)
+        cases = {c.id: c for c in load_suite(suite_path)}
+        if store.grade_count(run_id, "judge") and not replace:
+            console.print("[red]This run already has judge grades; pass --replace.[/red]")
+            raise typer.Exit(code=2)
+        store.delete_grades(run_id, "judge")
+        grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
+        todo = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases][:limit]
+
+        def one(a: dict[str, object]) -> tuple[dict[str, object], list[tuple[str, Grade]]]:
+            case = cases[str(a["case_id"])]
+            result = AgentResult(output=a["output"])  # type: ignore[arg-type]
+            return a, grade_all([grader], case, result)
+
+        judged = 0
+        with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool, Progress() as progress:
+            task = progress.add_task("Judging", total=len(todo))
+            for a, graded in pool.map(one, todo):
+                store.add_grades(run_id, str(a["case_id"]), int(str(a["attempt"])), graded)
+                judged += 1
+                progress.advance(task)
+        store.annotate_run(
+            run_id,
+            "judge",
+            {"version": grader.version, "model": cfg.judge.model.name, "salt": salt},
+        )
+        u = grader.usage
+        console.print(
+            f"judged {judged} answers with {cfg.judge.model.name} (judge {grader.version}): "
+            f"{u.model_calls} calls ({u.cached_calls} from cache), {u.input_tokens} in / "
+            f"{u.output_tokens} out tokens"
+        )
+        _print_summary(store, run_id)
+    finally:
+        store.close()
+
+
+@app.command()
+def label(
+    run_id: str,
+    labeler: Annotated[str, typer.Option(help="Your name; stored with each label.")],
+    limit: Annotated[int | None, typer.Option(help="Label at most N answers this time.")] = None,
+    attempt: Annotated[int, typer.Option(min=1, help="Which attempt of each case to label.")] = 1,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
+    import sys
+
+    from rich.panel import Panel
+    from rich.prompt import Prompt
+    from rich.text import Text
+
+    from agent_evals.corpus import Corpus
+    from agent_evals.judge_validation import label_split
+    from agent_evals.review import quote_context
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.suites import load_suite
+
+    if not sys.stdin.isatty():
+        console.print("[red]evals label needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    cfg = _config(config)
+    corpus = None
+    if (cfg.paths.corpus_dir / "pages.jsonl").exists():
+        corpus = Corpus.load(cfg.paths.corpus_dir)
+    store = ResultsStore(cfg.paths.db)
+    try:
+        info = store.run_info(run_id)
+        suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
+        cases = {c.id: c for c in load_suite(suite_path)} if suite_path.exists() else {}
+        done = {(x["case_id"], x["attempt"]) for x in store.labels(run_id, labeler)}
+        todo = [
+            a
+            for a in store.answered_attempts(run_id)
+            if a["attempt"] == attempt
+            and a["case_id"] in cases
+            and (a["case_id"], attempt) not in done
+        ][:limit]
+        if not todo:
+            console.print(
+                f"Nothing to label: {len(done)} already labeled by {labeler} in this run."
+            )
+            return
+        tally = {"judge-dev": 0, "judge-test": 0}
+        for i, a in enumerate(todo, 1):
+            c = cases[a["case_id"]]
+            out = a["output"]
+            console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(todo)}")
+            console.print(Panel(c.question, title="question"))
+            console.print(Panel(str(out.get("answer", "")), title="assistant's answer"))
+            cits = [x for x in (out.get("citations") or []) if isinstance(x, dict)]
+            for n, cit in enumerate(cits, 1):
+                url, quote = str(cit.get("url", "")), str(cit.get("quote", ""))
+                page = corpus.pages.get(url) if corpus is not None else None
+                ctx = quote_context(page.text, quote, width=200) if page else None
+                if ctx:
+                    before, match, after = ctx
+                    body = Text.assemble(before, (match, "bold yellow"), after)
+                    console.print(Panel(body, title=f"citation {n}/{len(cits)}: {url}"))
+                else:
+                    style = "red" if page else "yellow"
+                    note = "quote NOT found on page" if page else "page not in snapshot"
+                    title = f"citation {n}/{len(cits)}: {url} ({note})"
+                    console.print(Panel(quote, title=title, style=style))
+            supported: bool | None = None
+            if cits:
+                ans = Prompt.ask(
+                    "supported: is every claim backed by the quotes? (y)es, (n)o, (s)kip, (q)uit",
+                    choices=["y", "n", "s", "q"],
+                )
+                if ans == "q":
+                    break
+                if ans == "s":
+                    continue
+                supported = ans == "y"
+            else:
+                console.print(
+                    "[dim]no citations: supported is not asked (uncited_answer covers it)[/dim]"
+                )
+            console.print(Panel(c.gold.answer, title="reference answer (gold)"))
+            console.print(f"must_include: {c.gold.must_include}")
+            ans = Prompt.ask(
+                "responsive: does it answer the question as asked? (y)es, (n)o, (s)kip, (q)uit",
+                choices=["y", "n", "s", "q"],
+            )
+            if ans == "q":
+                break
+            if ans == "s":
+                continue
+            note = Prompt.ask("note (optional)", default="").strip()
+            split = label_split(c.id)
+            store.record_label(
+                run_id,
+                c.id,
+                attempt,
+                labeler,
+                supported=supported,
+                responsive=ans == "y",
+                note=note,
+                label_split=split,
+            )
+            tally[split] += 1
+        total = store.labels(run_id, labeler)
+        console.print(
+            f"\nlabeled {sum(tally.values())} now ({tally['judge-dev']} judge-dev, "
+            f"{tally['judge-test']} judge-test); {len(total)} in total by {labeler} for this run"
+        )
+    finally:
+        store.close()
+
+
+@app.command("judge-validate")
+def judge_validate(
+    run_id: str,
+    split: Annotated[
+        str, typer.Option(help="Which labels to score against: judge-test, judge-dev or all.")
+    ] = "judge-test",
+    labeler: Annotated[str | None, typer.Option(help="Only this person's labels.")] = None,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Agreement between hand labels and judge verdicts: kappa, TPR, TNR, confusion counts."""
+    from agent_evals.judge_validation import agreement
+    from agent_evals.store.db import ResultsStore
+
+    store = ResultsStore(_config(config).paths.db)
+    try:
+        labels = store.labels(run_id, labeler)
+        verdicts = store.grades_for(run_id, "judge")
+    finally:
+        store.close()
+    if split != "all":
+        labels = [x for x in labels if x["label_split"] == split]
+    title = f"judge vs {labeler or 'labels'} on {split}"
+    table = Table(show_header=True, header_style="bold", title=title)
+    columns = (
+        "verdict",
+        "n",
+        "kappa",
+        "TPR (catches failures)",
+        "TNR (passes good answers)",
+        "tp/fp/fn/tn",
+    )
+    for col in columns:
+        table.add_column(col, justify="right" if col != "verdict" else "left")
+    for verdict in ("supported", "responsive"):
+        pairs = [
+            (bool(x[verdict]), verdicts[(x["case_id"], x["attempt"])][f"judge_{verdict}"] >= 1.0)
+            for x in labels
+            if x[verdict] is not None
+            and (x["case_id"], x["attempt"]) in verdicts
+            and f"judge_{verdict}" in verdicts[(x["case_id"], x["attempt"])]
+        ]
+        if not pairs:
+            table.add_row(verdict, "0", "-", "-", "-", "-")
+            continue
+        a = agreement(verdict, pairs)
+        colour = "green" if a.kappa >= 0.7 else "red"
+
+        def fmt(e: Estimate | None) -> str:
+            return "-" if e is None else f"{e.mean:.2f} ({e.low:.2f} to {e.high:.2f})"
+
+        table.add_row(
+            verdict,
+            str(a.n),
+            f"[{colour}]{a.kappa:.3f}[/{colour}]",
+            fmt(a.tpr),
+            fmt(a.tnr),
+            f"{a.tp}/{a.fp}/{a.fn}/{a.tn}",
+        )
+    console.print(table)
+    console.print(
+        "bars (docs/plans/llm-judge.md): kappa at least 0.7 on each verdict on judge-test; "
+        "fewer than 30 labeled answers is too few to conclude anything"
     )
 
 

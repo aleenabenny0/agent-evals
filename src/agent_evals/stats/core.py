@@ -135,3 +135,24 @@ def mcnemar_exact(b: int, c: int) -> float:
         return 1.0
     tail = sum(comb(n, i) for i in range(min(b, c) + 1)) / (1 << n)  # P(X <= min) under H0
     return min(1.0, 2 * tail)
+
+
+def cohens_kappa(a: Sequence[bool], b: Sequence[bool]) -> float:
+    """Agreement between two raters beyond chance, for yes/no ratings of the same items.
+
+    kappa = (p_o - p_e) / (1 - p_e): observed agreement minus the agreement two raters with
+    these marginal rates would reach by luck, scaled so 1 is perfect and 0 is chance. A rater who
+    says the same thing every time scores 0 against anyone, which is why plain agreement is not
+    enough for judge validation.
+    """
+    if len(a) != len(b):
+        raise ValueError("need the same items rated by both")
+    if not a:
+        raise ValueError("no items")
+    n = len(a)
+    p_o = sum(x == y for x, y in zip(a, b, strict=True)) / n
+    pa, pb = sum(a) / n, sum(b) / n
+    p_e = pa * pb + (1 - pa) * (1 - pb)
+    if p_e == 1.0:
+        return 1.0 if p_o == 1.0 else 0.0
+    return (p_o - p_e) / (1 - p_e)

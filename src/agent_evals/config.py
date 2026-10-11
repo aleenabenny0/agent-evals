@@ -57,6 +57,13 @@ class GradersConfig(_Strict):
     min_quote_chars: int = 12
 
 
+class JudgeConfig(_Strict):
+    """The LLM judge (docs/plans/llm-judge.md). Runs post hoc via `evals judge`, never in `run`."""
+
+    model: ModelConfig = ModelConfig(name="claude-sonnet-5-5", max_tokens=400)
+    strict_tools: bool = True
+
+
 class SuitesConfig(_Strict):
     # Services deliberately kept out of the snapshot so unanswerable cases have real material.
     # `evals validate` errors if one of them shows up in a page title or URL (ADR 0006).
@@ -68,6 +75,7 @@ class Config(_Strict):
     run: RunConfig = RunConfig()
     docs_agent: DocsAgentConfig = DocsAgentConfig()
     graders: GradersConfig = GradersConfig()
+    judge: JudgeConfig = JudgeConfig()
     suites: SuitesConfig = SuitesConfig()
 
 
