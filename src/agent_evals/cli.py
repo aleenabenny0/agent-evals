@@ -107,7 +107,6 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
     from agent_evals.suites import (
         SuiteError,
         check_against_corpus,
-        check_held_out,
         load_suite,
         unassigned,
         unverified_drafts,
@@ -288,7 +287,9 @@ def split(
 @app.command()
 def run(
     suite: Path,
-    agent: Annotated[str, typer.Option(help="Agent to evaluate.")] = "docs",
+    agent: Annotated[
+        str, typer.Option(help="Agent to evaluate: docs, closed-book or oracle-evidence.")
+    ] = "docs",
     attempts: Annotated[int, typer.Option(min=1, help="Attempts per case (for pass^k).")] = 1,
     limit: Annotated[int | None, typer.Option(help="Only run the first N cases.")] = None,
     allow_drafts: Annotated[
@@ -303,6 +304,7 @@ def run(
     """Run an agent on a suite, grade every attempt, and store the results."""
     load_dotenv()
     from agent_evals.agents.docs.agent import DocsAgent
+    from agent_evals.agents.docs.baselines import ClosedBookAgent, OracleEvidenceAgent
     from agent_evals.corpus import Corpus
     from agent_evals.graders.deterministic import (
         AnswerGrader,
@@ -318,8 +320,13 @@ def run(
     from agent_evals.suites import load_suite, unassigned, unverified_drafts
     from agent_evals.types import Grader
 
-    if agent != "docs":
-        console.print(f"[red]Unknown agent {agent!r}. Available: docs[/red]")
+    agents: dict[str, type[DocsAgent]] = {
+        "docs": DocsAgent,
+        "closed-book": ClosedBookAgent,
+        "oracle-evidence": OracleEvidenceAgent,
+    }
+    if agent not in agents:
+        console.print(f"[red]Unknown agent {agent!r}. Available: {', '.join(agents)}[/red]")
         raise typer.Exit(code=2)
 
     cfg = _config(config)
@@ -334,7 +341,7 @@ def run(
         raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
     llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
-    docs_agent = DocsAgent(llm, corpus, cfg.docs_agent)
+    docs_agent = agents[agent](llm, corpus, cfg.docs_agent)
     graders: list[Grader] = [
         AnswerGrader(),
         CitationGrader(corpus, min_quote_chars=cfg.graders.min_quote_chars),

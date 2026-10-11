@@ -14,7 +14,7 @@ from agent_evals.suites import (
     write_suite,
 )
 from agent_evals.types import Case, Gold
-from conftest import BUCKETS_URL, make_case
+from conftest import BUCKETS_URL, LAMBDA_URL, make_case
 
 
 def test_drafts_and_unassigned_are_identified() -> None:
@@ -119,3 +119,16 @@ def test_validator_uses_whole_phrase_matching(corpus: Corpus) -> None:
     )
     _, warnings = check_against_corpus([substring_only], corpus)
     assert any(w.startswith("sub: no must_include") for w in warnings)
+
+
+def test_held_out_services_are_enforced(corpus: Corpus) -> None:
+    from agent_evals.suites import check_held_out
+
+    priced = make_case(id="p", type="unanswerable", gold=Gold(answer="n/a"))
+    priced = priced.model_copy(update={"question": "How much does Lambda cost per request?"})
+    vague = make_case(id="v", type="unanswerable", gold=Gold(answer="n/a"))
+    vague = vague.model_copy(update={"question": "What is the default timeout for a function?"})
+    errors, warnings = check_held_out([priced, vague], corpus, ["GameLift", "Lambda"])
+    assert errors == [f"held-out service 'lambda' appears in the snapshot: {LAMBDA_URL}"]
+    assert [w.split(":")[0] for w in warnings] == ["v"]
+    assert check_held_out([priced], corpus, ["GameLift"]) == ([], [])

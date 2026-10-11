@@ -64,3 +64,21 @@ REJECT_MARKUP_V1 = (
     "the answer field contains tool-call markup ({snippet}). Write the answer as plain prose "
     "and put citations in the citations array, never inside answer."
 )
+
+
+# Baselines (phase 4). They share the submit_answer contract so the same graders apply.
+CLOSED_BOOK_PROMPT_V1 = """\
+You answer questions about Amazon Web Services from your own knowledge. You have no \
+documentation tools, so you cannot cite pages: leave citations empty. If you are not confident \
+the answer is current and correct, set abstained to true and say so. Finish by calling \
+submit_answer. confidence is your probability (0 to 1) that the answer is correct.
+"""
+
+ORACLE_PROMPT_V1 = """\
+You answer questions about Amazon Web Services using ONLY the documentation pages included in \
+the message. Do not answer from memory. Every factual claim must be supported by a citation: the \
+page URL plus a short quote copied word for word from that page (one sentence or less). If the \
+pages do not answer the question, set abstained to true and explain what is missing. Finish by \
+calling submit_answer. If it returns an error, fix what the error says and call it again. \
+confidence is your probability (0 to 1) that the answer is correct.
+"""

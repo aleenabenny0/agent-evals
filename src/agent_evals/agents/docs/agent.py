@@ -55,13 +55,16 @@ class ReadInput(BaseModel):
     start: int = Field(default=0, ge=0)
 
 
-def submission_problems(answer: DocsAnswer) -> list[str]:
-    """Content rules a schema-valid submission must still meet. An empty list means accepted."""
+def submission_problems(answer: DocsAnswer, *, require_citations: bool = True) -> list[str]:
+    """Content rules a schema-valid submission must still meet. An empty list means accepted.
+
+    `require_citations` is False only for the closed-book baseline, which has nothing to cite.
+    """
     problems: list[str] = []
     snippet = find_tool_markup(answer.answer)
     if snippet is not None:
         problems.append(REJECT_MARKUP_V1.format(snippet=snippet))
-    if not answer.abstained and not answer.citations:
+    if require_citations and not answer.abstained and not answer.citations:
         problems.append(REJECT_UNCITED_V1)
     return problems
 
@@ -163,6 +166,7 @@ def _usage_of(resp: LLMResponse) -> Usage:
 
 class DocsAgent:
     name = "docs"
+    require_citations = True  # the closed-book baseline turns this off
 
     def __init__(self, llm: LLMClient, corpus: Corpus, config: DocsAgentConfig) -> None:
         self.llm = llm
@@ -170,6 +174,10 @@ class DocsAgent:
         self.config = config
         self.system_prompt = SYSTEM_PROMPT_V2
         self.tools = tool_specs(config.strict_tools)
+
+    def first_message(self, case: Case) -> str:
+        """The opening user message. Baselines override it to add or withhold context."""
+        return case.question
 
     def describe(self) -> dict[str, Any]:
         return {
@@ -187,6 +195,7 @@ class DocsAgent:
         detector. Pricing is excluded because it only affects cost reporting.
         """
         fingerprint = {
+            "agent": self.name,
             "config": self.config.model_dump(mode="json", exclude={"model": {"pricing"}}),
             "prompts": {
                 "system": self.system_prompt,
@@ -234,7 +243,7 @@ class DocsAgent:
             candidate = DocsAnswer.model_validate(raw)
         except ValidationError as exc:
             return None, INVALID_ANSWER_V1.format(errors=exc.errors(include_url=False)), True
-        problems = submission_problems(candidate)
+        problems = submission_problems(candidate, require_citations=self.require_citations)
         if problems:
             return None, REJECTED_V1.format(problems=" ".join(problems)), True
         return candidate, "Answer received.", False
@@ -243,7 +252,7 @@ class DocsAgent:
 
     def run(self, case: Case, ctx: RunContext) -> AgentResult:
         cfg = self.config
-        messages: list[dict[str, Any]] = [{"role": "user", "content": case.question}]
+        messages: list[dict[str, Any]] = [{"role": "user", "content": self.first_message(case)}]
         steps: list[Step] = []
         usage = Usage()
         nudged = False
