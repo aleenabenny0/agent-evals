@@ -138,6 +138,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   within (type, area) strata. Drafting workflow: drafts in `suites/docs/<name>.drafts.jsonl`
   with `provenance: synthetic`, `split: unassigned`, a verbatim `support` quote; Aleena verifies
   and sets `verified_by`; then `evals split`.
+- Review feedback (2026-10-11): one support sentence rarely covers a whole gold answer.
+  `gold.support` is now a list, one verbatim quote per fact; `evals validate` warns when a
+  required phrase group appears in none of the quotes; `evals review` highlights every quote.
+  75 cases gained quotes; core-028's gold was corrected to what the Block Public Access page
+  actually says ("don't allow public access by default"). Also: `evals review --restore <id>`
+  undoes a rejection, and a rejection now needs a reason of at least four characters.
 - Pilot draft batch: `suites/docs/ai-ml.drafts.jsonl`, 49 cases (40 lookup, 2 false_premise,
   2 multi_step, 1 changed_default, 4 unanswerable) drafted from 13 AI/ML pages (Bedrock
   cross-Region inference, inference profiles, quotas, model access, batch inference, Provisioned
