@@ -247,6 +247,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   launch rates, PITR window, public IPv4 charges, Bedrock managed knowledge bases, 90-minute
   Lambda Managed Instances). With it the drafts are 280 and changed_default is 46 (16%), on the
   15% plan.
+- 2026-10-11, later: Aleena finished reviewing the five original draft files: all 249 verified,
+  none rejected (commit `9543f7a`). The missing-quote sweep then ran: 9 cases got a longer or an
+  extra verbatim quote, and the number extractor learned two things AWS docs do ("1GB" and
+  "10GB" are numbers with a unit stuck on; "us-west-2" is a Region name, not a 2). All six suite
+  files validate with zero warnings. 156 tests. Only `changed-defaults.drafts.jsonl` (31) is
+  still unverified.
 
 ## Target: the three project briefs
 
@@ -261,12 +267,12 @@ over gated iterations, with a failure taxonomy shrinking beside it.
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
    drafting (280 across six files), evidence groups, paraphrase mechanics, validators, the five
    reliability/grounding metrics (ADR 0007). **Needs Aleena:**
-   (a) finish `evals review` on the five original draft files, run `evals validate` on each,
-   commit after each file; then review `changed-defaults.drafts.jsonl` (31 cases);
-   (b) say "review committed" so the 11 missing-quote warnings in the existing drafts get fixed
-   in one sweep (no file edits by the agent while her review is in progress);
-   (c) when verified cases exist in one file, `evals split <file> --dev 100 --test 150 --seed <N>`
-   and record the seed here; (d) approve `docs/plans/llm-judge.md` and answer its three open
+   (a) review `changed-defaults.drafts.jsonl` (31 cases) with `evals review`, then
+   `evals validate` it and commit; (b) done: the five original files are fully verified and the
+   quote sweep ran;
+   (c) once (a) is committed, the agent merges the 280 verified cases into one file and hands
+   over the command: `evals split <file> --dev 130 --test 150 --seed <N>` (2 held cases go to
+   dev automatically); record the seed here; (d) approve `docs/plans/llm-judge.md` and answer its three open
    questions, then hand-label 100-200 dev answers split into judge-dev and judge-test;
    (e) approve the first dev-split run and the two baseline runs (paid; cost estimate from smoke
    first); (f) set a hard monthly spend limit in the Anthropic console; (g) decide whether to

@@ -9,17 +9,22 @@ from __future__ import annotations
 
 import re
 
-# A standalone number: digits with optional thousands separators and a decimal part. It may not
-# touch a letter, digit or dot on either side, so "S3", "EC2", "python3.10" and "10.0.0.0" do not
-# shed a "3", "2", "3.10" or "0"; "/16", "10,240", "99.9%" and a "63." ending a sentence count.
-NUMBER = re.compile(r"(?<![\w.])\d+(?:,\d{3})*(?:\.\d+)?(?!\w)(?!\.\d)")
+# A standalone number: digits with optional thousands separators and a decimal part. Nothing
+# may touch it on the left (so "S3", "EC2", "python3.10" and "m5.large" shed no number) and on the
+# right it may only be followed by a short unit stuck to it, as AWS docs write "1GB" and "10GB"
+# (so "1GB" and "99.9%" count, "2xlarge" does not), by punctuation, or by the end. "10.0.0.0" is
+# an address, not four numbers; a "63." ending a sentence is still 63.
+NUMBER = re.compile(r"(?<![\w.])(\d+(?:,\d{3})*(?:\.\d+)?)(?=[A-Za-z]{0,4}(?!\w)(?!\.\d))")
+# Region and Availability Zone codes end in a digit that is a name, not a quantity.
+_REGION_CODE = re.compile(r"\b[a-z]{2}(?:-gov|-iso[a-z]*)?-[a-z]+-\d[a-z]?\b")
 URL = re.compile(r"https?://[^\s<>()\[\]\"']+")
 _TRAILING_PUNCTUATION = ".,;:!?"
 
 
 def numbers_in(text: str) -> set[str]:
     """Every standalone number in `text`, thousands separators removed ("10,240" -> "10240")."""
-    return {m.group(0).replace(",", "") for m in NUMBER.finditer(text)}
+    text = _REGION_CODE.sub(" ", text)
+    return {m.group(1).replace(",", "") for m in NUMBER.finditer(text)}
 
 
 def normalize_url(url: str) -> str:
