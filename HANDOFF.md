@@ -164,6 +164,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 - Lesson: a review done by Codex is a description, not a change. Codex tests against an
   in-memory copy and writes nothing; apply its fixes in this session and re-run `evals
   validate` before trusting them.
+- Batch 3: `suites/docs/integration.drafts.jsonl`, 47 drafts built hardest-first after the pilot
+  review (12 multi_step, 8 false_premise, 7 unanswerable, 3 changed_default, 17 lookup) across
+  Step Functions, SQS, API Gateway, EventBridge, Kinesis, Firehose, Secrets Manager, ACM,
+  CloudFormation and Parameter Store. All pass `evals validate`. Totals: 140 drafts, 5 verified.
+- Smoke suite: `docs-smoke-007` (Kinesis, unanswerable) was retired because the broadened
+  snapshot includes the Kinesis quotas page; `docs-smoke-008` (Amazon Chime SDK, held out)
+  replaces it. Runs before and after share 6 smoke cases, not 7.
 - Batch 2: `suites/docs/core.drafts.jsonl`, 45 drafts leaning to the under-represented types
   (7 changed_default, 5 multi_step, 4 false_premise, 24 lookup, 5 unanswerable) across compute
   (Lambda runtimes, EKS versions), storage (S3 bucket quotas), networking (VPC CIDR and quotas),
