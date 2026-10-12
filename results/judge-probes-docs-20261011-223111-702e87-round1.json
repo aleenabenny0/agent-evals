@@ -1,0 +1,174 @@
+{
+  "run_id": "docs-20261011-223111-702e87",
+  "judge": "b23a6c3aef09",
+  "summary": {
+    "number": {
+      "kind": "mutant",
+      "n": 15,
+      "rate": 1.0,
+      "low": 0.7961166989641514,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "qualifier": {
+      "kind": "mutant",
+      "n": 11,
+      "rate": 0.0,
+      "low": 0.0,
+      "high": 0.25883296696803165,
+      "bar": 0.9
+    },
+    "citation": {
+      "kind": "mutant",
+      "n": 40,
+      "rate": 0.925,
+      "low": 0.8013576647568947,
+      "high": 0.9741639742254118,
+      "bar": 0.9
+    },
+    "padding": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    },
+    "resample": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    }
+  },
+  "misses": [
+    {
+      "case_id": "docs-ai-002-p1",
+      "attempt": 1,
+      "probe": "qualifier",
+      "answer": "No. Amazon Bedrock does not add a routing fee for cross-Region inference. The price is calculated based on the Region from which you call the inference profile, so you pay the standard model pricing for that calling Region. (Global cross-Region inference is listed as having 10% savings compared with Geographic cross-Region inference.)",
+      "judge": "judge_supported=1 Quote 1 directly supports both the absence of an additional routing cost and the pricing based on the calling Region. Quote 2, which shows standard pricing versus approximately 10% savings and says to choose Global for cost optimization, supports the Global-versus-Geographic note.; judge_responsive=1 The answer says there is no routing fee and that pricing is based on the calling Region, matching the reference; the extra note on global inference savings is additional detail that doesn't contradict it."
+    },
+    {
+      "case_id": "docs-ai-002-p3",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "No. Amazon Bedrock does not add a surcharge for routing your inference request to another Region. Cross-Region inference has no additional routing cost, and pricing is based on the Region from which you call the inference profile. (Global cross-Region inference is documented as 10% cheaper than Geographic cross-Region inference, which is at standard pricing.)",
+      "judge": "judge_supported=1 Quote 1 directly supports no additional routing cost and pricing based on the calling Region. Quote 2, with \"Choose Global for cost optimization,\" supports Global having about 10% savings and the other option being standard pricing.; judge_responsive=1 The answer says there is no surcharge or extra routing cost and that pricing is based on the Region where the inference profile is called, which matches the reference. The added note about global versus geographic pricing is extra detail and doesn't contradict it."
+    },
+    {
+      "case_id": "docs-ai-004",
+      "attempt": 1,
+      "probe": "padding",
+      "answer": "Global cross-Region inference is roughly 10% cheaper than geographic cross-Region inference. The docs' comparison table lists Geographic cost as \"Standard pricing\" and Global cost as \"Approximately 10% savings.\" Note that this is an approximate figure from the docs, and the exact per-model rates are on the Amazon Bedrock pricing page, which I did not read. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_supported=0 The answer claims that the exact per-model rates are on the Amazon Bedrock pricing page, and the cited quote doesn't say that. The quote also gives no column headers, so it doesn't directly confirm which column is Geographic and which is Global.; judge_responsive=1 The answer states global is roughly 10% cheaper than geographic (standard) pricing, matching the reference."
+    },
+    {
+      "case_id": "docs-ai-004-p2",
+      "attempt": 1,
+      "probe": "qualifier",
+      "answer": "Global cross-Region inference is approximately 10% cheaper than Geographic cross-Region inference. The Bedrock documentation lists the cost of Geographic inference as \"Standard pricing\" and the cost of Global inference as \"Approximately 10% savings.\" The documentation gives this approximate figure, not an exact rate, so check the Amazon Bedrock pricing page for model-specific prices.",
+      "judge": "judge_supported=1 The quote's table row gives \"Standard pricing | Approximately 10% savings\", which supports the claims. It doesn't show column headers, but the order and the \"Choose Global for cost optimization\" note imply Geographic is standard and Global has the savings. The \"check the pricing page\" advice makes no factual claim.; judge_responsive=1 The answer states approximately 10% cheaper than geographic (standard) pricing, matching the reference."
+    },
+    {
+      "case_id": "docs-ai-004-p2",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "Global cross-Region inference is 10% cheaper than geographic cross-Region inference. The Bedrock cross-Region inference comparison table lists Geographic cost as \"Standard pricing\" and Global cost as \"Approximately 10% savings.\" The docs give this as an approximate figure, not an exact one, and I could not find a separate pricing page with a precise rate.",
+      "judge": "judge_supported=1 The quoted table row gives \"Standard pricing\" and \"Approximately 10% savings\", and \"Choose Global for cost optimization\" supports mapping the savings to Global. The answer also flags the figure as approximate.; judge_responsive=1 The answer states about 10% cheaper than geographic (standard) pricing and notes it is approximate, matching the reference."
+    },
+    {
+      "case_id": "docs-ai-004-p2",
+      "attempt": 3,
+      "probe": "qualifier",
+      "answer": "Global cross-Region inference is approximately 10% cheaper than geographic cross-Region inference. The Bedrock docs' comparison table lists geographic cross-Region inference at \"Standard pricing\" and global at \"Approximately 10% savings.\" The docs give this approximate figure, not an exact rate.",
+      "judge": "judge_supported=1 The quoted table row shows \"Standard pricing\" versus \"Approximately 10% savings\" with \"Choose Global for cost optimization\". That supports global being about 10% cheaper than the other option (geographic), and the answer correctly says the figure is approximate.; judge_responsive=1 The answer states approximately 10% cheaper than geographic (standard) pricing, matching the reference."
+    },
+    {
+      "case_id": "docs-ai-004-p3",
+      "attempt": 3,
+      "probe": "qualifier",
+      "answer": "According to the Bedrock documentation, a global cross-Region inference profile costs 10% less than a geographic one. The docs list geographic cross-Region inference at \"Standard pricing\" and global at \"Approximately 10% savings.\" The trade-off is data residency: geographic profiles keep processing within boundaries such as US, EU, or APAC, while global profiles can route requests to any supported commercial AWS Region worldwide. I could not open the Amazon Bedrock pricing page, so I can't give exact per-model dollar figures; the 10% is the documented approximation.",
+      "judge": "judge_supported=1 The quotes support the \"approximately 10% savings\" for global versus \"Standard pricing\" for geographic, and the data residency trade-off. The answer's \"costs 10% less\" is a slight tightening of \"approximately,\" but it later describes the 10% as an approximation. The statement that it couldn't open the pricing page describes the assistant's own process and is not a documentation claim.; judge_responsive=1 The answer states global profiles give roughly 10% savings versus standard geographic pricing, matching the reference, and it adds correct context on the data residency trade-off."
+    },
+    {
+      "case_id": "docs-ai-005-p2",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "Check the CloudTrail event for the Bedrock request and look at the additionalEventData.inferenceRegion field. CloudTrail logs cross-Region inference requests in your source Region (the Region you called from), and that field identifies the Region where the request was actually processed. Note that the field is in the event record; the call itself is logged in the Region you made it from.",
+      "judge": "judge_supported=1 Both quotes directly support the claims: the additionalEventData.inferenceRegion field shows where the request was processed, and CloudTrail logs these requests in the source Region.; judge_responsive=1 The answer names additionalEventData.inferenceRegion and says to look in the CloudTrail log of the source Region, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 1,
+      "probe": "citation",
+      "answer": "No. Amazon Bedrock offers two inference endpoints, bedrock-runtime and bedrock-mantle, each with its own per-model quota allocations. Traffic to the two endpoints is tracked against separate quotas, even when calling the same underlying model, so they do not share one token quota for the same model.",
+      "judge": "judge_supported=1 Quote 2 states that traffic to the two endpoints is tracked against separate quotas even for the same underlying model, which supports the answer's claim that they don't share one token quota.; judge_responsive=1 The answer says no, each endpoint has its own per-model quota and traffic is tracked separately even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 2,
+      "probe": "citation",
+      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the other endpoint's token quota. (The per-endpoint quota detail pages are referenced from that page but were not retrievable in the snapshot, so I could not confirm the specific numbers for each.)",
+      "judge": "judge_supported=1 The quotas page quote says traffic to the two endpoints is tracked against separate quotas even for the same underlying model, which supports the answer's \"No\" and its conclusion that usage on one endpoint doesn't draw down the other's quota.; judge_responsive=1 The answer says no, each endpoint has its own per-model quota allocations tracked separately even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 3,
+      "probe": "citation",
+      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the token quota of the other. Note: the per-endpoint quota detail pages (quotas-runtime and quotas-mantle) were listed in the docs but could not be opened in the snapshot, so the specific limit values for each endpoint are not confirmed here.",
+      "judge": "judge_supported=1 Quote 2 says traffic to the two endpoints is tracked against separate quotas even for the same model, which supports the answer's core claim that the endpoints don't share a quota. The remaining wording is a minor paraphrase or a caveat about the retrieval, not a factual claim about Bedrock.; judge_responsive=1 The answer says no, each endpoint has its own per-model quota and traffic is tracked separately even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 3,
+      "probe": "resample",
+      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the token quota of the other. Note: the per-endpoint quota detail pages (quotas-runtime and quotas-mantle) were listed in the docs but could not be opened in the snapshot, so the specific limit values for each endpoint are not confirmed here.",
+      "judge": "judge_supported=0 The core answer (separate quotas per endpoint) is supported by both quotes. However, the note that the quotas-runtime and quotas-mantle detail pages were \"listed in the docs but could not be opened in the snapshot\" is not stated in any cited quote.; judge_responsive=1 The answer says no, that each endpoint has separate per-model quotas tracked independently even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-036",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "No. Including an AsyncInferenceConfig object in the endpoint configuration means the endpoint can receive asynchronous invocations. It cannot also serve synchronous real-time requests. Asynchronous endpoints are invoked with InvokeEndpointAsync, with the request payload placed in Amazon S3. If you need both modes, you would need to deploy separate endpoints: one asynchronous and one real-time (without AsyncInferenceConfig).",
+      "judge": "judge_supported=1 Quote 1 says an endpoint with AsyncInferenceConfig can only receive asynchronous invocations, and quote 2 supports the InvokeEndpointAsync and S3 payload details. The advice to use separate endpoints follows directly from quote 1.; judge_responsive=1 The answer says no, as the reference does: an endpoint with AsyncInferenceConfig handles only asynchronous invocations. The extra detail it adds about InvokeEndpointAsync and using separate endpoints is correct."
+    },
+    {
+      "case_id": "docs-ai-036",
+      "attempt": 3,
+      "probe": "qualifier",
+      "answer": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can receive asynchronous invocations (requests submitted via InvokeEndpointAsync, with payloads in Amazon S3). It cannot also serve synchronous real-time requests. To serve real-time requests, you would need an endpoint configuration without AsyncInferenceConfig (a real-time endpoint).",
+      "judge": "judge_supported=1 Quote 1 says an endpoint with AsyncInferenceConfig can only receive asynchronous invocations, and Quote 2 supports the InvokeEndpointAsync and S3 payload details; the closing advice follows from Quote 1.; judge_responsive=1 The answer says no, matching the reference: an endpoint with AsyncInferenceConfig handles only asynchronous invocations and cannot also serve synchronous real-time requests."
+    },
+    {
+      "case_id": "docs-chg-004",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "Not necessarily. The standard default of 1,000 concurrent executions per Region is documented, but AWS also says new accounts start with reduced concurrency quotas. The Lambda scaling page says that your account has a total concurrency limit of 1,000 concurrent executions across all functions in a Region. However, the Lambda quotas page and the AWS Lambda endpoints and quotas page both state that new AWS accounts have reduced concurrency and memory quotas, and that AWS raises these automatically based on your usage. The docs I could reach do not give the specific reduced number for a new account. To see the value that applies to your account, check the Service Quotas console for Lambda, or run aws lambda get-account-settings. You can also request an increase.",
+      "judge": "judge_supported=1 The 1,000 default limit, the reduced quotas for new accounts, and the automatic increases based on usage are all stated in the quotes; the remaining suggestions (Service Quotas console, get-account-settings, requesting an increase) are advice and not factual claims that need support.; judge_responsive=1 The answer says \"Not necessarily\", explains that new accounts have reduced concurrency and memory quotas that AWS raises automatically based on usage, and treats 1,000 as the standard default, which matches the reference."
+    },
+    {
+      "case_id": "docs-int-002",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2.",
+      "judge": "judge_supported=1 The quotes support the main claims: the workflow type can't be changed, full history is retrievable via the API for up to 90 days, and CloudWatch log retention is configurable. The answer also flags that the Express logging details are unverified.; judge_responsive=1 The answer says the type cannot be changed and recommends creating a new Standard state machine with history retrievable for up to 90 days, which matches the reference; the CloudWatch Logs alternative is extra detail and is flagged as unverified."
+    },
+    {
+      "case_id": "docs-int-002",
+      "attempt": 2,
+      "probe": "padding",
+      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_supported=0 The answer says Standard workflows allow retrieving full history via the API for up to 90 days, but quote 2 never mentions Standard, so that attribution is unsupported. The claim that Express workflows can log to CloudWatch Logs is also uncited, though the answer flags it as unverified.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day history retrieval, which matches the reference; the CloudWatch Logs option is extra detail and is flagged as unverified."
+    },
+    {
+      "case_id": "docs-int-002",
+      "attempt": 2,
+      "probe": "resample",
+      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2.",
+      "judge": "judge_supported=0 No cited quote ties the 90-day API history retrieval to Standard workflows, and none says Express executions can log to CloudWatch Logs, so both claims are unsupported even though the answer hedges on the Express part.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day retrievable history, matching the reference; the CloudWatch Logs alternative is extra, hedged detail."
+    }
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "run_id": "docs-20261011-223111-702e87",
+  "judge": "b23a6c3aef09",
+  "summary": {
+    "number": {
+      "kind": "mutant",
+      "n": 15,
+      "rate": 1.0,
+      "low": 0.7961166989641514,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "qualifier": {
+      "kind": "mutant",
+      "n": 11,
+      "rate": 1.0,
+      "low": 0.7411670330319684,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "citation": {
+      "kind": "mutant",
+      "n": 40,
+      "rate": 1.0,
+      "low": 0.9123783988027133,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "padding": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    },
+    "resample": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    }
+  },
+  "misses": [
+    {
+      "case_id": "docs-ai-004",
+      "attempt": 1,
+      "probe": "padding",
+      "answer": "Global cross-Region inference is roughly 10% cheaper than geographic cross-Region inference. The docs' comparison table lists Geographic cost as \"Standard pricing\" and Global cost as \"Approximately 10% savings.\" Note that this is an approximate figure from the docs, and the exact per-model rates are on the Amazon Bedrock pricing page, which I did not read. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_supported=0 The answer claims that the exact per-model rates are on the Amazon Bedrock pricing page, and the cited quote doesn't say that. The quote also gives no column headers, so it doesn't directly confirm which column is Geographic and which is Global.; judge_responsive=1 The answer states global is roughly 10% cheaper than geographic (standard) pricing, matching the reference."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 3,
+      "probe": "resample",
+      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the token quota of the other. Note: the per-endpoint quota detail pages (quotas-runtime and quotas-mantle) were listed in the docs but could not be opened in the snapshot, so the specific limit values for each endpoint are not confirmed here.",
+      "judge": "judge_supported=0 The core answer (separate quotas per endpoint) is supported by both quotes. However, the note that the quotas-runtime and quotas-mantle detail pages were \"listed in the docs but could not be opened in the snapshot\" is not stated in any cited quote.; judge_responsive=1 The answer says no, that each endpoint has separate per-model quotas tracked independently even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-int-002",
+      "attempt": 2,
+      "probe": "padding",
+      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_supported=0 The answer says Standard workflows allow retrieving full history via the API for up to 90 days, but quote 2 never mentions Standard, so that attribution is unsupported. The claim that Express workflows can log to CloudWatch Logs is also uncited, though the answer flags it as unverified.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day history retrieval, which matches the reference; the CloudWatch Logs option is extra detail and is flagged as unverified."
+    },
+    {
+      "case_id": "docs-int-002",
+      "attempt": 2,
+      "probe": "resample",
+      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2.",
+      "judge": "judge_supported=0 No cited quote ties the 90-day API history retrieval to Standard workflows, and none says Express executions can log to CloudWatch Logs, so both claims are unsupported even though the answer hedges on the Express part.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day retrievable history, matching the reference; the CloudWatch Logs alternative is extra, hedged detail."
+    }
+  ]
+}
