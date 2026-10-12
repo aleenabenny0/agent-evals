@@ -10,21 +10,59 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-from agent_evals.corpus import normalize, phrase_in
+from agent_evals.corpus import _TYPOGRAPHY, normalize, phrase_in
 from agent_evals.entities import NUMBER, numbers_in
 from agent_evals.types import Case
 
+# What `corpus.normalize` throws away, expressed as what may sit between the quote's characters
+# in raw page text: markdown emphasis and structure, a link's URL part, and any whitespace.
+_MD_LINK_URL = r"\]\([^)]*\)"  # the "](./page.html)" tail of a markdown link
+_MARKUP = r"[*_`#>|\[\]]"
+_BETWEEN_WORDS = rf"(?:{_MD_LINK_URL}|\s|{_MARKUP})+"
+_WITHIN_WORD = rf"(?:{_MD_LINK_URL}|[*_`\[\]])*"
 
-def quote_context(text: str, quote: str, *, width: int = 300) -> tuple[str, str, str] | None:
-    """Locate `quote` in raw page text, tolerating whitespace and case differences.
 
-    Returns (before, match, after) with `width` characters of context on each side, or None
-    when the quote cannot be found in the raw text (it may still match after normalization).
+def _typography_variants() -> dict[str, str]:
+    """For each plain character `normalize` maps curly typography to, a class matching all of
+    them: "'" also matches the curly single quotes, "-" the en and em dashes. Built from the same
+    table `normalize` uses, so the two cannot drift."""
+    sources: dict[str, list[str]] = {}
+    for code, plain in _TYPOGRAPHY.items():
+        sources.setdefault(str(plain), []).append(chr(code))
+    return {plain: "[" + re.escape(plain + "".join(chars)) + "]" for plain, chars in sources.items()}
+
+
+_TYPOGRAPHY_VARIANTS = _typography_variants()
+
+
+def quote_pattern(quote: str) -> re.Pattern[str] | None:
+    """A regex that finds `quote` in raw page text exactly when `Corpus.contains_quote` would.
+
+    The quote is normalized the way the grader normalizes it, then rebuilt as a pattern that
+    lets markdown markers, link URLs, line breaks and curly typography sit between its
+    characters. Bold "**Provisioned Throughput**", a quote broken across lines, and "[Yes](url)"
+    inside a table row all match; a quote that merely shares words with the page does not.
     """
-    words = [re.escape(w) for w in quote.split()]
+    words = normalize(quote).split()
     if not words:
         return None
-    match = re.compile(r"\s+".join(words), re.IGNORECASE).search(text)
+    word_patterns = [
+        _WITHIN_WORD.join(_TYPOGRAPHY_VARIANTS.get(c, re.escape(c)) for c in w) for w in words
+    ]
+    return re.compile(_BETWEEN_WORDS.join(word_patterns), re.IGNORECASE)
+
+
+def quote_context(text: str, quote: str, *, width: int = 300) -> tuple[str, str, str] | None:
+    """Locate `quote` in raw page text, tolerating everything `normalize` tolerates.
+
+    Returns (before, match, after) with `width` characters of context on each side; `match` is
+    the raw page text, markdown included, so it can be highlighted in place. None when the quote
+    is not on the page, which is also when the citation grader would reject it.
+    """
+    pattern = quote_pattern(quote)
+    if pattern is None:
+        return None
+    match = pattern.search(text)
     if match is None:
         return None
     start, end = match.span()

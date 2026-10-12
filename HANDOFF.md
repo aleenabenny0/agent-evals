@@ -323,6 +323,14 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 - Observations logged for the skill review: 7 (review highlight = validator set), 8 (escapes in
   edit scripts), 9 (split must treat linked cases as a unit), 10 (first failures are instrument
   failures), 11 (a mutant must be wrong).
+- Found by Aleena while labeling: the review and label screens said a citation was NOT on the
+  page while the grader accepted it. Cause: the screen's locator joined the quote's words with
+  whitespace only, so bold markers ("**Provisioned Throughput**") blocked it; the grader compares
+  normalized text. `review.quote_pattern` now rebuilds the normalized quote as a regex that lets
+  markdown, link URLs, line breaks and curly typography sit between characters, and the label
+  screen defers to `corpus.contains_quote` for its red/yellow verdict so it can never contradict
+  the grader. Checked on all 360 support quotes in dev, test and smoke: 360 agreements, 0
+  disagreements. Tests in `tests/test_quote_context.py`, including her exact sentence.
 
 ## Target: the three project briefs
 

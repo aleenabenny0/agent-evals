@@ -646,8 +646,14 @@ def label(
                     body = Text.assemble(before, (match, "bold yellow"), after)
                     console.print(Panel(body, title=f"citation {n}/{len(cits)}: {url}"))
                 else:
-                    style = "red" if page else "yellow"
-                    note = "quote NOT found on page" if page else "page not in snapshot"
+                    # The grader has the final word on whether a quote is on the page; the
+                    # screen must never contradict it.
+                    if page is None:
+                        note, style = "page not in snapshot", "yellow"
+                    elif corpus is not None and corpus.contains_quote(url, quote):
+                        note, style = "on the page per the grader; shown without context", "yellow"
+                    else:
+                        note, style = "quote NOT found on page (grader agrees)", "red"
                     title = f"citation {n}/{len(cits)}: {url} ({note})"
                     console.print(Panel(quote, title=title, style=style))
             supported: bool | None = None
