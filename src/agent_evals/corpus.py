@@ -203,8 +203,12 @@ class Corpus:
         return f"# {page.title}\nURL: {page.url}\n\n{text}"
 
     def contains_quote(self, url: str, quote: str) -> bool:
+        """Verbatim quote check after normalization. A quote that normalizes to nothing (only
+        markdown markers or whitespace) is on no page: the empty string is in every string, and
+        that must not count."""
         haystack = self._normalized.get(url)
-        return haystack is not None and normalize(quote) in haystack
+        needle = normalize(quote)
+        return bool(needle) and haystack is not None and needle in haystack
 
     def contains_phrase(self, url: str, phrase: str) -> bool:
         """Whole-phrase match of a short key phrase on a page (see `phrase_in`)."""

@@ -42,7 +42,9 @@ def test_table_rows_links_and_typography_match_as_the_grader_sees_them() -> None
         "[Yes](https://console.aws.amazon.com/servicequotas/) | The number of vCPUs |\n"
         f"Bucket names can{RSQUO}t be changed {EN_DASH} ever."
     )
-    row_quote = "Fargate On-Demand vCPU resource count | Each supported Region: 6 | Yes | The number"
+    row_quote = (
+        "Fargate On-Demand vCPU resource count | Each supported Region: 6 | Yes | The number"
+    )
     row = quote_context(page, row_quote)
     assert row is not None and row[1].startswith("Fargate") and row[1].endswith("The number")
     curly = quote_context(page, "names can't be changed - ever")

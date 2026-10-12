@@ -93,6 +93,9 @@ def test_non_breaking_spaces_match_and_tokenize(corpus: Corpus) -> None:
     assert normalize("Bucket\u00a0names") == "bucket names"
     assert tokenize("Bucket\u00a0names") == ["bucket", "names"]
     assert corpus.contains_quote(BUCKETS_URL, "between 3 and\u00a063 characters")
+    # Only markup or whitespace normalizes to "", and "" is in every string: not a quote.
+    assert not corpus.contains_quote(BUCKETS_URL, "**")
+    assert not corpus.contains_quote(BUCKETS_URL, "  _  ")
 
 
 def test_build_snapshot_writes_a_lock_without_content(tmp_path: Path) -> None:

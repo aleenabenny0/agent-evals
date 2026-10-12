@@ -29,7 +29,9 @@ def _typography_variants() -> dict[str, str]:
     sources: dict[str, list[str]] = {}
     for code, plain in _TYPOGRAPHY.items():
         sources.setdefault(str(plain), []).append(chr(code))
-    return {plain: "[" + re.escape(plain + "".join(chars)) + "]" for plain, chars in sources.items()}
+    return {
+        plain: "[" + re.escape(plain + "".join(chars)) + "]" for plain, chars in sources.items()
+    }
 
 
 _TYPOGRAPHY_VARIANTS = _typography_variants()
