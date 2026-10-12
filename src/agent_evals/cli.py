@@ -589,6 +589,14 @@ def label(
     labeler: Annotated[str, typer.Option(help="Your name; stored with each label.")],
     limit: Annotated[int | None, typer.Option(help="Label at most N answers this time.")] = None,
     attempt: Annotated[int, typer.Option(min=1, help="Which attempt of each case to label.")] = 1,
+    revisit: Annotated[
+        str | None,
+        typer.Option(
+            "--revisit",
+            help="Walk your existing labels instead of new answers: 'unnoted' (no note yet) or "
+            "'all'. Enter keeps a previous answer; the note can be added or changed.",
+        ),
+    ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
@@ -599,7 +607,7 @@ def label(
     from rich.text import Text
 
     from agent_evals.corpus import Corpus
-    from agent_evals.judge_validation import label_split
+    from agent_evals.judge_validation import label_split, revisit_targets
     from agent_evals.review import quote_context
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
@@ -616,24 +624,41 @@ def label(
         info = store.run_info(run_id)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         cases = {c.id: c for c in load_suite(suite_path)} if suite_path.exists() else {}
-        done = {(x["case_id"], x["attempt"]) for x in store.labels(run_id, labeler)}
-        todo = [
-            a
-            for a in store.answered_attempts(run_id)
-            if a["attempt"] == attempt
-            and a["case_id"] in cases
-            and (a["case_id"], attempt) not in done
-        ][:limit]
-        if not todo:
-            console.print(
-                f"Nothing to label: {len(done)} already labeled by {labeler} in this run."
-            )
-            return
+        mine = store.labels(run_id, labeler)
+        previous = {(x["case_id"], x["attempt"]): x for x in mine}
+        answered = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
+        if revisit is not None:
+            by_key = {(a["case_id"], a["attempt"]): a for a in answered}
+            targets = revisit_targets(mine, revisit)
+            todo = [by_key[k] for x in targets if (k := (x["case_id"], x["attempt"])) in by_key]
+            todo = todo[:limit]
+            if not todo:
+                console.print(f"Nothing to revisit: no '{revisit}' labels by {labeler} here.")
+                return
+        else:
+            todo = [
+                a
+                for a in answered
+                if a["attempt"] == attempt and (a["case_id"], attempt) not in previous
+            ][:limit]
+            if not todo:
+                console.print(
+                    f"Nothing to label: {len(previous)} already labeled by {labeler} in this run."
+                )
+                return
         tally = {"judge-dev": 0, "judge-test": 0}
+        yn = {True: "y", False: "n"}
         for i, a in enumerate(todo, 1):
             c = cases[a["case_id"]]
             out = a["output"]
-            console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(todo)}")
+            prev = previous.get((c.id, a["attempt"])) if revisit is not None else None
+            console.rule(f"{c.id} #{a['attempt']}   {c.type}, {c.area}   {i}/{len(todo)}")
+            if prev is not None:
+                console.print(
+                    f"[cyan]your labels so far: supported={yn.get(prev['supported'], '-')} "
+                    f"responsive={yn[prev['responsive']]} note={prev['note'] or '(none)'}; "
+                    "Enter keeps an answer[/cyan]"
+                )
             console.print(Panel(c.question, title="question"))
             console.print(Panel(str(out.get("answer", "")), title="assistant's answer"))
             cits = [x for x in (out.get("citations") or []) if isinstance(x, dict)]
@@ -658,10 +683,14 @@ def label(
                     console.print(Panel(quote, title=title, style=style))
             supported: bool | None = None
             if cits:
-                ans = Prompt.ask(
-                    "supported: is every claim backed by the quotes? (y)es, (n)o, (s)kip, (q)uit",
-                    choices=["y", "n", "s", "q"],
+                prev_s = yn.get(prev["supported"]) if prev is not None else None
+                question = (
+                    "supported: is every claim backed by the quotes? (y)es, (n)o, (s)kip, (q)uit"
                 )
+                if prev_s is not None:
+                    ans = Prompt.ask(question, choices=["y", "n", "s", "q"], default=prev_s)
+                else:
+                    ans = Prompt.ask(question, choices=["y", "n", "s", "q"])
                 if ans == "q":
                     break
                 if ans == "s":
@@ -673,20 +702,27 @@ def label(
                 )
             console.print(Panel(c.gold.answer, title="reference answer (gold)"))
             console.print(f"must_include: {c.gold.must_include}")
-            ans = Prompt.ask(
-                "responsive: does it answer the question as asked? (y)es, (n)o, (s)kip, (q)uit",
-                choices=["y", "n", "s", "q"],
+            question = (
+                "responsive: does it answer the question as asked? (y)es, (n)o, (s)kip, (q)uit"
             )
+            if prev is not None:
+                prev_r = yn[prev["responsive"]]
+                ans = Prompt.ask(question, choices=["y", "n", "s", "q"], default=prev_r)
+            else:
+                ans = Prompt.ask(question, choices=["y", "n", "s", "q"])
             if ans == "q":
                 break
             if ans == "s":
                 continue
-            note = Prompt.ask("note (optional)", default="").strip()
+            note = Prompt.ask(
+                "note: what was unsupported or off, in your words (optional)",
+                default=(prev["note"] or "") if prev is not None else "",
+            ).strip()
             split = label_split(c.id)
             store.record_label(
                 run_id,
                 c.id,
-                attempt,
+                a["attempt"],
                 labeler,
                 supported=supported,
                 responsive=ans == "y",
@@ -695,8 +731,9 @@ def label(
             )
             tally[split] += 1
         total = store.labels(run_id, labeler)
+        verb = "revisited" if revisit is not None else "labeled"
         console.print(
-            f"\nlabeled {sum(tally.values())} now ({tally['judge-dev']} judge-dev, "
+            f"\n{verb} {sum(tally.values())} now ({tally['judge-dev']} judge-dev, "
             f"{tally['judge-test']} judge-test); {len(total)} in total by {labeler} for this run"
         )
     finally:

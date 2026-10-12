@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from agent_evals.config import JudgeConfig
 from agent_evals.graders.judge import JudgeGrader
 from agent_evals.harness.runner import grade_all
@@ -79,6 +81,20 @@ def test_label_split_is_deterministic_and_balanced() -> None:
     splits = [label_split(i) for i in ids]
     assert splits == [label_split(i) for i in ids]
     assert 150 < splits.count("judge-dev") < 250
+
+
+def test_revisit_targets_pick_unnoted_labels_or_all() -> None:
+    from agent_evals.judge_validation import revisit_targets
+
+    labels = [
+        {"case_id": "a", "attempt": 1, "supported": False, "responsive": True, "note": ""},
+        {"case_id": "b", "attempt": 1, "supported": True, "responsive": False, "note": "  "},
+        {"case_id": "c", "attempt": 2, "supported": None, "responsive": True, "note": "fine"},
+    ]
+    assert [x["case_id"] for x in revisit_targets(labels, "unnoted")] == ["a", "b"]
+    assert revisit_targets(labels, "all") == labels
+    with pytest.raises(ValueError):
+        revisit_targets(labels, "noted")
 
 
 def test_agreement_counts_failures_as_the_positive_class() -> None:
