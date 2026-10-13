@@ -116,6 +116,10 @@ def test_revisit_targets_pick_unnoted_labels_or_all() -> None:
     ]
     assert [x["case_id"] for x in revisit_targets(labels, "unnoted")] == ["a", "b"]
     assert revisit_targets(labels, "all") == labels
+    # "pending": the strict question was answered but the core one never asked; "c" had no
+    # citations (supported is None) so there is nothing to redo there.
+    labels[0]["core_supported"] = True
+    assert [x["case_id"] for x in revisit_targets(labels, "pending")] == ["b"]
     with pytest.raises(ValueError):
         revisit_targets(labels, "noted")
 

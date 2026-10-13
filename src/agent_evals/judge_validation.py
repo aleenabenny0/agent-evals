@@ -25,19 +25,25 @@ def label_split(case_id: str) -> str:
     return LABEL_SPLITS[int(sha256_text(case_id)[:8], 16) % 2]
 
 
-REVISIT_MODES = ("unnoted", "all")
+REVISIT_MODES = ("unnoted", "pending", "all")
 
 
 def revisit_targets(labels: Sequence[dict[str, Any]], mode: str) -> list[dict[str, Any]]:
     """Which of a labeler's existing labels `evals label --revisit` walks again.
 
     "unnoted": labels without a note, so the reasons behind a "no" can be added afterwards.
+    "pending": labels made before the two-question rubric (the strict question was answered,
+    the core one never asked), so a relabel can be resumed where it stopped.
     "all": every label, to re-check or re-word. Order is the stored order (case id, attempt).
     """
     if mode not in REVISIT_MODES:
         raise ValueError(f"revisit mode must be one of {REVISIT_MODES}, not {mode!r}")
     if mode == "all":
         return list(labels)
+    if mode == "pending":
+        return [
+            x for x in labels if x.get("supported") is not None and x.get("core_supported") is None
+        ]
     return [x for x in labels if not (x.get("note") or "").strip()]
 
 

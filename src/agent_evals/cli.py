@@ -593,8 +593,9 @@ def label(
         str | None,
         typer.Option(
             "--revisit",
-            help="Walk your existing labels instead of new answers: 'unnoted' (no note yet) or "
-            "'all'. Enter keeps a previous answer; the note can be added or changed.",
+            help="Walk your existing labels instead of new answers: 'unnoted' (no note yet), "
+            "'pending' (not yet redone under the two-question rubric) or 'all'. Enter keeps a "
+            "previous answer; the note can be added or changed.",
         ),
     ] = None,
     split: Annotated[
