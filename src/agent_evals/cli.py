@@ -692,7 +692,9 @@ def label(
             supported: bool | None = None
             core_supported: bool | None = None
             if cits:
-                console.print(Panel(SUPPORT_RUBRIC, title="rubric (the judge reads the same text)"))
+                # The rubric is hard-wrapped for the prompt file; let the panel wrap it instead.
+                rubric = "\n\n".join(" ".join(p.split()) for p in SUPPORT_RUBRIC.split("\n\n"))
+                console.print(Panel(rubric, title="rubric (the judge reads the same text)"))
                 prev_core = prev.get("core_supported") if prev is not None else None
                 prev_c = yn[prev_core] if isinstance(prev_core, bool) else None
                 question = (
