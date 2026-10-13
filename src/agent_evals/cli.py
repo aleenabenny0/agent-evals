@@ -740,6 +740,35 @@ def label(
         store.close()
 
 
+@app.command("label-export")
+def label_export(
+    run_id: str,
+    labeler: Annotated[str | None, typer.Option(help="Only this person's labels.")] = None,
+    out: Annotated[
+        Path | None, typer.Option(help="Output file; default results/labels/<run_id>.jsonl.")
+    ] = None,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Write a run's hand labels to JSONL so they live in git, not only in the local database."""
+    import json
+
+    from agent_evals.store.db import ResultsStore
+
+    store = ResultsStore(_config(config).paths.db)
+    try:
+        labels = store.labels(run_id, labeler)
+    finally:
+        store.close()
+    path = out or Path("results") / "labels" / f"{run_id}.jsonl"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = sorted(labels, key=lambda x: (str(x["case_id"]), int(x["attempt"]), str(x["labeler"])))
+    path.write_text(
+        "".join(json.dumps({"run_id": run_id, **r}, ensure_ascii=False) + "\n" for r in rows),
+        encoding="utf-8",
+    )
+    console.print(f"wrote {len(rows)} labels to {path}")
+
+
 @app.command("judge-validate")
 def judge_validate(
     run_id: str,

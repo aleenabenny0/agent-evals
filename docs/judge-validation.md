@@ -1,6 +1,7 @@
 # Judge validation
 
-**Status:** in progress, 2026-10-11: probes passed (round three), hand-label agreement pending.
+**Status:** in progress, 2026-10-12: probes passed; hand labels in (114); supported kappa 0.26, bar
+missed; rubric revision proposed.
 The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
@@ -27,20 +28,57 @@ The "supported" verdict is far stricter than the citation grader: it fails an an
 sentence the quotes do not carry, and the agent routinely adds a sentence of context from pages it
 read but did not quote. Whether that strictness matches a human reader is the question for step 2.
 
-## 2. Agreement with hand labels: pending
+## 2. Agreement with hand labels (2026-10-12)
 
-Aleena labels dev answers with `evals label docs-20261011-223111-702e87 --labeler aleena`. Labels
-are split judge-dev / judge-test by case-id hash before any verdict is seen. Then:
+Aleena labeled all 114 attempt-1 answers of the run (`evals label`), 49 on judge-dev and 65 on
+judge-test, assigned by case-id hash before any verdict was seen. Labels are exported to
+`results/labels/docs-20261011-223111-702e87.jsonl`. Scoring is `evals judge-validate`; positive
+class = a real failure.
 
-```
-uv run evals judge-validate docs-20261011-223111-702e87 --split judge-test
-```
+| Split | Verdict | n | kappa | TPR (judge catches her fails) | TNR (judge passes her passes) | tp/fp/fn/tn | Bar 0.7 |
+|---|---|---|---|---|---|---|---|
+| judge-test | supported | 65 | **0.256** | 1.00 (0.88 to 1.00) | 0.28 (0.16 to 0.44) | 29/26/0/10 | **missed** |
+| judge-test | responsive | 65 | 1.000 (degenerate) | undefined, no human fails | 1.00 (0.94 to 1.00) | 0/0/0/65 | not testable yet |
+| judge-dev | supported | 49 | 0.176 | 1.00 (0.82 to 1.00) | 0.23 (0.11 to 0.40) | 18/24/0/7 | |
+| all | supported | 114 | 0.219 | 1.00 (0.92 to 1.00) | 0.25 (0.16 to 0.37) | 47/50/0/17 | |
 
-Bars: Cohen's kappa at least 0.7 on each verdict; TPR and TNR reported with Wilson intervals and
-the confusion counts; at least 30 labeled answers before any conclusion. If "supported" misses
-the bar because the labels pass answers the judge fails, the prompt is revised on judge-dev
-(for example: judge the claims that answer the question, and name added context separately)
-and judge-test is scored once more, once.
+**Reading, from the judge-dev disagreements only** (the 26 judge-test disagreements were not
+read, so judge-test can still be scored once after a revision):
+
+- The judge never passes an answer Aleena failed (TPR 1.00 everywhere). Every disagreement is
+  an answer she passed and the judge failed: 24 on judge-dev.
+- All 24 are the same shape: the fact that answers the question is quoted, and the answer adds
+  context the quotes do not carry ("the quota is adjustable", "check Service Quotas", "a public
+  NAT gateway must be in a public subnet", "each document is at most 5 KB", a named API
+  parameter). Six of them are table-row quotes with no column header, where a reader who knows
+  AWS quota tables sees "Yes" as "adjustable" and the judge, correctly by the letter, does not.
+- Her own "no" notes fail answers for exactly that kind of added context (workaround steps,
+  API names, tier details not quoted). Across all 114 she split those cases about evenly: 47
+  fails, 50 passes. So the written definition ("every factual claim backed by the quotes") is
+  being applied consistently by the judge and inconsistently by the labels, with a lenient lean.
+  A judge cannot reach kappa 0.7 against a reference that disagrees with itself at that rate; a
+  prompt revision alone will not fix this.
+- "Responsive" agreed 114 of 114 because neither rater failed anything. Kappa is undefined
+  when both raters are constant; the table shows 1.0 only because the code returns 1.0 for
+  perfect agreement. The verdict is untested until it meets answers that are not responsive.
+- One label needs a look: `docs-ai-002` #1 carries a note about `modelId`, `Converse` and
+  `InvokeModel`, which belong to `docs-ai-001`'s answer, not this one. Probably typed at the
+  wrong prompt during the revisit; the label itself may be wrong too.
+
+**Decision needed (Aleena):**
+
+1. **Sharpen the rubric and split the verdict.** Two questions instead of one: *core supported*
+   (the claims that answer the question are in the quotes) and *fully supported* (every claim
+   is). The judge returns both; the brief's claim-level unsupported rate is the second, a usable
+   response-level hallucination metric is the first. Relabel judge-dev (49 answers, about 40
+   minutes) with the two-question rubric, tune the judge prompt against it, then relabel and
+   score judge-test once.
+2. **Give "responsive" something to catch.** Label 30 to 40 closed-book answers (run
+   `closed-book-20261011-225242-b58341`, 54.6% correct, so roughly half are wrong) with the
+   responsive question only, so TPR is measurable.
+3. Fix or confirm the `docs-ai-002` #1 label with `evals label ... --revisit all --limit 3`.
+
+Until then the judge's "supported" number is reported as unvalidated, as it is in the README.
 
 ## 3. Mutation tests and bias probes
 
@@ -113,6 +151,9 @@ a swapped Region), and those remain for the hand labels and for later rounds.
 
 ## 4. Decision
 
+- Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
+  rubric that the judge applies literally and the labels apply leniently and unevenly. Next
+  step is the two-question rubric above, not a prompt tweak. "Responsive" is untested.
 - Mutation tests and bias probes: **passed** on round three, with the caveats above and with the
   first two rounds kept in this document so the revisions are visible.
 - Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and

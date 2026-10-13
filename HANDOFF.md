@@ -331,6 +331,17 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   screen defers to `corpus.contains_quote` for its red/yellow verdict so it can never contradict
   the grader. Checked on all 360 support quotes in dev, test and smoke: 360 agreements, 0
   disagreements. Tests in `tests/test_quote_context.py`, including her exact sentence.
+- **2026-10-12, labels in.** Aleena labeled all 114 attempt-1 answers of the dev run
+  (`results/labels/docs-20261011-223111-702e87.jsonl`, via new `evals label-export`;
+  `evals label --revisit` added for notes). `evals judge-validate` on judge-test (n=65):
+  supported **kappa 0.256**, TPR 1.00, TNR 0.28 (29/26/0/10): the judge fails 72% of answers she
+  passed, never the reverse. Responsive 114/114 agreement but no failures on either side, so
+  untested. Judge-dev reading (judge-test unread): every disagreement is added context the
+  quotes do not carry; her own notes fail the same kind of thing about half the time, so the
+  reference is the inconsistent part. Proposal in `docs/judge-validation.md` section 2: a
+  two-question rubric (core supported / fully supported), relabel judge-dev, tune, score
+  judge-test once; label 30-40 closed-book answers for responsive; check the `docs-ai-002` #1
+  note, which describes another case's answer.
 
 ## Target: the three project briefs
 
@@ -351,7 +362,9 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
    single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
    the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
-   (h) **label 100 to 200 dev answers**: `uv run evals label docs-20261011-223111-702e87
+   (h) done: 114 labeled; next, decide on the two-question rubric and relabel judge-dev (see
+   `docs/judge-validation.md` section 2), label 30-40 closed-book answers for responsive, and
+   fix the `docs-ai-002` #1 note; (h-old) **label 100 to 200 dev answers**: `uv run evals label docs-20261011-223111-702e87
    --reviewer`-style, exact command `uv run evals label docs-20261011-223111-702e87 --labeler
    aleena --limit 50` per sitting (about two hours for 100); the agent then runs `evals judge`,
    `evals judge-validate` and `evals judge-probe` and writes `docs/judge-validation.md`;
