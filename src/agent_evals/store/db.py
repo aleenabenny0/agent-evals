@@ -61,6 +61,8 @@ CREATE TABLE IF NOT EXISTS labels (
     labeled_at  TIMESTAMP,
     PRIMARY KEY (run_id, case_id, attempt, labeler)
 );
+-- Added 2026-10-12 with the two-question support rubric; NULL on labels made before it.
+ALTER TABLE labels ADD COLUMN IF NOT EXISTS core_supported BOOLEAN;
 """
 
 
@@ -166,11 +168,29 @@ class ResultsStore:
         responsive: bool,
         note: str,
         label_split: str,
+        core_supported: bool | None = None,
     ) -> None:
-        """A hand label for one stored answer; relabeling by the same person replaces it."""
+        """A hand label for one stored answer; relabeling by the same person replaces it.
+
+        `supported` is the strict question (every claim quoted); `core_supported` the lenient one
+        (the claims that answer the question are quoted). Both None when there were no citations.
+        """
         self.con.execute(
-            "INSERT OR REPLACE INTO labels VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-            [run_id, case_id, attempt, labeler, supported, responsive, note, label_split, _now()],
+            "INSERT OR REPLACE INTO labels (run_id, case_id, attempt, labeler, supported, "
+            "responsive, note, label_split, labeled_at, core_supported) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            [
+                run_id,
+                case_id,
+                attempt,
+                labeler,
+                supported,
+                responsive,
+                note,
+                label_split,
+                _now(),
+                core_supported,
+            ],
         )
 
     # ---- reads --------------------------------------------------------------------
@@ -208,15 +228,24 @@ class ResultsStore:
 
     def labels(self, run_id: str, labeler: str | None = None) -> list[dict[str, Any]]:
         sql = (
-            "SELECT case_id, attempt, labeler, supported, responsive, note, label_split "
-            "FROM labels WHERE run_id = ?"
+            "SELECT case_id, attempt, labeler, supported, responsive, note, label_split, "
+            "core_supported FROM labels WHERE run_id = ?"
         )
         params: list[Any] = [run_id]
         if labeler is not None:
             sql += " AND labeler = ?"
             params.append(labeler)
         rows = self.con.execute(sql + " ORDER BY case_id, attempt", params).fetchall()
-        keys = ("case_id", "attempt", "labeler", "supported", "responsive", "note", "label_split")
+        keys = (
+            "case_id",
+            "attempt",
+            "labeler",
+            "supported",
+            "responsive",
+            "note",
+            "label_split",
+            "core_supported",
+        )
         return [dict(zip(keys, r, strict=True)) for r in rows]
 
     def latest_run_id(self) -> str | None:

@@ -250,10 +250,19 @@ def test_store_post_hoc_grades_and_labels(tmp_path: Path) -> None:
         run, "a", 1, "aleena", supported=True, responsive=False, note="", label_split="judge-dev"
     )
     store.record_label(
-        run, "a", 1, "aleena", supported=False, responsive=False, note="x", label_split="judge-dev"
+        run,
+        "a",
+        1,
+        "aleena",
+        supported=False,
+        responsive=False,
+        note="x",
+        label_split="judge-dev",
+        core_supported=True,
     )
     labels = store.labels(run, "aleena")
     assert len(labels) == 1 and labels[0]["supported"] is False and labels[0]["note"] == "x"
+    assert labels[0]["core_supported"] is True  # lenient question kept beside the strict one
     store.annotate_run(run, "judge", {"version": "abc"})
     assert store.run_info(run)["manifest"]["judge"] == {"version": "abc"}
     store.close()

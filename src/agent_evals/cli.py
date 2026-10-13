@@ -597,6 +597,10 @@ def label(
             "'all'. Enter keeps a previous answer; the note can be added or changed.",
         ),
     ] = None,
+    split: Annotated[
+        str | None,
+        typer.Option(help="With --revisit: only labels on this side, judge-dev or judge-test."),
+    ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
@@ -607,6 +611,7 @@ def label(
     from rich.text import Text
 
     from agent_evals.corpus import Corpus
+    from agent_evals.graders.judge_prompts import SUPPORT_RUBRIC
     from agent_evals.judge_validation import label_split, revisit_targets
     from agent_evals.review import quote_context
     from agent_evals.store.db import ResultsStore
@@ -630,6 +635,8 @@ def label(
         if revisit is not None:
             by_key = {(a["case_id"], a["attempt"]): a for a in answered}
             targets = revisit_targets(mine, revisit)
+            if split is not None:
+                targets = [x for x in targets if x["label_split"] == split]
             todo = [by_key[k] for x in targets if (k := (x["case_id"], x["attempt"])) in by_key]
             todo = todo[:limit]
             if not todo:
@@ -682,20 +689,42 @@ def label(
                     title = f"citation {n}/{len(cits)}: {url} ({note})"
                     console.print(Panel(quote, title=title, style=style))
             supported: bool | None = None
+            core_supported: bool | None = None
             if cits:
-                prev_s = yn.get(prev["supported"]) if prev is not None else None
+                console.print(Panel(SUPPORT_RUBRIC, title="rubric (the judge reads the same text)"))
+                prev_core = prev.get("core_supported") if prev is not None else None
+                prev_c = yn[prev_core] if isinstance(prev_core, bool) else None
                 question = (
-                    "supported: is every claim backed by the quotes? (y)es, (n)o, (s)kip, (q)uit"
+                    "core supported: are the claims that ANSWER the question backed by the quotes? "
+                    "(y)es, (n)o, (s)kip, (q)uit"
                 )
-                if prev_s is not None:
-                    ans = Prompt.ask(question, choices=["y", "n", "s", "q"], default=prev_s)
+                if prev_c is not None:
+                    ans = Prompt.ask(question, choices=["y", "n", "s", "q"], default=prev_c)
                 else:
                     ans = Prompt.ask(question, choices=["y", "n", "s", "q"])
                 if ans == "q":
                     break
                 if ans == "s":
                     continue
-                supported = ans == "y"
+                core_supported = ans == "y"
+                if not core_supported:
+                    supported = False  # an answer whose core is unsupported is not fully supported
+                    console.print("[dim]fully supported: no (follows from core = no)[/dim]")
+                else:
+                    prev_s = yn.get(prev["supported"]) if prev is not None else None
+                    question = (
+                        "fully supported: is EVERY claim, context included, backed by the quotes? "
+                        "(y)es, (n)o, (s)kip, (q)uit"
+                    )
+                    if prev_s is not None:
+                        ans = Prompt.ask(question, choices=["y", "n", "s", "q"], default=prev_s)
+                    else:
+                        ans = Prompt.ask(question, choices=["y", "n", "s", "q"])
+                    if ans == "q":
+                        break
+                    if ans == "s":
+                        continue
+                    supported = ans == "y"
             else:
                 console.print(
                     "[dim]no citations: supported is not asked (uncited_answer covers it)[/dim]"
@@ -728,6 +757,7 @@ def label(
                 responsive=ans == "y",
                 note=note,
                 label_split=split,
+                core_supported=core_supported,
             )
             tally[split] += 1
         total = store.labels(run_id, labeler)
@@ -802,13 +832,14 @@ def judge_validate(
     )
     for col in columns:
         table.add_column(col, justify="right" if col != "verdict" else "left")
-    for verdict in ("supported", "responsive"):
+    for verdict in ("core_supported", "supported", "responsive"):
+        metric = f"judge_{verdict}"
         pairs = [
-            (bool(x[verdict]), verdicts[(x["case_id"], x["attempt"])][f"judge_{verdict}"] >= 1.0)
+            (bool(x[verdict]), verdicts[(x["case_id"], x["attempt"])][metric] >= 1.0)
             for x in labels
-            if x[verdict] is not None
+            if x.get(verdict) is not None
             and (x["case_id"], x["attempt"]) in verdicts
-            and f"judge_{verdict}" in verdicts[(x["case_id"], x["attempt"])]
+            and metric in verdicts[(x["case_id"], x["attempt"])]
         ]
         if not pairs:
             table.add_row(verdict, "0", "-", "-", "-", "-")

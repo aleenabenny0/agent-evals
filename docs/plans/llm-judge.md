@@ -79,3 +79,23 @@ input tokens and 200 output tokens, under a cent per answer at first-party rates
 
 The plan is approved with these answers. The code shipped the same day (see Mechanics); what
 remains is the validation run: labels, `evals judge`, `evals judge-validate`, mutants, probes.
+
+## Revision (Aleena, 2026-10-12): two levels of "supported"
+
+The first validation against 114 hand labels gave kappa 0.26 on "supported" (see
+`docs/judge-validation.md`). Every disagreement was an answer whose core fact was quoted and whose
+added context was not; the single every-claim verdict failed those, the labels passed about half
+of them. Decision: the support question has two levels, judged in one call and labeled as two
+questions, with one written rubric (`SUPPORT_RUBRIC` in `graders/judge_prompts.py`) shown to the
+judge and to the labeler alike:
+
+- **core supported** (`judge_core_supported`): the claims that answer the question are in the
+  quotes. This is the response-level hallucination metric for reports.
+- **fully supported** (`judge_supported`): every claim, context included, is in the quotes. This
+  is the brief's claim-level unsupported rate. It can only pass when core passes.
+
+Rubric rules settled at the same time: a table cell quoted without its header supports only what
+the cell literally says ("Yes" is not "adjustable"); advice, hedges and offers to help are not
+claims; support, not truth, is judged. Validation restarts: relabel judge-dev under the new
+rubric, tune the judge against it, relabel judge-test once and score once. "Responsive" gets its
+first real negatives from 30 to 40 closed-book answers, labeled with that question only.

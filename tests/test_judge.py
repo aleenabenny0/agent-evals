@@ -14,6 +14,15 @@ def verdict(v: str, reason: str = "because") -> list[dict[str, object]]:
     return [tool_use("submit_verdict", {"verdict": v, "reason": reason})]
 
 
+def support(core: str, full: str, reason: str = "because") -> list[dict[str, object]]:
+    return [
+        tool_use(
+            "submit_support_verdict",
+            {"core_supported": core, "fully_supported": full, "reason": reason},
+        )
+    ]
+
+
 def answered(answer: str, cite: bool = True) -> AgentResult:
     cits = [{"url": BUCKETS_URL, "quote": "between 3 and 63 characters long"}] if cite else []
     return AgentResult(
@@ -21,22 +30,33 @@ def answered(answer: str, cite: bool = True) -> AgentResult:
     )
 
 
-def test_two_verdicts_and_what_each_prompt_may_see() -> None:
-    llm = ScriptedLLM([verdict("pass"), verdict("fail", "answers a different question")])
+def test_three_verdicts_and_what_each_prompt_may_see() -> None:
+    llm = ScriptedLLM(
+        [support("pass", "fail", "the 10 GB claim is not quoted"), verdict("fail", "different q")]
+    )
     case = make_case(gold=Gold(answer="3 to 63 characters", must_include=[["63"]]))
     grades = JudgeGrader(llm, JudgeConfig()).grade(case, answered("Up to 63 characters."))
     by = {g.metric: g for g in grades}
-    assert by["judge_supported"].passed and by["judge_supported"].value == 1.0
-    assert not by["judge_responsive"].passed
-    assert "different question" in by["judge_responsive"].reason
+    assert by["judge_core_supported"].passed and by["judge_core_supported"].value == 1.0
+    assert not by["judge_supported"].passed and "10 GB" in by["judge_supported"].reason
+    assert not by["judge_responsive"].passed and "different q" in by["judge_responsive"].reason
     supported_req, responsive_req = llm.requests
-    # The supported prompt sees the citations and never the gold answer; responsive sees the gold.
+    # The support prompt sees the citations and never the gold answer; responsive sees the gold.
     assert "between 3 and 63" in supported_req["messages"][0]["content"]
     assert "3 to 63 characters" not in supported_req["messages"][0]["content"]
     assert "3 to 63 characters" in responsive_req["messages"][0]["content"]
     assert "tool_choice" not in supported_req  # Sonnet 5.5 rejects a forced tool (400)
-    assert supported_req["tools"][0]["name"] == "submit_verdict"
+    assert supported_req["tools"][0]["name"] == "submit_support_verdict"
+    assert responsive_req["tools"][0]["name"] == "submit_verdict"
     assert supported_req["model"] == "claude-sonnet-5-5"
+    assert "core claims" in supported_req["system"].lower()
+
+
+def test_fully_supported_implies_core_supported() -> None:
+    llm = ScriptedLLM([support("fail", "pass"), verdict("pass")])  # a contradictory judge
+    grades = JudgeGrader(llm, JudgeConfig()).grade(make_case(), answered("63"))
+    by = {g.metric: g for g in grades}
+    assert by["judge_core_supported"].passed and by["judge_supported"].passed
 
 
 def test_judge_skips_what_code_already_settled() -> None:
@@ -56,9 +76,12 @@ def test_missing_or_malformed_verdict_becomes_a_grader_error() -> None:
     graded = grade_all([JudgeGrader(llm, JudgeConfig())], make_case(), answered("x"))
     assert [(name, g.metric) for name, g in graded] == [("judge", "grader_error")]
     assert "no verdict" in graded[0][1].reason
-    bad = ScriptedLLM([[tool_use("submit_verdict", {"verdict": "maybe", "reason": "?"})]])
+    bad = ScriptedLLM([support("maybe", "pass")])
     graded = grade_all([JudgeGrader(bad, JudgeConfig())], make_case(), answered("x"))
     assert graded[0][1].metric == "grader_error" and "validation" in graded[0][1].reason
+    wrong_tool = ScriptedLLM([verdict("pass")])  # the one-verdict tool where two were asked
+    graded = grade_all([JudgeGrader(wrong_tool, JudgeConfig())], make_case(), answered("x"))
+    assert graded[0][1].metric == "grader_error"
 
 
 def test_judge_version_tracks_model_and_salt_is_separate() -> None:
@@ -70,7 +93,7 @@ def test_judge_version_tracks_model_and_salt_is_separate() -> None:
 
 
 def test_usage_is_counted_across_calls() -> None:
-    llm = ScriptedLLM([verdict("pass"), verdict("pass")])
+    llm = ScriptedLLM([support("pass", "pass"), verdict("pass")])
     grader = JudgeGrader(llm, JudgeConfig())
     grader.grade(make_case(), answered("63"))
     assert grader.usage.model_calls == 2 and grader.usage.input_tokens == 200
