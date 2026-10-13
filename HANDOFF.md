@@ -342,6 +342,14 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   two-question rubric (core supported / fully supported), relabel judge-dev, tune, score
   judge-test once; label 30-40 closed-book answers for responsive; check the `docs-ai-002` #1
   note, which describes another case's answer.
+- **2026-10-12, judge "supported" split in two** (Aleena approved both proposals): one rubric
+  text (`SUPPORT_RUBRIC`) shown to the judge and on the label screen; `judge_core_supported`
+  (claims that answer the question are quoted) and `judge_supported` (every claim is) from one
+  call; `labels.core_supported` column; `evals label` asks both questions and `--revisit --split
+  judge-dev` walks one side; `judge-validate` scores three verdicts. Validation restarts: dev run
+  re-judged with the new judge, then Aleena relabels judge-dev (49), the judge is tuned if needed,
+  judge-test (65) is relabeled and scored once. Closed-book answers (run
+  `closed-book-20261011-225242-b58341`, ~half wrong) give "responsive" its first negatives.
 
 ## Target: the three project briefs
 
@@ -362,9 +370,12 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
    single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
    the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
-   (h) done: 114 labeled; next, decide on the two-question rubric and relabel judge-dev (see
-   `docs/judge-validation.md` section 2), label 30-40 closed-book answers for responsive, and
-   fix the `docs-ai-002` #1 note; (h-old) **label 100 to 200 dev answers**: `uv run evals label docs-20261011-223111-702e87
+   (h) relabel judge-dev with the two-question rubric:
+   `uv run evals label docs-20261011-223111-702e87 --labeler aleena --revisit all --split judge-dev`
+   (49 answers), then label 30-40 closed-book answers for responsive:
+   `uv run evals label closed-book-20261011-225242-b58341 --labeler aleena --limit 40`;
+   fix the `docs-ai-002` #1 note on the way; the agent then tunes the judge on judge-dev and asks
+   for the judge-test relabel (65) for the one final score; (h-old) **label 100 to 200 dev answers**: `uv run evals label docs-20261011-223111-702e87
    --reviewer`-style, exact command `uv run evals label docs-20261011-223111-702e87 --labeler
    aleena --limit 50` per sitting (about two hours for 100); the agent then runs `evals judge`,
    `evals judge-validate` and `evals judge-probe` and writes `docs/judge-validation.md`;
