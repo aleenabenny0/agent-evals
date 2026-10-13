@@ -243,7 +243,13 @@ def test_store_post_hoc_grades_and_labels(tmp_path: Path) -> None:
     store.add_grades(run, "a", 1, [("judge", grade)])
     assert store.grade_count(run, "judge") == 1
     assert store.grades_for(run, "judge") == {("a", 1): {"judge_supported": 1.0}}
+    assert store.grade_reasons(run, "judge") == {("a", 1): {"judge_supported": (1.0, "")}}
     assert summarize(store, run).metrics["judge_supported"].mean == 1.0
+    store.delete_grades(run, "judge", [("zzz", 9)])  # keyed delete touches only those keys
+    assert store.grade_count(run, "judge") == 1
+    store.delete_grades(run, "judge", [("a", 1)])
+    assert store.grades_for(run, "judge") == {}
+    store.add_grades(run, "a", 1, [("judge", grade)])
     store.delete_grades(run, "judge")
     assert store.grades_for(run, "judge") == {}
     store.record_label(

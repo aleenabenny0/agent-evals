@@ -1,7 +1,7 @@
 # Judge validation
 
-**Status:** in progress, 2026-10-12: probes passed; hand labels in (114); supported kappa 0.26, bar
-missed; rubric revision proposed.
+**Status:** in progress, 2026-10-13: probes passed; two-question rubric in place; judge-dev relabeled
+(core kappa 0.40, fully 0.14); label calibration pass next, then judge-test once.
 The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
@@ -79,6 +79,44 @@ read, so judge-test can still be scored once after a revision):
 3. Fix or confirm the `docs-ai-002` #1 label with `evals label ... --revisit all --limit 3`.
 
 Until then the judge's "supported" number is reported as unvalidated, as it is in the README.
+
+## 2b. Second round: judge-dev relabeled under the two-question rubric (2026-10-13)
+
+Aleena relabeled the 49 judge-dev answers with both questions; the judge (`8251be566ff1`,
+`JUDGE_SUPPORTED_V2`) was re-run over the dev run. Judge-test is untouched and unread.
+
+| Verdict | n | kappa | TPR | TNR | tp/fp/fn/tn |
+|---|---|---|---|---|---|
+| core supported | 49 | 0.395 | 0.67 (0.21 to 0.94) | 0.91 (0.80 to 0.97) | 2/4/1/42 |
+| fully supported | 49 | 0.137 | 1.00 (0.87 to 1.00) | 0.13 (0.05 to 0.32) | 26/20/0/3 |
+| responsive | 49 | 1.0 (degenerate) | undefined | 1.00 | 0/0/0/49 |
+
+Raw agreement on core is 44 of 49; kappa is low because Aleena failed only 3 answers, so each
+disagreement weighs heavily. Reading the disagreements, judge-dev only:
+
+- **Core, 5 disagreements.** Four are the rubric's headerless-table-row rule: a row like
+  "Cost | Standard pricing | Approximately 10% savings" or "Elasticsearch 7.10 | November 7, 2027 |
+  Not announced | November 7, 2030" quoted without its header. The judge applied the rule all four
+  times; the labels passed three of them and failed one (`docs-core-002`, where the judge passed
+  because a second quote says the table lists deprecation dates). The fifth (`docs-mix-012`) is a
+  label slip: the note says "not adjustable" is quoted, and it is not in the cited quotes.
+- **Fully, 20 disagreements, all judge fail / human pass.** In every one the judge names a
+  specific claim that is in the answer and in no quote: "each document is at most 5 KB", "an email
+  one month before each upgrade", "request an increase through the Service Quotas console",
+  "SnapStart is available for Java 11/17". Eighteen of the twenty carry no note. By the rubric
+  the judge is right in all twenty.
+
+Conclusion: no prompt change is indicated on judge-dev. The judge applies the written rubric;
+the labels do not yet apply it consistently, on the strict question especially. Calibration step:
+Aleena revisits judge-dev with the judge's verdicts and reasons shown (`evals label --revisit
+all --split judge-dev --show-judge`, a flag the tool refuses on judge-test), keeps or changes each
+label on the merits, and decides the open rubric point below. Judge-test is then labeled fresh,
+without the judge in view, and scored once.
+
+Open rubric point for Aleena: the headerless-row rule. Keep it (a row quoted without its header
+proves only what the row literally says; the agent should quote the header, which becomes an
+improvement-loop target) or relax it for core claims when the row itself names the entity asked
+about. The judge and the labels must apply the same choice.
 
 ## 3. Mutation tests and bias probes
 

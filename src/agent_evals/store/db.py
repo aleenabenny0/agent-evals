@@ -146,8 +146,19 @@ class ResultsStore:
                 [run_id, case_id, attempt, grader_name, g.metric, g.value, g.passed, g.reason],
             )
 
-    def delete_grades(self, run_id: str, grader: str) -> None:
-        self.con.execute("DELETE FROM grades WHERE run_id = ? AND grader = ?", [run_id, grader])
+    def delete_grades(
+        self, run_id: str, grader: str, keys: list[tuple[str, int]] | None = None
+    ) -> None:
+        """Drop one grader's grades for a run, or only for the (case_id, attempt) keys given."""
+        if keys is None:
+            self.con.execute("DELETE FROM grades WHERE run_id = ? AND grader = ?", [run_id, grader])
+            return
+        for case_id, attempt in keys:
+            self.con.execute(
+                "DELETE FROM grades WHERE run_id = ? AND grader = ? AND case_id = ? "
+                "AND attempt = ?",
+                [run_id, grader, case_id, attempt],
+            )
 
     def annotate_run(self, run_id: str, key: str, value: Any) -> None:
         """Add one entry to a run's manifest, e.g. which judge version graded it."""
@@ -224,6 +235,20 @@ class ResultsStore:
         out: dict[tuple[str, int], dict[str, float]] = defaultdict(dict)
         for case_id, attempt, metric, value in rows:
             out[(str(case_id), int(attempt))][str(metric)] = float(value)
+        return dict(out)
+
+    def grade_reasons(
+        self, run_id: str, grader: str
+    ) -> dict[tuple[str, int], dict[str, tuple[float, str]]]:
+        """(case_id, attempt) -> metric -> (value, reason), for one grader."""
+        rows = self.con.execute(
+            "SELECT case_id, attempt, metric, value, reason FROM grades "
+            "WHERE run_id = ? AND grader = ?",
+            [run_id, grader],
+        ).fetchall()
+        out: dict[tuple[str, int], dict[str, tuple[float, str]]] = defaultdict(dict)
+        for case_id, attempt, metric, value, reason in rows:
+            out[(str(case_id), int(attempt))][str(metric)] = (float(value), str(reason or ""))
         return dict(out)
 
     def labels(self, run_id: str, labeler: str | None = None) -> list[dict[str, Any]]:

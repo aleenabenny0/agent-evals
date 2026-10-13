@@ -523,6 +523,14 @@ def judge(
     replace: Annotated[
         bool, typer.Option("--replace", help="Overwrite this run's existing judge grades.")
     ] = False,
+    only_labeled: Annotated[
+        str | None,
+        typer.Option(
+            "--only-labeled",
+            help="Judge only answers that carry hand labels on this side (judge-dev or "
+            "judge-test): the cheap loop for tuning the judge prompt. Replaces just those grades.",
+        ),
+    ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Judge a run's stored answers (supported? responsive?) with the LLM judge. Costs money."""
@@ -548,12 +556,22 @@ def judge(
             console.print(f"[red]The run's suite file {suite_path} is gone; cannot judge.[/red]")
             raise typer.Exit(code=2)
         cases = {c.id: c for c in load_suite(suite_path)}
-        if store.grade_count(run_id, "judge") and not replace:
-            console.print("[red]This run already has judge grades; pass --replace.[/red]")
-            raise typer.Exit(code=2)
-        store.delete_grades(run_id, "judge")
+        todo = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
+        if only_labeled is not None:
+            labeled = {
+                (x["case_id"], x["attempt"])
+                for x in store.labels(run_id)
+                if x["label_split"] == only_labeled
+            }
+            todo = [a for a in todo if (a["case_id"], a["attempt"]) in labeled]
+            store.delete_grades(run_id, "judge", [(a["case_id"], a["attempt"]) for a in todo])
+        else:
+            if store.grade_count(run_id, "judge") and not replace:
+                console.print("[red]This run already has judge grades; pass --replace.[/red]")
+                raise typer.Exit(code=2)
+            store.delete_grades(run_id, "judge")
+        todo = todo[:limit]
         grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
-        todo = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases][:limit]
 
         def one(a: dict[str, object]) -> tuple[dict[str, object], list[tuple[str, Grade]]]:
             case = cases[str(a["case_id"])]
@@ -602,6 +620,14 @@ def label(
         str | None,
         typer.Option(help="With --revisit: only labels on this side, judge-dev or judge-test."),
     ] = None,
+    show_judge: Annotated[
+        bool,
+        typer.Option(
+            "--show-judge",
+            help="Show the judge's verdicts and reasons for each answer (calibration). Allowed on "
+            "judge-dev only: judge-test labels must never be made with the judge in view.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
@@ -621,6 +647,12 @@ def label(
     if not sys.stdin.isatty():
         console.print("[red]evals label needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
+    if show_judge and split != "judge-dev":
+        console.print(
+            "[red]--show-judge needs --revisit ... --split judge-dev: the judge-test "
+            "labels are the judge's exam and must be made without seeing it.[/red]"
+        )
+        raise typer.Exit(code=2)
     cfg = _config(config)
     corpus = None
     if (cfg.paths.corpus_dir / "pages.jsonl").exists():
@@ -632,6 +664,7 @@ def label(
         cases = {c.id: c for c in load_suite(suite_path)} if suite_path.exists() else {}
         mine = store.labels(run_id, labeler)
         previous = {(x["case_id"], x["attempt"]): x for x in mine}
+        judge_view = store.grade_reasons(run_id, "judge") if show_judge else {}
         answered = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
         if revisit is not None:
             by_key = {(a["case_id"], a["attempt"]): a for a in answered}
@@ -662,11 +695,18 @@ def label(
             prev = previous.get((c.id, a["attempt"])) if revisit is not None else None
             console.rule(f"{c.id} #{a['attempt']}   {c.type}, {c.area}   {i}/{len(todo)}")
             if prev is not None:
+                core_prev = prev.get("core_supported")
+                full_prev = prev.get("supported")
                 console.print(
-                    f"[cyan]your labels so far: supported={yn.get(prev['supported'], '-')} "
+                    f"[cyan]your labels so far: "
+                    f"core={yn[core_prev] if isinstance(core_prev, bool) else '-'} "
+                    f"fully={yn[full_prev] if isinstance(full_prev, bool) else '-'} "
                     f"responsive={yn[prev['responsive']]} note={prev['note'] or '(none)'}; "
                     "Enter keeps an answer[/cyan]"
                 )
+            for metric, (value, reason) in sorted(judge_view.get((c.id, a["attempt"]), {}).items()):
+                verdict = "pass" if value >= 1.0 else "FAIL"
+                console.print(f"[magenta]judge {metric} = {verdict}: {reason}[/magenta]")
             console.print(Panel(c.question, title="question"))
             console.print(Panel(str(out.get("answer", "")), title="assistant's answer"))
             cits = [x for x in (out.get("citations") or []) if isinstance(x, dict)]
