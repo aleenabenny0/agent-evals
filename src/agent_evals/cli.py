@@ -628,6 +628,10 @@ def label(
             "judge-dev only: judge-test labels must never be made with the judge in view.",
         ),
     ] = False,
+    case_ids: Annotated[
+        list[str] | None,
+        typer.Option("--case", help="Only these case ids (repeat the flag); re-open just them."),
+    ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
@@ -666,6 +670,10 @@ def label(
         previous = {(x["case_id"], x["attempt"]): x for x in mine}
         judge_view = store.grade_reasons(run_id, "judge") if show_judge else {}
         answered = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
+        if case_ids:
+            wanted = set(case_ids)
+            answered = [a for a in answered if a["case_id"] in wanted]
+            mine = [x for x in mine if x["case_id"] in wanted]
         if revisit is not None:
             by_key = {(a["case_id"], a["attempt"]): a for a in answered}
             targets = revisit_targets(mine, revisit)
