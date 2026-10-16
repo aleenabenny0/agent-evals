@@ -1,7 +1,8 @@
 # Judge validation
 
-**Status:** in progress, 2026-10-16: probes passed; judge-dev calibrated (core kappa 0.69, fully 0.22);
-responsive kappa 0.70 on 24 closed-book judge-test labels; one short disputed-labels pass, then judge-test once.
+**Status:** scored, 2026-10-16. Fully supported: kappa 1.00 on 65 blind judge-test labels (validated).
+Core supported: kappa 0.37 (not validated; advisory). Responsive: 0.68 to 0.84 on closed-book labels.
+Probes passed. Judge `2cf75fa03e09`.
 The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
@@ -190,6 +191,54 @@ Both support bars are met on judge-dev. Judge-dev was used for tuning (two rubri
 screen fix, two label calibration passes), so these numbers are not the published ones. The
 published numbers come from the 65 judge-test answers, labeled once, fresh, on the fixed screen,
 without the judge in view, then judged once with the final judge.
+
+## 2f. Published result: judge-test, labeled blind, scored once (2026-10-16)
+
+Aleena relabeled the 65 judge-test answers fresh on the fixed screen (`--revisit all --split
+judge-test --fresh`: no previous answers shown, no judge in view, two-question rubric, strict
+headerless-row rule, a note on 58 of 65). The final judge (`2cf75fa03e09`, `JUDGE_SUPPORTED_V2`
+with the refined rubric) then graded those 65 answers, 130 calls, and `judge-validate` ran once.
+
+| Verdict | n | kappa | TPR (judge catches her fails) | TNR (judge passes her passes) | tp/fp/fn/tn | Bar 0.7 |
+|---|---|---|---|---|---|---|
+| **fully supported** | 65 | **1.000** | 1.00 (0.94 to 1.00) | 1.00 (0.65 to 1.00) | 58/0/0/7 | **met** |
+| core supported | 65 | **0.366** | 0.33 (0.12 to 0.65) | 0.96 (0.88 to 0.99) | 3/2/6/54 | **missed** |
+| responsive (dev run) | 65 | degenerate | no human failures | 1.00 | 0/0/0/65 | see closed-book |
+| responsive (closed-book, judge-test) | 36 | 0.679 | 0.80 (0.38 to 0.96) | 0.94 (0.79 to 0.99) | 4/2/1/29 | just missed |
+| responsive (closed-book, all 61) | 61 | 0.839 | 0.91 (0.62 to 0.98) | 0.96 (0.87 to 0.99) | 10/2/1/48 | |
+
+**Fully supported is validated.** On 65 blind labels the judge and the labeler agree on every
+answer: 58 answers carry at least one claim no quote states, 7 do not. This is the brief's
+claim-level unsupported rate, and it is the hallucination number this project reports.
+
+**Core supported is not validated**, and the post-score reading of the eight disagreements says
+why (read after the single scoring; it may inform the next judge version, which must then be
+validated on new labels, never on these 65):
+
+- Six are human fail / judge pass, and five of those are the same pattern: the labeler applies the
+  strict row rule to the core figure itself. "Cache behaviors per distribution | 75" states a
+  number but not that 75 is the *default*; "Text response length | 4,000 | No | N/A" does not say
+  4,000 is a *maximum*; "IPv4 CIDR blocks per VPC | 5 | [Yes] (up to 50)" does not establish 5 as
+  the default without its header. The judge accepts a quota row as establishing the number and its
+  role. The sixth (`docs-mix-003`) is a plain judge miss: the 300-association figure the answer
+  rests on is in no quote.
+- Two are human pass / judge fail (`docs-ai-023`, `docs-core-001`): the judge counts billing
+  factors and runtime lists as core claims; the labeler counts them as peripheral.
+- Agreement is 57 of 65; kappa is low because core failures are rare (9 of 65) and the judge
+  caught 3 of the 9.
+
+The judge-dev result for core (0.79) did not carry to judge-test (0.37): the dev tuning fixed the
+screen and the rubric, not the judge's reading of quota rows, and judge-dev had few such rows.
+
+**Decisions.**
+
+1. `judge_supported` (fully supported) ships as the validated hallucination metric.
+2. `judge_core_supported` is reported as advisory, with this table beside it. A next version of the
+   support prompt should add the quota-row example ("a row 'X | 75' states 75, not that 75 is a
+   default or a maximum") and the core/peripheral line for billing details; it is validated only
+   against labels on a new run's answers.
+3. `judge_responsive` is validated on closed-book answers at 0.68 (n = 36) to 0.84 (n = 61); on the
+   agent's own answers it has met no failures. Reported with those numbers.
 
 ## 3. Mutation tests and bias probes
 
