@@ -394,6 +394,11 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   `output_config` as sampling controls. Judge v3 is therefore rubric v3 alone; its stability is
   measured by the resample probe like any other version. Re-run on the v3 champion dev run so
   Aleena's next 40 labels (fresh answers) can score both judges.
+- **Judge v3 scored the champion run** (23:06 UTC): agreement with the validated judge 95% core,
+  96% fully, 100% responsive; v3 slightly stricter on core. Next for Aleena, 40 labels on fresh
+  answers: `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --limit 40`; then
+  the agent runs `judge-validate` for both judges and picks the one with the higher core kappa
+  (fully is already at 1.00 for the validated one).
 
 ## Target: the three project briefs
 

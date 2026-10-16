@@ -328,6 +328,26 @@ answers but matters for any per-answer use. The next judge version should set th
 temperature to 0 (the config leaves it at the API default) together with the quota-row example;
 both change the judge version and both are validated on new labels, not these.
 
+## 5. Candidate judge v3 (2026-10-16, unvalidated)
+
+Rubric v3 adds the quota-row example and the core/peripheral line for billing details that the
+judge-test diagnosis pointed at. Temperature 0 was planned too, but the installed SDK
+(anthropic 1.13) does not accept a temperature argument, so v3 is a rubric change only. It runs
+under grader name `judge-v3` beside the validated judge, and was run on the current champion's
+dev run (`docs-20261016-214710-02abb7`, 349 answers, 697 calls).
+
+| Verdict | validated judge pass rate | judge-v3 pass rate | agreement |
+|---|---|---|---|
+| core supported | 0.943 | 0.925 | 95.4% |
+| fully supported | 0.307 | 0.305 | 96.3% |
+| responsive | 0.991 | 0.991 | 100% |
+
+v3 is slightly stricter on core, as the quota-row example intends. Whether it is *better* is
+decided by fresh labels: 40 answers of this run, labeled on the fixed screen, scored against both
+judges with `evals judge-validate` (default config for the validated judge, `-c
+configs/judge-v3.yaml` for the candidate). Those labels were never used to write rubric v3, so the
+comparison is clean. Until then the validated judge stays in the gate.
+
 ## 4. Decision
 
 - Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
