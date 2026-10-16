@@ -726,14 +726,30 @@ def label(
             console.print(Panel(c.question, title="question"))
             console.print(Panel(str(out.get("answer", "")), title="assistant's answer"))
             cits = [x for x in (out.get("citations") or []) if isinstance(x, dict)]
+            if cits:
+                # What the judge sees: the cited text alone. Shown first and whole, so that
+                # support is judged against the citation and not against the page around it.
+                evidence = Text()
+                for n, cit in enumerate(cits, 1):
+                    evidence.append(f"{n}. ", style="bold")
+                    evidence.append(str(cit.get("quote", "")), style="bold yellow")
+                    evidence.append("\n")
+                console.print(
+                    Panel(
+                        evidence,
+                        title="THE CITED QUOTES, exactly as the agent submitted them. Only this "
+                        "text counts as evidence; the page context below does not.",
+                    )
+                )
             for n, cit in enumerate(cits, 1):
                 url, quote = str(cit.get("url", "")), str(cit.get("quote", ""))
                 page = corpus.pages.get(url) if corpus is not None else None
                 ctx = quote_context(page.text, quote, width=200) if page else None
                 if ctx:
                     before, match, after = ctx
-                    body = Text.assemble(before, (match, "bold yellow"), after)
-                    console.print(Panel(body, title=f"citation {n}/{len(cits)}: {url}"))
+                    body = Text.assemble((before, "dim"), (match, "bold yellow"), (after, "dim"))
+                    title = f"page context for citation {n} (dim text is NOT cited): {url}"
+                    console.print(Panel(body, title=title, style="dim"))
                 else:
                     # The grader has the final word on whether a quote is on the page; the
                     # screen must never contradict it.
@@ -750,6 +766,11 @@ def label(
             if cits:
                 # The rubric is hard-wrapped for the prompt file; let the panel wrap it instead.
                 rubric = "\n\n".join(" ".join(p.split()) for p in SUPPORT_RUBRIC.split("\n\n"))
+                rubric += (
+                    "\n\nFor you, not the judge: judge against the cited quotes panel above. A "
+                    "header row, a neighbouring table row or a sentence that is visible only in the"
+                    " dim page context was not cited and does not support anything."
+                )
                 console.print(Panel(rubric, title="rubric (the judge reads the same text)"))
                 prev_core = prev.get("core_supported") if prev is not None else None
                 prev_c = yn[prev_core] if isinstance(prev_core, bool) else None
