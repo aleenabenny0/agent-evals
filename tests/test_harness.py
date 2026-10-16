@@ -230,6 +230,28 @@ def test_flip_rate_and_pass_at_k_need_repeated_attempts(tmp_path: Path) -> None:
     store.close()
 
 
+def test_gate_passes_only_when_target_improves_and_nothing_regresses(tmp_path: Path) -> None:
+    from agent_evals.report import gate
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id=f"s{i}", area="storage") for i in range(6)]
+    cases += [make_case(id=f"c{i}", area="compute") for i in range(6)]
+    # Champion: storage all pass, compute all fail. Challenger: everything passes.
+    champ = _run(store, FakeAgent({f"s{i}": {1} for i in range(6)}), cases, attempts=1)
+    better = _run(store, FakeAgent({c.id: {1} for c in cases}), cases, attempts=1)
+    g = gate(store, champ, better, cases, target="correct")
+    assert g.target.verdict == "improved" and g.passed
+    assert not g.regressed_categories and "area=compute" not in g.regressed_categories
+    # A challenger that fixes compute but breaks storage: the target still improves on average,
+    # yet the storage category's paired interval excludes zero, so the gate fails.
+    mixed = _run(store, FakeAgent({f"c{i}": {1} for i in range(6)}), cases, attempts=1)
+    g2 = gate(store, champ, mixed, cases, target="correct")
+    assert g2.target.verdict == "no detectable change" or not g2.passed
+    assert "area=storage" in g2.regressed_categories
+    assert g2.skipped  # FakeAgent runs carry no citation metrics, so those are skipped, not failed
+    store.close()
+
+
 def test_regrade_rescores_stored_answers_against_changed_cases(tmp_path: Path) -> None:
     from agent_evals.harness.runner import regrade_run
     from agent_evals.types import Gold, Grade

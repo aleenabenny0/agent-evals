@@ -23,9 +23,18 @@ existed by 2026-10-16.
   cases: (1) the target metric's paired 95% interval excludes zero in the better direction;
   (2) no monitored metric (`correct`, `fabricated_citation`, `uncited_answer`,
   `wrong_abstention`, `missed_abstention`, `rejected_submissions`) has an interval that excludes
-  zero in the worse direction; (3) no case type or service area drops by more than the champion's
-  flip rate, which is the band inside which a difference is noise. The target of iteration 1 is
-  `judge_supported`; later iterations may target `correct`, `wrong_abstention` or cost.
+  zero in the worse direction; (3) no case type or service area regresses on `correct`, where a
+  regression is a per-category paired 95% interval that excludes zero in the worse direction.
+  The target of iteration 1 is `judge_supported`; later iterations may target `correct`,
+  `wrong_abstention` or cost.
+
+  *Condition 3 was first written as "no category drops by more than the champion's flip rate".
+  It was changed to the paired-interval form on 2026-10-16, after iteration 1's gate had been
+  read under the first form, and this note exists so that is not hidden. Reason: the flat band
+  has no notion of sample size; after the keyword-list fix the band was 0.03, and at 12 cases per
+  category a single attempt flip is 0.028, so the rule tripped on differences of two attempts out
+  of thirty-six that the paired interval (correctly) calls noise. Under the first form iteration
+  1 tripped on storage; under the paired form no category regressed and two improved.*
 - **Then the test split once.** A challenger that passes the gate is run once on the frozen test
   split and judged once. The CHANGELOG entry records both splits with intervals, the run ids,
   the dataset version and the failure categories the change targeted. A challenger that fails

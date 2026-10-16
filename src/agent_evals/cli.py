@@ -1131,6 +1131,83 @@ def regrade(
         store.close()
 
 
+@app.command("gate")
+def gate_cmd(
+    champion: str,
+    challenger: str,
+    target: Annotated[
+        str, typer.Option(help="Metric the change is meant to improve.")
+    ] = "judge_supported",
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """The ADR 0008 gate: target improved, no monitored metric regressed, no category regressed."""
+    from agent_evals.report import gate
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.suites import load_suite
+
+    store = ResultsStore(_config(config).paths.db)
+    try:
+        manifest = store.run_info(champion)["manifest"]
+        suite_path = Path(str(manifest.get("suite", {}).get("path", "")))
+        if "test" in suite_path.name:
+            console.print(
+                "[red]The gate reads the dev split; test is run once after it passes.[/red]"
+            )
+            raise typer.Exit(code=2)
+        cases = load_suite(suite_path) if suite_path.exists() else []
+        try:
+            g = gate(store, champion, challenger, cases, target)
+        except ValueError as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=1) from exc
+    finally:
+        store.close()
+
+    table = Table(show_header=True, header_style="bold", title="paired on the shared dev cases")
+    for col in ("metric", "champion", "challenger", "difference", "95% CI", "verdict"):
+        table.add_column(col, justify="right" if col != "metric" else "left")
+    for c in (g.target, *g.monitored):
+        colour = {"improved": "green", "regressed": "red"}.get(c.verdict, "")
+        tag = " (target)" if c.metric == target else ""
+        table.add_row(
+            c.metric + tag,
+            f"{c.baseline:.3f}",
+            f"{c.candidate:.3f}",
+            f"{c.diff.mean:+.3f}",
+            f"{c.diff.low:+.3f} to {c.diff.high:+.3f}",
+            f"[{colour}]{c.verdict}[/{colour}]" if colour else c.verdict,
+        )
+    console.print(table)
+    if g.skipped:
+        console.print(f"not compared (absent from one run): {', '.join(g.skipped)}")
+    cats = Table(show_header=True, header_style="bold", title="correct by category, paired")
+    for col in ("category", "n", "difference", "95% CI", ""):
+        cats.add_column(col, justify="right" if col in ("n",) else "left")
+    for cat in g.categories:
+        cats.add_row(
+            f"{cat.kind}={cat.name}",
+            str(cat.n),
+            f"{cat.diff.mean:+.3f}",
+            f"{cat.diff.low:+.3f} to {cat.diff.high:+.3f}",
+            "[red]regressed[/red]"
+            if cat.regressed
+            else ("[green]improved[/green]" if cat.diff.low > 0 else ""),
+        )
+    console.print(cats)
+    if g.passed:
+        console.print(
+            f"[bold green]GATE PASSED[/bold green]: {target} improved, nothing regressed."
+        )
+    else:
+        reasons = []
+        if g.target.verdict != "improved":
+            reasons.append(f"{target}: {g.target.verdict}")
+        reasons += [f"{m} regressed" for m in g.regressed_metrics]
+        reasons += [f"{c} regressed on correct" for c in g.regressed_categories]
+        console.print("[bold red]GATE FAILED[/bold red]: " + "; ".join(reasons))
+        raise typer.Exit(code=1)
+
+
 @app.command("compare")
 def compare_cmd(
     baseline: str,

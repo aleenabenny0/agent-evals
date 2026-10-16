@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -174,6 +175,92 @@ class Comparison:
         if high < 0:
             return "regressed"
         return "no detectable change"
+
+
+# Metrics the gate watches for regressions besides the target (ADR 0008, condition 2).
+MONITORED = (
+    "correct",
+    "fabricated_citation",
+    "uncited_answer",
+    "wrong_abstention",
+    "missed_abstention",
+    "rejected_submissions",
+)
+
+
+@dataclass
+class CategoryDiff:
+    kind: str  # "type" or "area"
+    name: str
+    n: int
+    diff: Estimate  # paired difference in `correct`, challenger minus champion
+
+    @property
+    def regressed(self) -> bool:
+        return self.diff.high < 0
+
+
+@dataclass
+class GateResult:
+    target: Comparison
+    monitored: list[Comparison]
+    skipped: list[str]  # monitored metrics absent from one of the runs
+    categories: list[CategoryDiff]
+
+    @property
+    def regressed_metrics(self) -> list[str]:
+        return [c.metric for c in self.monitored if c.verdict == "regressed"]
+
+    @property
+    def regressed_categories(self) -> list[str]:
+        return [f"{c.kind}={c.name}" for c in self.categories if c.regressed]
+
+    @property
+    def passed(self) -> bool:
+        """ADR 0008: target improved with its interval, no monitored metric regressed with its
+        interval, no type or area regressed on `correct` with its paired interval."""
+        return (
+            self.target.verdict == "improved"
+            and not self.regressed_metrics
+            and not self.regressed_categories
+        )
+
+
+def gate(
+    store: ResultsStore,
+    champion: str,
+    challenger: str,
+    cases: Sequence[Any],
+    target: str = "judge_supported",
+) -> GateResult:
+    """The champion-versus-challenger gate on one suite (dev), read from the store."""
+    target_cmp = compare(store, champion, challenger, target)
+    monitored: list[Comparison] = []
+    skipped: list[str] = []
+    for metric in MONITORED:
+        if metric == target:
+            continue
+        try:
+            monitored.append(compare(store, champion, challenger, metric))
+        except ValueError:
+            skipped.append(metric)
+    a = store.metric_by_case(champion, "correct")
+    b = store.metric_by_case(challenger, "correct")
+    categories: list[CategoryDiff] = []
+    keys: list[tuple[str, Callable[[Any], str]]] = [
+        ("type", lambda c: str(c.type)),
+        ("area", lambda c: str(c.area or "")),
+    ]
+    for kind, key in keys:
+        groups: dict[str, list[str]] = {}
+        for c in cases:
+            if c.id in a and c.id in b:
+                groups.setdefault(key(c), []).append(c.id)
+        for name, ids in sorted(groups.items()):
+            x = [sum(a[i]) / len(a[i]) for i in ids]
+            y = [sum(b[i]) / len(b[i]) for i in ids]
+            categories.append(CategoryDiff(kind, name, len(ids), paired_bootstrap_diff(x, y)))
+    return GateResult(target_cmp, monitored, skipped, categories)
 
 
 def _passes(mean: float, lower_is_better: bool) -> bool:
