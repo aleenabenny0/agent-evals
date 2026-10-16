@@ -375,6 +375,15 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   Gate-rule weakness noted for ADR 0008: a per-category band on `correct` at n = 12 trips on
   grader misses; the fix is a paired per-category interval plus a judge-responsive cross-check,
   to be adopted for iteration 2 onward, not applied retroactively to this one.
+- **Iteration 1 shipped (2026-10-16, 22:40 UTC).** Gate passed under the paired-interval rule
+  (`evals gate`, `results/gates/iteration-1-dev-gate.txt`). Test once: judge_supported 0.106 ->
+  0.318 (CI +0.14 to +0.30), correct 0.987 -> 0.980 (noise), unsupported_entity halved.
+  `prompt_version: v3` is the champion in `default.yaml`; `configs/challenger-v3.yaml` is now
+  identical to it and stays as the record. CHANGELOG has the full entry. Test-split exposure: 2.
+  Next iterations, in order: (2) abstention rule + read the top hit (taxonomy B; target
+  wrong_abstention and pass^3, since v3 cost some run-to-run consistency); (3) judge v3
+  (temperature 0, quota-row example) validated on labels from the next run's answers; then the
+  simulated-user phase or Brief 01, Aleena's choice.
 
 ## Target: the three project briefs
 

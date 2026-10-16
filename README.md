@@ -65,8 +65,10 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
 
 | Run | Split | Cases | Attempts | correct (95% CI) | fabricated_citation | Cost |
 | --- | --- | --- | --- | --- | --- | --- |
-| docs agent | test | 150 | 1 | **0.987** (0.953 to 0.996) | 0.028 | $0.35 |
-| docs agent | dev | 130 | 3 | 0.918 (0.874 to 0.956) | 0.021 | $0.97 |
+| docs agent v3 (after iteration 1) | test | 150 | 1 | **0.980** (0.943 to 0.993) | 0.035 | $0.34 |
+| docs agent v2 (baseline) | test | 150 | 1 | 0.987 (0.953 to 0.996) | 0.028 | $0.35 |
+| docs agent v3 | dev | 130 | 3 | 0.959 (0.931 to 0.982) | 0.013 | $0.99 |
+| docs agent v2 | dev | 130 | 3 | 0.954 (0.918 to 0.985) | 0.021 | $0.97 |
 | closed-book baseline (no tools) | dev | 130 | 1 | 0.546 (0.460 to 0.629) | n/a | $0.06 |
 | oracle baseline (gold pages given) | dev | 130 | 1 | 0.923 (0.864 to 0.958) | 0.000 | $0.07 |
 
@@ -77,12 +79,17 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
 - Reliability on dev with 3 attempts: pass^3 0.862, pass@3 0.962, **flip rate 0.100** (0.059 to
   0.164). A change between two prompt versions smaller than that band is noise.
 - Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
-  why its score is below test's.
+  why its score is below test's. Dev correctness was regraded after iteration 1 widened the
+  keyword lists of 20 dev cases (gold answers unchanged; test cases untouched); the regrade also
+  cut the measured flip rate from 10% to 3%, most of the noise having been the keyword grader.
 - LLM judge (Sonnet 5.5, run after the fact on the stored answers), **validated against 65 hand
   labels made blind**: on "fully supported" (every claim in the answer is in the quotes it cites)
-  the judge and the human labeler agree on all 65, kappa 1.00. On the dev run only **11.4%** of
-  answers pass it: the agent almost always adds a sentence of context its citations do not
-  carry. That is this project's claim-level hallucination rate and the first improvement target.
+  the judge and the human labeler agree on all 65, kappa 1.00. That is this project's claim-level
+  hallucination rate. **Iteration 1** (one prompt change: quote every sentence, cite table
+  headers) moved it on the frozen test split from **10.6% to 31.8%** of answers fully supported
+  (+21 points, 95% CI +14 to +30, p = 8e-7) with correctness unchanged (0.987 to 0.980, interval
+  spans zero). The gate, the dev numbers, the one cost (run-to-run consistency dipped from 97%
+  to 93%) and the grader fix it exposed are in [CHANGELOG.md](CHANGELOG.md) and ADR 0008.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
   advisory, kappa 0.37 on the same 65, with the disagreement pattern documented. "Responsive"
   (0.997 pass) is validated on 61 closed-book answers at kappa 0.68 to 0.84. Planted-error
