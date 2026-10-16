@@ -9,6 +9,8 @@ labels showed the single every-claim verdict failing 72% of the answers a carefu
 the fact that answered the question was quoted, and added context was not. So the judge now
 says whether the *core* claims are supported and, separately, whether *every* claim is. The
 rubric below is the same text the labeling screen shows the human, so both apply one standard.
+Rubric revised 2026-10-16 (Aleena): the headerless-row rule applies to rows as well as cells, and
+a header fragment quoted alongside the value is the one thing that lifts it.
 """
 
 from __future__ import annotations
@@ -22,11 +24,13 @@ of APIs or parameters, descriptions of other features, statements about what the
 says or where.
 
 A claim is supported when a quote states it, or when it follows from the quotes by simple
-arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table cell quoted
-without its column header supports only what the cell literally says: a bare "Yes" does not
-establish "adjustable". Advice ("check the console"), hedges ("I could not confirm"), and offers
-to help are not factual claims and need no support. Judge support, not truth: a true claim that
-no quote states is unsupported."""
+arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table row or cell
+quoted without its column header supports only what it literally says: a bare "Yes" does not
+establish "adjustable", and a row of dates does not establish which date is the deprecation date.
+The header counts only when it is inside a quote: a quoted header fragment that names the column
+(for example "Deprecation date") does establish the meaning of that value. Advice ("check the
+console"), hedges ("I could not confirm"), and offers to help are not factual claims and need no
+support. Judge support, not truth: a true claim that no quote states is unsupported."""
 
 JUDGE_SUPPORTED_V1 = """\
 You are checking whether an answer is supported by the evidence it cites.

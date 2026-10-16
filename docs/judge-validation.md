@@ -155,6 +155,18 @@ Reading, judge-dev only:
   the session (the first answer's note had landed on the second answer, and the second's verdict
   had followed); both corrections are recorded in the exported file.
 
+## 2d. Decisions before the final scoring (Aleena, 2026-10-16)
+
+1. The strict headerless-row rule applies everywhere, refined: a quoted header fragment naming
+   the column counts as the header; prose near the row does not. `docs-chg-013` and
+   `docs-chg-030` flipped to core = no (neither quote set names the date column). The rubric
+   text, read by the judge and shown on the label screen, carries the refinement; the judge was
+   re-run with it.
+2. The 14 strict disputes: Aleena agreed that a factual sentence no quote states fails "fully
+   supported", re-checked each against its quotes, and flipped those where the judge was right.
+   Any kept are listed with the quote that supports them.
+3. Then the 65 judge-test answers are labeled blind, once, and scored once.
+
 ## 3. Mutation tests and bias probes
 
 Variants are built from answers the judge passed on both verdicts (40 of them here), judged, and

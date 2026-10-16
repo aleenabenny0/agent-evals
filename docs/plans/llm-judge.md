@@ -98,6 +98,9 @@ Rubric rules settled at the same time: a table cell quoted without its header su
 the cell literally says ("Yes" is not "adjustable"); advice, hedges and offers to help are not
 claims; support, not truth, is judged. Confirmed 2026-10-16 after the first judge-dev round showed
 it to be the main source of core disagreements: the rule stays strict for rows as well as cells,
-and the labels apply it the same way the judge does. Validation restarts: relabel judge-dev under the new
+and the labels apply it the same way the judge does. Refinement the same day: a header fragment
+quoted alongside the value (for example "Deprecation date") is the one thing that establishes a
+column's meaning; prose near the row ("the deprecated runtime") does not. This changed the judge's
+prompt, so the judge version moved and the dev run was re-judged before the final scoring. Validation restarts: relabel judge-dev under the new
 rubric, tune the judge against it, relabel judge-test once and score once. "Responsive" gets its
 first real negatives from 30 to 40 closed-book answers, labeled with that question only.
