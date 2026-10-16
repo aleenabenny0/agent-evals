@@ -350,6 +350,18 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   re-judged with the new judge, then Aleena relabels judge-dev (49), the judge is tuned if needed,
   judge-test (65) is relabeled and scored once. Closed-book answers (run
   `closed-book-20261011-225242-b58341`, ~half wrong) give "responsive" its first negatives.
+- **2026-10-16, judge validation finished** (`docs/judge-validation.md`, sections 2c to 2f).
+  Process in full: 114 labels, kappa 0.26 on a single "supported" question; two-question rubric;
+  judge-dev relabeled, calibrated with the judge in view (`--show-judge`, judge-dev only),
+  disputed pass; a label-screen bug found and fixed (page context around a quote read as cited
+  text); judge-dev final core 0.79 / fully 1.00; then 65 judge-test answers labeled blind and
+  fresh (`--fresh`), judged once with the final judge `2cf75fa03e09`. **Published: fully
+  supported kappa 1.00 (58/0/0/7), core supported kappa 0.37 (3/2/6/54), responsive 0.68 on 36
+  closed-book test labels (0.84 on all 61).** Decisions: `judge_supported` ships as the
+  hallucination metric (the brief's claim-level unsupported rate); `judge_core_supported` is
+  advisory, with a documented next prompt version to validate on new labels; responsive is
+  reported on closed-book numbers. Labels for both runs are in `results/labels/`. Dev and
+  closed-book runs re-judged with the final judge; probes re-run against it (section 3).
 
 ## Target: the three project briefs
 
@@ -370,10 +382,15 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
    single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
    the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
-   (h) 2026-10-16: judge-dev relabeled (core kappa 0.40, fully 0.14, see
-   `docs/judge-validation.md` 2b); headerless-row rule kept strict. Now the calibration pass with
-   `--show-judge` on judge-dev, then 40 closed-book labels, then the agent rescores; if core
-   clears 0.7, judge-test (65) is relabeled blind and scored once. Earlier wording of (h):
+   (h) done 2026-10-16: judge validated (see status). **Next: the first gated improvement
+   iteration** (phase 5 / Brief 02 M6), agent-side, no labeling needed: (1) a submit-time rule
+   that an abstention carries no answer and an answer is not marked abstained (taxonomy B); (2)
+   read the top search hit before reasoning from other pages (taxonomy B root cause); (3) cite
+   what you state, including the header row with any table cell (the fully-supported rate is
+   12%, and both the judge and the labeler now agree on why). Each is one change, champion vs
+   challenger on dev with 3 attempts, then test once, CHANGELOG entry with intervals, ship only
+   on a paired interval excluding zero with no category regressing. Aleena approves each paid
+   run (about $1 dev, $0.35 test). Earlier wording of (h):
    relabel judge-dev with the two-question rubric:
    `uv run evals label docs-20261011-223111-702e87 --labeler aleena --revisit all --split judge-dev`
    (49 answers), then label 30-40 closed-book answers for responsive:
