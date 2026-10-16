@@ -370,7 +370,11 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
    single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
    the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
-   (h) relabel judge-dev with the two-question rubric:
+   (h) 2026-10-16: judge-dev relabeled (core kappa 0.40, fully 0.14, see
+   `docs/judge-validation.md` 2b); headerless-row rule kept strict. Now the calibration pass with
+   `--show-judge` on judge-dev, then 40 closed-book labels, then the agent rescores; if core
+   clears 0.7, judge-test (65) is relabeled blind and scored once. Earlier wording of (h):
+   relabel judge-dev with the two-question rubric:
    `uv run evals label docs-20261011-223111-702e87 --labeler aleena --revisit all --split judge-dev`
    (49 answers), then label 30-40 closed-book answers for responsive:
    `uv run evals label closed-book-20261011-225242-b58341 --labeler aleena --limit 40`;

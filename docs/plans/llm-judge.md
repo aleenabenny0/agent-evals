@@ -96,6 +96,8 @@ judge and to the labeler alike:
 
 Rubric rules settled at the same time: a table cell quoted without its header supports only what
 the cell literally says ("Yes" is not "adjustable"); advice, hedges and offers to help are not
-claims; support, not truth, is judged. Validation restarts: relabel judge-dev under the new
+claims; support, not truth, is judged. Confirmed 2026-10-16 after the first judge-dev round showed
+it to be the main source of core disagreements: the rule stays strict for rows as well as cells,
+and the labels apply it the same way the judge does. Validation restarts: relabel judge-dev under the new
 rubric, tune the judge against it, relabel judge-test once and score once. "Responsive" gets its
 first real negatives from 30 to 40 closed-book answers, labeled with that question only.

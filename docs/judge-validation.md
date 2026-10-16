@@ -113,10 +113,12 @@ all --split judge-dev --show-judge`, a flag the tool refuses on judge-test), kee
 label on the merits, and decides the open rubric point below. Judge-test is then labeled fresh,
 without the judge in view, and scored once.
 
-Open rubric point for Aleena: the headerless-row rule. Keep it (a row quoted without its header
-proves only what the row literally says; the agent should quote the header, which becomes an
-improvement-loop target) or relax it for core claims when the row itself names the entity asked
-about. The judge and the labels must apply the same choice.
+Rubric decision (Aleena, 2026-10-16): the headerless-row rule **stays strict**. A table row or
+cell quoted without its header proves only what it literally says; which column a value belongs
+to cannot be inferred. This binds the labels as it already binds the judge, so the three judge-dev
+core passes on headerless rows (`docs-ai-004-p1`, `docs-chg-013`, `docs-chg-030`) are expected to
+flip to "no" in the calibration pass, and the agent-side fix, quote the header row with the cell,
+goes on the improvement-loop list.
 
 ## 3. Mutation tests and bias probes
 
