@@ -362,6 +362,19 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   advisory, with a documented next prompt version to validate on new labels; responsive is
   reported on closed-book numbers. Labels for both runs are in `results/labels/`. Dev and
   closed-book runs re-judged with the final judge; probes re-run against it (section 3).
+- **Iteration 1 run (2026-10-16 evening)**, prompt v3 challenger vs v2 champion on dev, 3
+  attempts, $0.99 + judge: judge_supported 0.114 -> 0.306 (CI +0.14 to +0.25), core 0.893 ->
+  0.939, correct 0.918 -> 0.900 (noise), wrong_abstention improved, everything else flat. The
+  written gate tripped on the storage category (4 attempt flips of 36: 3 keyword misses the judge
+  contradicts, 1 markup rejection). Record: `CHANGELOG.md`, `results/gates/iteration-1-dev.txt`.
+  **Decision needed:** ship v3 (then test once, promote in `default.yaml`) or iterate. Also for
+  Aleena: 9 dev cases whose keyword lists miss the page's own wording, surfaced by the shorter
+  fully-quoted answers (judge says responsive): docs-ai-002-p3, docs-ai-003-p3, docs-chg-008,
+  docs-chg-016, docs-chg-023, docs-core-034, docs-int-020, docs-int-041, docs-mix-079. Widening
+  their `must_include` alternatives is a case fix she verifies, never a gold-to-pass edit.
+  Gate-rule weakness noted for ADR 0008: a per-category band on `correct` at n = 12 trips on
+  grader misses; the fix is a paired per-category interval plus a judge-responsive cross-check,
+  to be adopted for iteration 2 onward, not applied retroactively to this one.
 
 ## Target: the three project briefs
 

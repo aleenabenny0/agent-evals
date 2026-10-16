@@ -1,0 +1,56 @@
+warning: `VIRTUAL_ENV=C:\Users\Vineetha\Downloads\mr_kf_ab\mr_kf_ab\venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+metric                   champ   chall     diff              95% CI        p  verdict
+judge_supported          0.114   0.306   +0.192    +0.141 to +0.245  0.000402  improved 
+judge_core_supported     0.893   0.939   +0.046    +0.006 to +0.088   0.0923  improved 
+judge_responsive         0.997   0.990   -0.007    -0.019 to +0.000      0.5  no detectable change 
+correct                  0.918   0.900   -0.018    -0.051 to +0.013        1  no detectable change 
+fabricated_citation      0.021   0.013   -0.008    -0.029 to +0.011      0.5  no detectable change lower better
+unsupported_entity       0.046   0.034   -0.011    -0.037 to +0.009    0.625  no detectable change lower better
+uncited_answer           0.000   0.000   +0.000    +0.000 to +0.000        1  no detectable change lower better
+wrong_abstention         0.031   0.017   -0.014    -0.031 to -0.003      0.5  improved lower better
+missed_abstention        0.083   0.056   -0.028    -0.083 to +0.000        1  no detectable change lower better
+rejected_submissions     0.013   0.021   +0.008    -0.010 to +0.031      0.5  no detectable change lower better
+evidence_recall          0.958   0.958   +0.000    -0.020 to +0.020        1  no detectable change 
+evidence_precision       0.910   0.915   +0.006    -0.005 to +0.016      0.5  no detectable change 
+model_calls              4.021   4.003   -0.018    -0.110 to +0.069        1  no detectable change lower better
+tool_errors              0.379   0.331   -0.049    -0.103 to +0.003        1  no detectable change lower better
+
+docs-20261011-223111-702e87: flip rate 0.100 (0.059 to 0.164); pass^3 0.862; cost $0.97; cost/success $0.0027; p50 7471 ms; p95 17275 ms
+
+docs-20261016-214710-02abb7: flip rate 0.100 (0.059 to 0.164); pass^3 0.838; cost $0.99; cost/success $0.0028; p50 6660 ms; p95 15215 ms
+
+correct by type (champion -> challenger; flagged if drop > flip-rate band 0.10)
+  changed_default  0.917 ->  0.817
+  false_premise   0.806 ->  0.722
+  lookup          0.928 ->  0.937
+  multi_step      0.972 ->  0.972
+  unanswerable    0.917 ->  0.917
+
+correct by area (champion -> challenger; flagged if drop > flip-rate band 0.10)
+  ai_ml           0.903 ->  0.931
+  analytics       1.000 ->  1.000
+  compute         0.941 ->  0.843
+  databases       0.762 ->  0.810
+  integration     0.909 ->  0.939
+  management      0.833 ->  0.750
+  networking      1.000 ->  1.000
+  security        0.879 ->  0.788
+  storage         0.972 ->  0.861  <-- REGRESSED
+
+judge_supported by type (champion -> challenger; flagged if drop > flip-rate band 0.10)
+  changed_default  0.017 ->  0.167
+  false_premise   0.061 ->  0.303
+  lookup          0.164 ->  0.369
+  multi_step      0.028 ->  0.194
+  unanswerable    0.000 ->  0.000
+
+judge_supported by area (champion -> challenger; flagged if drop > flip-rate band 0.10)
+  ai_ml           0.167 ->  0.367
+  analytics       0.200 ->  0.267
+  compute         0.024 ->  0.214
+  databases       0.190 ->  0.357
+  integration     0.100 ->  0.200
+  management      0.000 ->  0.500
+  networking      0.083 ->  0.361
+  security        0.100 ->  0.200
+  storage         0.030 ->  0.242
