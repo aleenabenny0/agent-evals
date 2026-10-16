@@ -384,6 +384,16 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   wrong_abstention and pass^3, since v3 cost some run-to-run consistency); (3) judge v3
   (temperature 0, quota-row example) validated on labels from the next run's answers; then the
   simulated-user phase or Brief 01, Aleena's choice.
+- **Iteration 2 rejected by the gate (2026-10-16, 23:00 UTC).** Number-coverage check at
+  submit: unsupported_entity went to 0.000 but judge_supported moved only +0.02 (CI touches zero)
+  and rejected submissions rose from 2% to 12%. Not shipped; v3 remains champion; CHANGELOG has the
+  entry and `results/gates/iteration-2-dev-gate.txt` the gate output. Lesson: unsupported
+  *numbers* are a small part of unsupported *claims*; the next lever is sentence-level.
+- **Candidate judge v3** could not run: the installed Anthropic SDK's `messages.create` rejects
+  `temperature` (TypeError, zero calls, zero spend): anthropic 1.13 exposes only `thinking` and
+  `output_config` as sampling controls. Judge v3 is therefore rubric v3 alone; its stability is
+  measured by the resample probe like any other version. Re-run on the v3 champion dev run so
+  Aleena's next 40 labels (fresh answers) can score both judges.
 
 ## Target: the three project briefs
 

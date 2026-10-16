@@ -1,4 +1,4 @@
-# Candidate judge v3 (2026-10-16): temperature 0 and the quota-row rubric example. Runs under
+# Candidate judge v3 (2026-10-16): the quota-row rubric example (v3). Runs under
 # grader name judge-v3 beside the validated judge until labels on a new run validate it.
 # Use: uv run evals judge RUN -c configs/judge-v3.yaml ; evals judge-validate RUN -c configs/judge-v3.yaml
 # Default configuration. Copy and edit for experiments: `evals run ... -c configs/my.yaml`.
@@ -42,7 +42,7 @@ judge:
   model:
     name: claude-sonnet-5-5
     max_tokens: 2048
-    temperature: 0.0
+    temperature: null      # the installed SDK (anthropic 1.x) rejects temperature; leave null
     pricing:
       input_per_mtok: null
       output_per_mtok: null

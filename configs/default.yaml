@@ -15,7 +15,7 @@ docs_agent:
   model:
     name: claude-haiku-5-5
     max_tokens: 2048
-    temperature: null      # null = API default
+    temperature: null      # leave null: anthropic SDK 1.x messages.create has no temperature
     pricing:
       # USD per million tokens for claude-haiku-5-5, Anthropic first-party rates as of 2026-10-06,
       # for prompts up to 100K tokens (every request here is far below that). Re-check at

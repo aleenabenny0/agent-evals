@@ -17,6 +17,29 @@ Format:
 - Runs: baseline <run id>, candidate <run id>
 ```
 
+## Rejected: iteration 2 (2026-10-16) - number coverage check at submit time
+
+- Change: `require_number_coverage` (`configs/challenger-numbers.yaml`, commit d181715): a
+  submission whose answer states a number found in neither the question nor any cited quote is
+  rejected with the numbers named, so the model quotes or drops them. One change, on top of v3.
+- Targeted: the remaining 69% of answers with an unsupported claim; unsupported numbers in
+  particular (`unsupported_entity` 0.034 on v3).
+- Dev, paired against v3 (`results/gates/iteration-2-dev-gate.txt`, run
+  `docs-20261016-225705-5447b9`, 1560 of 1597 agent calls from cache, so about $0.05):
+  judge_supported 0.308 -> 0.328 (+0.020, 95% CI +0.000 to +0.045, no detectable change);
+  unsupported_entity 0.034 -> **0.000** (the check does exactly what it says);
+  rejected_submissions 0.021 -> 0.118 (**regressed**: the check fired on 38 of 390 attempts);
+  correct 0.959 -> 0.951 (no detectable change); one new `malformed_submission` where the
+  agent could not satisfy the check because the number was legitimate arithmetic (50 x 65,536).
+- Gate: **failed**. The target did not move with its interval, and the mechanism's own cost
+  showed up as a regression. Reading: numbers are a small share of the unsupported claims; the
+  bulk is unquoted prose context, which a number check cannot touch. The deterministic metric
+  it was aimed at went to zero, which is a useful finding in itself, not a shipped change.
+- Decision: **not shipped**. v3 stays the champion. Candidate for a later iteration: sentence-level
+  coverage (each sentence must share a distinctive phrase with a cited quote), or asking the
+  model to tag each sentence with the citation that backs it so the check is structural.
+- Runs: champion `docs-20261016-214710-02abb7`, challenger `docs-20261016-225705-5447b9`.
+
 ## v3 (2026-10-16) - iteration 1: cite every sentence, cite table headers
 
 - Change: `docs_agent.prompt_version` v2 -> v3 (`configs/challenger-v3.yaml`; commit 68064d7).
