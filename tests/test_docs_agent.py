@@ -226,3 +226,33 @@ def test_prompt_version_selects_the_system_prompt_and_changes_the_version(corpus
     assert champion.version != challenger.version  # the fingerprint sees the prompt change
     with pytest.raises(ValueError, match="prompt_version"):
         make_agent(ScriptedLLM([]), corpus, prompt_version="v9")
+
+
+def test_number_coverage_rejects_unquoted_numbers_then_accepts_the_fix(
+    corpus: Corpus, case: Case
+) -> None:
+    from agent_evals.agents.docs.agent import DocsAnswer, submission_problems
+
+    unquoted = {
+        **GOOD_ANSWER,
+        "answer": "Bucket names must be 3 to 63 characters, up to 100 buckets.",
+    }
+    answer = DocsAnswer.model_validate(unquoted)
+    assert submission_problems(answer, question=case.question) == []  # off by default
+    problems = submission_problems(answer, require_number_coverage=True, question=case.question)
+    assert len(problems) == 1 and "100" in problems[0] and "63" not in problems[0]
+    asked = submission_problems(answer, require_number_coverage=True, question="Can I have 100?")
+    assert asked == []  # a number the question states is not a claim
+    # In the loop: the first submission is rejected with the number named; the second passes.
+    llm = ScriptedLLM(
+        [
+            [tool_use("read_page", {"url": BUCKETS_URL, "start": 0}, "t1")],
+            [tool_use("submit_answer", unquoted, "t2")],
+            [tool_use("submit_answer", GOOD_ANSWER, "t3")],
+        ]
+    )
+    result = make_agent(llm, corpus, require_number_coverage=True).run(case, CTX)
+    assert result.error is None and result.output == GOOD_ANSWER
+    rejection = llm.requests[2]["messages"][-1]["content"][0]
+    assert rejection["is_error"] and "100" in rejection["content"]
+    assert sum(1 for s in result.trajectory if s.kind == "tool" and s.is_error) == 1

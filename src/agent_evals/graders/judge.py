@@ -22,10 +22,11 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from agent_evals.config import JudgeConfig
 from agent_evals.graders.judge_prompts import (
     JUDGE_RESPONSIVE_V1,
-    JUDGE_SUPPORTED_V2,
+    SUPPORT_RUBRICS,
     responsive_message,
     support_verdict_tool,
     supported_message,
+    supported_prompt,
     verdict_tool,
 )
 from agent_evals.harness.cache import canonical_json, sha256_text
@@ -52,21 +53,27 @@ V = TypeVar("V", bound=BaseModel)
 
 
 class JudgeGrader:
-    name = "judge"
-
     def __init__(self, llm: LLMClient, config: JudgeConfig, *, salt: str = "judge") -> None:
         self.llm = llm
         self.config = config
         self.salt = salt
+        self.name = config.grader_name  # "judge" for the validated one; candidates run beside it
+        if config.rubric_version not in SUPPORT_RUBRICS:
+            raise ValueError(
+                f"unknown judge.rubric_version {config.rubric_version!r}; "
+                f"known: {sorted(SUPPORT_RUBRICS)}"
+            )
+        self.supported_prompt = supported_prompt(SUPPORT_RUBRICS[config.rubric_version])
         self.tool = verdict_tool(config.strict_tools)
         self.support_tool = support_verdict_tool(config.strict_tools)
         self.usage = Usage()  # every judge call, for the cost line
         self._lock = threading.Lock()
-        # Changes with the model, any prompt word, or a tool schema. Not with pricing or salt.
+        # Changes with the model (temperature included), any prompt word, or a tool schema. Not
+        # with pricing, salt or the grader name.
         fingerprint = {
-            "grader": self.name,
+            "grader": "judge",
             "model": config.model.model_dump(mode="json", exclude={"pricing"}),
-            "prompts": {"supported": JUDGE_SUPPORTED_V2, "responsive": JUDGE_RESPONSIVE_V1},
+            "prompts": {"supported": self.supported_prompt, "responsive": JUDGE_RESPONSIVE_V1},
             "tools": [self.support_tool, self.tool],
         }
         self.version = sha256_text(canonical_json(fingerprint))[:12]
@@ -80,7 +87,7 @@ class JudgeGrader:
         grades: list[Grade] = []
         if citations:
             s = self._ask(
-                JUDGE_SUPPORTED_V2,
+                self.supported_prompt,
                 supported_message(case.question, answer, citations),
                 f"{self.salt}#supported#{case.id}",
                 self.support_tool,

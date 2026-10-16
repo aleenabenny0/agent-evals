@@ -49,7 +49,26 @@ claim in the answer supported by the cited quotes?
 Call submit_verdict with "pass" or "fail" and a one-sentence reason. When the verdict is "fail",
 the reason names the unsupported claim."""
 
-JUDGE_SUPPORTED_V2 = f"""\
+# V3 of the rubric (candidate, 2026-10-16): adds the quota-row example that the judge-test
+# validation showed the judge reading differently from the labeler. Validated only against labels
+# on a new run's answers; until then the judge built on it runs under another grader name.
+SUPPORT_RUBRIC_V3 = (
+    SUPPORT_RUBRIC
+    + """
+
+A quota row quoted without its header, such as "Cache behaviors per distribution | 75", states
+the number 75 and nothing else: not that 75 is a default, a maximum or a limit, and not whether
+it can be raised. Those are claims about the column, which only a quoted header can supply.
+Billing factors, commitment terms and option lists are core claims when the question asks how
+something is billed or what the options are; otherwise they are peripheral."""
+)
+
+SUPPORT_RUBRICS = {"v2": SUPPORT_RUBRIC, "v3": SUPPORT_RUBRIC_V3}
+
+
+def supported_prompt(rubric: str) -> str:
+    """The two-level support prompt built around one rubric text."""
+    return f"""\
 You are checking whether an answer is supported by the evidence it cites.
 
 You will be given a user's question about AWS documentation, an assistant's answer, and the
@@ -58,13 +77,16 @@ quotes the assistant cited from the documentation. Decide two things, both about
 1. core_supported: is every core claim supported by the cited quotes?
 2. fully_supported: is every claim in the answer, core and peripheral, supported by them?
 
-{SUPPORT_RUBRIC}
+{rubric}
 
 Do not judge whether the answer is correct, complete or helpful. That is someone else's job.
 fully_supported can only be "pass" when core_supported is "pass".
 
 Call submit_support_verdict with both verdicts and a one-sentence reason that names the first
 unsupported claim you found, or says that every claim is quoted."""
+
+
+JUDGE_SUPPORTED_V2 = supported_prompt(SUPPORT_RUBRIC)
 
 JUDGE_RESPONSIVE_V1 = """\
 You are checking whether an answer responds to the question that was asked.

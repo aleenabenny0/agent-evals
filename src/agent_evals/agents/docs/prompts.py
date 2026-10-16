@@ -96,6 +96,12 @@ REJECT_MARKUP_V1 = (
     "the answer field contains tool-call markup ({snippet}). Write the answer as plain prose "
     "and put citations in the citations array, never inside answer."
 )
+# Iteration 2 (2026-10-16): numbers in the answer must come from a cited quote or the question.
+REJECT_UNSUPPORTED_NUMBERS_V1 = (
+    "the answer states numbers that appear in neither the question nor any cited quote: "
+    "{numbers}. For each, either add a citation whose quote contains that number as the page "
+    "writes it, or remove the number from the answer."
+)
 
 
 # Baselines (phase 4). They share the submit_answer contract so the same graders apply.

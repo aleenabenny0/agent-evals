@@ -17,11 +17,13 @@ from agent_evals.agents.docs.prompts import (
     NUDGE_V1,
     REJECT_MARKUP_V1,
     REJECT_UNCITED_V1,
+    REJECT_UNSUPPORTED_NUMBERS_V1,
     REJECTED_V1,
     SYSTEM_PROMPTS,
 )
 from agent_evals.config import DocsAgentConfig
 from agent_evals.corpus import Corpus
+from agent_evals.entities import numbers_in
 from agent_evals.harness.cache import canonical_json, sha256_text
 from agent_evals.harness.llm import LLMClient, LLMResponse
 from agent_evals.tool_markup import TOOL_MARKUP, find_tool_markup
@@ -55,10 +57,20 @@ class ReadInput(BaseModel):
     start: int = Field(default=0, ge=0)
 
 
-def submission_problems(answer: DocsAnswer, *, require_citations: bool = True) -> list[str]:
+def submission_problems(
+    answer: DocsAnswer,
+    *,
+    require_citations: bool = True,
+    require_number_coverage: bool = False,
+    question: str = "",
+) -> list[str]:
     """Content rules a schema-valid submission must still meet. An empty list means accepted.
 
     `require_citations` is False only for the closed-book baseline, which has nothing to cite.
+    `require_number_coverage` (iteration 2) rejects an answer that states a number appearing in
+    neither the question nor any cited quote, naming the numbers, so the model can quote the
+    sentence that carries them or drop them. It uses the same extractor as the grounding grader
+    and the validator, so the three agree on what a number is.
     """
     problems: list[str] = []
     snippet = find_tool_markup(answer.answer)
@@ -66,6 +78,13 @@ def submission_problems(answer: DocsAnswer, *, require_citations: bool = True) -
         problems.append(REJECT_MARKUP_V1.format(snippet=snippet))
     if require_citations and not answer.abstained and not answer.citations:
         problems.append(REJECT_UNCITED_V1)
+    if require_number_coverage and not answer.abstained:
+        quoted = " ".join(c.quote for c in answer.citations)
+        loose = numbers_in(answer.answer) - numbers_in(question) - numbers_in(quoted)
+        if loose:
+            problems.append(
+                REJECT_UNSUPPORTED_NUMBERS_V1.format(numbers=", ".join(sorted(loose, key=float)))
+            )
     return problems
 
 
@@ -209,6 +228,7 @@ class DocsAgent:
                 "rejected": REJECTED_V1,
                 "reject_uncited": REJECT_UNCITED_V1,
                 "reject_markup": REJECT_MARKUP_V1,
+                "reject_unsupported_numbers": REJECT_UNSUPPORTED_NUMBERS_V1,
             },
             "tool_markup": TOOL_MARKUP.pattern,
             "tools": self.tools,
@@ -239,7 +259,9 @@ class DocsAgent:
             return f"Invalid input for {name}: {exc.errors(include_url=False)}", True
         return f"Unknown tool {name!r}.", True
 
-    def _check_submission(self, raw: dict[str, Any]) -> tuple[DocsAnswer | None, str, bool]:
+    def _check_submission(
+        self, raw: dict[str, Any], question: str = ""
+    ) -> tuple[DocsAnswer | None, str, bool]:
         """Shape check (Pydantic), then content rules. Returns (answer or None, text, is_error).
 
         `text` is what goes back to the model as the tool result either way.
@@ -248,7 +270,12 @@ class DocsAgent:
             candidate = DocsAnswer.model_validate(raw)
         except ValidationError as exc:
             return None, INVALID_ANSWER_V1.format(errors=exc.errors(include_url=False)), True
-        problems = submission_problems(candidate, require_citations=self.require_citations)
+        problems = submission_problems(
+            candidate,
+            require_citations=self.require_citations,
+            require_number_coverage=self.config.require_number_coverage,
+            question=question,
+        )
         if problems:
             return None, REJECTED_V1.format(problems=" ".join(problems)), True
         return candidate, "Answer received.", False
@@ -308,7 +335,7 @@ class DocsAgent:
             for tu in tool_uses:
                 start = time.perf_counter()
                 if tu["name"] == "submit_answer":
-                    candidate, text, is_error = self._check_submission(tu["input"])
+                    candidate, text, is_error = self._check_submission(tu["input"], case.question)
                     if is_error:
                         rejections += 1
                         last_rejection = text

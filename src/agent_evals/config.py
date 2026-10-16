@@ -39,6 +39,9 @@ class DocsAgentConfig(_Strict):
     # Which system prompt the docs agent uses (keys of agents.docs.prompts.SYSTEM_PROMPTS). The
     # champion stays here; a challenger config file overrides it for a gated comparison.
     prompt_version: str = "v2"
+    # Iteration 2 challenger: reject a submission whose answer states a number found in neither
+    # the question nor any cited quote, so the model quotes it or drops it before submitting.
+    require_number_coverage: bool = False
 
 
 class Paths(_Strict):
@@ -66,6 +69,11 @@ class JudgeConfig(_Strict):
     # Sonnet 5.5 thinks for a few hundred tokens before the tool call; 400 truncated the verdict.
     model: ModelConfig = ModelConfig(name="claude-sonnet-5-5", max_tokens=2048)
     strict_tools: bool = True
+    # Grader name the judge's grades are stored under. A candidate judge runs under another name
+    # (for example "judge-v3") so two judges can score one run and be compared against labels.
+    grader_name: str = "judge"
+    # Which support rubric the judge and the label screen read (keys of SUPPORT_RUBRICS).
+    rubric_version: str = "v2"
 
 
 class SuitesConfig(_Strict):

@@ -178,3 +178,22 @@ def test_agreement_counts_failures_as_the_positive_class() -> None:
     perfect = agreement("responsive", [(True, True)] * 3 + [(False, False)] * 3)
     assert perfect.kappa == 1.0 and perfect.tpr is not None and perfect.tpr.mean == 1.0
     assert agreement("responsive", [(True, True)] * 3).tpr is None  # no human failures to catch
+
+
+def test_candidate_judge_has_its_own_name_rubric_and_version() -> None:
+    llm = ScriptedLLM([])
+    validated = JudgeGrader(llm, JudgeConfig())
+    candidate = JudgeGrader(
+        llm,
+        JudgeConfig.model_validate(
+            {"grader_name": "judge-v3", "rubric_version": "v3", "model": {"temperature": 0.0}}
+        ),
+    )
+    assert validated.name == "judge" and candidate.name == "judge-v3"
+    assert "75" in candidate.supported_prompt and "75" not in validated.supported_prompt
+    assert validated.version != candidate.version
+    # The name alone does not change the version: same judge stored under another name.
+    renamed = JudgeGrader(llm, JudgeConfig.model_validate({"grader_name": "shadow"}))
+    assert renamed.version == validated.version
+    with pytest.raises(ValueError, match="rubric_version"):
+        JudgeGrader(llm, JudgeConfig.model_validate({"rubric_version": "v9"}))

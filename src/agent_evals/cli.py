@@ -564,12 +564,16 @@ def judge(
                 if x["label_split"] == only_labeled
             }
             todo = [a for a in todo if (a["case_id"], a["attempt"]) in labeled]
-            store.delete_grades(run_id, "judge", [(a["case_id"], a["attempt"]) for a in todo])
+            keys = [(a["case_id"], a["attempt"]) for a in todo]
+            store.delete_grades(run_id, cfg.judge.grader_name, keys)
         else:
-            if store.grade_count(run_id, "judge") and not replace:
-                console.print("[red]This run already has judge grades; pass --replace.[/red]")
+            if store.grade_count(run_id, cfg.judge.grader_name) and not replace:
+                console.print(
+                    f"[red]This run already has {cfg.judge.grader_name} grades; pass "
+                    "--replace.[/red]"
+                )
                 raise typer.Exit(code=2)
-            store.delete_grades(run_id, "judge")
+            store.delete_grades(run_id, cfg.judge.grader_name)
         todo = todo[:limit]
         grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
 
@@ -587,8 +591,13 @@ def judge(
                 progress.advance(task)
         store.annotate_run(
             run_id,
-            "judge",
-            {"version": grader.version, "model": cfg.judge.model.name, "salt": salt},
+            cfg.judge.grader_name,
+            {
+                "version": grader.version,
+                "model": cfg.judge.model.name,
+                "rubric": cfg.judge.rubric_version,
+                "salt": salt,
+            },
         )
         u = grader.usage
         console.print(
@@ -650,7 +659,7 @@ def label(
     from rich.text import Text
 
     from agent_evals.corpus import Corpus
-    from agent_evals.graders.judge_prompts import SUPPORT_RUBRIC
+    from agent_evals.graders.judge_prompts import SUPPORT_RUBRICS
     from agent_evals.judge_validation import disagreements, label_split, revisit_targets
     from agent_evals.review import quote_context
     from agent_evals.store.db import ResultsStore
@@ -676,7 +685,7 @@ def label(
         cases = {c.id: c for c in load_suite(suite_path)} if suite_path.exists() else {}
         mine = store.labels(run_id, labeler)
         previous = {(x["case_id"], x["attempt"]): x for x in mine}
-        judge_view = store.grade_reasons(run_id, "judge") if show_judge else {}
+        judge_view = store.grade_reasons(run_id, cfg.judge.grader_name) if show_judge else {}
         answered = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
         if case_ids:
             wanted = set(case_ids)
@@ -775,7 +784,8 @@ def label(
             core_supported: bool | None = None
             if cits:
                 # The rubric is hard-wrapped for the prompt file; let the panel wrap it instead.
-                rubric = "\n\n".join(" ".join(p.split()) for p in SUPPORT_RUBRIC.split("\n\n"))
+                rubric_text = SUPPORT_RUBRICS[cfg.judge.rubric_version]
+                rubric = "\n\n".join(" ".join(p.split()) for p in rubric_text.split("\n\n"))
                 rubric += (
                     "\n\nFor you, not the judge: judge against the cited quotes panel above. A "
                     "header row, a neighbouring table row or a sentence that is visible only in the"
@@ -902,10 +912,11 @@ def judge_validate(
     from agent_evals.judge_validation import agreement
     from agent_evals.store.db import ResultsStore
 
-    store = ResultsStore(_config(config).paths.db)
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
     try:
         labels = store.labels(run_id, labeler)
-        verdicts = store.grades_for(run_id, "judge")
+        verdicts = store.grades_for(run_id, cfg.judge.grader_name)
     finally:
         store.close()
     if split != "all":
@@ -984,7 +995,7 @@ def judge_probe(
         info = store.run_info(run_id)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         cases = {c.id: c for c in load_suite(suite_path)}
-        verdicts = store.grades_for(run_id, "judge")
+        verdicts = store.grades_for(run_id, cfg.judge.grader_name)
         answered = store.answered_attempts(run_id)
     finally:
         store.close()

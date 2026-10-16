@@ -1,0 +1,67 @@
+# Iteration 2 challenger (2026-10-16): default.yaml plus require_number_coverage.
+# Run: uv run evals run suites/docs/dev.jsonl --attempts 3 -c configs/challenger-numbers.yaml
+# Default configuration. Copy and edit for experiments: `evals run ... -c configs/my.yaml`.
+
+paths:
+  corpus_dir: data/snapshots/aws-docs
+  docs_lock: configs/docs_pages.lock.json   # page hashes, committed; see evals snapshot --check
+  suites_dir: suites
+  cache_dir: .cache/llm
+  db: results/evals.duckdb
+
+run:
+  workers: 4         # parallel cases; lower this if you hit rate limits
+  budget_usd: 5.0    # stop a run once uncached spend passes this (needs pricing below)
+
+docs_agent:
+  model:
+    name: claude-haiku-5-5
+    max_tokens: 2048
+    temperature: null      # null = API default
+    pricing:
+      # USD per million tokens for claude-haiku-5-5, Anthropic first-party rates as of 2026-10-06,
+      # for prompts up to 100K tokens (every request here is far below that). Re-check at
+      # https://platform.claude.com/docs/en/about-claude/pricing when the model changes.
+      input_per_mtok: 0.10
+      output_per_mtok: 0.50
+  max_steps: 12
+  search_k: 5
+  page_chars: 8000
+  strict_tools: true       # set false if the API rejects strict tool schemas for this model
+  max_submission_rejections: 3   # then the attempt fails as malformed_submission
+  require_number_coverage: true  # iteration 2: numbers in the answer must be quoted or asked
+  prompt_version: v3             # champion since iteration 1 (2026-10-16); v2 is the previous champion
+
+graders:
+  min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated
+
+judge:
+  # LLM judge for "supported" and "responsive" (docs/plans/llm-judge.md). Only `evals judge RUN`
+  # calls it; a normal run never does. Pricing left empty until checked on the pricing page, so
+  # `evals judge` reports tokens, not dollars.
+  model:
+    name: claude-sonnet-5-5
+    max_tokens: 2048       # the model thinks before the tool call; 400 truncated verdicts
+    temperature: null
+    pricing:
+      input_per_mtok: null
+      output_per_mtok: null
+  strict_tools: true
+
+suites:
+  # Kept out of the snapshot on purpose so unanswerable cases have real material; `evals
+  # validate` fails if a page about one of these is ever added. Matched case-insensitively
+  # against page titles and URLs, and against unanswerable questions.
+  held_out_services:
+    - GameLift
+    - Ground Station
+    - Braket
+    - RoboMaker
+    - Snowball
+    - Snow Family
+    - Chime
+    - Greengrass
+    - WorkSpaces
+    - MediaConvert
+    - Managed Blockchain
+    - Outposts
