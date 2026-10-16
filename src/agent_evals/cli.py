@@ -643,7 +643,7 @@ def label(
 
     from agent_evals.corpus import Corpus
     from agent_evals.graders.judge_prompts import SUPPORT_RUBRIC
-    from agent_evals.judge_validation import label_split, revisit_targets
+    from agent_evals.judge_validation import disagreements, label_split, revisit_targets
     from agent_evals.review import quote_context
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
@@ -679,6 +679,14 @@ def label(
             targets = revisit_targets(mine, revisit)
             if split is not None:
                 targets = [x for x in targets if x["label_split"] == split]
+            if revisit == "disagree":
+                if not show_judge:
+                    console.print(
+                        "[red]--revisit disagree needs --show-judge (and so judge-dev): it walks "
+                        "the labels the judge disputes.[/red]"
+                    )
+                    raise typer.Exit(code=2)
+                targets = disagreements(targets, judge_view)
             todo = [by_key[k] for x in targets if (k := (x["case_id"], x["attempt"])) in by_key]
             todo = todo[:limit]
             if not todo:

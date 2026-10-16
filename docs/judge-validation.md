@@ -1,7 +1,7 @@
 # Judge validation
 
-**Status:** in progress, 2026-10-13: probes passed; two-question rubric in place; judge-dev relabeled
-(core kappa 0.40, fully 0.14); label calibration pass next, then judge-test once.
+**Status:** in progress, 2026-10-16: probes passed; judge-dev calibrated (core kappa 0.69, fully 0.22);
+responsive kappa 0.70 on 24 closed-book judge-test labels; one short disputed-labels pass, then judge-test once.
 The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
@@ -119,6 +119,41 @@ to cannot be inferred. This binds the labels as it already binds the judge, so t
 core passes on headerless rows (`docs-ai-004-p1`, `docs-chg-013`, `docs-chg-030`) are expected to
 flip to "no" in the calibration pass, and the agent-side fix, quote the header row with the cell,
 goes on the improvement-loop list.
+
+## 2c. Calibration pass and the closed-book labels (2026-10-16)
+
+Aleena revisited all 49 judge-dev labels with the judge's verdicts in view (`--show-judge`,
+refused on judge-test), changed what the rubric required, and labeled 41 closed-book answers
+(run `closed-book-20261011-225242-b58341`, same model with no tools, 54.6% correct) for the
+responsive question. The judge was then run over the closed-book answers (98 calls).
+
+| Run | Verdict | n | kappa | TPR | TNR | tp/fp/fn/tn |
+|---|---|---|---|---|---|---|
+| dev, judge-dev | core supported | 49 | **0.693** | 0.80 (0.38 to 0.96) | 0.95 (0.85 to 0.99) | 4/2/1/42 |
+| dev, judge-dev | fully supported | 49 | 0.219 | 1.00 (0.89 to 1.00) | 0.18 (0.06 to 0.37) | 32/14/0/3 |
+| closed-book, judge-dev | responsive | 17 | 0.850 | 0.80 (0.38 to 0.96) | 1.00 (0.76 to 1.00) | 4/0/1/12 |
+| closed-book, judge-test | responsive | 24 | **0.700** | 0.75 (0.30 to 0.95) | 0.95 (0.76 to 0.99) | 3/1/1/19 |
+| closed-book, all | responsive | 41 | 0.778 | 0.78 (0.45 to 0.94) | 0.97 (0.84 to 0.99) | 7/1/2/31 |
+
+Reading, judge-dev only:
+
+- **Core**: 46 of 49 agree. Two of the three disagreements (`docs-chg-013`, `docs-chg-030`) are
+  headerless rows kept as "core = yes" after the rule was confirmed strict; under that rule they
+  are "no". The third (`docs-core-002`) is the judge passing a headerless row because a second
+  quote says the table lists deprecation dates, which the labeler counts as not enough. A
+  defensible disagreement either way; it stays.
+- **Fully**: 14 disagreements remain, every one a judge fail / human pass with no note. In each
+  the judge names a sentence that is in the answer and in no quote ("each document is at most 5
+  KB", "an email one month before each upgrade", "SnapStart is available for Java 11/17"). These
+  read as labels kept with Enter rather than disputed on the merits, so a short pass over exactly
+  the disputed labels (`--revisit disagree --show-judge`) is the next step, with a note wherever
+  the judge is overruled.
+- **Responsive** has its first real negatives: 9 of 41 closed-book answers were not responsive.
+  The judge caught 7 of 9 and wrongly failed 1 of 32 good answers. On the 24 judge-test labels
+  kappa is exactly 0.70 with wide intervals; 20 more closed-book labels would make the number
+  worth quoting. Two closed-book labels were corrected by hand after an off-by-one at the start of
+  the session (the first answer's note had landed on the second answer, and the second's verdict
+  had followed); both corrections are recorded in the exported file.
 
 ## 3. Mutation tests and bias probes
 

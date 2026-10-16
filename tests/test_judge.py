@@ -124,6 +124,40 @@ def test_revisit_targets_pick_unnoted_labels_or_all() -> None:
         revisit_targets(labels, "noted")
 
 
+def test_disagreements_are_labels_the_judge_disputes_on_any_verdict() -> None:
+    from agent_evals.judge_validation import disagreements
+
+    def label(cid: str, core: bool | None, full: bool | None, resp: bool) -> dict[str, object]:
+        return {
+            "case_id": cid,
+            "attempt": 1,
+            "core_supported": core,
+            "supported": full,
+            "responsive": resp,
+        }
+
+    def verdicts(core: float, full: float, resp: float) -> dict[str, tuple[float, str]]:
+        return {
+            "judge_core_supported": (core, ""),
+            "judge_supported": (full, ""),
+            "judge_responsive": (resp, ""),
+        }
+
+    labels = [
+        label("a", True, True, True),
+        label("b", True, False, True),
+        label("c", None, None, True),
+    ]
+    judge = {
+        ("a", 1): verdicts(1.0, 0.0, 1.0),
+        ("b", 1): verdicts(1.0, 0.0, 1.0),
+        ("c", 1): {"judge_responsive": (0.0, "off topic")},
+    }
+    # a: differs on fully; b: agrees everywhere; c: differs on responsive (support never asked).
+    assert [x["case_id"] for x in disagreements(labels, judge)] == ["a", "c"]
+    assert disagreements(labels, {}) == []  # no verdicts yet: nothing to dispute
+
+
 def test_agreement_counts_failures_as_the_positive_class() -> None:
     # (human_pass, judge_pass): judge catches 2 of 3 real failures, passes 4 of 5 good answers.
     pairs = [

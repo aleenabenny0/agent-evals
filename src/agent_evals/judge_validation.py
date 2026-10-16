@@ -25,7 +25,34 @@ def label_split(case_id: str) -> str:
     return LABEL_SPLITS[int(sha256_text(case_id)[:8], 16) % 2]
 
 
-REVISIT_MODES = ("unnoted", "pending", "all")
+REVISIT_MODES = ("unnoted", "pending", "disagree", "all")
+_LABEL_TO_METRIC = {
+    "core_supported": "judge_core_supported",
+    "supported": "judge_supported",
+    "responsive": "judge_responsive",
+}
+
+
+def disagreements(
+    labels: Sequence[dict[str, Any]],
+    judge: dict[tuple[str, int], dict[str, tuple[float, str]]],
+) -> list[dict[str, Any]]:
+    """Labels on which the human and the judge differ on any verdict both of them gave.
+
+    The calibration pass walks only these. Judge-dev only by construction: the caller must refuse
+    to compute this for judge-test, whose labels are the judge's exam.
+    """
+    out = []
+    for x in labels:
+        verdicts = judge.get((x["case_id"], x["attempt"]), {})
+        for field, metric in _LABEL_TO_METRIC.items():
+            human = x.get(field)
+            if human is None or metric not in verdicts:
+                continue
+            if bool(human) != (verdicts[metric][0] >= 1.0):
+                out.append(x)
+                break
+    return out
 
 
 def revisit_targets(labels: Sequence[dict[str, Any]], mode: str) -> list[dict[str, Any]]:
@@ -38,7 +65,7 @@ def revisit_targets(labels: Sequence[dict[str, Any]], mode: str) -> list[dict[st
     """
     if mode not in REVISIT_MODES:
         raise ValueError(f"revisit mode must be one of {REVISIT_MODES}, not {mode!r}")
-    if mode == "all":
+    if mode in ("all", "disagree"):  # "disagree" is narrowed by the caller with `disagreements`
         return list(labels)
     if mode == "pending":
         return [
