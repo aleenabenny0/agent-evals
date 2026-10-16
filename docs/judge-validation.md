@@ -167,6 +167,30 @@ Reading, judge-dev only:
    Any kept are listed with the quote that supports them.
 3. Then the 65 judge-test answers are labeled blind, once, and scored once.
 
+## 2e. Judge-dev, final (2026-10-16)
+
+The remaining strict disputes turned out to be a screen problem: the label screen had shown each
+quote inside 200 characters of page context, and the notes on 13 kept labels cited header rows
+and neighbouring rows that were visible there but absent from the stored citations the judge
+sees. The screen now shows the citations first, alone and verbatim, and dims the context as
+uncited. Aleena redid the disputed pass on the fixed screen. Judge `2cf75fa03e09` (final rubric).
+
+| Verdict | n | kappa | TPR | TNR | tp/fp/fn/tn |
+|---|---|---|---|---|---|
+| core supported | 49 | **0.787** | 0.88 (0.53 to 0.98) | 0.95 (0.84 to 0.99) | 7/2/1/39 |
+| fully supported | 49 | **1.000** | 1.00 (0.92 to 1.00) | 1.00 (0.44 to 1.00) | 46/0/0/3 |
+| responsive | 49 | degenerate | no failures on dev | 1.00 | 0/0/0/49 |
+
+Three disagreements remain on core, all reasoned and recorded: `docs-int-002` and `docs-mix-049`
+(Aleena: the core claim is in quote 1, the judge: the claim leans on which workflow type or on
+"remove" versus "add"), and `docs-mix-056` (Aleena: the cited row does not say 100 is the
+default; the judge passes it). These are the kind of disagreement a judge is allowed to have.
+
+Both support bars are met on judge-dev. Judge-dev was used for tuning (two rubric revisions, one
+screen fix, two label calibration passes), so these numbers are not the published ones. The
+published numbers come from the 65 judge-test answers, labeled once, fresh, on the fixed screen,
+without the judge in view, then judged once with the final judge.
+
 ## 3. Mutation tests and bias probes
 
 Variants are built from answers the judge passed on both verdicts (40 of them here), judged, and

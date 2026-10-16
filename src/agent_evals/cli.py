@@ -632,6 +632,14 @@ def label(
         list[str] | None,
         typer.Option("--case", help="Only these case ids (repeat the flag); re-open just them."),
     ] = None,
+    fresh: Annotated[
+        bool,
+        typer.Option(
+            "--fresh",
+            help="With --revisit: hide previous answers and notes, ask everything anew (for a "
+            "blind pass over labels made under an older rubric). Keeps each label's split.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
@@ -709,6 +717,8 @@ def label(
             c = cases[a["case_id"]]
             out = a["output"]
             prev = previous.get((c.id, a["attempt"])) if revisit is not None else None
+            if fresh:
+                prev = None  # asked anew; the stored split is kept by label_split(c.id) below
             console.rule(f"{c.id} #{a['attempt']}   {c.type}, {c.area}   {i}/{len(todo)}")
             if prev is not None:
                 core_prev = prev.get("core_supported")
