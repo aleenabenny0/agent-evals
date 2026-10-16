@@ -1,6 +1,6 @@
 {
   "run_id": "docs-20261011-223111-702e87",
-  "judge": "b23a6c3aef09",
+  "judge": "2cf75fa03e09",
   "summary": {
     "number": {
       "kind": "mutant",
@@ -12,65 +12,107 @@
     },
     "qualifier": {
       "kind": "mutant",
-      "n": 11,
-      "rate": 1.0,
-      "low": 0.7411670330319684,
-      "high": 1.0,
+      "n": 5,
+      "rate": 0.8,
+      "low": 0.37553462976252544,
+      "high": 0.9637758913675698,
       "bar": 0.9
     },
     "citation": {
       "kind": "mutant",
-      "n": 40,
+      "n": 38,
       "rate": 1.0,
-      "low": 0.9123783988027133,
+      "low": 0.908190131774416,
       "high": 1.0,
       "bar": 0.9
     },
     "padding": {
       "kind": "probe",
-      "n": 40,
-      "rate": 0.95,
-      "low": 0.8349612263085903,
-      "high": 0.9861793326138516,
+      "n": 38,
+      "rate": 0.9210526315789473,
+      "low": 0.7920062854222853,
+      "high": 0.9727854044930122,
       "bar": 0.95
     },
     "resample": {
       "kind": "probe",
-      "n": 40,
-      "rate": 0.95,
-      "low": 0.8349612263085903,
-      "high": 0.9861793326138516,
+      "n": 38,
+      "rate": 0.8421052631578947,
+      "low": 0.6958318822077686,
+      "high": 0.9255613658484106,
       "bar": 0.95
     }
   },
   "misses": [
     {
       "case_id": "docs-ai-004",
-      "attempt": 1,
-      "probe": "padding",
-      "answer": "Global cross-Region inference is roughly 10% cheaper than geographic cross-Region inference. The docs' comparison table lists Geographic cost as \"Standard pricing\" and Global cost as \"Approximately 10% savings.\" Note that this is an approximate figure from the docs, and the exact per-model rates are on the Amazon Bedrock pricing page, which I did not read. I hope this helps; let me know if you need anything else about this topic.",
-      "judge": "judge_supported=0 The answer claims that the exact per-model rates are on the Amazon Bedrock pricing page, and the cited quote doesn't say that. The quote also gives no column headers, so it doesn't directly confirm which column is Geographic and which is Global.; judge_responsive=1 The answer states global is roughly 10% cheaper than geographic (standard) pricing, matching the reference."
+      "attempt": 2,
+      "probe": "resample",
+      "answer": "Global cross-Region inference is roughly 10% cheaper than geographic cross-Region inference. The Amazon Bedrock docs list geographic inference at \"Standard pricing\" and global inference at \"Approximately 10% savings.\" The docs give this as an approximate figure, so check the Bedrock pricing page for exact per-model rates.",
+      "judge": "judge_core_supported=1 The quote's \"Approximately 10% savings\" and \"Choose Global for cost optimization\" support the roughly 10% figure. The quote has no column headers, so it never says \"Standard pricing\" is the geographic column and \"Approximately 10% savings\" is the global column. That mapping is the first unsupported claim.; judge_supported=0 The quote's \"Approximately 10% savings\" and \"Choose Global for cost optimization\" support the roughly 10% figure. The quote has no column headers, so it never says \"Standard pricing\" is the geographic column and \"Approximately 10% savings\" is the global column. That mapping is the first unsupported claim.; judge_responsive=1 The answer says global inference is roughly 10% cheaper than geographic inference, which matches the reference."
     },
     {
       "case_id": "docs-ai-011",
       "attempt": 3,
-      "probe": "resample",
-      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the token quota of the other. Note: the per-endpoint quota detail pages (quotas-runtime and quotas-mantle) were listed in the docs but could not be opened in the snapshot, so the specific limit values for each endpoint are not confirmed here.",
-      "judge": "judge_supported=0 The core answer (separate quotas per endpoint) is supported by both quotes. However, the note that the quotas-runtime and quotas-mantle detail pages were \"listed in the docs but could not be opened in the snapshot\" is not stated in any cited quote.; judge_responsive=1 The answer says no, that each endpoint has separate per-model quotas tracked independently even for the same model, which matches the reference."
+      "probe": "padding",
+      "answer": "No. According to the Amazon Bedrock quotas page, the bedrock-runtime and bedrock-mantle endpoints each have their own per-model quota allocations, and traffic to the two endpoints is tracked against separate quotas even when it calls the same underlying model. So usage through one endpoint does not draw down the token quota of the other. Note: the per-endpoint quota detail pages (quotas-runtime and quotas-mantle) were listed in the docs but could not be opened in the snapshot, so the specific limit values for each endpoint are not confirmed here. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=1 The core claims are quoted, but the statement that the quotas-runtime and quotas-mantle detail pages were listed in the docs but could not be opened in the snapshot is not supported by any cited quote.; judge_supported=0 The core claims are quoted, but the statement that the quotas-runtime and quotas-mantle detail pages were listed in the docs but could not be opened in the snapshot is not supported by any cited quote.; judge_responsive=1 The answer says no, each endpoint has its own per-model quota allocations and traffic is tracked separately even for the same model, which matches the reference."
     },
     {
-      "case_id": "docs-int-002",
+      "case_id": "docs-ai-028",
+      "attempt": 1,
+      "probe": "resample",
+      "answer": "No. According to the Amazon Bedrock Guardrails documentation, custom word filters use case-insensitive whole-word and whole-phrase matching, so a word is matched regardless of capitalization. The docs also describe whole-word matching, so a filter does not match a word embedded inside a larger word.",
+      "judge": "judge_core_supported=1 The claim that a filter does not match a word embedded inside a larger word is not stated in the quote, which says only \"whole-word\" matching. The case-insensitivity claim itself is quoted.; judge_supported=0 The claim that a filter does not match a word embedded inside a larger word is not stated in the quote, which says only \"whole-word\" matching. The case-insensitivity claim itself is quoted.; judge_responsive=1 The answer says No, custom word filters are case-insensitive and use whole-word and whole-phrase matching, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-028",
       "attempt": 2,
       "probe": "padding",
-      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2. I hope this helps; let me know if you need anything else about this topic.",
-      "judge": "judge_supported=0 The answer says Standard workflows allow retrieving full history via the API for up to 90 days, but quote 2 never mentions Standard, so that attribution is unsupported. The claim that Express workflows can log to CloudWatch Logs is also uncited, though the answer flags it as unverified.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day history retrieval, which matches the reference; the CloudWatch Logs option is extra detail and is flagged as unverified."
+      "answer": "No. Amazon Bedrock Guardrails custom word filters are case-insensitive. They use whole-word and whole-phrase matching, so for example a custom word such as a competitor name is matched regardless of capitalization. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=1 The quote supports case-insensitive whole-word and whole-phrase matching, but the example that a competitor name is matched regardless of capitalization is not stated in it.; judge_supported=0 The quote supports case-insensitive whole-word and whole-phrase matching, but the example that a competitor name is matched regardless of capitalization is not stated in it.; judge_responsive=1 The answer says No, custom word filters are case-insensitive and use whole-word and whole-phrase matching, which matches the reference."
     },
     {
-      "case_id": "docs-int-002",
+      "case_id": "docs-core-034",
+      "attempt": 3,
+      "probe": "padding",
+      "answer": "Root user access keys would have complete access to every AWS service and resource in the account, and you cannot restrict them with policies. AWS recommends against this for a CI pipeline. Use an IAM role with temporary credentials instead.\n\nPermissions: The AWS account root user is \"a single sign-in identity that has complete access to all AWS services and resources in the account.\" Root access keys are programmatic credentials for that same identity, so they carry the same full access. Also, \"You cannot attach identity-based policies to the root user, and you cannot set the permissions boundary for the root user,\" so you cannot scope root keys down with IAM policies.\n\nRecommendation: AWS says to \"Use the root user only to perform the tasks that require root-level permissions,\" and that workloads running outside AWS, including \"managed continuous integration and continuous delivery (CI/CD) platforms, can still use temporary credentials.\" For CI, create an IAM role with a least-privilege policy and have the pipeline assume it, rather than creating root keys. For IAM users, AWS also advises that \"use temporary security credentials (such as IAM roles) instead of creating long-term credentials like access keys.\"\n\nNote: I could not retrieve the pages on creating or deleting root access keys, so I cannot confirm the exact steps for creating them. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=1 The core claims are supported by quotes 1 and 2. The first unsupported claim is \"For IAM users, AWS also advises...\", because quote 5 doesn't limit that advice to IAM users. The \"least-privilege policy\" recommendation for the role isn't in any quote either.; judge_supported=0 The core claims are supported by quotes 1 and 2. The first unsupported claim is \"For IAM users, AWS also advises...\", because quote 5 doesn't limit that advice to IAM users. The \"least-privilege policy\" recommendation for the role isn't in any quote either.; judge_responsive=1 The answer rejects the root-key plan as bad practice and recommends IAM roles with temporary credentials, as the reference does, and it also correctly says the keys would carry full root access."
+    },
+    {
+      "case_id": "docs-core-034",
+      "attempt": 3,
+      "probe": "resample",
+      "answer": "Root user access keys would have complete access to every AWS service and resource in the account, and you cannot restrict them with policies. AWS recommends against this for a CI pipeline. Use an IAM role with temporary credentials instead.\n\nPermissions: The AWS account root user is \"a single sign-in identity that has complete access to all AWS services and resources in the account.\" Root access keys are programmatic credentials for that same identity, so they carry the same full access. Also, \"You cannot attach identity-based policies to the root user, and you cannot set the permissions boundary for the root user,\" so you cannot scope root keys down with IAM policies.\n\nRecommendation: AWS says to \"Use the root user only to perform the tasks that require root-level permissions,\" and that workloads running outside AWS, including \"managed continuous integration and continuous delivery (CI/CD) platforms, can still use temporary credentials.\" For CI, create an IAM role with a least-privilege policy and have the pipeline assume it, rather than creating root keys. For IAM users, AWS also advises that \"use temporary security credentials (such as IAM roles) instead of creating long-term credentials like access keys.\"\n\nNote: I could not retrieve the pages on creating or deleting root access keys, so I cannot confirm the exact steps for creating them.",
+      "judge": "judge_core_supported=1 The claim that root access keys are programmatic credentials for the root identity and carry its full access is not stated in any cited quote, and neither is the \"For IAM users\" scoping of the last quote. The quotes also support only \"no identity-based policies or permissions boundary\", not the broader \"cannot restrict them with policies\".; judge_supported=0 The claim that root access keys are programmatic credentials for the root identity and carry its full access is not stated in any cited quote, and neither is the \"For IAM users\" scoping of the last quote. The quotes also support only \"no identity-based policies or permissions boundary\", not the broader \"cannot restrict them with policies\".; judge_responsive=1 The answer rejects the premise by recommending against root access keys for CI and advising IAM roles with temporary credentials, which matches the reference. It also correctly says root keys have full access."
+    },
+    {
+      "case_id": "docs-int-045",
+      "attempt": 1,
+      "probe": "resample",
+      "answer": "The maximum size of a Step Functions state machine definition is 1 MB. This is a hard quota, so it cannot be increased.",
+      "judge": "judge_core_supported=1 The quote supports the 1 MB limit, but \"so it cannot be increased\" is not stated in the quote, which only says \"Hard quota\" with no explanation of what that means.; judge_supported=0 The quote supports the 1 MB limit, but \"so it cannot be increased\" is not stated in the quote, which only says \"Hard quota\" with no explanation of what that means.; judge_responsive=1 The answer states 1 MB and that it is a hard quota, matching the reference."
+    },
+    {
+      "case_id": "docs-int-045",
+      "attempt": 3,
+      "probe": "resample",
+      "answer": "The maximum size of a Step Functions state machine definition is 1 MB. This is a hard quota, so it cannot be increased.",
+      "judge": "judge_core_supported=1 The quote supports the 1 MB limit, but \"so it cannot be increased\" is not stated in the quote, which only says \"Hard quota\" with no explanation of what that means.; judge_supported=0 The quote supports the 1 MB limit, but \"so it cannot be increased\" is not stated in the quote, which only says \"Hard quota\" with no explanation of what that means.; judge_responsive=1 The answer states 1 MB and that it is a hard quota, matching the reference."
+    },
+    {
+      "case_id": "docs-mix-046",
       "attempt": 2,
       "probe": "resample",
-      "answer": "No, you can't switch the type. The workflow type can't be updated after you create a state machine, so an Express workflow stays Express. To get 90 days of history, either (1) create a new Standard state machine with the same definition and role and point callers at it, since Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes; or (2) keep the Express workflow, enable logging to CloudWatch Logs, and set the log group's retention to at least 90 days, because by default log data is kept indefinitely but can be configured. I did not confirm the exact Express history retention behavior or the logging setup steps in the docs, so verify those before relying on option 2.",
-      "judge": "judge_supported=0 No cited quote ties the 90-day API history retrieval to Standard workflows, and none says Express executions can log to CloudWatch Logs, so both claims are unsupported even though the answer hedges on the Express part.; judge_responsive=1 The answer says the type can't be changed and recommends creating a new Standard state machine with 90-day retrievable history, matching the reference; the CloudWatch Logs alternative is extra, hedged detail."
+      "answer": "No. In a Multi-AZ DB instance deployment, the standby DB instance provides failover support but doesn't serve read traffic. (By contrast, the standby instances in a Multi-AZ DB cluster deployment can also serve read traffic. If you need read scaling, you can use a read replica, since a standby replica can't serve read traffic.)",
+      "judge": "judge_core_supported=1 The claim \"If you need read scaling, you can use a read replica\" is not stated in any quote. Quote 3 says only that a standby replica can't serve read traffic, unlike a read replica, so it doesn't establish read replicas as a way to scale reads.; judge_supported=0 The claim \"If you need read scaling, you can use a read replica\" is not stated in any quote. Quote 3 says only that a standby replica can't serve read traffic, unlike a read replica, so it doesn't establish read replicas as a way to scale reads.; judge_responsive=1 The answer says no, the standby in a Multi-AZ DB instance deployment provides failover support only and doesn't serve read traffic. This matches the reference, and the extra detail about Multi-AZ DB clusters and read replicas is correct."
+    },
+    {
+      "case_id": "docs-mix-050",
+      "attempt": 2,
+      "probe": "qualifier",
+      "answer": "Yes, according to the AWS docs, an Aurora Serverless cluster can scale to zero ACUs when idle. The Aurora User Guide has a dedicated section titled \"Scaling to Zero ACUs with automatic pause and resume for Aurora serverless\", and the main Aurora serverless page says that when the database isn't in use, its DB instances scale down to avoid unnecessary charges. I could not open that dedicated page in the snapshot, so I can't confirm its conditions, such as the required idle period, whether it is enabled only on request, or how long resume takes. Check that page for those details.",
+      "judge": "judge_core_supported=1 Every claim is quoted: the section title \"Scaling to Zero ACUs with automatic pause and resume\" and the line that DB instances scale down when the database isn't in use. The caveats about unconfirmed conditions are hedges, not factual claims.; judge_supported=1 Every claim is quoted: the section title \"Scaling to Zero ACUs with automatic pause and resume\" and the line that DB instances scale down when the database isn't in use. The caveats about unconfirmed conditions are hedges, not factual claims.; judge_responsive=1 The answer says yes, an Aurora Serverless cluster can scale to zero ACUs, and it ties this to automatic pause and resume. That matches the reference, and the caveats about unconfirmed details don't contradict it."
     }
   ]
 }
