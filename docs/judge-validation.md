@@ -309,18 +309,35 @@ Caveats that stay on the record: the qualifier class has n = 11, so its interval
 mutant set is deterministic text surgery; it does not plant subtle errors (a wrong service name,
 a swapped Region), and those remain for the hand labels and for later rounds.
 
+**Round four, against the final judge `2cf75fa03e09`** (same 40-answer pool; 38 answers now pass
+both verdicts under the stricter rubric, so n fell):
+
+| Variant | Kind | n | Expected | Observed (95% CI) | Bar | Met |
+|---|---|---|---|---|---|---|
+| number | mutant | 15 | judge fails it | 1.00 (0.80 to 1.00) | 0.90 | yes |
+| qualifier (bound flipped) | mutant | 5 | judge fails it | 0.80 (0.38 to 0.96) | 0.90 | too few to say (n = 5) |
+| citation (all swapped) | mutant | 38 | judge fails it | 1.00 (0.91 to 1.00) | 0.90 | yes |
+| padding | probe | 38 | verdicts unchanged | 0.92 (0.79 to 0.97) | 0.95 | **just missed** |
+| resample | probe | 38 | verdicts unchanged | 0.84 (0.70 to 0.93) | 0.95 | **missed** |
+
+268 judge calls, 107 from cache. The mutants are caught. The probes slipped against round three:
+the final rubric is stricter, so more "fully supported" verdicts sit on the edge and move between
+samples; 6 of 38 answers changed a verdict on re-sampling with nothing else changed. That is the
+judge's own noise, about 16% per answer on this version; it averages out in a rate over 346
+answers but matters for any per-answer use. The next judge version should set the judge model's
+temperature to 0 (the config leaves it at the API default) together with the quota-row example;
+both change the judge version and both are validated on new labels, not these.
+
 ## 4. Decision
 
 - Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
   rubric that the judge applies literally and the labels apply leniently and unevenly. Next
   step is the two-question rubric above, not a prompt tweak. "Responsive" is untested.
-- Mutation tests and bias probes: **passed** on round three, with the caveats above and with the
-  first two rounds kept in this document so the revisions are visible.
+- Mutation tests and bias probes: mutants **passed** in every round; stability probes passed in
+  round three (0.95) and slipped to 0.84 against the final, stricter judge (round four). Reported
+  as such; temperature 0 is the planned fix for the next version.
 - Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and
   no judge number appears in a headline, until kappa is reported on judge-test.
 - What the judge is already allowed to do: flag dev answers where code says fail and the judge
   says responsive, as suspected grader misses for human confirmation (failure taxonomy, A).
 
-## 4. Decision
-
-Pending steps 2 and 3.

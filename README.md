@@ -78,10 +78,16 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   0.164). A change between two prompt versions smaller than that band is noise.
 - Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
   why its score is below test's.
-- LLM judge (Sonnet 5.5, two verdicts, run after the fact on the stored answers): responsive
-  0.997, supported 0.177. The judge is not yet validated against hand labels, so these are shown,
-  not trusted; the low "supported" rate is the agent adding context its citations do not carry.
-  Validation status and bars: [docs/judge-validation.md](docs/judge-validation.md).
+- LLM judge (Sonnet 5.5, run after the fact on the stored answers), **validated against 65 hand
+  labels made blind**: on "fully supported" (every claim in the answer is in the quotes it cites)
+  the judge and the human labeler agree on all 65, kappa 1.00. On the dev run only **11.4%** of
+  answers pass it: the agent almost always adds a sentence of context its citations do not
+  carry. That is this project's claim-level hallucination rate and the first improvement target.
+  "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
+  advisory, kappa 0.37 on the same 65, with the disagreement pattern documented. "Responsive"
+  (0.997 pass) is validated on 61 closed-book answers at kappa 0.68 to 0.84. Planted-error
+  mutants were caught 100% of the time; verdict stability under re-sampling is 84% on this
+  version. Everything, including the rounds that failed: [docs/judge-validation.md](docs/judge-validation.md).
 - What broke: all 32 failing dev attempts were read. None states a wrong fact. 13 are keyword
   grader misses, 12 are the agent answering correctly while marking itself abstained, 6 are case
   defects. Details and two traces per category in [docs/failure-taxonomy.md](docs/failure-taxonomy.md).
@@ -100,6 +106,9 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
 | `unsupported_entity` | Answer states a number or URL found in neither the question nor any page the agent read or cited | lower |
 | `repeated_calls` | Identical tool calls (same tool, same input) within one trajectory: loop detection | lower |
 | `model_calls`, `tool_errors`, `rejected_submissions` | Efficiency and recovery signals from the trajectory | lower |
+| `judge_supported` | LLM judge, validated: every claim in the answer is backed by its cited quotes (claim-level hallucination, inverted) | higher |
+| `judge_core_supported` | LLM judge, advisory: the claims that answer the question are backed by the cited quotes | higher |
+| `judge_responsive` | LLM judge: the answer addresses the question as asked and agrees with the gold on substance | higher |
 | pass^k | Chance that all k attempts at a case pass; what a user who asks once gets | higher |
 | pass@k | Chance that at least one of k attempts passes; the gap to pass^k is reliability lost | higher |
 | flip rate | Share of cases whose repeated attempts disagree: the noise floor for any comparison | lower |
