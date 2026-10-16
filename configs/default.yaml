@@ -27,6 +27,7 @@ docs_agent:
   page_chars: 8000
   strict_tools: true       # set false if the API rejects strict tool schemas for this model
   max_submission_rejections: 3   # then the attempt fails as malformed_submission
+  prompt_version: v2             # the champion; challengers override this in their own file
 
 graders:
   min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated

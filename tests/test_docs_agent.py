@@ -213,3 +213,16 @@ def test_repeated_rejections_fail_with_their_own_cause(corpus: Corpus, case: Cas
     assert result.output == {}
     assert sum(s.is_error for s in result.trajectory) == 3
     assert llm.script == []  # exactly three model turns were spent, not max_steps
+
+
+def test_prompt_version_selects_the_system_prompt_and_changes_the_version(corpus: Corpus) -> None:
+    from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V2, SYSTEM_PROMPT_V3
+
+    champion = make_agent(ScriptedLLM([]), corpus)
+    challenger = make_agent(ScriptedLLM([]), corpus, prompt_version="v3")
+    assert champion.system_prompt == SYSTEM_PROMPT_V2
+    assert challenger.system_prompt == SYSTEM_PROMPT_V3
+    assert "header row" in SYSTEM_PROMPT_V3 and "header row" not in SYSTEM_PROMPT_V2
+    assert champion.version != challenger.version  # the fingerprint sees the prompt change
+    with pytest.raises(ValueError, match="prompt_version"):
+        make_agent(ScriptedLLM([]), corpus, prompt_version="v9")

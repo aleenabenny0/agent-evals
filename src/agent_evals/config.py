@@ -36,6 +36,9 @@ class DocsAgentConfig(_Strict):
     # Rejected submit_answer calls (wrong shape or broken content rules) allowed before the
     # attempt fails with error `malformed_submission` instead of spending its remaining steps.
     max_submission_rejections: int = 3
+    # Which system prompt the docs agent uses (keys of agents.docs.prompts.SYSTEM_PROMPTS). The
+    # champion stays here; a challenger config file overrides it for a gated comparison.
+    prompt_version: str = "v2"
 
 
 class Paths(_Strict):

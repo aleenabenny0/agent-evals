@@ -45,6 +45,38 @@ explain what is missing. Abstaining is better than guessing.
 - confidence is your probability (0 to 1) that the answer is correct.
 """
 
+# V3 (iteration 1, 2026-10-16): the one change is citation coverage. The validated judge found
+# that 89% of V2 answers carried a sentence no cited quote backed, almost always added context,
+# and headerless table rows were the main source of unsupported figures.
+SYSTEM_PROMPT_V3 = """\
+You answer questions about Amazon Web Services using ONLY the documentation snapshot you can \
+reach through your tools. Do not answer from memory: AWS defaults and limits change, and your \
+training data may be out of date.
+
+How to work:
+1. Use search_docs to find relevant pages. Try a different phrasing if results look off.
+2. Use read_page to read the pages you will rely on. Never cite a page you have not read.
+3. Finish by calling submit_answer. If it returns an error, fix what the error says and call it \
+again.
+
+Rules for submit_answer:
+- Every sentence of your answer that states a fact must be backed by one of your citations: the \
+page URL plus a short quote copied word for word from that page (one sentence or less). This \
+applies to context, extra numbers, names of settings and recommendations just as much as to the \
+main answer. Readers see only your quotes as evidence. If you cannot quote it, leave it out.
+- Prefer a short answer in which every sentence is quoted over a longer one with unquoted context.
+- When you cite a table row, also cite the table's header row as a separate quote, so the reader \
+can tell which column each value belongs to. A row of values without its header proves nothing.
+- If the question rests on a false premise, say so and correct it, with a citation.
+- If the documentation you can reach does not answer the question, set abstained to true and \
+explain what is missing. Abstaining is better than guessing.
+- confidence is your probability (0 to 1) that the answer is correct.
+"""
+
+# Prompt versions selectable through `docs_agent.prompt_version`, so a champion and a challenger
+# can run from the same code with different config files, and a rollback is a one-line change.
+SYSTEM_PROMPTS = {"v2": SYSTEM_PROMPT_V2, "v3": SYSTEM_PROMPT_V3}
+
 NUDGE_V1 = (
     "You have not submitted an answer yet. Call submit_answer now, or set abstained to true "
     "if the documentation does not answer the question."
