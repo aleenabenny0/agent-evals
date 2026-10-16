@@ -1086,6 +1086,51 @@ def judge_probe(
     console.print(f"details, including every miss with the judge's reasons: {out}")
 
 
+@app.command()
+def regrade(
+    run_id: str,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Re-score a run's stored answers with the code graders against the suite as it is now.
+
+    Free: the agent is not re-run. Use after a case's keyword list or a grader changes. Judge
+    grades are left alone.
+    """
+    from agent_evals.corpus import Corpus
+    from agent_evals.graders.deterministic import (
+        AnswerGrader,
+        CitationGrader,
+        FormatGrader,
+        GroundingGrader,
+        TrajectoryGrader,
+    )
+    from agent_evals.harness.runner import regrade_run
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.suites import load_suite
+    from agent_evals.types import Grader
+
+    cfg = _config(config)
+    corpus = Corpus.load(cfg.paths.corpus_dir)
+    graders: list[Grader] = [
+        AnswerGrader(),
+        CitationGrader(corpus, min_quote_chars=cfg.graders.min_quote_chars),
+        FormatGrader(),
+        TrajectoryGrader(),
+        GroundingGrader(corpus),
+    ]
+    store = ResultsStore(cfg.paths.db)
+    try:
+        suite_path = Path(str(store.run_info(run_id)["manifest"].get("suite", {}).get("path", "")))
+        if not suite_path.exists():
+            console.print(f"[red]The run's suite file {suite_path} is gone.[/red]")
+            raise typer.Exit(code=2)
+        n = regrade_run(store, run_id, load_suite(suite_path), graders)
+        console.print(f"regraded {n} attempts of {run_id} against {suite_path}")
+        _print_summary(store, run_id)
+    finally:
+        store.close()
+
+
 @app.command("compare")
 def compare_cmd(
     baseline: str,

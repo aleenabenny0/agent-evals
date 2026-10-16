@@ -334,6 +334,24 @@ class ResultsStore:
         ).fetchall()
         return [float(r[0]) for r in rows]
 
+    def all_attempts(self, run_id: str) -> list[dict[str, Any]]:
+        """Every stored attempt of a run with what a grader needs: output, trajectory, error."""
+        rows = self.con.execute(
+            "SELECT case_id, attempt, output, trajectory, error FROM attempts WHERE run_id = ? "
+            "ORDER BY case_id, attempt",
+            [run_id],
+        ).fetchall()
+        return [
+            {
+                "case_id": str(c),
+                "attempt": int(a),
+                "output": json.loads(o),
+                "trajectory": json.loads(t),
+                "error": e,
+            }
+            for c, a, o, t, e in rows
+        ]
+
     def attempt(self, run_id: str, case_id: str, attempt: int) -> dict[str, Any] | None:
         """One stored attempt: output, trajectory, usage, error, and its grades."""
         row = self.con.execute(

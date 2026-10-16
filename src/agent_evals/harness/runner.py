@@ -12,7 +12,7 @@ from rich.progress import Progress
 
 from agent_evals.config import Pricing
 from agent_evals.store.db import ResultsStore
-from agent_evals.types import Agent, AgentResult, Case, Grade, Grader, RunContext
+from agent_evals.types import Agent, AgentResult, Case, Grade, Grader, RunContext, Step
 
 
 def new_run_id(agent_name: str) -> str:
@@ -48,6 +48,42 @@ def grade_all(
                 )
             )
     return graded
+
+
+def regrade_run(
+    store: ResultsStore, run_id: str, cases: Sequence[Case], graders: Sequence[Grader]
+) -> int:
+    """Re-run code graders over a run's stored attempts against the cases as they are now.
+
+    For when a case's `must_include` list or a grader changes after the run: the agent is not
+    re-run (its answers are stored), only the deterministic grades are replaced, grader by
+    grader. Grades from graders not in `graders` (the LLM judge, for example) are untouched.
+    Returns the number of attempts regraded. The manifest keeps the original grader versions;
+    the new ones are added under `regraded`.
+    """
+    by_id = {c.id: c for c in cases}
+    attempts = [a for a in store.all_attempts(run_id) if a["case_id"] in by_id]
+    for grader in graders:
+        store.delete_grades(run_id, grader.name)
+    for a in attempts:
+        result = AgentResult(
+            output=a["output"],
+            trajectory=[Step.model_validate(s) for s in a["trajectory"]],
+            error=a["error"],
+        )
+        store.add_grades(
+            run_id, a["case_id"], a["attempt"], grade_all(graders, by_id[a["case_id"]], result)
+        )
+    store.annotate_run(
+        run_id,
+        "regraded",
+        {
+            "at": datetime.now(UTC).isoformat(),
+            "graders": {g.name: g.version for g in graders},
+            "cases": len(by_id),
+        },
+    )
+    return len(attempts)
 
 
 def run_suite(

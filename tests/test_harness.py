@@ -230,6 +230,26 @@ def test_flip_rate_and_pass_at_k_need_repeated_attempts(tmp_path: Path) -> None:
     store.close()
 
 
+def test_regrade_rescores_stored_answers_against_changed_cases(tmp_path: Path) -> None:
+    from agent_evals.harness.runner import regrade_run
+    from agent_evals.types import Gold, Grade
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id="a"), make_case(id="b")]
+    run = _run(store, FakeAgent({"a": {1}, "b": {1}}), cases, attempts=1)  # both answer "63"
+    assert summarize(store, run).metrics["correct"].mean == 1.0
+    store.add_grades(run, "a", 1, [("judge", Grade(metric="judge_supported", value=1.0))])
+    # The keyword list for "b" is tightened after the run: "63" alone no longer passes.
+    tightened = Gold(answer="", must_include=[["sixty-three"]])
+    changed = [cases[0], cases[1].model_copy(update={"gold": tightened})]
+    assert regrade_run(store, run, changed, [AnswerGrader()]) == 2
+    s = summarize(store, run)
+    assert s.metrics["correct"].mean == 0.5
+    assert s.metrics["judge_supported"].mean == 1.0  # the judge's grades were left alone
+    assert store.run_info(run)["manifest"]["regraded"]["graders"] == {"answer_keywords": "2"}
+    store.close()
+
+
 def test_store_post_hoc_grades_and_labels(tmp_path: Path) -> None:
     from agent_evals.types import Grade
 
