@@ -63,19 +63,23 @@ Billing factors, commitment terms and option lists are core claims when the ques
 something is billed or what the options are; otherwise they are peripheral."""
 )
 
-# V4 of the rubric (DRAFT, 2026-10-16): rubric v2 plus Aleena's two decisions after the v2-vs-v3
-# adjudication (docs/judge-validation.md section 7). (1) Decided and written: a statement that the
-# documentation does NOT say something is a hedge. (2) Decided, wording to be added by Aleena:
-# when a question asks how something is billed, the price factors are not part of the main
-# answer (they are peripheral). Not validated and not used by any gate until (2) is written and
-# the judge built on it is scored against fresh labels; v2 stays the validated judge until then.
+# V4 of the rubric (candidate, wording final 2026-10-17): rubric v2 plus Aleena's two decisions
+# after the v2-vs-v3 adjudication (docs/judge-validation.md section 7): (1) a statement that the
+# documentation does NOT say something is a hedge; (2) when a question asks how something is
+# billed, the price factors are peripheral, not part of the main answer (wording drafted by the
+# agent, approved by Aleena 2026-10-17). Not used by any gate until the judge built on it passes
+# the rule in docs/judge-validation.md section 8; v2 stays the validated judge until then.
 SUPPORT_RUBRIC_V4 = (
     SUPPORT_RUBRIC
     + """
 
 Statements about what the documentation says or where are claims, but a statement that it does
 not say something ("the docs don't state the starting number", "the docs don't define a new
-customer") is a hedge and needs no support."""
+customer") is a hedge and needs no support.
+
+When a question asks how something is billed, the core claims are how and when you are charged
+(for example, billed hourly until you delete it). The factors that set the price, such as the
+model, the number of units bought or the length of a commitment, are peripheral."""
 )
 
 SUPPORT_RUBRICS = {"v2": SUPPORT_RUBRIC, "v3": SUPPORT_RUBRIC_V3, "v4": SUPPORT_RUBRIC_V4}

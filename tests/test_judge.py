@@ -199,11 +199,14 @@ def test_candidate_judge_has_its_own_name_rubric_and_version() -> None:
         JudgeGrader(llm, JudgeConfig.model_validate({"rubric_version": "v9"}))
 
 
-def test_draft_rubric_v4_adds_the_absence_hedge_rule_to_v2() -> None:
+def test_rubric_v4_adds_the_labelers_two_decisions_to_v2() -> None:
     from agent_evals.graders.judge_prompts import SUPPORT_RUBRICS
 
     v2, v4 = SUPPORT_RUBRICS["v2"], SUPPORT_RUBRICS["v4"]
     assert v4.startswith(v2) and "does\nnot say something" in v4 and "is a hedge" in v4
+    # Billing: price factors are peripheral, the opposite of rubric v3's billing sentence.
+    assert "factors that set the price" in v4 and "are peripheral" in v4
+    assert "are core claims when the question asks how" not in v4
     llm = ScriptedLLM([])
     draft = JudgeGrader(
         llm, JudgeConfig.model_validate({"grader_name": "judge-v4", "rubric_version": "v4"})

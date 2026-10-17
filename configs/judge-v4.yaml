@@ -1,7 +1,7 @@
-# DRAFT judge v4 (2026-10-16): rubric v2 plus Aleena's decisions after the v2-vs-v3 adjudication
-# ("the docs don't say X" is a hedge; price factors are not core for billing questions, wording
-# to be added by Aleena). Not validated: do not judge runs with it for any gate or report until
-# the billing wording is in and it is scored on fresh labels (docs/judge-validation.md section 7).
+# Candidate judge v4 (wording final 2026-10-17): rubric v2 plus Aleena's two decisions after the
+# v2-vs-v3 adjudication ("the docs don't say X" is a hedge; price factors are peripheral for
+# billing questions). Judge version bf1a8e9f376a. Not used by any gate until it passes the rule in
+# docs/judge-validation.md section 8. Label with it: evals label RUN --labeler NAME -c this file.
 
 paths:
   corpus_dir: data/snapshots/aws-docs

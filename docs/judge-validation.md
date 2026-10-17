@@ -488,7 +488,8 @@ Findings:
 1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
    (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
 2. **Price factors are not part of the main answer** when a question asks how something is
-   billed; they are peripheral. Aleena will add the wording to rubric v4 later.
+   billed; they are peripheral. Wording drafted by the agent and approved by Aleena on
+   2026-10-17; it is in rubric v4.
 
 What follows from them:
 
@@ -517,7 +518,7 @@ is recorded as a disagreement with it, not a correction.
 
 Judge v4 is rubric v2 plus the labeler's two decisions of 2026-10-16: a statement that the
 documentation does not say something is a hedge, and price factors are peripheral for billing
-questions (wording pending). Unlike v3, v4 is not a tuning attempt: it changes the definition the
+questions (wording final 2026-10-17; judge version `bf1a8e9f376a`). Unlike v3, v4 is not a tuning attempt: it changes the definition the
 labeler applies, so v2 is now known to diverge from the reference on a named pattern. The test is
 whether v4 implements the revised definition at least as well as v2 implemented the old one.
 

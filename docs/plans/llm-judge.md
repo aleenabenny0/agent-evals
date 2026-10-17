@@ -113,8 +113,12 @@ disagreements that belonged to the rubric rather than to anyone's mistake. Decis
 1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
    (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
 2. **Price factors are not part of the main answer** when a question asks how something is
-   billed; they are peripheral. Aleena will add the wording to rubric v4 later.
+   billed; they are peripheral. Wording drafted by the agent and approved by Aleena on
+   2026-10-17 ("write it"): "When a question asks how something is billed, the core claims
+   are how and when you are charged (for example, billed hourly until you delete it). The
+   factors that set the price, such as the model, the number of units bought or the length
+   of a commitment, are peripheral."
 
-Both apply from judge v4 on. v2 stays the validated judge until v4, with the billing wording in,
+Both apply from judge v4 on (`bf1a8e9f376a`). v2 stays the validated judge until v4
 is scored against fresh labels under a rule fixed in advance; if v4 is adopted, every run in the
 changelog is re-judged with it so the history stays on one judge version.
