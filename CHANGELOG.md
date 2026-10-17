@@ -17,6 +17,25 @@ Format:
 - Runs: baseline <run id>, candidate <run id>
 ```
 
+## Instrument (2026-10-17): 10 more dev keyword lists widened; all six dev runs regraded
+
+- Change: the keyword lists of 10 dev cases gained the correct wordings that the iteration-3
+  review found the grader missing in both runs' answers (4 misses in v3's, 11 in v4's), approved
+  by Aleena; the additions are listed in `scripts/keyword_fix_counterfactual.py`. Gold answers
+  are unchanged and test cases untouched. All six runs on the dev suite were regraded for free
+  with the current code graders, including the closed-book and oracle baselines, which the
+  iteration-1 regrade had skipped. Every dev number now rests on the same keyword lists.
+- correct, before -> after (`results/iteration-3/dev-runs-before-keyword-fix.json`, `...-after-...`):
+  v2 0.954 -> 0.956; v3 0.959 -> 0.969; iteration-2 challenger 0.951 -> 0.962; v4 0.931 -> 0.959;
+  closed-book 0.546 -> 0.585; oracle 0.923 -> 0.938. The only other metric that moved is the
+  closed-book baseline's unsupported_entity, 0.571 -> 0.551, because its grades predated the
+  grounding grader's current version.
+- Restated comparisons: closed-book minus docs v2, -0.372 (CI -0.462 to -0.282), unchanged;
+  oracle minus docs v2, -0.018 (CI -0.064 to +0.028; reported earlier as +0.005), no detectable
+  change either way; v2 dev flip rate 0.038 (was 0.031). Gate decisions re-read for the record
+  (`results/gates/iteration-*-dev-gate-after-keyword-fix-2.txt`): iteration 1 still passes;
+  iterations 2 and 3 still fail, for the same reasons.
+
 ## Rejected: iteration 3 (2026-10-17) - system prompt v4: check each sentence, quote whole units
 
 - Change: `docs_agent.prompt_version` v3 -> v4 (`configs/challenger-v4.yaml`, commit 356c135),

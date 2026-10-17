@@ -1,0 +1,44 @@
+          paired on the shared dev cases (judge metrics from 'judge')          
++-----------------------------------------------------------------------------+
+| metric      | champion | challenger | difference |     95% CI |     verdict |
+|-------------+----------+------------+------------+------------+-------------|
+| judge_supp… |    0.114 |      0.306 |     +0.192 |  +0.141 to |    improved |
+| (target)    |          |            |            |     +0.245 |             |
+| correct     |    0.956 |      0.969 |     +0.013 |  -0.003 to |          no |
+|             |          |            |            |     +0.031 |  detectable |
+|             |          |            |            |            |      change |
+| fabricated… |    0.021 |      0.013 |     -0.008 |  -0.029 to |          no |
+|             |          |            |            |     +0.011 |  detectable |
+|             |          |            |            |            |      change |
+| uncited_an… |    0.000 |      0.000 |     +0.000 |  +0.000 to |          no |
+|             |          |            |            |     +0.000 |  detectable |
+|             |          |            |            |            |      change |
+| wrong_abst… |    0.031 |      0.017 |     -0.014 |  -0.031 to |    improved |
+|             |          |            |            |     -0.003 |             |
+| missed_abs… |    0.083 |      0.056 |     -0.028 |  -0.083 to |          no |
+|             |          |            |            |     +0.000 |  detectable |
+|             |          |            |            |            |      change |
+| rejected_s… |    0.013 |      0.021 |     +0.008 |  -0.010 to |          no |
+|             |          |            |            |     +0.031 |  detectable |
+|             |          |            |            |            |      change |
++-----------------------------------------------------------------------------+
+                      correct by category, paired                       
++----------------------------------------------------------------------+
+| category             |  n | difference | 95% CI           |          |
+|----------------------+----+------------+------------------+----------|
+| type=changed_default | 20 | +0.000     | -0.050 to +0.050 |          |
+| type=false_premise   | 12 | +0.000     | +0.000 to +0.000 |          |
+| type=lookup          | 74 | +0.023     | +0.005 to +0.050 | improved |
+| type=multi_step      | 12 | +0.000     | +0.000 to +0.000 |          |
+| type=unanswerable    | 12 | -0.000     | -0.083 to +0.083 |          |
+| area=ai_ml           | 48 | +0.035     | +0.007 to +0.076 | improved |
+| area=analytics       |  6 | +0.000     | +0.000 to +0.000 |          |
+| area=compute         | 17 | -0.020     | -0.059 to +0.000 |          |
+| area=databases       |  7 | +0.048     | +0.000 to +0.143 |          |
+| area=integration     | 11 | +0.030     | +0.000 to +0.091 |          |
+| area=management      |  4 | +0.000     | +0.000 to +0.000 |          |
+| area=networking      | 14 | +0.000     | +0.000 to +0.000 |          |
+| area=security        | 11 | +0.000     | +0.000 to +0.000 |          |
+| area=storage         | 12 | -0.028     | -0.083 to +0.000 |          |
++----------------------------------------------------------------------+
+GATE PASSED: judge_supported improved, nothing regressed.

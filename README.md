@@ -58,7 +58,7 @@ uv run evals compare <baseline-run-id> <candidate-run-id>
 Before your first real run, set a monthly spend limit in the Claude Console and fill in
 `pricing` in `configs/default.yaml` so the per-run budget cap can work.
 
-## Results so far (2026-10-11)
+## Results so far (updated 2026-10-17)
 
 Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every number has its
 95% interval and n; the test split is frozen and was run once.
@@ -67,21 +67,24 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
 | --- | --- | --- | --- | --- | --- | --- |
 | docs agent v3 (after iteration 1) | test | 150 | 1 | **0.980** (0.943 to 0.993) | 0.035 | $0.34 |
 | docs agent v2 (baseline) | test | 150 | 1 | 0.987 (0.953 to 0.996) | 0.028 | $0.35 |
-| docs agent v3 | dev | 130 | 3 | 0.959 (0.931 to 0.982) | 0.013 | $0.99 |
-| docs agent v2 | dev | 130 | 3 | 0.954 (0.918 to 0.985) | 0.021 | $0.97 |
-| closed-book baseline (no tools) | dev | 130 | 1 | 0.546 (0.460 to 0.629) | n/a | $0.06 |
-| oracle baseline (gold pages given) | dev | 130 | 1 | 0.923 (0.864 to 0.958) | 0.000 | $0.07 |
+| docs agent v3 | dev | 130 | 3 | 0.969 (0.944 to 0.990) | 0.013 | $0.99 |
+| docs agent v2 | dev | 130 | 3 | 0.956 (0.921 to 0.985) | 0.021 | $0.97 |
+| closed-book baseline (no tools) | dev | 130 | 1 | 0.585 (0.499 to 0.666) | n/a | $0.06 |
+| oracle baseline (gold pages given) | dev | 130 | 1 | 0.938 (0.883 to 0.968) | 0.000 | $0.07 |
 
-- Retrieval is worth 37 points: docs agent minus closed-book on the same dev cases is -0.372 for
-  the baseline (95% CI -0.462 to -0.282, McNemar p = 3e-12).
-- Retrieval is not the bottleneck: the oracle, handed the right pages, is +0.005 over the docs
-  agent (95% CI -0.046 to +0.054, no detectable change).
-- Reliability on dev with 3 attempts: pass^3 0.862, pass@3 0.962, **flip rate 0.100** (0.059 to
-  0.164). A change between two prompt versions smaller than that band is noise.
+- Retrieval is worth 37 points: closed-book minus the docs agent (v2) on the same dev cases is
+  -0.372 (95% CI -0.462 to -0.282, McNemar p = 3e-12).
+- Retrieval is not the bottleneck: the oracle, handed the right pages, scores 0.018 below the
+  docs agent (95% CI -0.064 to +0.028, no detectable change).
+- Reliability on dev with 3 attempts (v2): pass^3 0.938, pass@3 0.977, **flip rate 0.038**
+  (0.017 to 0.087). It first read 0.100; most of that was the keyword grader (next point). A
+  change between two prompt versions smaller than that band is noise.
 - Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
   why its score is below test's. Dev correctness was regraded after iteration 1 widened the
-  keyword lists of 20 dev cases (gold answers unchanged; test cases untouched); the regrade also
-  cut the measured flip rate from 10% to 3%, most of the noise having been the keyword grader.
+  keyword lists of 20 dev cases, and again on 2026-10-17 after 10 more, both approved by Aleena
+  (gold answers unchanged; test cases untouched). The second regrade covered all six dev runs,
+  including the two baselines the first had skipped, so every dev number above rests on the same
+  keyword lists.
 - LLM judge (Sonnet 5.5, run after the fact on the stored answers), **validated against 65 hand
   labels made blind**: on "fully supported" (every claim in the answer is in the quotes it cites)
   the judge and the human labeler agree on all 65, kappa 1.00, on 36 of 40 fresh answers in a
