@@ -439,6 +439,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   changed). Note: paraphrase siblings of those cases keep the narrower lists; no current answer
   hits the gap. (2) Next: iteration 4, v4 plus an abstention guard; it will need her 30-answer
   spot check because v4-style answers are 27% shorter.
+- **Iteration 4 dev gate passed (2026-10-17).** Prompt v5 (v4 plus an abstention guard,
+  pre-registered in `docs/plans/iteration-4.md`, run `docs-20261017-174739-1c0e8e`):
+  judge_supported 0.308 -> 0.612 with nothing regressed. Answers are 28% shorter, so before the
+  test split runs, **Aleena spot-checks 30 v5 answers** (the command is in the plan's dev-result
+  section; the list is fixed by a hash). The number is trusted if the judge passes at most 2 answers
+  she fails on fully supported. Then: the test split once, the CHANGELOG entry, and her ship decision.
 
 ## Target: the three project briefs
 

@@ -74,3 +74,31 @@ If the gate passes and the spot check holds, the frozen test split is run once a
 and the CHANGELOG entry records both splits. Shipping, which means setting `prompt_version: v5`
 in `default.yaml`, is Aleena's decision. If the gate fails, v3 stays the champion and the
 rejection is recorded.
+
+## Dev result (2026-10-17): gate passed; spot check pending
+
+Run `docs-20261017-174739-1c0e8e`, $1.01 agent, 704 judge calls, no errors
+(`results/gates/iteration-4-dev-gate.txt`). Paired against v3: judge_supported **0.308 -> 0.612**
+(+0.304, 95% CI +0.240 to +0.370); correct 0.969 -> 0.967 (no detectable change);
+wrong_abstention 0.017 -> 0.008, missed_abstention 0.056 -> 0.028, fabricated_citation 0.013 ->
+0.005, rejected_submissions 0.021 -> 0.008 (all no detectable change); no case type or area
+regressed. **Gate passed.**
+
+Checks (`results/iteration-4/post-run-checks.txt`):
+
+1. Median answer length 350 -> 251 characters (ratio 0.72), so the 30-answer spot check is
+   required before the number is trusted and before the test split is run.
+2. Errored attempts: v3 2, v5 0.
+3. No unanswerable case is answered by v5 where v3 abstained.
+4. Both rules did work. Rule 1: five attempts in the docs-ai-001 group read the page that
+   answers them. Rule 2: the hedged and title-only cases (docs-chg-019, docs-mix-012,
+   docs-mix-050) stopped abstaining on the same evidence.
+5. Absence statements: v3 12.0%, v4 7.6%, v5 8.8%.
+
+Spot-check sample, as pre-registered: docs-int-002, docs-int-042, docs-mix-063, docs-chg-016,
+docs-ai-045, docs-mix-016, docs-core-009, docs-int-030, docs-chg-030, docs-mix-003, docs-mix-049,
+docs-ai-001-p2, docs-mix-023, docs-mix-071, docs-ai-004-p2, docs-core-024, docs-mix-011,
+docs-core-002, docs-ai-003-p1, docs-mix-018, docs-mix-024, docs-mix-057, docs-mix-058,
+docs-mix-068, docs-mix-020, docs-mix-087, docs-core-017, docs-mix-046, docs-int-004,
+docs-ai-002-p1 (attempt 1 of each).
+

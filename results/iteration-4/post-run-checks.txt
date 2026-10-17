@@ -1,0 +1,38 @@
+1. median answer length v3 350, v5 251, ratio 0.72: spot check required before the number is trusted
+2. errored attempts v3 2, v5 0 (within 3); v5: []
+   docs-ai-047: answered v3 0/3, v4 0/3, v5 0/3
+   docs-ai-048: answered v3 0/3, v4 0/3, v5 0/3
+   docs-core-042: answered v3 0/3, v4 0/3, v5 0/3
+   docs-int-021: answered v3 0/3, v4 0/3, v5 0/3
+   docs-int-023: answered v3 2/3, v4 0/3, v5 1/3
+   docs-int-024: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-030: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-034: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-035: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-037: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-039: answered v3 0/3, v4 0/3, v5 0/3
+   docs-mix-040: answered v3 0/3, v4 0/3, v5 0/3
+3. unanswerable cases v5 answers where v3 abstained: none
+4. cases where v5 has fewer wrong abstentions than v4:
+   docs-ai-001-p1: wrong abstentions v4 2 -> v5 0; rule 2 (same evidence, flag) []
+   docs-ai-001-p2: wrong abstentions v4 1 -> v5 0; rule 2 (same evidence, flag) []
+   docs-ai-001-p3: wrong abstentions v4 2 -> v5 1; rule 2 (same evidence, flag) []
+   docs-chg-019: wrong abstentions v4 1 -> v5 0; rule 2 (same evidence, flag) []
+   docs-int-017: wrong abstentions v4 3 -> v5 2; rule 2 (same evidence, flag) []
+   docs-mix-012: wrong abstentions v4 1 -> v5 0; rule 2 (same evidence, flag) []
+   docs-mix-050: wrong abstentions v4 2 -> v5 0; rule 2 (same evidence, flag) []
+5. absence statements v3: 0.120 of 349 answered attempts
+5. absence statements v4: 0.076 of 341 answered attempts
+5. absence statements v5: 0.088 of 352 answered attempts
+
+spot-check sample (30): ['docs-int-002', 'docs-int-042', 'docs-mix-063', 'docs-chg-016', 'docs-ai-045', 'docs-mix-016', 'docs-core-009', 'docs-int-030', 'docs-chg-030', 'docs-mix-003', 'docs-mix-049', 'docs-ai-001-p2', 'docs-mix-023', 'docs-mix-071', 'docs-ai-004-p2', 'docs-core-024', 'docs-mix-011', 'docs-core-002', 'docs-ai-003-p1', 'docs-mix-018', 'docs-mix-024', 'docs-mix-057', 'docs-mix-058', 'docs-mix-068', 'docs-mix-020', 'docs-mix-087', 'docs-core-017', 'docs-mix-046', 'docs-int-004', 'docs-ai-002-p1']
+label command:
+  uv run evals label docs-20261017-174739-1c0e8e --labeler aleena --case docs-int-002 --case docs-int-042 --case docs-mix-063 --case docs-chg-016 --case docs-ai-045 --case docs-mix-016 --case docs-core-009 --case docs-int-030 --case docs-chg-030 --case docs-mix-003 --case docs-mix-049 --case docs-ai-001-p2 --case docs-mix-023 --case docs-mix-071 --case docs-ai-004-p2 --case docs-core-024 --case docs-mix-011 --case docs-core-002 --case docs-ai-003-p1 --case docs-mix-018 --case docs-mix-024 --case docs-mix-057 --case docs-mix-058 --case docs-mix-068 --case docs-mix-020 --case docs-mix-087 --case docs-core-017 --case docs-mix-046 --case docs-int-004 --case docs-ai-002-p1
+
+Check 4, refined per attempt (the script's case-level version credits rule 2 whenever v4 read the
+page in any attempt of the case). Each v5 attempt that no longer abstains, against the v4
+attempts that abstained in the same case:
+- docs-ai-001-p2 #1-3 and docs-ai-001-p3 #2-3: rule 1. v5 read cross-region-inference.html, a
+  first search result that the abstaining v4 attempts never read.
+- docs-ai-001-p1 #1-3, docs-chg-019 #1-3, docs-int-017 #3, docs-mix-012 #1-3, docs-mix-050 #1-3:
+  rule 2. No new first result was read; the abstained flag changed on the same evidence.
