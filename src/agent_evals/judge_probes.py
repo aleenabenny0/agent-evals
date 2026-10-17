@@ -44,6 +44,9 @@ BOUND_FLIPS = (
     ("approximately", "exactly"),
     ("about", "exactly"),
 )
+# Approximation words are a bound only before a figure: "about 10%" is one, "this is about
+# opt-in" is not, and flipping it plants no error (probe round five, 2026-10-17).
+BEFORE_A_FIGURE = frozenset({"about", "approximately"})
 PADDING = " I hope this helps; let me know if you need anything else about this topic."
 
 
@@ -82,7 +85,8 @@ def flip_bound(answer: str) -> str | None:
     63" becomes "at least 63"). None when the answer states no bound."""
     best: tuple[int, int, str] | None = None  # (start, end, replacement) of the earliest match
     for old, new in BOUND_FLIPS:
-        pattern = re.compile(rf"(?<!\w){re.escape(old)}(?!\w)", re.IGNORECASE)
+        figure = r"(?=\s*[$\u20ac\u00a3]?\d)" if old in BEFORE_A_FIGURE else ""
+        pattern = re.compile(rf"(?<!\w){re.escape(old)}(?!\w){figure}", re.IGNORECASE)
         m = pattern.search(answer)
         if m and (best is None or m.start() < best[0]):
             replacement = new.capitalize() if m.group(0)[0].isupper() else new

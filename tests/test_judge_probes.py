@@ -38,6 +38,10 @@ def test_flip_bound_contradicts_the_first_bound() -> None:
     assert flip_bound("Set per account") == "Set per Region"
     assert flip_bound("No bound stated.") is None
     assert flip_bound("Roundabout talk, up to a point") == "Roundabout talk, at least a point"
+    # "about" as a preposition is no bound: flipping it would plant no error.
+    assert flip_bound("Note that this is about opt-in only.") is None
+    assert flip_bound("This is about quotas, at most 5") == "This is about quotas, at least 5"
+    assert flip_bound("It costs about $5") == "It costs exactly $5"
 
 
 def test_swap_citations_replaces_every_quote_with_unrelated_ones() -> None:
