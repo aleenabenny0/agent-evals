@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -302,18 +303,42 @@ class ResultsStore:
         info["manifest"] = json.loads(info["manifest"])
         return info
 
-    def metrics(self, run_id: str) -> list[str]:
+    def judge_graders(self, run_id: str) -> list[str]:
+        """Graders that wrote LLM-judge verdicts (metrics named judge_*) on this run. More than
+        one when a candidate judge was run beside the validated one."""
         rows = self.con.execute(
-            "SELECT DISTINCT metric FROM grades WHERE run_id = ? ORDER BY metric", [run_id]
+            "SELECT DISTINCT grader FROM grades WHERE run_id = ? "
+            "AND starts_with(metric, 'judge_') ORDER BY grader",
+            [run_id],
         ).fetchall()
         return [str(r[0]) for r in rows]
 
-    def metric_by_case(self, run_id: str, metric: str) -> dict[str, list[float]]:
-        """case_id -> metric value for each attempt, in attempt order."""
+    @staticmethod
+    def _without(exclude_graders: Sequence[str]) -> tuple[str, list[str]]:
+        if not exclude_graders:
+            return "", []
+        marks = ", ".join("?" for _ in exclude_graders)
+        return f" AND grader NOT IN ({marks})", list(exclude_graders)
+
+    def metrics(self, run_id: str, exclude_graders: Sequence[str] = ()) -> list[str]:
+        clause, params = self._without(exclude_graders)
         rows = self.con.execute(
-            "SELECT case_id, attempt, value FROM grades WHERE run_id = ? AND metric = ? "
+            f"SELECT DISTINCT metric FROM grades WHERE run_id = ?{clause} ORDER BY metric",
+            [run_id, *params],
+        ).fetchall()
+        return [str(r[0]) for r in rows]
+
+    def metric_by_case(
+        self, run_id: str, metric: str, exclude_graders: Sequence[str] = ()
+    ) -> dict[str, list[float]]:
+        """case_id -> metric value for each attempt, in attempt order. Grades from the graders
+        in `exclude_graders` are left out: two judges' verdicts on one answer are two opinions
+        about the same attempt, not two attempts."""
+        clause, params = self._without(exclude_graders)
+        rows = self.con.execute(
+            f"SELECT case_id, attempt, value FROM grades WHERE run_id = ? AND metric = ?{clause} "
             "ORDER BY case_id, attempt",
-            [run_id, metric],
+            [run_id, metric, *params],
         ).fetchall()
         out: dict[str, list[float]] = defaultdict(list)
         for case_id, _attempt, value in rows:

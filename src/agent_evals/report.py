@@ -94,11 +94,19 @@ def _interval(case_means: list[float]) -> Estimate:
     return bootstrap_ci(case_means)
 
 
-def summarize(store: ResultsStore, run_id: str) -> RunSummary:
+def other_judges(store: ResultsStore, run_id: str, judge: str) -> tuple[str, ...]:
+    """Judge graders on the run other than `judge`, whose grades a summary must leave out."""
+    return tuple(g for g in store.judge_graders(run_id) if g != judge)
+
+
+def summarize(store: ResultsStore, run_id: str, judge: str = "judge") -> RunSummary:
+    """Every metric of a run with its interval. Judge metrics come from the grader named
+    `judge` only; a candidate judge's grades on the same answers are left out."""
     info = store.run_info(run_id)
+    skip = other_judges(store, run_id, judge)
     metrics: dict[str, Estimate] = {}
-    for metric in store.metrics(run_id):
-        per_case = store.metric_by_case(run_id, metric)
+    for metric in store.metrics(run_id, skip):
+        per_case = store.metric_by_case(run_id, metric, skip)
         case_means = [sum(v) / len(v) for v in per_case.values()]
         metrics[metric] = _interval(case_means)
 
@@ -232,16 +240,18 @@ def gate(
     challenger: str,
     cases: Sequence[Any],
     target: str = "judge_supported",
+    judge: str = "judge",
 ) -> GateResult:
-    """The champion-versus-challenger gate on one suite (dev), read from the store."""
-    target_cmp = compare(store, champion, challenger, target)
+    """The champion-versus-challenger gate on one suite (dev), read from the store. Judge
+    metrics come from the grader named `judge` on both runs."""
+    target_cmp = compare(store, champion, challenger, target, judge)
     monitored: list[Comparison] = []
     skipped: list[str] = []
     for metric in MONITORED:
         if metric == target:
             continue
         try:
-            monitored.append(compare(store, champion, challenger, metric))
+            monitored.append(compare(store, champion, challenger, metric, judge))
         except ValueError:
             skipped.append(metric)
     a = store.metric_by_case(champion, "correct")
@@ -269,10 +279,15 @@ def _passes(mean: float, lower_is_better: bool) -> bool:
 
 
 def compare(
-    store: ResultsStore, baseline_id: str, candidate_id: str, metric: str = "correct"
+    store: ResultsStore,
+    baseline_id: str,
+    candidate_id: str,
+    metric: str = "correct",
+    judge: str = "judge",
 ) -> Comparison:
-    a = store.metric_by_case(baseline_id, metric)
-    b = store.metric_by_case(candidate_id, metric)
+    """Paired comparison on the shared cases; judge metrics from the grader named `judge`."""
+    a = store.metric_by_case(baseline_id, metric, other_judges(store, baseline_id, judge))
+    b = store.metric_by_case(candidate_id, metric, other_judges(store, candidate_id, judge))
     fp_a = store.run_info(baseline_id)["manifest"].get("corpus_fingerprint")
     fp_b = store.run_info(candidate_id)["manifest"].get("corpus_fingerprint")
     same_snapshot = (fp_a == fp_b) if fp_a is not None and fp_b is not None else None

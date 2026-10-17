@@ -314,3 +314,29 @@ def test_store_post_hoc_grades_and_labels(tmp_path: Path) -> None:
     store.annotate_run(run, "judge", {"version": "abc"})
     assert store.run_info(run)["manifest"]["judge"] == {"version": "abc"}
     store.close()
+
+
+def test_two_judges_on_one_run_are_never_averaged(tmp_path: Path) -> None:
+    from agent_evals.report import gate
+    from agent_evals.types import Grade
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id="a"), make_case(id="b")]
+    one = _run(store, FakeAgent({"a": {1}, "b": {1}}), cases, attempts=1)
+    two = _run(store, FakeAgent({"a": {1}, "b": {1}}), cases, attempts=1)
+    for run in (one, two):
+        for cid in ("a", "b"):
+            store.add_grades(run, cid, 1, [("judge", Grade(metric="judge_supported", value=1.0))])
+            v4 = Grade(metric="judge_supported", value=0.0)
+            store.add_grades(run, cid, 1, [("judge-v4", v4)])
+    store.add_grades(one, "a", 1, [("judge-v4", Grade(metric="grader_error", value=1.0))])
+    assert store.judge_graders(one) == ["judge", "judge-v4"]
+    s = summarize(store, one)
+    assert s.metrics["judge_supported"].mean == 1.0  # the validated judge alone, not 0.5
+    assert "grader_error" not in s.metrics  # the candidate's error is not the run's
+    assert summarize(store, one, judge="judge-v4").metrics["judge_supported"].mean == 0.0
+    assert compare(store, one, two, "judge_supported").baseline == 1.0
+    assert compare(store, one, two, "judge_supported", judge="judge-v4").candidate == 0.0
+    assert gate(store, one, two, cases, judge="judge-v4").target.baseline == 0.0
+    assert summarize(store, one).metrics["correct"].mean == 1.0  # code graders unaffected
+    store.close()

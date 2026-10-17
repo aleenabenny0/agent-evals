@@ -432,7 +432,7 @@ def run(
             budget_usd=cfg.run.budget_usd,
             manifest=manifest,
         )
-        _print_summary(store, run_id)
+        _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
         store.close()
 
@@ -445,13 +445,14 @@ def report(
     """Summarize a run: every metric with a 95% confidence interval."""
     from agent_evals.store.db import ResultsStore
 
-    store = ResultsStore(_config(config).paths.db)
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
     try:
         rid = run_id or store.latest_run_id()
         if rid is None:
             console.print("No runs yet. Try `evals run suites/docs/smoke.jsonl`.")
             raise typer.Exit(code=1)
-        _print_summary(store, rid)
+        _print_summary(store, rid, cfg.judge.grader_name)
     finally:
         store.close()
 
@@ -605,7 +606,7 @@ def judge(
             f"{u.model_calls} calls ({u.cached_calls} from cache), {u.input_tokens} in / "
             f"{u.output_tokens} out tokens"
         )
-        _print_summary(store, run_id)
+        _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
         store.close()
 
@@ -1137,7 +1138,7 @@ def regrade(
             raise typer.Exit(code=2)
         n = regrade_run(store, run_id, load_suite(suite_path), graders)
         console.print(f"regraded {n} attempts of {run_id} against {suite_path}")
-        _print_summary(store, run_id)
+        _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
         store.close()
 
@@ -1156,7 +1157,8 @@ def gate_cmd(
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
 
-    store = ResultsStore(_config(config).paths.db)
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
     try:
         manifest = store.run_info(champion)["manifest"]
         suite_path = Path(str(manifest.get("suite", {}).get("path", "")))
@@ -1167,14 +1169,15 @@ def gate_cmd(
             raise typer.Exit(code=2)
         cases = load_suite(suite_path) if suite_path.exists() else []
         try:
-            g = gate(store, champion, challenger, cases, target)
+            g = gate(store, champion, challenger, cases, target, cfg.judge.grader_name)
         except ValueError as exc:
             console.print(f"[red]{exc}[/red]")
             raise typer.Exit(code=1) from exc
     finally:
         store.close()
 
-    table = Table(show_header=True, header_style="bold", title="paired on the shared dev cases")
+    title = f"paired on the shared dev cases (judge metrics from '{cfg.judge.grader_name}')"
+    table = Table(show_header=True, header_style="bold", title=title)
     for col in ("metric", "champion", "challenger", "difference", "95% CI", "verdict"):
         table.add_column(col, justify="right" if col != "metric" else "left")
     for c in (g.target, *g.monitored):
@@ -1230,9 +1233,10 @@ def compare_cmd(
     from agent_evals.report import compare
     from agent_evals.store.db import ResultsStore
 
-    store = ResultsStore(_config(config).paths.db)
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db)
     try:
-        c = compare(store, baseline, candidate, metric)
+        c = compare(store, baseline, candidate, metric, cfg.judge.grader_name)
     except ValueError as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=1) from exc
@@ -1286,15 +1290,23 @@ def power(
     )
 
 
-def _print_summary(store: ResultsStore, run_id: str) -> None:
-    from agent_evals.report import LOWER_IS_BETTER, NEUTRAL, summarize
+def _print_summary(store: ResultsStore, run_id: str, judge: str = "judge") -> None:
+    from agent_evals.report import LOWER_IS_BETTER, NEUTRAL, other_judges, summarize
 
-    s = summarize(store, run_id)
+    s = summarize(store, run_id, judge)
     info = s.info
     console.print(
         f"\n[bold]{run_id}[/bold]  agent={info['agent']}@{info['agent_version']}  "
         f"suite={info['suite']}  status={info['status']}"
     )
+    judges = store.judge_graders(run_id)
+    if judges:
+        version = info["manifest"].get(judge, {}).get("version", "not run")
+        others = other_judges(store, run_id, judge)
+        console.print(
+            f"judge metrics from '{judge}' ({version})"
+            + (f"; left out: {', '.join(others)} (pick one with -c)" if others else "")
+        )
     table = Table(show_header=True, header_style="bold")
     for col in ("metric", "mean", "95% CI", "interval", "cases", "better"):
         table.add_column(col, justify="right" if col != "metric" else "left")
