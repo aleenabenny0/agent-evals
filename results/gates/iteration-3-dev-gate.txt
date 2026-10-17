@@ -1,0 +1,44 @@
+          paired on the shared dev cases (judge metrics from 'judge')          
++-----------------------------------------------------------------------------+
+| metric      | champion | challenger | difference |     95% CI |     verdict |
+|-------------+----------+------------+------------+------------+-------------|
+| judge_supp… |    0.311 |      0.604 |     +0.293 |  +0.219 to |    improved |
+| (target)    |          |            |            |     +0.368 |             |
+| correct     |    0.959 |      0.931 |     -0.028 |  -0.054 to |   regressed |
+|             |          |            |            |     -0.005 |             |
+| fabricated… |    0.013 |      0.013 |     +0.000 |  -0.013 to |          no |
+|             |          |            |            |     +0.013 |  detectable |
+|             |          |            |            |            |      change |
+| uncited_an… |    0.000 |      0.000 |     +0.000 |  +0.000 to |          no |
+|             |          |            |            |     +0.000 |  detectable |
+|             |          |            |            |            |      change |
+| wrong_abst… |    0.017 |      0.034 |     +0.017 |  +0.000 to |   regressed |
+|             |          |            |            |     +0.037 |             |
+| missed_abs… |    0.056 |      0.000 |     -0.056 |  -0.167 to |          no |
+|             |          |            |            |     +0.000 |  detectable |
+|             |          |            |            |            |      change |
+| rejected_s… |    0.021 |      0.005 |     -0.015 |  -0.036 to |    improved |
+|             |          |            |            |     -0.003 |             |
++-----------------------------------------------------------------------------+
+                       correct by category, paired                       
++-----------------------------------------------------------------------+
+| category             |  n | difference | 95% CI           |           |
+|----------------------+----+------------+------------------+-----------|
+| type=changed_default | 20 | -0.033     | -0.083 to +0.000 |           |
+| type=false_premise   | 12 | -0.028     | -0.111 to +0.056 |           |
+| type=lookup          | 74 | -0.041     | -0.072 to -0.018 | regressed |
+| type=multi_step      | 12 | -0.056     | -0.167 to +0.000 |           |
+| type=unanswerable    | 12 | +0.083     | +0.000 to +0.194 |           |
+| area=ai_ml           | 48 | -0.042     | -0.083 to -0.007 | regressed |
+| area=analytics       |  6 | -0.056     | -0.167 to +0.000 |           |
+| area=compute         | 17 | -0.039     | -0.118 to +0.000 |           |
+| area=databases       |  7 | -0.143     | -0.286 to -0.048 | regressed |
+| area=integration     | 11 | +0.061     | +0.000 to +0.182 |           |
+| area=management      |  4 | -0.083     | -0.250 to +0.000 |           |
+| area=networking      | 14 | +0.000     | +0.000 to +0.000 |           |
+| area=security        | 11 | -0.030     | -0.091 to +0.000 |           |
+| area=storage         | 12 | +0.028     | -0.056 to +0.111 |           |
++-----------------------------------------------------------------------+
+GATE FAILED: correct regressed; wrong_abstention regressed; type=lookup 
+regressed on correct; area=ai_ml regressed on correct; area=databases regressed
+on correct

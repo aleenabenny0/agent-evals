@@ -1,0 +1,1050 @@
+{
+ "what": "Same error analysis on the v4 challenger's failing attempt-1 dev answers",
+ "run": "docs-20261017-163240-f5782a",
+ "answers": {
+  "attempt1_answered": 114,
+  "failing_fully_supported": 46
+ },
+ "aggregate": {
+  "answers": 46,
+  "missing": [],
+  "unsupported_claims": 81,
+  "core_claims": 11,
+  "by_kind": {
+   "about_the_docs": {
+    "claims": 14,
+    "core_claims": 0,
+    "answers_with": 12,
+    "answers_where_it_is_the_only_kind": 5
+   },
+   "headerless_row": {
+    "claims": 7,
+    "core_claims": 0,
+    "answers_with": 6,
+    "answers_where_it_is_the_only_kind": 3
+   },
+   "unquoted_on_page": {
+    "claims": 44,
+    "core_claims": 8,
+    "answers_with": 33,
+    "answers_where_it_is_the_only_kind": 18
+   },
+   "beyond_quote": {
+    "claims": 13,
+    "core_claims": 3,
+    "answers_with": 10,
+    "answers_where_it_is_the_only_kind": 3
+   },
+   "not_in_read_pages": {
+    "claims": 3,
+    "core_claims": 0,
+    "answers_with": 3,
+    "answers_where_it_is_the_only_kind": 1
+   },
+   "other": {
+    "claims": 0,
+    "core_claims": 0,
+    "answers_with": 0,
+    "answers_where_it_is_the_only_kind": 0
+   }
+  },
+  "judge_right": {
+   "yes": 46,
+   "no": 0,
+   "unsure": 0
+  },
+  "dispensable": {
+   "yes": 40,
+   "partly": 3,
+   "no": 3
+  },
+  "could_quote_instead": {
+   "yes": 26,
+   "partly": 16,
+   "no": 4
+  }
+ },
+ "classifications": [
+  {
+   "id": "docs-ai-001#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "it describes inference profiles in terms of on-demand invocation and cross-Region routing",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This describes what the docs say. Quote 2 covers only on-demand invocation tagging and no cited quote mentions cross-Region routing, although inference-profiles.html (page-001 line 9) does describe it."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core 'not documented as supported' answer stands, but the description of the docs as covering cross-Region routing has no cited quote, even though the inference-profiles page says it."
+  },
+  {
+   "id": "docs-ai-020#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "You upload your input files to an S3 bucket, submit the batch inference request specifying that bucket",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/batch-inference.html: \"After defining model inputs in files you create, you upload the files to an S3 bucket. You then submit a batch inference request and specify the S3 bucket.\"",
+     "note": "The cited quotes cover only where responses are generated and retrieving output, not uploading inputs or specifying the bucket. These are the sentences between the two cited quotes on the same page."
+    },
+    {
+     "claim": "The page on viewing results was not in the snapshot",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a statement about what the documentation snapshot contains, and no quote supports it."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The agent paraphrased the workflow sentences between its two quotes without quoting them, and added a statement about the snapshot that nothing supports."
+  },
+  {
+   "id": "docs-chg-004#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "The docs don't state the reduced number",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This claims something about what the documentation leaves out, and no quote can establish it."
+    },
+    {
+     "claim": "check your current limit in the Service Quotas console or with get-account-settings",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html: \"To check your current account level concurrency quota, use the AWS Command Line Interface (AWS CLI) to run the following command: aws lambda get-account-settings\"",
+     "note": "This is phrased as advice, but it names a console and a CLI command that show the limit, and no cited quote says so. The judge counted it. The Lambda concurrency page states the get-account-settings part, and gettingstarted-limits.html mentions viewing quotas in the Service Quotas dashboard."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core facts are quoted. The answer adds an unquotable claim that the docs omit the reduced number, plus tool names that are on the pages but not quoted."
+  },
+  {
+   "id": "docs-chg-019#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "The documentation I could reach does not give the dates of each phase",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This claims something about what the documentation leaves out, and no quote supports it."
+    },
+    {
+     "claim": "the migration options are in a blog post that is not in the documentation snapshot",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This points to where information is documented. The welcome page does say 'For more information on the details of Python end of life and migration options, see the blog post', but that sentence was not quoted, and the 'not in the snapshot' part cannot be quoted at all."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "Both unsupported claims are statements about the documentation: missing phase dates, and the blog post that holds the migration options."
+  },
+  {
+   "id": "docs-core-009#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "you can request an increase",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/BucketRestrictions.html: \"To request a quota increase for general purpose buckets, visit the Service Quotas console.\"",
+     "note": "Quote 2 ends before the sentence about requesting an increase, which comes right after it on the page."
+    },
+    {
+     "claim": "Individual objects are capped at 5 TB",
+     "role": "peripheral",
+     "kind": "not_in_read_pages",
+     "page_evidence": "",
+     "note": "Neither page states a 5 TB object cap. The upload page gives up to 50 TB via multipart upload. Quote 3 is about the single-PUT upload limit, not the maximum object size, so the 5 TB figure comes from background knowledge."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core no-limit answer is quoted. The quote stops one sentence short of the increase-request text, and the 5 TB object cap comes from memory and conflicts with the 50 TB figure on the page."
+  },
+  {
+   "id": "docs-core-037#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "changing applications or aliases to use it",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html: \"you can create new KMS keys, and then change your applications or aliases to use the new KMS keys.\"",
+     "note": "Quote 4 says only that you might create a new KMS key and use it in place of the original. The wording about applications and aliases is in a different sentence on the same page that was not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core answer is quoted. The detail about changing applications or aliases comes from an unquoted sentence on the same page."
+  },
+  {
+   "id": "docs-int-029#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Secrets that you create and rotate yourself, such as a database credential you store, use rotation by Lambda function.",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 2 says only 'For other types of secrets'. The answer recasts that category as self-created secrets and stored database credentials, which no read page states. The managed-secrets pages were not in the snapshot."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "no",
+   "summary": "The agent turned the page's 'other types of secrets' into a specific, unstated category: self-created secrets and stored database credentials."
+  },
+  {
+   "id": "docs-int-041#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "You must renew and re-import the certificate yourself.",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "The quotes say imported certificates are not eligible for automatic renewal. The managed-renewal page never mentions renewing or re-importing them, so this workaround goes beyond what the quotes say."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "no",
+   "summary": "The core 'not eligible' answer is quoted, but the agent added a workaround, renew and re-import yourself, that no read page states."
+  },
+  {
+   "id": "docs-mix-024#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Go functions are deployed as an executable that already includes the compiled code and all its dependencies",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html: \"For Go and Rust functions, you provide your function code as an executable, which includes your compiled function code along with all of its dependencies.\"",
+     "note": "The cited quotes give the recommendation and the cold-start effect but not this explanation. It is the sentence just before quote 2 on the same page."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The explanation for the recommendation is paraphrased from an unquoted sentence right next to a cited quote."
+  },
+  {
+   "id": "docs-mix-087#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "the quota is adjustable",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "Quote 2 is a table row ending in a bare 'Yes'. The header '| Category | Description | Default quota (RPS) | Adjustable |' (quotas.html line 546) was not quoted, so nothing shows that 'Yes' is in the Adjustable column."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The answer reads adjustability from a table row's bare 'Yes' without quoting the header row that names the Adjustable column."
+  },
+  {
+   "id": "docs-ai-001-p1#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "For a provisioned model, you call InvokeModel with the Provisioned Throughput ARN as the modelId",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/APIReference/API_runtime_InvokeModel.html (page-007 lines 69-76): \"modelId: Specifies the model or throughput with which to run inference... The value depends on the resource that you use: ... If you use a provisioned model, specify the ARN of the Provisioned Throughput.\"",
+     "note": "Quote 2 is a list item with its lead-in left out, so it never names the modelId field. The page puts it under the modelId parameter."
+    },
+    {
+     "claim": "not an inference profile ID or ARN",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "No page says not to use an inference profile ID for a provisioned model. The claim combines quote 1 (profiles don't support PT) with quote 2 (specify the PT ARN). The InvokeModel page only says to use the inference profile ID when you use an inference profile."
+    },
+    {
+     "claim": "You can purchase Provisioned Throughput",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html (page-002 line 6): \"You can purchase **Provisioned Throughput** to provision a higher level of throughput for a model at a fixed cost.\"",
+     "note": "Neither cited quote says Provisioned Throughput can be purchased."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core 'no' is quoted. The modelId detail and 'you can purchase' are on pages the agent read but were not quoted, and 'not an inference profile ID' is an inference the agent drew from combining the two quotes."
+  },
+  {
+   "id": "docs-ai-023#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "the number of Model Units (MUs) you purchase",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html (page-002 line 15): \"2. The number of Model Units (MUs) that you specify for the Provisioned Throughput.\"",
+     "note": "The agent quoted items 1 and 3 of the price-factor list but skipped item 2, so the MU factor has no quote."
+    },
+    {
+     "claim": "The hourly price depends on three factors",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html (page-002 lines 11-28): the list after \"The price per hour depends on the following factors:\" has three numbered items.",
+     "note": "Quote 2 says 'the following factors' without a count. The count of three depends on the list, which was not fully quoted."
+    },
+    {
+     "claim": "You can choose no commitment (deletable at any time), a 1-month commitment, or a 6-month commitment.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html (page-002 lines 29-34): \"You can choose between the following levels of commitment: No commitment – You can delete the Provisioned Throughput at any time. 1 month – ... 6 months – ...\"",
+     "note": "No quote lists the commitment levels or says no-commitment PT can be deleted at any time."
+    },
+    {
+     "claim": "Per-MU pricing is not published on this page",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a statement about what the page does not contain. Quote 6 supports only the advice to contact the account manager."
+    }
+   ],
+   "dispensable": "partly",
+   "could_quote_instead": "partly",
+   "summary": "The agent quoted only some items of the page's price-factor and commitment lists, so the MU factor, the count of three and the commitment options were left unquoted, and it added a remark about what the page does not publish."
+  },
+  {
+   "id": "docs-chg-007#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Existing customers can keep using it",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html (page-018 line 8): \"Existing customers can continue to use the service as normal.\"",
+     "note": "The agent quoted the sentences before and after this one but not this one."
+    },
+    {
+     "claim": "I could not open the linked availability-change page, so I can't name the recommended replacement",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This says the docs link to an availability-change page that names a recommended replacement. No quote mentions that page or a replacement. The page was not in the snapshot."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The agent skipped quoting the 'Existing customers can continue' sentence even though it sits between two sentences it did quote, and it added a claim about a linked page with a replacement recommendation."
+  },
+  {
+   "id": "docs-chg-022#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Enterprise Support's minimum is $5,000, reduced from $15,000",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html (page-024 line 11): \"Enterprise Support provides designated TAM assignment, 15-minute response times, and AWS Security Incident Response available at no additional cost, all at a lower $5,000 minimum (reduced from $15,000).\"",
+     "note": "Quote 2 is a sentence fragment without its subject, so it never says which plan the $5,000 minimum applies to."
+    },
+    {
+     "claim": "so the cost basis changes after the upgrade",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "No page gives Enterprise On-Ramp's price. The claim that cost changes is the agent's own conclusion from the minimum-price fragment."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core end-of-support facts are quoted, but the $5,000 quote is a fragment without its subject, and the cost-basis conclusion goes beyond the quotes."
+  },
+  {
+   "id": "docs-core-011#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "To get the new name, you would need to create a new bucket with that name and move your data into it.",
+     "role": "peripheral",
+     "kind": "not_in_read_pages",
+     "page_evidence": "",
+     "note": "Grep finds nothing about copying or moving data to a new bucket on the bucket naming page. This workaround is background knowledge, not something the quote says. Arguably beyond_quote, since the quote is about renaming."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "no",
+   "summary": "The false premise is corrected with a quote, but the agent added a migration workaround of its own that no page states."
+  },
+  {
+   "id": "docs-core-038#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Exact rates are on the AWS KMS pricing page, which this documentation snapshot does not include.",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a pointer to a page and a statement about the snapshot. The page's 'For details, see AWS Key Management Service Pricing' was not quoted, and nothing supports 'not included'."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The charging facts are fully quoted, and the only unsupported content is an added remark about where rates are documented."
+  },
+  {
+   "id": "docs-int-030#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Those classic quotas are separate from the Custom Event Bus quotas.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html (page-048 lines 26-32): under the heading \"## Custom Event Bus quotas\": \"These quotas are separate from the Custom Event Bus - Classic quotas in Custom Event Bus - Classic quotas.\"",
+     "note": "Quote 2 leaves out the subject of 'These quotas'. The page sets it with the section heading 'Custom Event Bus quotas', which was not quoted."
+    },
+    {
+     "claim": "The EventBridge quotas page says: \"If you use Custom Event Bus - Classic, the event bus that routes with rules and targets, see Custom Event Bus - Classic quotas.\"",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This states what the page says, and quote 1 stops at 'see', so the rest of the sentence the answer attributes to the page is not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core is quoted, but quote 2 leaves out its subject, so 'which quotas are separate' depends on an unquoted section heading. The answer also reports what the page says rather than stating the fact."
+  },
+  {
+   "id": "docs-mix-003#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "and that quota can be increased",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/DNSLimitations.html (page-051 line 300): \"| Number of VPCs that can be associated to a Profile | 1000  [Request a higher quota](...) |\"",
+     "note": "Quote 3 cuts the cell before the 'Request a higher quota' link, so nothing quoted says the Profile quota can be raised."
+    },
+    {
+     "claim": "so 400 is over the default quota",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "The table header ('| Entity | Quota |') was not quoted, and in any case it does not say 'default'. Nothing quoted shows that 300 is a default rather than a fixed limit."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core 300 limit and the Profiles recommendation are quoted. The 'can be increased' claim comes from a part of the table cell the agent cut off, and 'default' rests on a header that was not quoted."
+  },
+  {
+   "id": "docs-mix-055#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "you can request a higher quota",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cloudfront-limits.html (page-058 line 44): \"| Requests per second per distribution (...) | 250,000  [Request a higher quota](https://console.aws.amazon.com/support/home#/case/create?issueType=service-limit-increase) |\"",
+     "note": "The quoted row stops at '250,000' and leaves out the 'Request a higher quota' link in the same cell."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The default and the flat-rate exclusion are quoted with their header, but the quoted row cuts off the 'Request a higher quota' text that would support the last claim."
+  },
+  {
+   "id": "docs-ai-002-p3#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Note that global cross-Region inference is listed as having approximately 10% savings compared with geographic cross-Region inference.",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "Quote 2 is the Cost row without the header '| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |' (page-008 line 33), so nothing quoted says the 10% cell belongs to Global or that the 'Standard pricing' cell is Geographic. The 'is listed as' wording reports what the docs say, but the part that lacks support is which column the value is in."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core no-surcharge answer is quoted, but the Global-versus-Geographic savings claim rests on a table row quoted without its header row."
+  },
+  {
+   "id": "docs-ai-029#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Amazon Bedrock Knowledge Bases offers two types: Managed Knowledge Base and Customer-managed Knowledge Base.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html : \"* **Customer-managed Knowledge Base** – This enables you set up and manage your own RAG pipeline...\" (list item under \"Amazon Bedrock Knowledge Bases offers two types of knowledge bases:\")",
+     "note": "Quote 2 stops at the colon of the list lead-in, so the names of the two types, in particular 'Customer-managed Knowledge Base', are in no cited quote, although the page lists them right after."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The agent quoted the lead-in of a list but not its items, so the name of the second knowledge base type is unsupported."
+  },
+  {
+   "id": "docs-chg-013#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "on top of instance costs",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html : \"For version you are running on Extended Support, you will be charged a **flat fee per Normalized Instance Hour (NIH)**, in addition to the standard instance cost.\"",
+     "note": "Quote 4 gives the $0.0065 per NIH rate but does not say it is in addition to instance costs; that is stated elsewhere on the page and not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The dates, security fixes and rate are quoted, but 'on top of instance costs' comes from an uncited sentence on the same page."
+  },
+  {
+   "id": "docs-chg-025#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Separately, when a table with PITR enabled is deleted, DynamoDB keeps a system backup for 35 days.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/PointInTimeRecovery_Howitworks.html : \"When you delete a table that has point-in-time recovery enabled, DynamoDB automatically creates a backup snapshot called a *system backup* and retains it for 35 days (at no additional cost).\"",
+     "note": "Quote 3 leaves out the sentence's opening clause, which supplies the table-deletion and PITR-enabled condition, so the quoted text alone does not support the condition."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The agent cut the conditional clause off the system-backup sentence, so the 'when a PITR-enabled table is deleted' context is unsupported."
+  },
+  {
+   "id": "docs-core-018#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Extended support costs extra per cluster hour.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/eks/latest/userguide/kubernetes-versions.html : \"Extended support allows you to stay at a specific Kubernetes version for longer at an additional cost per cluster hour.\"",
+     "note": "Quote 6 says only that there is additional cost; 'per cluster hour' is in a different page sentence that was not cited."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core dates and end-of-support behaviour are quoted, but the 'per cluster hour' billing unit comes from an uncited sentence on the page."
+  },
+  {
+   "id": "docs-int-002#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Standard workflows let you retrieve the full execution history through the Step Functions API for up to 90 days after an execution completes.",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html : \"**Standard Workflows** are ideal for long-running (up to one year), durable, and auditable workflows. You can retrieve the full execution history using the Step Functions API for up to 90 days after your execution completes.\"",
+     "note": "Quote 2 leaves out the preceding sentence, which says the passage is about Standard Workflows, so nothing quoted ties the 90-day history to Standard. That link is what the answer's 'create a new Standard state machine' rests on."
+    },
+    {
+     "claim": "Express executions are inspected through CloudWatch Logs when logging is enabled.",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "Quote 3 is a cell from the Express column of the 'Execution history' row of the comparison table, quoted without the row label or the '| Type / Category | Standard Workflows | Express Workflows... |' header, so it does not show that it applies to Express (the Standard cell says much the same)."
+    }
+   ],
+   "dispensable": "no",
+   "could_quote_instead": "yes",
+   "summary": "The quotes leave out their subjects, so the core link between Standard workflows and 90-day API history is unsupported, and so is the link between Express and CloudWatch Logs."
+  },
+  {
+   "id": "docs-int-032#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "When the limit is reached with short polling",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html : \"**When using short polling** – If this limit is reached while using short polling, Amazon SQS will return an `OverLimit` error, indicating that no additional messages can be received until some in-flight messages are deleted.\"",
+     "note": "Quote 2 comes from the general paragraph and does not mention short polling; the short-polling qualifier is in an uncited list item."
+    },
+    {
+     "claim": "it simply returns no new messages until the in-flight count drops below the limit.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html : \"Instead, it will not return any new messages until the number of in-flight messages drops below the limit.\"",
+     "note": "Quote 3 stops after 'does not return an error'; the next sentence, which describes what happens instead, was not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core limit and error are quoted, but the short-polling qualifier and the long-polling behaviour come from page text next to the cited quotes that was not quoted."
+  },
+  {
+   "id": "docs-mix-007#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "though it can be suspended",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html : \"After you version-enable a bucket, it can never return to an unversioned state. But you can *suspend* versioning on that bucket.\"",
+     "note": "Quote 3 is only the first sentence; the next sentence, which says versioning can be suspended, was not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core Object Lock and versioning claims are quoted, but the note that versioning can be suspended comes from the uncited next sentence on the Versioning page."
+  },
+  {
+   "id": "docs-mix-063#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "This is a default quota that you can request to increase by contacting AWS Support.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/efs/latest/ug/limits.html : \"* Number of access points for each file system.\" (list item under \"You can also request an increase for the following Amazon EFS quotas by contacting AWS Support.\")",
+     "note": "Quote 3 is the list lead-in 'the following Amazon EFS quotas' without its items, so nothing quoted shows that access points are among the quotas you can increase; the page lists them, but the item was not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The 10,000 default is quoted with its header, but the claim that it can be increased rests on a list lead-in quoted without the list item that names access points."
+  },
+  {
+   "id": "docs-ai-003-p1#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Separately, if you use Service Control Policies, the geographic profile requires that you allow all destination Regions in the profile.",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "Quote 2 is a single cell. The row label 'SCP requirements' and the column header 'Geographic Cross-Region Inference' (page-008 lines 33 and 38) are not quoted, so nothing in the quotes ties the cell to SCPs or to the geographic profile."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core answer is quoted, but the SCP sentence rests on one table cell quoted without its row label or column header."
+  },
+  {
+   "id": "docs-chg-001#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "use only lowercase letters, numbers, periods, and hyphens",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html: \"Bucket names can consist only of lowercase letters, numbers, periods (`.`), and hyphens (`-`).\"",
+     "note": "Quote 3 stops at 'periods', so the page's mention of hyphens was cut off."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "A list item was quoted only up to 'periods', so the answer's claim that hyphens are allowed has no quote."
+  },
+  {
+   "id": "docs-chg-016#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "The quota is adjustable.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/general/latest/gr/ecs-service.html: row \"Fargate On-Demand Burst Launch Rate | ... Each of the other supported Regions: 100 | [Yes](https://console.aws.amazon.com/servicequotas/home/services/fargate/quotas/L-6BAD92DD) | ...\" under header \"| Name | Default | Adjustable | Description |\"",
+     "note": "The header with 'Adjustable' is quoted, but the row quote ends before the 'Yes' cell, so no quoted value says the quota is adjustable."
+    },
+    {
+     "claim": "Regions introduced after May 20, 2025 also get 25.",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 3 says the maximum is 25 for those Regions. The answer presents this as the same default as the listed Regions, and the page never states a default for them."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core per-Region values are quoted, but the row was cut before its Adjustable cell, and the note's 'maximum is 25' was restated as a default."
+  },
+  {
+   "id": "docs-chg-027#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Amazon Bedrock offers two types of knowledge bases.",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html: \"Amazon Bedrock Knowledge Bases offers two types of knowledge bases:\"",
+     "note": "None of the cited quotes includes the lead-in sentence that sets up the two types."
+    },
+    {
+     "claim": "In a Managed Knowledge Base, Amazon Bedrock handles storage and retrieval for you",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html: \"Managed Knowledge Base – Amazon Bedrock manages the underlying data ingestion, indexing, storage, and retrieval infrastructure so you can focus on your application and agent logic.\"",
+     "note": "Quote 2 covers only embedding, re-ranking and reasoning. The sentence about storage and retrieval was not quoted."
+    },
+    {
+     "claim": "and it uses service-managed embedding models by default, though you can choose your own",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html: \"Managed Knowledge Base – ... You connect your data sources and Amazon Bedrock manages embedding, re-ranking, and reasoning with service-managed models by default (with option to choose your own models).\"",
+     "note": "Quote 2 leaves out its subject, the 'Managed Knowledge Base' list item, so nothing quoted ties the embedding default to the Managed type."
+    },
+    {
+     "claim": "In a Customer-managed Knowledge Base, you set up and manage the vector store yourself",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html: \"Customer-managed Knowledge Base – This enables you set up and manage your own RAG pipeline, including the vector store...\"",
+     "note": "Quote 3 begins with 'This enables' and leaves out the 'Customer-managed Knowledge Base' label it refers to, so the type name and the attribution are unquoted."
+    }
+   ],
+   "dispensable": "no",
+   "could_quote_instead": "yes",
+   "summary": "Quotes 2 and 3 were cut from their list items, which drops the type names and the storage and retrieval sentence the core answer depends on."
+  },
+  {
+   "id": "docs-core-019#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "This applies when you create the VPC",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html: \"When you create a VPC, you must specify an IPv4 CIDR block for the VPC. The allowed block size is between a `/16` netmask (65,536 IP addresses) and `/28` netmask (16 IP addresses).\"",
+     "note": "Quote 1 leaves out the preceding sentence that ties the range to VPC creation."
+    },
+    {
+     "claim": "secondary CIDR blocks added later must also fall between /28 and /16",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-cidr-blocks.html: \"To add a CIDR block to your VPC, the following rules apply: * The allowed block size is between a `/28` netmask and `/16` netmask.\"",
+     "note": "Quote 2 is a list item quoted without its lead-in, so nothing in the quotes says it applies to added or secondary blocks."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The range is quoted, but both quotes leave out the lead-ins that say whether they cover creation or added blocks."
+  },
+  {
+   "id": "docs-int-004#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "so the message gets processed more than once",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html: \"It can then be retrieved by the same or a different consumer for another processing attempt.\"",
+     "note": "Quote 1 says only that the message becomes visible again and can be retrieved. The page sentence about another processing attempt was not quoted."
+    },
+    {
+     "claim": "(or the same one)",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html: \"It can then be retrieved by the same or a different consumer for another processing attempt.\"",
+     "note": "Quote 1 mentions only 'another consumer'."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The consequence ('processed more than once', 'or the same one') is stated in the Handling failures section, which the agent did not quote."
+  },
+  {
+   "id": "docs-int-034#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "(The account-level throttle quota for API requests is a different quota, and it can be increased.)",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/apigateway/latest/developerguide/limits.html: row \"| Throttle quota per account, per Region across HTTP APIs, REST APIs, WebSocket APIs, and WebSocket callback APIs | 10,000 requests per second (RPS) with an additional burst capacity ... | [Yes](https://console.aws.amazon.com/servicequotas/...\" under header \"| Resource or operation | Default quota | Can be increased |\"",
+     "note": "Quote 5 ends before the 'Yes' cell, and the account-level table's own header was not quoted (quote 2 is the fixed-quota table's header)."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core answer is quoted, but the aside about the throttle quota relies on a 'Yes' cell that was cut off."
+  },
+  {
+   "id": "docs-mix-011#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "An SCP never grants permissions",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html: \"However, an SCP never grants permissions.\"",
+     "note": "The page states it word for word, but no cited quote includes it."
+    },
+    {
+     "claim": "even when the user has AdministratorAccess",
+     "role": "core",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html: \"...a user or role in the affected account can't use that permission, even if the account administrator attaches the `AdministratorAccess` IAM policy with */* permissions to the user.\"",
+     "note": "Quote 1 stops at 'attaches the', so it never mentions AdministratorAccess."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "Besides the unquoted 'never grants' sentence, quote 1 was cut off just before the words 'AdministratorAccess' that the answer relies on."
+  },
+  {
+   "id": "docs-mix-068#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "It protects an object version in the same way a retention period does",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html: \"A legal hold provides the same protection as a retention period, but it has no expiration date.\"",
+     "note": "The quote starts partway through this sentence at 'it has no expiration date', which drops the clause about the same protection."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The quote starts partway through its sentence, so the 'same protection as a retention period' clause the answer repeats was left out."
+  },
+  {
+   "id": "docs-ai-010#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "Requests are evaluated against conditions described in the quota increase documentation",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This points to what another doc page describes. Neither quote mentions conditions or the quota increase page. The page sentence 'For the request process and the conditions that apply to a request, see Request an increase...' was not quoted."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core 'not granted automatically' is quoted, but the agent added an unquoted pointer to the conditions described in the quota-increase documentation."
+  },
+  {
+   "id": "docs-chg-003#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "block function create is at least 30 days after deprecation, and block function update is at least 60 days after deprecation",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html: '| Block function create | At least 30 days after deprecation | ...' and '| Block function update | At least 60 days after deprecation | ...'",
+     "note": "No cited quote contains the 30-day or 60-day figures. They appear only in a timeline table that was not quoted."
+    },
+    {
+     "claim": "with per-runtime dates in the tables",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a statement about where the docs list dates. Quote 4 mentions 'these tables' but not that they hold per-runtime dates."
+    },
+    {
+     "claim": "security patches and technical support end",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 2 says AWS 'may no longer apply security patches'. Saying patches 'end' drops the hedge. The technical-support part is supported."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core answer about invoking indefinitely is quoted. The 30/60-day blocking figures are on the page but were never quoted, and the agent turned the 'may' about security patches into a definite end."
+  },
+  {
+   "id": "docs-chg-017#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "(described in the docs as cost-effective)",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a statement about what the docs say. Quote 4 'This cost-effective storage type...' omits its list lead-in 'General Purpose (SSD)', so no quote ties cost-effective to General Purpose SSD."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core deprecation answer is quoted, but the cost-effective description is attributed to General Purpose SSD through a quote that leaves out its subject."
+  },
+  {
+   "id": "docs-chg-030#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "such as nodejs22.x or nodejs24.x",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html: 'The following table lists the supported Lambda runtimes and projected deprecation dates.' followed by the row '| Node.js 24 | `nodejs24.x` | Amazon Linux 2023 | Apr 30, 2028 | Jun 1, 2028 | Jul 1, 2028 |'",
+     "note": "No quote names nodejs24.x. The quoted nodejs22.x row comes without the 'supported runtimes' lead-in, so nothing quoted shows that either one is a supported runtime."
+    },
+    {
+     "claim": "AWS no longer patches the runtime",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 6 says AWS 'may no longer apply security patches'. The answer drops 'may' and states it as definite."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core end-of-support status and dates are quoted with the header. The suggested replacement runtimes are not quoted as supported, and 'may no longer apply patches' became 'no longer patches'."
+  },
+  {
+   "id": "docs-core-034#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "For CI/CD, AWS recommends temporary credentials from an IAM role instead of long-term access keys.",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html: 'Where possible, we recommend relying on temporary credentials instead of creating long-term credentials such as access keys.' and heading 'Require workloads to use temporary credentials with IAM roles to access AWS'",
+     "note": "Quote 3 says only that CI/CD platforms 'can still use temporary credentials'. It does not express a recommendation, mention IAM roles, or contrast with access keys."
+    },
+    {
+     "claim": "Root user access keys would have complete access to every service and resource in the account.",
+     "role": "core",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 1 leaves out its subject ('This identity is called the AWS account root user' is unquoted) and says nothing about access keys. That keys carry the root user's full access is an inference that no read page states (the add-key page is not in the snapshot)."
+    },
+    {
+     "claim": "like a CI pipeline",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 2 says not to use root for 'everyday tasks'. Classing a CI pipeline as one of those is the agent's addition."
+    },
+    {
+     "claim": "you cannot scope root keys down to least privilege",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "This conclusion is drawn from 'You cannot attach identity-based policies to the root user'. No page states it, and the same page notes that SCPs and RCPs still affect the root user."
+    }
+   ],
+   "dispensable": "no",
+   "could_quote_instead": "partly",
+   "summary": "The CI/CD recommendation was turned from 'can use' into 'recommends' without quoting the page's actual recommendation. The core claim that root keys have complete access rests on a quote with no subject that never mentions access keys."
+  },
+  {
+   "id": "docs-int-020#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "the per-parameter monthly rate",
+     "role": "core",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 3 says only 'advanced tier and higher throughput billed' and quote 1 says 'Charges apply'. No read page gives a per-parameter-per-month billing basis, and the pricing page is not in the snapshot."
+    }
+   ],
+   "dispensable": "partly",
+   "could_quote_instead": "no",
+   "summary": "The correction that the standard tier is free is quoted, but the estimation method assumes a per-parameter monthly billing basis for advanced parameters that no quote or read page states."
+  },
+  {
+   "id": "docs-int-035#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "If you use Custom Event Bus - Classic (the rules-and-targets bus), the default is 100 event buses per account per Region",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "The quoted row and header give the Default column, but nothing quoted says the row belongs to the Custom Event Bus - Classic table. Its section heading and 'Maximum event buses per account' description were not quoted."
+    },
+    {
+     "claim": "in the Custom Event Bus",
+     "role": "peripheral",
+     "kind": "headerless_row",
+     "page_evidence": "",
+     "note": "Quotes 1-3 give the column header and the 'per account per Region' lead-in. The section heading 'Custom Event Bus quotas' that ties the 5-bus row to that bus type is not quoted."
+    },
+    {
+     "claim": "(the current EventBridge bus type)",
+     "role": "peripheral",
+     "kind": "not_in_read_pages",
+     "page_evidence": "",
+     "note": "No read page calls the Custom Event Bus the 'current' type, and no quote discusses bus types."
+    },
+    {
+     "claim": "(the rules-and-targets bus)",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html: 'If you use Custom Event Bus - Classic, the event bus that routes with rules and targets, see Custom Event Bus - Classic quotas.'",
+     "note": "The description is on the page but in no cited quote."
+    },
+    {
+     "claim": "and that quota is separate",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html: 'These quotas are separate from the Custom Event Bus - Classic quotas in Custom Event Bus - Classic quotas.'",
+     "note": "The page states the quotas are separate, but no quote contains that sentence."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "partly",
+   "summary": "The core 5-bus default is quoted. The agent tied table rows to bus types (Custom vs Classic) without quoting the section headings, and added an unsourced 'current' label."
+  },
+  {
+   "id": "docs-mix-022#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "so a whole page will usually exceed it",
+     "role": "core",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 2 gives the 10,000-byte limit, but no read page says anything about how large a page is or whether it would exceed the limit."
+    },
+    {
+     "claim": "The real-time table also lists a maximum document size of 100,000 bytes",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This is a statement about what a doc table lists. The quoted row does not show it sits in the real-time table, though the page does place it there."
+    },
+    {
+     "claim": "which applies to document translation",
+     "role": "peripheral",
+     "kind": "beyond_quote",
+     "page_evidence": "",
+     "note": "Quote 3 is a bare 'Maximum document size' row. No page says it applies to 'document translation' as a feature."
+    },
+    {
+     "claim": "the batch translation quotas list a maximum size of translatable text in a single document of 1 MB",
+     "role": "peripheral",
+     "kind": "about_the_docs",
+     "page_evidence": "",
+     "note": "This describes what a doc table lists. The 'Asynchronous batch translation quotas' heading on the page was not quoted, so quote 4 does not tie 1 MB to batch."
+    }
+   ],
+   "dispensable": "partly",
+   "could_quote_instead": "partly",
+   "summary": "The 10,000-byte correction is quoted, but the whole-page conclusion is the agent's own, and the document-size and 1 MB rows are assigned to sections whose headings were not quoted."
+  },
+  {
+   "id": "docs-mix-071#1",
+   "judge_right": "yes",
+   "unsupported_claims": [
+    {
+     "claim": "it changes how S3 handles them in future requests",
+     "role": "peripheral",
+     "kind": "unquoted_on_page",
+     "page_evidence": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html: 'What changes is how Amazon S3 handles the objects in future requests.'",
+     "note": "The quote ends at 'do not change.' and leaves out the next sentence that states this."
+    }
+   ],
+   "dispensable": "yes",
+   "could_quote_instead": "yes",
+   "summary": "The core null version ID is quoted, but the follow-on sentence about future requests was cut off from the quote even though it is on the page."
+  }
+ ]
+}

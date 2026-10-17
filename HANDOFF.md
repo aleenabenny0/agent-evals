@@ -429,6 +429,16 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   (recomputed; both gates on that run were saved before a second judge graded it). Open for
   Aleena: keep v2 (the rule's verdict; recommended, since v4 measured no better on her labels) or
   one fresh probe test of v4 under a new rule committed first. Then iteration 3.
+- **Iteration 3 rejected (2026-10-17).** Error analysis of v3's 82 failing dev answers
+  (`docs/failure-taxonomy.md`, `results/iteration-3/`), then prompt v4, pre-registered in
+  `docs/plans/iteration-3.md`. Gate failed: judge_supported 0.311 -> 0.604, but correct and
+  wrong_abstention regressed. Half the new correctness failures are keyword-grader misses; with
+  them fixed (counterfactual on a copy of the store) it still fails on wrong_abstention and lookup.
+  **Open for Aleena:** (1) approve widening the keyword lists of 10 dev cases with the correct
+  wordings in `scripts/keyword_fix_counterfactual.py` (both runs' misses; gold answers and test
+  cases untouched; every dev run regraded for free, README dev numbers restated); (2) the plan for
+  iteration 4, v4 plus an abstention guard, which will need her 30-answer spot check because v4's
+  answers are 27% shorter.
 
 ## Target: the three project briefs
 

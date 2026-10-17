@@ -1,0 +1,131 @@
+cases where v4 lost correctness: 13; cases where it gained: 3 ['docs-core-011', 'docs-core-042', 'docs-int-023']
+v4 failing attempts in lost cases: 18
+
+=== docs-ai-001-p1 (lookup, ai_ml) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 0.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 1.0, 1.0]
+QUESTION: Can I buy Provisioned Throughput and use it through a Bedrock inference profile?
+GOLD: No. Inference profiles currently don't support Provisioned Throughput; Provisioned Throughput is purchased separately for a model.
+KEYWORD GROUPS (every group needs one alternative): [['not support', "don't support", 'do not support', "doesn't support", 'unsupported', 'not currently support', "don't currently support", 'do not currently support', 'does not currently support']]
+  v4 #2 FAIL (abstained on an answerable question) abstained=True
+     answer: The documentation I can reach does not say that you can use a Provisioned Throughput through an inference profile, so I can't confirm it. What it does document: you can purchase Provisioned Throughput for a base or custom model, and when you call the API with a provisioned model, you pass the Provisioned Throughput ARN as the modelId. Inference profiles are a separate option in the same modelId field, and the docs describe them as routing requests across Regions and tracking usage. Check the Provisioned Throughput usage page or the AWS account team before relying on this combination.
+  v4 #3 FAIL (abstained on an answerable question) abstained=True
+     answer: Yes, you can purchase Provisioned Throughput. The docs I could reach do not confirm that you can use it through an inference profile.
+
+What the docs do say: Provisioned Throughput is a paid capacity option. "You can purchase Provisioned Throughput to provision a higher level of throughput for a model at a fixed cost." For invocation, the InvokeModel modelId field says "If you use a provisioned model, specify the ARN of the Provisioned Throughput." Inference profiles are described separately, with "If you use an inference profile, specify the inference profile ID or its ARN." The inference profile docs describe application inference profiles as tools for tracking costs and usage, and say tags are used "to track costs when you submit on-demand model invocation requests." Nothing I read says a Provisioned Throughput can be invoked via an inference profile ARN. Check the Provisioned Throughp
+  v3 #1 PASS answer: No. You can purchase Provisioned Throughput, but you can't use it through an inference profile. Amazon Bedrock's cross-Region inference documentation says that inference profiles don't support Provisioned Throughput. To use Provisioned Throughput, you purchase it for a base or custom model and then run inference against that provisioned model. To increase throughput, you purchase Provisioned Throughput directly for the model rather than routing through a cross-Region inference profile.
+
+=== docs-core-018 (multi_step, compute) v3 [1.0, 0.0, 1.0] -> v4 [0.0, 0.0, 0.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: It is October 2026 and my EKS cluster runs Kubernetes 1.32. What support tier is it in now, and what happens on March 23, 2027?
+GOLD: Kubernetes 1.32 left standard support on March 23, 2026, so the cluster is in extended support at extra cost. Extended support ends March 23, 2027; if the cluster has not been upgraded by then it is auto-upgraded to the oldest supported extended version.
+KEYWORD GROUPS (every group needs one alternative): [['extended support'], ['auto-upgraded', 'automatically upgraded', 'auto upgraded', 'automatically updated', 'automatically upgrades', 'auto-upgrades', 'automatically upgrade']]
+  v4 #1 FAIL (missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade) abstained=False
+     answer: In October 2026, Kubernetes 1.32 is in extended support. Its end of standard support was March 23, 2026. On March 23, 2027 it reaches end of extended support. From that date you can no longer create new clusters on 1.32, and Amazon EKS automatically updates existing control planes to the earliest supported version, with no notice beforehand. Extended support costs extra per cluster hour.
+  v4 #2 FAIL (missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade) abstained=False
+     answer: On October 2026, Kubernetes 1.32 on EKS is in extended support, not standard support. Standard support ended March 23, 2026, and extended support ends March 23, 2027.
+
+On March 23, 2027 (the end of extended support date), you can no longer create new EKS clusters on 1.32. Amazon EKS then automatically updates existing control planes to the earliest supported version through a gradual deployment process. The exact timing is not specified, so the update can happen any time after that date. After the control plane update, you must manually update cluster add-ons and your EC2 nodes. Extended support carries an additional cost per cluster hour.
+  v4 #3 FAIL (missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade) abstained=False
+     answer: In October 2026, Kubernetes 1.32 on EKS is in extended support. Its end of standard support was March 23, 2026, and its end of extended support is March 23, 2027.
+
+On March 23, 2027, extended support ends for 1.32. The docs say that after the end of support date, Amazon EKS automatically updates existing control planes to the earliest supported version, and that this can happen at any time after that date, with no notice. The automatic update covers only the control plane, so you must still update add-ons and nodes yourself. The docs recommend updating proactively before then. You also cannot create new clusters on the unsupported version on that date.
+  v3 #1 PASS answer: In October 2026, Kubernetes 1.32 on EKS is in extended support. Its standard support ended on March 23, 2026, and extended support runs until March 23, 2027.
+
+On March 23, 2027, extended support ends for 1.32. You can no longer create new clusters on that version. Existing control planes are then automatically updated by EKS to the earliest supported version, through a gradual process that can happen at any time after that date, with no notice. The automatic update covers only the control plane, so you must still update add-ons and nodes yourself. Self-managed nodes and managed node groups sta
+
+=== docs-ai-001-p2 (lookup, ai_ml) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 1.0, 0.0]
+QUESTION: Is Provisioned Throughput compatible with Bedrock inference profiles?
+GOLD: No. Inference profiles currently don't support Provisioned Throughput; Provisioned Throughput is purchased separately for a model.
+KEYWORD GROUPS (every group needs one alternative): [['not support', "don't support", 'do not support', "doesn't support", 'unsupported', 'not currently support', "don't currently support", 'do not currently support', 'does not currently support']]
+  v4 #2 FAIL (abstained on an answerable question) abstained=True
+     answer: The documentation I could reach does not say whether Provisioned Throughput is compatible with Bedrock inference profiles. It never states that they can be combined or that they cannot. It treats them as separate options for the model ID in an inference request. For inference profiles, the Converse API reference says to specify the inference profile ID or ARN. For a provisioned model, it says to specify the ARN of the Provisioned Throughput. No page I read says these can be used together. Please check the AWS documentation or contact AWS support to confirm.
+  v3 #1 PASS answer: No. According to the Amazon Bedrock docs, inference profiles currently don't support Provisioned Throughput. Cross-Region inference profiles are a separate way to increase throughput, and to use Provisioned Throughput you must instead purchase it for a model directly.
+
+=== docs-ai-002-p2 (lookup, ai_ml) v3 [1.0, 1.0, 1.0] -> v4 [0.0, 1.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Will cross-Region inference in Bedrock cost me extra for the routing itself?
+GOLD: No. There is no additional routing cost; the price is calculated from the Region you call the inference profile from.
+KEYWORD GROUPS (every group needs one alternative): [['no additional', 'no extra', 'not charged', 'no routing cost', 'no routing charge', 'no additional cost', "doesn't charge", 'does not charge', "doesn't add", 'does not add', 'no surcharge']]
+  v4 #1 FAIL (missing: no additional | no extra | not charged | no routing cost | no routing charge | no additional cost | doesn't charge | does not charge | doesn't add | does not add | no surcharge) abstained=False
+     answer: No. Cross-Region inference has no separate routing charge. You pay the model price for the Region from which you call the inference profile. Global cross-Region inference is listed at approximately 10% savings compared with Geographic cross-Region inference, which is at standard pricing.
+  v3 #1 PASS answer: No. There is no additional routing charge for cross-Region inference. You pay the model price for the Region you call the inference profile from. (Note that the Global profile's "approximately 10% savings" is a separate pricing comparison, not a routing fee.)
+
+=== docs-ai-003 (lookup, ai_ml) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 1.0, 0.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Before cross-Region inference can route a Bedrock request to another Region, do I have to manually enable that Region in my AWS account?
+GOLD: No. Manual Region enablement is not required; cross-Region inference can route to Regions that are not manually enabled in your account.
+KEYWORD GROUPS (every group needs one alternative): [['not required', "don't need", 'do not need', 'no need', 'not necessary', "doesn't require", 'does not require']]
+  v4 #3 FAIL (missing: not required | don't need | do not need | no need | not necessary | doesn't require | does not require) abstained=False
+     answer: No. You don't have to manually enable the destination Region for Bedrock cross-Region inference. Cross-Region inference can route requests to Regions that are not manually enabled in your account.
+  v3 #1 PASS answer: No. Cross-Region inference can route requests to Regions that are not manually enabled in your account, so you don't need to enable the destination Region first. However, if your organization uses SCPs, they must allow the routing: geographic profiles need SCPs that allow all destination Regions in the profile, and global profiles need SCPs that allow "aws:RequestedRegion": "unspecified".
+
+=== docs-chg-017 (changed_default, databases) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Can I launch a new RDS DB instance on magnetic (standard) storage to save money?
+GOLD: No. Magnetic storage is deprecated and no longer offered for new DB instances, and starting July 1, 2026 you can no longer restore a snapshot to magnetic storage. Use General Purpose SSD or Provisioned IOPS SSD.
+KEYWORD GROUPS (every group needs one alternative): [['deprecated', 'no longer offered'], ['General Purpose SSD', 'gp2', 'gp3', 'Provisioned IOPS']]
+  v4 #2 FAIL (missing: General Purpose SSD | gp2 | gp3 | Provisioned IOPS) abstained=False
+     answer: No. Magnetic storage is deprecated for RDS and can't be used for new DB instances. Use General Purpose (SSD) as the lower-cost option; it is described as a cost-effective storage type. I did not check current pricing, so I can't state the savings.
+  v3 #1 PASS answer: No. Magnetic storage is deprecated for Amazon RDS and can't be chosen for new DB instances. The RDS documentation also says that starting July 1, 2026, you can't restore a snapshot to magnetic storage. For new storage, AWS recommends General Purpose SSD or Provisioned IOPS SSD. General Purpose SSD is the cost-effective option for most workloads.
+
+=== docs-chg-019 (changed_default, analytics) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 1.0, 0.0]
+QUESTION: We rely on Python UDFs in Amazon Redshift. Can we keep creating and running them?
+GOLD: Not for long. Amazon Redshift will no longer support Python UDFs after June 30, 2026, and enforcement starts in phases. Plan a migration.
+KEYWORD GROUPS (every group needs one alternative): [['June 30, 2026', 'Jun 30, 2026', '2026']]
+  v4 #2 FAIL (abstained on an answerable question) abstained=True
+     answer: Not beyond June 30, 2026. Amazon Redshift will stop supporting Python UDFs after that date, and enforcement will be phased. Until then the documentation does not say that creating or running them is blocked, but I could not find details on when each phase starts or whether creating new Python UDFs is restricted earlier. The migration options are described in an AWS blog post that is not in the documentation snapshot I can reach, so you should check that post and plan a migration before the cutoff.
+  v3 #1 PASS answer: Not beyond June 30, 2026. The Redshift documentation says Amazon Redshift will no longer support the use of Python UDFs after June 30, 2026, and that it will start enforcing this in phases. So you can keep running them for now, but you should plan a migration. The snapshot I could access does not say exactly when creating new Python UDFs gets blocked, which phase applies to your clusters or Serverless namespaces, or what the recommended replacement is. The blog post the docs point to (about end of support and migration options) was not available in the snapshot, so check it and your account no
+
+=== docs-core-037 (lookup, security) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Can asymmetric or HMAC KMS keys use automatic key rotation?
+GOLD: No. They are not eligible for automatic or on-demand rotation; rotate them manually by creating a new key.
+KEYWORD GROUPS (every group needs one alternative): [['manual', 'not eligible', 'cannot', "can't", 'not supported']]
+  v4 #2 FAIL (missing: manual | not eligible | cannot | can't | not supported) abstained=False
+     answer: No. Automatic key rotation is supported only for symmetric encryption KMS keys with AWS KMS-generated key material (AWS_KMS origin). Asymmetric and HMAC KMS keys do not support automatic rotation, so you must rotate them manually, for example by creating a new KMS key and changing your applications or aliases to use it.
+  v3 #1 PASS answer: No. AWS KMS automatic key rotation is not supported for asymmetric KMS keys or HMAC KMS keys. It is supported only on symmetric encryption KMS keys with AWS_KMS origin. For asymmetric and HMAC keys, you must rotate manually (create a new KMS key and update applications or aliases). On-demand rotation is also unavailable for these key types.
+
+=== docs-int-020 (false_premise, management) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Parameter Store bills per parameter per month like Secrets Manager, so how should I estimate the cost of 500 parameters?
+GOLD: The premise is wrong: the Parameter Store standard tier is free; only the advanced tier and higher throughput are billed. Secrets Manager is the service billed per secret per month.
+KEYWORD GROUPS (every group needs one alternative): [['free', 'no charge', '$0', 'no additional charge', 'not charged']]
+  v4 #2 FAIL (missing: free | no charge | $0 | no additional charge | not charged) abstained=False
+     answer: The premise is not quite right. Parameter Store does not bill every parameter per month the way Secrets Manager does. Standard-tier parameters have no parameter charge, and only advanced-tier parameters (and higher throughput) are billed. So for 500 parameters, the estimate depends on the tier you choose:
+
+- If all 500 are standard parameters, the parameter storage cost is zero. The standard tier allows up to 10,000 parameters per account and Region, and the default size is 4 KB.
+- If some or all are advanced parameters, those are billed. The docs I could reach do not give the advanced per-parameter rate, so take it from the Systems Manager pricing page and multiply by the advanced count (for example, 500 × that monthly rate). Add high-throughput charges if you enable that.
+
+Secrets Manager, by contrast, bills per secret per month plus per API call. Use Secrets Manager for credentials an
+  v3 #1 PASS answer: Your premise is incorrect: Parameter Store does not charge per parameter per month like Secrets Manager. Standard-tier parameters have no charge, and only advanced-tier parameters (and higher throughput) are billed. For 500 standard parameters, the parameter cost is $0, and that fits within the 10,000 standard-parameter limit per account and Region. If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page; I could not find that rate in the documentation snapshot, so I cannot give a dollar figure. Secrets Manager, by cont
+
+=== docs-mix-012 (false_premise, databases) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 1.0, 0.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 1.0]
+QUESTION: The RDS Data API requests-per-second quota applies to every Aurora cluster, including Serverless v2. How do I raise it?
+GOLD: The premise is wrong: the 1,000 requests-per-second Data API quota applies only to Aurora Serverless v1 clusters and is not adjustable.
+KEYWORD GROUPS (every group needs one alternative): [['Serverless v1', 'v1'], ['only']]
+  v4 #3 FAIL (abstained on an answerable question) abstained=True
+     answer: The premise is incorrect. The RDS Data API requests-per-second quota is 1,000 per second per Region, it is not adjustable, and it applies only to Aurora Serverless v1 clusters, not to Serverless v2 or other Aurora clusters. So there is no quota increase to request for this limit. The documentation I could reach does not describe a way to raise it, so I can't give you a procedure.
+  v3 #1 PASS answer: The premise is incorrect. The RDS Data API requests-per-second quota does not apply to every Aurora cluster, and it is not adjustable, so there is no increase to request.
+
+The quotas page lists "Data API requests per second" with a default of 1,000 per second per Region, marks it as not adjustable, and says it applies only to Aurora Serverless v1 clusters. Aurora Serverless v2 is not covered by this quota. Because the quota is fixed, you cannot raise it through Service Quotas or a support case. If you are hitting request-rate limits on a Serverless v2 cluster, the documentation I could reach d
+
+=== docs-mix-068 (lookup, storage) v3 [1.0, 1.0, 1.0] -> v4 [1.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 0.0] v4 [0.0, 0.0, 0.0]
+QUESTION: Does an S3 Object Lock legal hold expire on its own?
+GOLD: No. A legal hold has no expiration date and stays until you explicitly remove it.
+KEYWORD GROUPS (every group needs one alternative): [['no expiration', 'until you explicitly remove', 'until removed', "doesn't expire", 'does not expire', 'never expires']]
+  v4 #2 FAIL (missing: no expiration | until you explicitly remove | until removed | doesn't expire | does not expire | never expires) abstained=False
+     answer: No. An S3 Object Lock legal hold has no fixed duration and stays in effect until it is explicitly removed. Like a retention period, it prevents an object version from being overwritten or deleted.
+  v3 #1 PASS answer: No. An S3 Object Lock legal hold has no expiration date and stays in place until someone explicitly removes it. Legal holds are independent of retention periods, so clearing a retention period does not remove a legal hold.
+
+=== docs-ai-001-p3 (lookup, ai_ml) v3 [1.0, 1.0, 0.0] -> v4 [0.0, 0.0, 1.0]; wrong_abstention v3 [0.0, 0.0, 1.0] v4 [1.0, 1.0, 0.0]
+QUESTION: Do inference profiles in Amazon Bedrock work with purchased Provisioned Throughput capacity?
+GOLD: No. Inference profiles currently don't support Provisioned Throughput; Provisioned Throughput is purchased separately for a model.
+KEYWORD GROUPS (every group needs one alternative): [['not support', "don't support", 'do not support', "doesn't support", 'unsupported', 'not currently support', "don't currently support", 'do not currently support', 'does not currently support']]
+  v4 #1 FAIL (abstained on an answerable question) abstained=True
+     answer: The documentation I could reach does not say whether inference profiles can be used with purchased Provisioned Throughput. It describes the two as separate options. Inference profiles are documented for on-demand requests, and Provisioned Throughput is documented as a separate way to run inference on a model, with its own ARN. I found no page that says they can be combined, and no page that says they cannot.
+  v4 #2 FAIL (abstained on an answerable question) abstained=True
+     answer: The documentation I can reach does not say whether inference profiles work with purchased Provisioned Throughput. It describes inference profiles as resources that route on-demand invocation requests across Regions, and it describes Provisioned Throughput as invoked through its own ARN. I found no page that connects the two, so I can't confirm compatibility.
+  v3 #1 PASS answer: No. According to the Amazon Bedrock docs, inference profiles currently don't support Provisioned Throughput. To raise throughput, you can purchase Provisioned Throughput, but it is a separate mechanism: you call a provisioned model by its Provisioned Throughput ARN, not through an inference profile.
+
+=== docs-mix-050 (lookup, databases) v3 [0.0, 1.0, 1.0] -> v4 [0.0, 0.0, 1.0]; wrong_abstention v3 [1.0, 0.0, 0.0] v4 [1.0, 1.0, 0.0]
+QUESTION: Can an Aurora Serverless cluster scale down to zero ACUs when idle?
+GOLD: Yes, with automatic pause and resume it can scale to zero ACUs.
+KEYWORD GROUPS (every group needs one alternative): [['zero', '0 ACU', 'pause']]
+  v4 #1 FAIL (abstained on an answerable question) abstained=True
+     answer: Probably yes, but I could not confirm the details. The Aurora Serverless documentation has a page titled "Scaling to Zero ACUs with automatic pause and resume for Aurora serverless", which suggests scaling to zero ACUs is supported. I could not open that page in the snapshot, so I cannot state the conditions, such as how long the cluster must be idle or what the minimum capacity setting must be. The main Aurora Serverless page says that when the database isn't in use, the DB instances scale down to avoid unnecessary charges.
+  v4 #2 FAIL (abstained on an answerable question) abstained=True
+     answer: I could not confirm from the documentation I can reach whether an Aurora Serverless cluster scales to zero ACUs when idle. The Aurora Serverless overview lists a dedicated topic titled "Scaling to Zero ACUs with automatic pause and resume for Aurora serverless", which suggests this is supported, but that page is not in the snapshot I can read, so its details (minimum settings, pause timing, resume behavior) are unverified. The overview only says that when the database isn't in use, the DB instances scale down to avoid unnecessary charges, and it does not say they scale to zero.
+  v3 #2 PASS answer: Probably yes, but I could only partly verify it. The Aurora Serverless overview says that when the database isn't in use, its DB instances scale down to avoid unnecessary charges. The overview's topic list also includes a page titled "Scaling to Zero ACUs with automatic pause and resume for Aurora serverless", which covers scaling to zero. I could not open that page (it is not in the snapshot), so I can't confirm the conditions, such as the idle time before pause, the minimum-capacity setting needed, or resume behavior. Check that page before relying on zero-ACU idle behavior.

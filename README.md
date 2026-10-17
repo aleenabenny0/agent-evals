@@ -92,6 +92,9 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   (+21 points, 95% CI +14 to +30, p = 8e-7) with correctness unchanged (0.987 to 0.980, interval
   spans zero). The gate, the dev numbers, the one cost (run-to-run consistency dipped from 97%
   to 93%) and the grader fix it exposed are in [CHANGELOG.md](CHANGELOG.md) and ADR 0008.
+  Iterations 2 and 3 were rejected by the gate and are recorded there too. Iteration 3's prompt
+  doubled the dev fully-supported rate (0.31 to 0.60), but it abstained on more answerable
+  questions and correctness slipped, so v3 stays.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
   advisory: kappa 0.37 on the 65, 0.79 on the 40 fresh answers but with only 3 failures among
   them, so the interval spans 0 to 1. Two candidate judges with revised rubrics were each tested

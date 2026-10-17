@@ -1,0 +1,95 @@
+v3: 16 failing attempts: {'abstained on an answerable question': 6, 'keyword': 6, 'agent error': 2, 'answered an unanswerable question': 2}
+v4: 27 failing attempts: {'keyword': 14, 'abstained on an answerable question': 12, 'agent error': 1}
+
+=== docs-ai-001 (lookup, ai_ml)
+GOLD: No. Inference profiles currently don't support Provisioned Throughput; Provisioned Throughput is purchased separately for a model.
+GROUPS: [['not support', "don't support", 'do not support', "doesn't support", 'unsupported', 'not currently support', "don't currently support", 'do not currently support', 'does not currently support']]
+  v4 #1 missing: not support | don't support | do not support | doesn't support | unsupported | not currently support | don't currently support | do not currently suppo
+     The documentation I could reach does not say that Amazon Bedrock inference profiles support Provisioned Throughput. It describes Provisioned Throughput as something you purchase for a base or custom model, and it describes inference profiles in terms of on-demand invocation and cross-Region routing. So the documented answer is no, or at least not documented as supported. I could not confirm this from a page that explicitly rules it out.
+
+=== docs-ai-002-p2 (lookup, ai_ml)
+GOLD: No. There is no additional routing cost; the price is calculated from the Region you call the inference profile from.
+GROUPS: [['no additional', 'no extra', 'not charged', 'no routing cost', 'no routing charge', 'no additional cost', "doesn't charge", 'does not charge', "doesn't add", 'does not add', 'no surcharge']]
+  v4 #1 missing: no additional | no extra | not charged | no routing cost | no routing charge | no additional cost | doesn't charge | does not charge | doesn't add | do
+     No. Cross-Region inference has no separate routing charge. You pay the model price for the Region from which you call the inference profile. Global cross-Region inference is listed at approximately 10% savings compared with Geographic cross-Region inference, which is at standard pricing.
+
+=== docs-ai-003 (lookup, ai_ml)
+GOLD: No. Manual Region enablement is not required; cross-Region inference can route to Regions that are not manually enabled in your account.
+GROUPS: [['not required', "don't need", 'do not need', 'no need', 'not necessary', "doesn't require", 'does not require']]
+  v4 #3 missing: not required | don't need | do not need | no need | not necessary | doesn't require | does not require
+     No. You don't have to manually enable the destination Region for Bedrock cross-Region inference. Cross-Region inference can route requests to Regions that are not manually enabled in your account.
+
+=== docs-chg-017 (changed_default, databases)
+GOLD: No. Magnetic storage is deprecated and no longer offered for new DB instances, and starting July 1, 2026 you can no longer restore a snapshot to magnetic storage. Use General Purpose SSD or Provisioned IOPS SSD.
+GROUPS: [['deprecated', 'no longer offered'], ['General Purpose SSD', 'gp2', 'gp3', 'Provisioned IOPS']]
+  v4 #2 missing: General Purpose SSD | gp2 | gp3 | Provisioned IOPS
+     No. Magnetic storage is deprecated for RDS and can't be used for new DB instances. Use General Purpose (SSD) as the lower-cost option; it is described as a cost-effective storage type. I did not check current pricing, so I can't state the savings.
+
+=== docs-chg-025 (changed_default, databases)
+GOLD: No. You can set the recovery period for continuous backups to any number between 1 and 35 days (RecoveryPeriodInDays). Changing the window does not change the price: PITR is charged on table size regardless of the recovery period.
+GROUPS: [['1 and 35', '1 to 35', 'between 1 and 35'], ["doesn't reduce the price", 'cost remains the same', 'same regardless', "doesn't impact the price", 'does not reduce the price']]
+  v3 #1 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. DynamoDB PITR's recovery period is configurable, not fixed at 35 days. You can set it to any value from 1 to 35 days, and 35 is the maximum. For example, a 30-day setting lets you restore to any point in the past 30 days. Separately, when a PITR-enabled table is deleted, DynamoDB keeps a system backup for 35 days, which is a fixed retention period for that backup.
+  v3 #2 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. The PITR recovery period is configurable, not fixed at 35 days. You can set it to any number from 1 to 35 days, and 35 is the maximum. For example, a 30-day setting lets you restore to any point in the past 30 days. The 35-day figure is also separately the retention period for system backups created when a table with PITR enabled is deleted.
+  v3 #3 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. The PITR recovery period is configurable, not fixed at 35 days. You can set it to any number from 1 to 35 days, so 35 is the maximum. Changing it doesn't affect price. Separately, system backups kept after a table with PITR is deleted are retained for 35 days.
+  v4 #1 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. The DynamoDB PITR recovery period is configurable, not fixed at 35 days. You can set it to any number between 1 and 35 days, and the maximum is 35. The 35-day figure is the upper limit, and you can edit the setting later to change the recovery period. Separately, when a table with PITR enabled is deleted, DynamoDB keeps a system backup for 35 days.
+  v4 #2 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. The PITR recovery period is configurable, not fixed at 35 days. You can set it to any number of days from 1 to 35. The 35-day value is the maximum. Changing the recovery period doesn't change the price. Separately, when you delete a table with PITR enabled, DynamoDB keeps a system backup for 35 days.
+  v4 #3 missing: doesn't reduce the price | cost remains the same | same regardless | doesn't impact the price | does not reduce the price
+     No. The PITR recovery period is configurable: you can set it to any number from 1 to 35 days, so 35 days is the maximum, not a fixed value. Separately, when you delete a table that has PITR enabled, DynamoDB keeps a system backup for 35 days.
+
+=== docs-core-011 (false_premise, storage)
+GOLD: The premise is wrong: after you create a bucket you cannot change its name or Region. Create a new bucket with the right name and copy the objects.
+GROUPS: [["can't change", 'cannot change', "can't rename", 'cannot rename', 'cannot be renamed', "can't be renamed", 'not possible', 'no way to rename', 'name is fixed', 'cannot be changed', "can't be changed", 'fixed at creation']]
+  v3 #2 missing: can't change | cannot change | can't rename | cannot rename | cannot be renamed | can't be renamed | not possible | no way to rename | name is fixed | 
+     There is no API call to rename an S3 bucket. Bucket names are fixed once the bucket is created. To get the new name, you must create a new bucket with that name, move the objects into it, update your applications to point to it, and then delete the old bucket if you no longer need it. Options for copying objects include S3 Batch Replication, which is an on-demand replication job. Note that deleting a bucket releases its name only with delays and not guaranteed, so check the naming rules before you rely on reusing the old name.
+
+=== docs-core-018 (multi_step, compute)
+GOLD: Kubernetes 1.32 left standard support on March 23, 2026, so the cluster is in extended support at extra cost. Extended support ends March 23, 2027; if the cluster has not been upgraded by then it is auto-upgraded to the oldest supported extended version.
+GROUPS: [['extended support'], ['auto-upgraded', 'automatically upgraded', 'auto upgraded', 'automatically updated', 'automatically upgrades', 'auto-upgrades', 'automatically upgrade']]
+  v3 #2 missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade
+     As of October 2026, Kubernetes 1.32 on EKS is in extended support, not standard support. Standard support ended March 23, 2026, and extended support runs until March 23, 2027.
+
+On March 23, 2027, 1.32 reaches end of extended support. From that date you can no longer create new clusters on 1.32. Amazon EKS then automatically updates existing control planes to the earliest supported version, at a time it does not announce in advance, so you should upgrade before then. The automatic update covers only the control plane. You must still update add-ons and nodes yourself: self-managed nodes and managed node groups stay on the previous version. Extended support also costs extra per cluster hour.
+  v4 #1 missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade
+     In October 2026, Kubernetes 1.32 is in extended support. Its end of standard support was March 23, 2026. On March 23, 2027 it reaches end of extended support. From that date you can no longer create new clusters on 1.32, and Amazon EKS automatically updates existing control planes to the earliest supported version, with no notice beforehand. Extended support costs extra per cluster hour.
+  v4 #2 missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade
+     On October 2026, Kubernetes 1.32 on EKS is in extended support, not standard support. Standard support ended March 23, 2026, and extended support ends March 23, 2027.
+
+On March 23, 2027 (the end of extended support date), you can no longer create new EKS clusters on 1.32. Amazon EKS then automatically updates existing control planes to the earliest supported version through a gradual deployment process. The exact timing is not specified, so the update can happen any time after that date. After the control plane update, you must manually update cluster add-ons and your EC2 nodes. Extended support carries an additional cost per cluster hour.
+  v4 #3 missing: auto-upgraded | automatically upgraded | auto upgraded | automatically updated | automatically upgrades | auto-upgrades | automatically upgrade
+     In October 2026, Kubernetes 1.32 on EKS is in extended support. Its end of standard support was March 23, 2026, and its end of extended support is March 23, 2027.
+
+On March 23, 2027, extended support ends for 1.32. The docs say that after the end of support date, Amazon EKS automatically updates existing control planes to the earliest supported version, and that this can happen at any time after that date, with no notice. The automatic update covers only the control plane, so you must still update add-ons and nodes yourself. The docs recommend updating proactively before then. You also cannot create new clusters on the unsupported version on that date.
+
+=== docs-core-034 (false_premise, security)
+GOLD: The premise is a bad practice the docs warn against: do not use root credentials to create access keys; use temporary credentials such as IAM roles instead of long-term keys.
+GROUPS: [['roles', 'temporary'], ['do not', "don't", 'should not', "shouldn't", 'never', 'avoid', 'recommends against', 'advises against', 'against this']]
+  v3 #3 missing: do not | don't | should not | shouldn't | never | avoid | recommends against | advises against | against this
+     Root user access keys would have complete access to every AWS service and resource in the account, so your CI pipeline would be able to do anything the account owner can do. AWS does not recommend this. Use the root user only for tasks that require it, and for CI/CD use temporary credentials from an IAM role instead of long-term keys. AWS's guidance also covers CI/CD platforms: they can use temporary credentials, which you deliver to the workload. I could not open AWS's access key pages from the snapshot, so I can't confirm the exact steps for creating or scoping keys.
+  v4 #3 missing: do not | don't | should not | shouldn't | never | avoid | recommends against | advises against | against this
+     Root user access keys would have complete access to every AWS service and resource in the account. I recommend against using them for your CI pipeline. AWS recommends temporary credentials from IAM roles instead of long-term access keys, and you can scope a role or dedicated IAM user to only the permissions your deployment needs.
+
+=== docs-core-037 (lookup, security)
+GOLD: No. They are not eligible for automatic or on-demand rotation; rotate them manually by creating a new key.
+GROUPS: [['manual', 'not eligible', 'cannot', "can't", 'not supported']]
+  v4 #2 missing: manual | not eligible | cannot | can't | not supported
+     No. Automatic key rotation is supported only for symmetric encryption KMS keys with AWS KMS-generated key material (AWS_KMS origin). Asymmetric and HMAC KMS keys do not support automatic rotation, so you must rotate them manually, for example by creating a new KMS key and changing your applications or aliases to use it.
+
+=== docs-int-020 (false_premise, management)
+GOLD: The premise is wrong: the Parameter Store standard tier is free; only the advanced tier and higher throughput are billed. Secrets Manager is the service billed per secret per month.
+GROUPS: [['free', 'no charge', '$0', 'no additional charge', 'not charged']]
+  v4 #2 missing: free | no charge | $0 | no additional charge | not charged
+     The premise is not quite right. Parameter Store does not bill every parameter per month the way Secrets Manager does. Standard-tier parameters have no parameter charge, and only advanced-tier parameters (and higher throughput) are billed. So for 500 parameters, the estimate depends on the tier you choose:
+
+- If all 500 are standard parameters, the parameter storage cost is zero. The standard tier allows up to 10,000 parameters per account and Region, and the default size is 4 KB.
+- If some or all are advanced parameters, those are billed. The docs I could reach do not give the advanced per-parameter rate, so take it from the Systems Manager pricing page and multiply by the advanced count (fo
+
+=== docs-mix-068 (lookup, storage)
+GOLD: No. A legal hold has no expiration date and stays until you explicitly remove it.
+GROUPS: [['no expiration', 'until you explicitly remove', 'until removed', "doesn't expire", 'does not expire', 'never expires']]
+  v4 #2 missing: no expiration | until you explicitly remove | until removed | doesn't expire | does not expire | never expires
+     No. An S3 Object Lock legal hold has no fixed duration and stays in effect until it is explicitly removed. Like a retention period, it prevents an object version from being overwritten or deleted.

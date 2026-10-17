@@ -57,3 +57,14 @@ copy exactly.
 If the gate passes, the frozen test split is run once and judged once, and the CHANGELOG entry
 records both splits. Shipping, which means setting `prompt_version: v4` in `default.yaml`, is
 Aleena's decision. If the gate fails, v3 stays the champion and the rejection is recorded.
+
+## Result (2026-10-17): rejected by the gate
+
+The gate failed: judge_supported rose far more than predicted (0.311 to 0.604, +0.293, CI +0.219
+to +0.368), but correct (-0.028) and wrong_abstention (+0.017) regressed, and so did lookup,
+ai_ml and databases on correct. Check 1 tripped (answers 27% shorter), so the support number also
+waits on a 30-answer spot check; check 2 did not (absence statements 12.0% to 7.6%). Reading the
+18 new failures showed half of them to be keyword-grader misses, but a counterfactual with the
+misses fixed in both runs still fails on wrong_abstention and lookup. Full entry, numbers and
+files: CHANGELOG.md, "Rejected: iteration 3".
+

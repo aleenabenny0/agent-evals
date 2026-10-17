@@ -1,0 +1,25 @@
+# COUNTERFACTUAL, not a re-gate (2026-10-17). Computed on a copy of the results store:
+# the keyword lists of 10 dev cases widened with correct wordings found in BOTH runs' keyword
+# failures, both runs regraded, the ADR 0008 gate re-run. The suite and the store are unchanged.
+# Script: scripts/keyword_fix_counterfactual.py. The widening itself awaits Aleena's approval.
+
+
+== as recorded (original keyword lists): gate FAILED
+  judge_supported        0.311 -> 0.604  +0.293 (+0.219 to +0.368)  improved
+  correct                0.959 -> 0.931  -0.028 (-0.054 to -0.005)  regressed
+  fabricated_citation    0.013 -> 0.013  +0.000 (-0.013 to +0.013)  no detectable change
+  uncited_answer         0.000 -> 0.000  +0.000 (+0.000 to +0.000)  no detectable change
+  wrong_abstention       0.017 -> 0.034  +0.017 (+0.000 to +0.037)  regressed
+  missed_abstention      0.056 -> 0.000  -0.056 (-0.167 to +0.000)  no detectable change
+  rejected_submissions   0.021 -> 0.005  -0.015 (-0.036 to -0.003)  improved
+  regressed categories: ['type=lookup', 'area=ai_ml', 'area=databases']
+
+== counterfactual: 10 keyword lists widened, both runs regraded: gate FAILED
+  judge_supported        0.311 -> 0.604  +0.293 (+0.219 to +0.368)  improved
+  correct                0.969 -> 0.959  -0.010 (-0.028 to +0.008)  no detectable change
+  fabricated_citation    0.013 -> 0.013  +0.000 (-0.013 to +0.013)  no detectable change
+  uncited_answer         0.000 -> 0.000  +0.000 (+0.000 to +0.000)  no detectable change
+  wrong_abstention       0.017 -> 0.034  +0.017 (+0.000 to +0.037)  regressed
+  missed_abstention      0.056 -> 0.000  -0.056 (-0.167 to +0.000)  no detectable change
+  rejected_submissions   0.021 -> 0.005  -0.015 (-0.036 to -0.003)  improved
+  regressed categories: ['type=lookup']

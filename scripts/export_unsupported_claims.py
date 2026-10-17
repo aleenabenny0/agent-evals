@@ -1,21 +1,25 @@
-"""Export the iteration-3 error-analysis set: every attempt-1 answer on the champion DEV run that
-the validated judge (v2) fails on "fully supported", with what a reader needs to say why. Dev
-split only; no test-split case is read. Writes batch files, one text file per page read, and a
-context file into OUT."""
+"""Export an error-analysis set: every attempt-1 answer on a DEV run that the validated judge (v2)
+fails on "fully supported", with what a reader needs to say why. Dev split only; no test-split
+case is read. Writes batch files, one text file per page read, and a context file into OUT.
+
+Usage: uv run python -I -X utf8 scripts/export_unsupported_claims.py OUT [RUN [PROMPT_VERSION]]
+Defaults: the v3 champion run of iteration 3 and prompt v3.
+"""
 
 import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, "src")
-from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V3
+from agent_evals.agents.docs.prompts import SYSTEM_PROMPTS
 from agent_evals.corpus import Corpus
 from agent_evals.graders.judge_prompts import SUPPORT_RUBRIC
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import load_suite
 
-RUN = "docs-20261016-214710-02abb7"
 OUT = Path(sys.argv[1])
+RUN = sys.argv[2] if len(sys.argv) > 2 else "docs-20261016-214710-02abb7"
+PROMPT = sys.argv[3] if len(sys.argv) > 3 else "v3"
 (OUT / "pages").mkdir(parents=True, exist_ok=True)
 
 store = ResultsStore(Path("results/evals.duckdb"))
@@ -128,8 +132,8 @@ second = [x for b in batches for x in b[2::5][:5]]
     "# Context for the iteration-3 error analysis\n\n"
     "## The judge's support rubric (the standard every verdict here applies)\n\n"
     + SUPPORT_RUBRIC
-    + "\n\n## The docs agent's current system prompt (v3, the champion)\n\n"
-    + SYSTEM_PROMPT_V3,
+    + f"\n\n## The docs agent's system prompt on this run ({PROMPT})\n\n"
+    + SYSTEM_PROMPTS[PROMPT],
     encoding="utf-8",
 )
 (OUT / "items.json").write_text(json.dumps(items, indent=1, ensure_ascii=False), encoding="utf-8")
