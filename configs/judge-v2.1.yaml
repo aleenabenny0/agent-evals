@@ -1,6 +1,7 @@
 # Candidate judge v2.1 (2026-10-17): rubric v2 plus one paragraph on reporting phrases
-# ("according to the ... docs"). Validated or rejected under docs/judge-validation.md section 9;
-# until then v2 stays the validated judge. Grade a run with it: evals judge RUN -c this file.
+# ("according to the ... docs"). NOT ADOPTED (2026-10-17): it halved false passes on fully
+# supported on 30 fresh labels but scored 27 against v2's 29 on core supported
+# (docs/judge-validation.md section 9). v2 stays the validated judge.
 
 paths:
   corpus_dir: data/snapshots/aws-docs

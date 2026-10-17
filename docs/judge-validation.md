@@ -648,3 +648,45 @@ pass on an answer the labeler failed.
    the miss is recorded here. A revised paragraph may be tested only on labels collected after it
    is written, positions 61 onward.
 
+### Result (2026-10-17): v2.1 fails criterion 1 on core supported, so v2 stays
+
+Scored once with `scripts/judge_compare_v2_1.py`; outputs are in `results/judge-v2-vs-v2.1/`. The
+fresh labels were exported (`34f28f1`) before any v2.1 grade existed. v2.1 was graded once with
+the default salt on the v5 run and on the labeled answers of the two earlier runs.
+
+| Criterion | v2 | v2.1 | Bar | Result |
+|---|---|---|---|---|
+| 1. Fresh 30, fully supported: agreement | 26 | 28 | at least v2 | pass |
+| 1. Fresh 30, fully supported: false passes | 4 | 2 | at most v2's, and at most 2 | pass |
+| 1. Fresh 30, core supported: agreement | 29 | 27 | at least v2 | **fail** |
+| 2. Earlier sets, per set, fully / core | 114, 74, 27 / 103, 77, 30 | 113, 73, 30 / 105, 77, 30 | not lower by more than 1 | pass |
+| 2. Earlier sets, summed, fully / core | 215 / 210 | 216 / 212 | at least v2 | pass |
+| 3. Mutants caught: number, qualifier, citation | 11/11, 11/11, 40/40 | 11/11, 11/11, 40/40 | at least v2 minus one | pass |
+| Reported only: padding, resample, harmless attribution | 40/40, 40/40, 39/40 | 39/40, 40/40, 40/40 | | |
+
+Under the rule, **v2 stays the validated judge**, and iteration 4's v5 number stays untrusted.
+
+What happened on the fresh 30. v2.1 did what the paragraph was for: false passes on fully
+supported fell from 4 to 2, and agreement rose from 26 to 28. The two core failures, docs-int-020
+and docs-int-029, are not attributions. In both, v2.1 flagged the same unsupported claim that
+Aleena's note names, so its fully-supported verdict agrees with hers. But it called that claim
+core where she called it peripheral:
+
+- docs-int-020: the premise correction "Parameter Store does not bill per parameter like Secrets
+  Manager".
+- docs-int-029: the answer drops the quote's "most" from "most managed secrets".
+
+Over the 60 labeled v5 answers, fully-supported agreement is v2 53/60 and v2.1 58/60. The second
+figure includes the spot-check 30 that informed the paragraph.
+
+Facts that bear on the next step (post hoc, not part of the rule):
+
+- Aleena's labels on v5's answers, all 60 hash-sampled, give fully supported 35/60 (0.58). Her
+  80 labels on v3's answers give 27/80 (0.34). The v3 labels are the first 80 in case-id order, not
+  a random sample.
+- v2's false passes on fully supported are 7 of 60 on v5's answers and 2 of 80 on v3's. The judge
+  is lenient on the improved answers, as the spot check found.
+- The README reports core supported as advisory, and the gate does not monitor it. Gating
+  adoption on it was this rule's choice, made on a reviewer's advice. It is recorded as a lesson,
+  not changed after the fact.
+

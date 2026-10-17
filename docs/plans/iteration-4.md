@@ -139,3 +139,10 @@ The judge's error is not new. v5 names its source as often as v3 did, but in v5 
 more often the only unsupported claim left, so the judge's blind spot weighs more. This is the
 drift the spot-check rule exists to catch.
 
+## Judge fix attempt (2026-10-17): not adopted
+
+Aleena chose to fix the judge before going further. Rubric v2.1 (validation doc section 9) halved
+the false passes on 30 fresh v5 answers but failed its pre-registered rule on core supported. v2
+stays, and the v5 number stays untrusted. Her 60 labels on v5's answers give 0.58 fully
+supported, against 0.34 on v3's. The next step is her decision.
+

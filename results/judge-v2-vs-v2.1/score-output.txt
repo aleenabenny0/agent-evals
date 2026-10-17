@@ -1,0 +1,12 @@
+first dev run (114)    fully n=114 agree v2 114 v2.1 113 false pass 0->0  false fail 0->1  differ ['docs-core-039']
+first dev run (114)    core  n=114 agree v2 103 v2.1 105 false pass 7->7  false fail 4->2  differ ['docs-ai-004', 'docs-ai-023', 'docs-mix-049', 'docs-mix-056']
+v3 champion run (80)   fully n=80  agree v2 74  v2.1 73  false pass 2->3  false fail 4->4  differ ['docs-ai-002-p1']
+v3 champion run (80)   core  n=80  agree v2 77  v2.1 77  false pass 2->2  false fail 1->1  differ ['docs-int-002', 'docs-int-029']
+spot check (30)        fully n=30  agree v2 27  v2.1 30  false pass 3->0  false fail 0->0  differ ['docs-ai-001-p2', 'docs-mix-024', 'docs-mix-049']
+spot check (30)        core  n=30  agree v2 30  v2.1 30  false pass 0->0  false fail 0->0  differ []
+fresh (30)             fully n=30  agree v2 26  v2.1 28  false pass 4->2  false fail 0->0  differ ['docs-int-020', 'docs-int-029']
+fresh (30)             core  n=30  agree v2 29  v2.1 27  false pass 1->1  false fail 0->2  differ ['docs-int-020', 'docs-int-029']
+
+probes: {'citation': {'judge': '40/40', 'judge-v2.1': '40/40'}, 'padding': {'judge': '40/40', 'judge-v2.1': '39/40'}, 'resample': {'judge': '40/40', 'judge-v2.1': '40/40'}, 'number': {'judge': '11/11', 'judge-v2.1': '11/11'}, 'qualifier': {'judge': '11/11', 'judge-v2.1': '11/11'}, 'attribution': {'judge': '39/40', 'judge-v2.1': '40/40'}}
+
+DECISION (rule committed in d645d5d): {'criterion_1_fresh': False, 'fresh_verdicts_identical_label_61_to_90': False, 'criterion_2_per_set': True, 'criterion_2_summed': True, 'criterion_3_probes': True, 'adopt_v2_1': False}

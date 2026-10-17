@@ -1,0 +1,8 @@
+base answers both judges pass: 40; variants: 182
+  citation     judge 40/40   judge-v2.1 40/40
+  padding      judge 40/40   judge-v2.1 39/40
+  resample     judge 40/40   judge-v2.1 40/40
+  number       judge 11/11   judge-v2.1 11/11
+  qualifier    judge 11/11   judge-v2.1 11/11
+  attribution  judge 39/40   judge-v2.1 40/40
+criterion 3: {'per_mutant': {'number': True, 'qualifier': True, 'citation': True}, 'holds': True}

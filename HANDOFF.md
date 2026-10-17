@@ -448,6 +448,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   **Spot check done (2026-10-17): failed by one.** The judge passed 3 of her fails, against a bar of 2; two
   are attributions it credits from the cited URL. Test split not run. Her labels: v5 0.60 fully
   supported (n 30) against v3 0.34 (n 80). Next step is her decision (plan, "Spot check").
+  **Judge v2.1 not adopted (2026-10-17).** It halved false passes on fully supported on 30 fresh
+  labels, but scored 27 against v2's 29 on core supported (validation doc section 9). v2 stays;
+  the v5 number stays untrusted. Her 60 v5 labels: 0.58 fully supported. Next is her decision.
 
 ## Target: the three project briefs
 

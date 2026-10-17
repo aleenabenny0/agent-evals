@@ -1,0 +1,90 @@
+{
+  "run": "docs-20261017-174739-1c0e8e",
+  "judges": [
+    "judge",
+    "judge-v2.1"
+  ],
+  "base_answers": 40,
+  "probes": {
+    "citation": {
+      "judge": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      },
+      "judge-v2.1": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      }
+    },
+    "padding": {
+      "judge": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      },
+      "judge-v2.1": {
+        "ok": 39,
+        "n": 40,
+        "rate": 0.975
+      }
+    },
+    "resample": {
+      "judge": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      },
+      "judge-v2.1": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      }
+    },
+    "number": {
+      "judge": {
+        "ok": 11,
+        "n": 11,
+        "rate": 1.0
+      },
+      "judge-v2.1": {
+        "ok": 11,
+        "n": 11,
+        "rate": 1.0
+      }
+    },
+    "qualifier": {
+      "judge": {
+        "ok": 11,
+        "n": 11,
+        "rate": 1.0
+      },
+      "judge-v2.1": {
+        "ok": 11,
+        "n": 11,
+        "rate": 1.0
+      }
+    },
+    "attribution": {
+      "judge": {
+        "ok": 39,
+        "n": 40,
+        "rate": 0.975
+      },
+      "judge-v2.1": {
+        "ok": 40,
+        "n": 40,
+        "rate": 1.0
+      }
+    }
+  },
+  "criterion_3": {
+    "per_mutant": {
+      "number": true,
+      "qualifier": true,
+      "citation": true
+    },
+    "holds": true
+  }
+}
