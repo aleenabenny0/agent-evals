@@ -348,6 +348,37 @@ judges with `evals judge-validate` (default config for the validated judge, `-c
 configs/judge-v3.yaml` for the candidate). Those labels were never used to write rubric v3, so the
 comparison is clean. Until then the validated judge stays in the gate.
 
+## 6. Judge v2 or v3: decision rule, committed before scoring (2026-10-16)
+
+Aleena labeled 40 attempt-1 answers of the champion dev run (`docs-20261016-214710-02abb7`) on
+the fixed screen (citations first, rubric v2 text shown, no judge in view): 25 on the judge-test
+side, 15 on the judge-dev side; core supported 37 yes / 3 no, fully supported 18 / 22,
+responsive 40 / 0. Both judges (`2cf75fa03e09` validated, `9e7b588e83f8` candidate) graded these
+answers before the labels existed. This rule was committed before either judge was scored against
+them:
+
+1. **Primary verdict: core supported** (the advisory one, and the reason v3 exists). v3 replaces
+   v2 only if, on the 40, v3 agrees with the labels on more answers than v2 and the difference is
+   beyond chance: exact McNemar p < 0.05 on the answers where exactly one judge agrees with the
+   label.
+2. **Guard: fully supported.** v3 must not agree on fewer answers than v2 by more than one, and
+   McNemar on fully must not favour v2 at p < 0.05.
+3. Otherwise **v2 stays** the validated judge, because every recorded number (the iteration 1 and
+   2 gates, the changelog, the README) was produced by v2, and v2's fully-supported validation
+   (kappa 1.00 on 65 blind labels) does not transfer to a changed prompt.
+4. If v3 passes 1 and 2, its resample stability is measured on the same run before adoption,
+   and every run in the changelog is re-judged with v3 so the history stays on one judge version.
+5. Either way, both judges' agreement on the 40 is reported with intervals, split by label side
+   and by whether the case's original-run disagreement informed rubric v3 (`docs-ai-004-p3`,
+   `docs-ai-007`, `docs-ai-023` are among the 40), since those cases are not independent of v3's
+   design; and the judge-dev side, where the labeler calibrated against v2's reasoning on the same
+   questions in the earlier run, is reported separately.
+
+Known before scoring: with 3 of 40 labels failing core, the core comparison can only resolve a
+large difference, so rule 1 is unlikely to be met unless v3 corrects several answers v2 gets
+wrong. If v3 looks better without meeting the rule, the number of further labels needed to decide
+is computed from the observed discordance and reported.
+
 ## 4. Decision
 
 - Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
