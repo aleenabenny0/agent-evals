@@ -102,3 +102,40 @@ docs-core-002, docs-ai-003-p1, docs-mix-018, docs-mix-024, docs-mix-057, docs-mi
 docs-mix-068, docs-mix-020, docs-mix-087, docs-core-017, docs-mix-046, docs-int-004,
 docs-ai-002-p1 (attempt 1 of each).
 
+## Spot check (2026-10-17): the rule failed by one, so the judge's v5 number is not trusted
+
+Aleena labeled the 30 pre-registered answers (`results/labels/docs-20261017-174739-1c0e8e.jsonl`,
+exported in `a4c3efa` before any comparison). Against the validated judge on fully supported:
+agreement 27 of 30, kappa 0.78, the judge failing none that she passed and **passing 3 that she
+failed** (the rule allowed 2). Under the rule, the judge's 0.612 for v5 is not trusted, and the
+test split has not been run.
+
+The three answers the judge passed and she failed:
+
+- docs-ai-001-p2: "according to the Amazon Bedrock cross-Region inference documentation".
+- docs-mix-049: "this is stated in the Aurora Serverless v2 user guide".
+- docs-mix-024: "alongside your compiled executable", for a quote about dependencies and the
+  deployment package.
+
+In the first two, the judge's reason credits the attribution because the cited URL is that page.
+Rubric v2 makes a statement about where the documentation says something a claim that needs a
+quote, so her reading follows the rubric's letter. The third is a paraphrase read as plain
+rewording.
+
+Facts that bear on the next step (post hoc, not part of the rule):
+
+| | v3 answers | v5 answers |
+|---|---|---|
+| Fully supported by Aleena's labels | 27 of 80 (0.34, 95% CI 0.24 to 0.45) | 18 of 30 (0.60, 0.42 to 0.75) |
+| Judge passes she failed | 2 of 25 | 3 of 21 |
+| Answers naming their source page ("according to the ... documentation") | 10.9% of 349 | 11.4% of 352 |
+| Of those, the judge passed | 37% | 70% |
+
+The v3 labels are the first 80 attempt-1 answers in case-id order, and the v5 labels are a hash
+sample, so the two rates compare different cases. By her labels v5 is better by about 26
+points; the judge says 30.
+
+The judge's error is not new. v5 names its source as often as v3 did, but in v5 that phrase is
+more often the only unsupported claim left, so the judge's blind spot weighs more. This is the
+drift the spot-check rule exists to catch.
+

@@ -1,0 +1,14 @@
+                            judge vs aleena on all                             
++-----------------------------------------------------------------------------+
+|                |    |       |   TPR (catches |    TNR (passes |             |
+| verdict        |  n | kappa |      failures) |  good answers) | tp/fp/fn/tn |
+|----------------+----+-------+----------------+----------------+-------------|
+| core_supported | 30 | 1.000 |              - |  1.00 (0.89 to |    0/0/0/30 |
+|                |    |       |                |          1.00) |             |
+| supported      | 30 | 0.783 |  0.75 (0.47 to |  1.00 (0.82 to |    9/0/3/18 |
+|                |    |       |          0.91) |          1.00) |             |
+| responsive     | 30 | 1.000 |              - |  1.00 (0.89 to |    0/0/0/30 |
+|                |    |       |                |          1.00) |             |
++-----------------------------------------------------------------------------+
+bars (docs/plans/llm-judge.md): kappa at least 0.7 on each verdict on 
+judge-test; fewer than 30 labeled answers is too few to conclude anything

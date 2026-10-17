@@ -445,6 +445,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   test split runs, **Aleena spot-checks 30 v5 answers** (the command is in the plan's dev-result
   section; the list is fixed by a hash). The number is trusted if the judge passes at most 2 answers
   she fails on fully supported. Then: the test split once, the CHANGELOG entry, and her ship decision.
+  **Spot check done (2026-10-17): failed by one.** The judge passed 3 of her fails, against a bar of 2; two
+  are attributions it credits from the cited URL. Test split not run. Her labels: v5 0.60 fully
+  supported (n 30) against v3 0.34 (n 80). Next step is her decision (plan, "Spot check").
 
 ## Target: the three project briefs
 
