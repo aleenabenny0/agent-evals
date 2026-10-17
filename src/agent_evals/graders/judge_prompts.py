@@ -63,7 +63,22 @@ Billing factors, commitment terms and option lists are core claims when the ques
 something is billed or what the options are; otherwise they are peripheral."""
 )
 
-SUPPORT_RUBRICS = {"v2": SUPPORT_RUBRIC, "v3": SUPPORT_RUBRIC_V3}
+# V4 of the rubric (DRAFT, 2026-10-16): rubric v2 plus Aleena's two decisions after the v2-vs-v3
+# adjudication (docs/judge-validation.md section 7). (1) Decided and written: a statement that the
+# documentation does NOT say something is a hedge. (2) Decided, wording to be added by Aleena:
+# when a question asks how something is billed, the price factors are not part of the main
+# answer (they are peripheral). Not validated and not used by any gate until (2) is written and
+# the judge built on it is scored against fresh labels; v2 stays the validated judge until then.
+SUPPORT_RUBRIC_V4 = (
+    SUPPORT_RUBRIC
+    + """
+
+Statements about what the documentation says or where are claims, but a statement that it does
+not say something ("the docs don't state the starting number", "the docs don't define a new
+customer") is a hedge and needs no support."""
+)
+
+SUPPORT_RUBRICS = {"v2": SUPPORT_RUBRIC, "v3": SUPPORT_RUBRIC_V3, "v4": SUPPORT_RUBRIC_V4}
 
 
 def supported_prompt(rubric: str) -> str:

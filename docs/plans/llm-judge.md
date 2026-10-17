@@ -104,3 +104,17 @@ column's meaning; prose near the row ("the deprecated runtime") does not. This c
 prompt, so the judge version moved and the dev run was re-judged before the final scoring. Validation restarts: relabel judge-dev under the new
 rubric, tune the judge against it, relabel judge-test once and score once. "Responsive" gets its
 first real negatives from 30 to 40 closed-book answers, labeled with that question only.
+
+## Revision (Aleena, 2026-10-16): two rubric questions from the v2-vs-v3 adjudication
+
+The blind adjudication of the 40-label comparison (`docs/judge-validation.md` section 7) left two
+disagreements that belonged to the rubric rather than to anyone's mistake. Decisions:
+
+1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
+   (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
+2. **Price factors are not part of the main answer** when a question asks how something is
+   billed; they are peripheral. Aleena will add the wording to rubric v4 later.
+
+Both apply from judge v4 on. v2 stays the validated judge until v4, with the billing wording in,
+is scored against fresh labels under a rule fixed in advance; if v4 is adopted, every run in the
+changelog is re-judged with it so the history stays on one judge version.

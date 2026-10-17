@@ -409,10 +409,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   result: both judges wrong on docs-ai-007 (headerless rows matched to columns by elimination);
   docs-ai-023 genuinely ambiguous (blind 4-1 reads price factors as core; both readings
   defensible); docs-chg-003/004/008 labels look like slips under the rubric's plain reading.
-  Open for Aleena: (1) recheck those three labels on the screen without the judge:
-  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --revisit all --case docs-chg-003 --case docs-chg-004 --case docs-chg-008`;
-  (2) two rubric questions: is "the docs don't say X" a hedge or a claim? Are price factors part
-  of the main answer when someone asks how a thing is billed?
+  Aleena's decisions (2026-10-16): "the docs don't say X" is a hedge (written into draft rubric
+  v4, `configs/judge-v4.yaml`, judge `c6a0e804f415`); price factors are not core for billing
+  questions (wording: Aleena will add it to rubric v4). These settle docs-chg-004, docs-chg-008
+  and docs-ai-023. Left for Aleena: (1) recheck one label, docs-chg-003:
+  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --revisit all --case docs-chg-003`;
+  (2) add the billing wording to rubric v4. Then judge v4 is validated on fresh labels; v2 stays
+  the gate's judge until then.
 
 ## Target: the three project briefs
 

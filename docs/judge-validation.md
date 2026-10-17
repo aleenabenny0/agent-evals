@@ -482,3 +482,29 @@ Findings:
    followed a standing user rule to load a skill and read a shared log. Blind or isolated agents
    now run as an agent type without CLAUDE.md, and their transcripts are audited; the expected
    tool-call count is a cheap leak detector.
+
+### Decisions on the two rubric questions (Aleena, 2026-10-16)
+
+1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
+   (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
+2. **Price factors are not part of the main answer** when a question asks how something is
+   billed; they are peripheral. Aleena will add the wording to rubric v4 later.
+
+What follows from them:
+
+- **Labels.** For docs-chg-004 the clean panel's only unsupported statement was an absence
+  statement ("The docs don't state the starting number"), so under decision 1 the label (fully
+  supported: yes) stands. docs-chg-008 turned on an absence statement plus a page name inside the
+  same closing hedge; the label already reads the whole caveat as a hedge, and stands on that
+  reading. docs-ai-023's label (core: yes) matches decision 2. docs-chg-003 ("stops providing
+  patches" for the quote's "may no longer apply") is untouched by either decision and is the one
+  label still offered back for a second look.
+- **Judge.** v2 stays the validated judge. It counts absence statements as unsupported claims, so
+  its fully-supported verdict is stricter than the labeler's rubric on that point; this is now a
+  documented difference, not a disagreement to re-score. Judge v4 (draft) waits for the billing
+  wording; then it is run on a fresh run's answers and scored against fresh labels, as in
+  section 6.
+- **Headline metric.** Decision 1 relaxes "fully supported", so the iteration-1 numbers (10.6% to
+  31.8% on test) are v2-judge numbers and stay labelled as such until a re-judge under an adopted
+  v4.
+
