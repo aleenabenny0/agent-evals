@@ -140,3 +140,55 @@ fabricated_citation 0.028, unsupported_entity 0.060, $0.35. Three failures, unre
 score is higher than dev's because dev deliberately holds the paraphrase groups (whose source,
 `docs-ai-001`, is category B six times over) and the two held cases; dev is built to be the
 harder, more informative split.
+
+## Unsupported claims in the v3 champion's answers (iteration 3 error analysis, 2026-10-17)
+
+**Run:** `docs-20261016-214710-02abb7` (prompt v3, dev split). **Set:** all 82 attempt-1 answers
+that the validated judge (`2cf75fa03e09`) fails on fully supported, of 115 answered; only 5 of
+them also fail core supported. **Method:** eight reader agents of a type that inherits no session
+instructions, with read-only tools, each took 10 or 11 answers. Each reader listed every
+unsupported claim under the judge's rubric, not only the one the judge named, and gave it the
+first cause that applies in the order below. "On a page the agent read" was decided by searching
+the exported text of every page the agent read or cited, never from memory. Aleena's notes went
+in as evidence for the 55 answers that had one. A ninth reader re-read 15 answers on its own. Dev
+only. Data, per answer and per claim: `results/iteration-3/error-analysis.json`; export
+`scripts/export_unsupported_claims.py`; workflow `results/iteration-3/error-analysis-workflow.js`.
+
+| Cause (first that applies) | Claims | Core | Answers with it | Answers where it is the only cause |
+|---|---|---|---|---|
+| About the docs: what they say, leave out, or where | 27 | 0 | 21 | 6 |
+| Headerless row: a table value's column not quoted | 16 | 4 | 13 | 6 |
+| On a page the agent read, not quoted | 82 | 7 | 57 | 31 |
+| Beyond the quote: stronger, broader, or inferred | 27 | 5 | 25 | 4 |
+| On no page the agent read | 4 | 0 | 4 | 0 |
+| Other (a wrong unit conversion) | 1 | 0 | 1 | 1 |
+| **Total** | **157** | **16** | **82** | |
+
+- **The agent mostly had the evidence and did not quote it.** The commonest form is a quote cut
+  short of the words the answer uses: docs-ai-005-p2's quote stops at "to identify", so nothing
+  quoted says what the field identifies; docs-core-002's stops at "and are", dropping "subject to
+  change"; docs-chg-016 quotes the Adjustable header but not the row's "Yes". v3's own rule
+  ("a short quote ... one sentence or less") pushes in that direction.
+- **Background knowledge is rare:** four claims on no page the agent read, all workarounds or
+  asides (docs-core-011's create-copy-delete bucket rename, docs-int-007's dead-letter pattern).
+- **Going beyond the quote** is mostly a strengthened modal or scope: "you must rotate manually"
+  where the page says "can" (docs-core-037), "only needed for" where the quote lists one case
+  (docs-int-029).
+- **Statements about the docs** are the agent narrating its sources ("the Kendra page still
+  mentions a free trial", "the docs do not say whether the 300-VPC limit can be increased").
+- **Almost all of it is removable:** in 71 of 82 answers the answer stays complete with every
+  unsupported claim deleted (5 partly, 6 no), and in 72 the claims could have been kept by quoting
+  text the agent had read (47 fully, 25 partly).
+- **The judge's verdict held up:** the readers confirmed at least one unsupported claim in 78 of
+  82 and were unsure in 4; none found an answer that was in fact fully supported.
+
+**Reliability.** The independent second reading gave the identical set of causes on 11 of 15
+answers (mean Jaccard 0.80), the same verdict on whether the unsupported content was removable
+on 15 of 15, and the same verdict on the judge on 13 of 15. All four differences are claims about
+the docs that one reader counted and the other let pass, so that row is the least certain; the
+ranking of causes does not depend on it.
+
+Fixing a cause flips an answer only if every unsupported claim in it is fixed: quoting what was
+on the page alone would make 31 answers fully supported; together with going beyond the quote, 45;
+together with that and the statements about the docs, 65.
+
