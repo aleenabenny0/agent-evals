@@ -1,0 +1,298 @@
+{
+  "rubric_v2": "Core claims are the statements that answer the question: the direct answer and the facts it\nrests on. Peripheral claims are everything else factual: added context, extra numbers, names\nof APIs or parameters, descriptions of other features, statements about what the documentation\nsays or where.\n\nA claim is supported when a quote states it, or when it follows from the quotes by simple\narithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table row or cell\nquoted without its column header supports only what it literally says: a bare \"Yes\" does not\nestablish \"adjustable\", and a row of dates does not establish which date is the deprecation date.\nThe header counts only when it is inside a quote: a quoted header fragment that names the column\n(for example \"Deprecation date\") does establish the meaning of that value. Advice (\"check the\nconsole\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no\nsupport. Judge support, not truth: a true claim that no quote states is unsupported.",
+  "rubric_v3": "Core claims are the statements that answer the question: the direct answer and the facts it\nrests on. Peripheral claims are everything else factual: added context, extra numbers, names\nof APIs or parameters, descriptions of other features, statements about what the documentation\nsays or where.\n\nA claim is supported when a quote states it, or when it follows from the quotes by simple\narithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table row or cell\nquoted without its column header supports only what it literally says: a bare \"Yes\" does not\nestablish \"adjustable\", and a row of dates does not establish which date is the deprecation date.\nThe header counts only when it is inside a quote: a quoted header fragment that names the column\n(for example \"Deprecation date\") does establish the meaning of that value. Advice (\"check the\nconsole\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no\nsupport. Judge support, not truth: a true claim that no quote states is unsupported.\n\nA quota row quoted without its header, such as \"Cache behaviors per distribution | 75\", states\nthe number 75 and nothing else: not that 75 is a default, a maximum or a limit, and not whether\nit can be raised. Those are claims about the column, which only a quoted header can supply.\nBilling factors, commitment terms and option lists are core claims when the question asks how\nsomething is billed or what the options are; otherwise they are peripheral.",
+  "responsive_prompt": "You are checking whether an answer responds to the question that was asked.\n\nYou will be given a user's question about AWS documentation, a reference answer written by a\nperson from the documentation, and an assistant's answer. Decide one thing only: does the\nassistant's answer address the question as asked and agree with the reference on substance?\n\n- \"pass\" when the answer covers what was asked and says what the reference says, in any wording.\n  A multi-part question needs every part answered. A question built on a false premise needs the\n  premise rejected, as the reference does. Extra correct detail is not a failure.\n- \"fail\" when the answer addresses a nearby question instead, leaves a part out, or contradicts\n  the reference on substance.\n- Do not judge citations, formatting or tone.\n\nCall submit_verdict with \"pass\" or \"fail\" and a one-sentence reason.",
+  "items": [
+    {
+      "id": "docs-ai-007#1",
+      "case_id": "docs-ai-007",
+      "attempt": 1,
+      "type": "multi_step",
+      "area": "ai_ml",
+      "label_side": "judge-test",
+      "v3_informed": true,
+      "question": "My Bedrock workload has EU data-residency rules. Which kind of cross-Region inference profile should I use, and what does that mean for cost compared with the global option?",
+      "reference_answer": "Use a geographic (EU) cross-Region inference profile so processing stays within the geography; it is billed at standard pricing, whereas global cross-Region inference saves approximately 10%.",
+      "answer": "Use a Geographic cross-Region inference profile tied to the EU, not a Global profile. Geographic profiles keep processing within the geography: Amazon Bedrock \"automatically selects a commercial AWS Region within that geography to process your inference request.\" Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.\n\nCost: a Geographic profile is at standard pricing, while Global is about 10% cheaper (\"Approximately 10% savings\"). So choosing EU geographic means you give up that roughly 10% discount in exchange for residency. Pricing for either is based on the Region from which you call the profile, and cross-Region routing itself has no extra charge.\n\nAlso check SCPs: Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\".",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+          "quote": "When you choose an inference profile tied to a specific geography, Amazon Bedrock automatically selects a commercial AWS Region within that geography to process your inference request."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+          "quote": "| Data residency | Within geographic boundaries (such as US, EU, and APAC) | Any supported AWS commercial Region worldwide | Choose Geographic for compliance requirements |"
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+          "quote": "| Cost | Standard pricing | Approximately 10% savings | Choose Global for cost optimization |"
+        },
+        {
+          "n": 4,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+          "quote": "There's no additional routing cost for using cross-Region inference. The price is calculated based on the Region from which you call an inference profile."
+        },
+        {
+          "n": 5,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/cross-region-inference.html",
+          "quote": "| SCP requirements | Allow all destination Regions in profile | Allow `\"aws:RequestedRegion\": \"unspecified\"` | Configure based on your organizational policies |"
+        }
+      ],
+      "disputed": [
+        "core_supported",
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "no",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Core n: the cost comparison (Geographic standard pricing vs Global about 10% cheaper) rests on the row \"Cost | Standard pricing | Approximately 10% savings | Choose Global for cost optimization\", quoted without the Geographic/Global header row, so the quotes don't establish which cell belongs to which profile type. The EU/Geographic part is supported by quotes 1 and 2."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Every claim is quoted: geographic profiles process within the geography (quotes 1 and 2), global profiles route to any commercial Region (quote 2), pricing is standard versus about 10% savings (quote 3), there's no extra routing cost and pricing is based on the calling Region (quote 4), and the SCP requirements (quote 5).",
+        "responsive_reason": "The answer recommends a geographic EU cross-Region profile for residency, states it is billed at standard pricing, and says global saves about 10%, which matches the reference. The extra SCP and pricing details do not contradict it."
+      },
+      "judge_v3": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Every claim is quoted or follows from the quotes: the Geographic profile keeps processing within the EU geography, Global routes to any commercial Region worldwide, Global has about 10% savings, routing has no extra charge, and the SCP requirements for each profile type.",
+        "responsive_reason": "The answer recommends a geographic EU cross-Region profile for residency, states it is billed at standard pricing, and says global saves about 10%, which matches the reference. The extra SCP and pricing details do not contradict it."
+      }
+    },
+    {
+      "id": "docs-ai-023#1",
+      "case_id": "docs-ai-023",
+      "attempt": 1,
+      "type": "lookup",
+      "area": "ai_ml",
+      "label_side": "judge-test",
+      "v3_informed": true,
+      "question": "How is Amazon Bedrock Provisioned Throughput billed?",
+      "reference_answer": "Hourly, based on the model, the number of model units and the commitment term; billing continues until you delete the Provisioned Throughput.",
+      "answer": "Amazon Bedrock Provisioned Throughput is billed hourly for as long as you hold it. The hourly price depends on three factors: the model (custom models are priced the same as the base model they were customized from), the number of Model Units (MUs) you purchase, and the commitment duration. Commitment options are no commitment (deletable any time), 1 month, or 6 months, and longer commitments have a more discounted hourly price. Billing continues until you delete the Provisioned Throughput. For exact rates, see the Amazon Bedrock pricing page; per-MU pricing is available from your AWS account manager.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+          "quote": "You're billed hourly for a Provisioned Throughput that you purchase."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+          "quote": "The price per hour\ndepends on the following factors:"
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+          "quote": "The longer the commitment\n   duration, the more discounted the hourly price becomes."
+        },
+        {
+          "n": 4,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+          "quote": "Billing continues until you delete the Provisioned Throughput."
+        },
+        {
+          "n": 5,
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+          "quote": "for custom models, pricing is the same as the base\n   model that it was customized from"
+        }
+      ],
+      "disputed": [
+        "core_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Fully n: the number of Model Units as a pricing factor, the commitment options (no commitment, 1 month, 6 months), and \"per-MU pricing is available from your AWS account manager\" are not in any cited quote (they appear only in the dim page context; quote 2 stops before the list of factors). Core y: quote 1 says Provisioned Throughput is billed hourly and quote 4 says billing continues until you delete it."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The quotes support hourly billing, the commitment discount, billing until deletion and custom-model pricing. They don't state the commitment options (no commitment, 1 month, 6 months), that the number of MUs is a pricing factor, or that per-MU pricing comes from an account manager.",
+        "responsive_reason": "The answer states hourly billing based on model, number of model units and commitment term, and that billing continues until the Provisioned Throughput is deleted, matching the reference; the extra detail is consistent."
+      },
+      "judge_v3": {
+        "core_supported": "fail",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The quotes never list the pricing factors, so the claim that the price depends on the number of Model Units is unsupported. The commitment options (no commitment, 1 month, 6 months) and the account-manager pricing claim are also not quoted.",
+        "responsive_reason": "The answer states hourly billing based on model, number of model units and commitment term, and that billing continues until the Provisioned Throughput is deleted, matching the reference; the extra detail is consistent."
+      }
+    },
+    {
+      "id": "docs-chg-003#1",
+      "case_id": "docs-chg-003",
+      "attempt": 1,
+      "type": "changed_default",
+      "area": "compute",
+      "label_side": "judge-test",
+      "v3_informed": false,
+      "question": "Our function runs on a runtime that Lambda deprecated last month. Will Lambda stop invoking it?",
+      "reference_answer": "No. You can continue to invoke functions on a deprecated runtime indefinitely. But AWS may no longer apply security patches or updates to that runtime, the functions are no longer eligible for technical support, and AWS strongly recommends migrating to a supported runtime.",
+      "answer": "No. Lambda does not stop invoking functions on a deprecated runtime. The docs say you can keep invoking them indefinitely, but AWS strongly recommends migrating and stops providing patches and technical support. The restrictions come in stages: creating new functions on the runtime is blocked at least 30 days after deprecation, and updating existing functions' code and configuration is blocked at least 60 days after deprecation. Since your runtime was deprecated last month, you may be close to the create block, and the update block will follow. Check the exact dates for your runtime in the deprecated runtimes table, and plan to upgrade your function to a supported runtime, since rolling back may be blocked once updates are blocked.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+          "quote": "While you can continue to invoke your functions indefinitely, AWS strongly recommends migrating to a supported runtime."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+          "quote": "After a runtime is deprecated, AWS may no longer apply security patches or updates to that runtime, and functions using that runtime are no longer eligible for technical support."
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+          "quote": "| Block function create | At least 30 days after deprecation |"
+        },
+        {
+          "n": 4,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+          "quote": "| Block function update | At least 60 days after deprecation |"
+        },
+        {
+          "n": 5,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html",
+          "quote": "You will not be able to revert to the deprecated runtime after function updates are blocked."
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "yes",
+        "responsive": "yes",
+        "note": ""
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The core claim that Lambda keeps invoking functions on a deprecated runtime is quoted in quote 1. The first unsupported claim is that the update block covers \"code and configuration\", because quote 4 says only \"Block function update\". The answer also turns \"may no longer apply security patches\" into a flat statement that AWS \"stops providing patches\".",
+        "responsive_reason": "The answer says Lambda does not stop invoking functions on a deprecated runtime, and it covers the lack of patches, the loss of support and the migration recommendation. The extra detail about create and update blocks doesn't contradict the reference."
+      },
+      "judge_v3": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The answer says AWS \"stops providing patches\", but quote 2 only says AWS \"may no longer apply\" them. The answer also says updates to \"code and configuration\" are blocked, which the quoted \"Block function update\" row doesn't state. The core claim that Lambda keeps invoking the function is quoted in quote 1.",
+        "responsive_reason": "The answer says Lambda does not stop invoking functions on a deprecated runtime, and it covers the lack of patches, the loss of support and the migration recommendation. The extra detail about create and update blocks doesn't contradict the reference."
+      }
+    },
+    {
+      "id": "docs-chg-004#1",
+      "case_id": "docs-chg-004",
+      "attempt": 1,
+      "type": "changed_default",
+      "area": "compute",
+      "label_side": "judge-test",
+      "v3_informed": false,
+      "question": "I just opened a new AWS account. Do I get the standard 1,000 concurrent executions for Lambda right away?",
+      "reference_answer": "Not necessarily. New AWS accounts have reduced concurrency and memory quotas for Lambda functions, and AWS raises them automatically based on usage. The documented default of 1,000 concurrent executions, which can be increased to tens of thousands, is the quota for established accounts.",
+      "answer": "Not necessarily. The documented default is 1,000 concurrent executions per Region, but new accounts start with reduced Lambda concurrency quotas that AWS raises automatically based on usage. The docs don't state the starting number, so check your account's actual value in the Service Quotas console (or with aws lambda get-account-settings), and request an increase if you need more now.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "quote": "By default, Lambda provides your account with a total concurrency limit of 1,000 concurrent executions across all functions in an AWS Region."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html",
+          "quote": "New AWS accounts have reduced concurrency and memory quotas for Lambda Functions and Lambda MicroVMs."
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html",
+          "quote": "AWS raises these quotas automatically based on your usage."
+        },
+        {
+          "n": 4,
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-limits.html",
+          "quote": "To see the quotas that apply to your account, navigate to the"
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "yes",
+        "responsive": "yes",
+        "note": ""
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The core claims (1,000 default, reduced quotas for new accounts, automatic raises) are quoted, but the `aws lambda get-account-settings` command is not in any quote, and the \"Service Quotas console\" is not named in the truncated quote 4.",
+        "responsive_reason": "The answer says \"not necessarily\", explains that new accounts start with reduced concurrency quotas that AWS raises automatically based on usage, and treats 1,000 as the documented default. This matches the reference, and the extra advice on checking the actual value is correct."
+      },
+      "judge_v3": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The core claims (1,000 default per Region, reduced quotas for new accounts, automatic raises) are quoted, but quote 4 is cut off at \"navigate to the\", so nothing cited names the Service Quotas console or the `aws lambda get-account-settings` command.",
+        "responsive_reason": "The answer says \"not necessarily\", explains that new accounts start with reduced concurrency quotas that AWS raises automatically based on usage, and treats 1,000 as the documented default. This matches the reference, and the extra advice on checking the actual value is correct."
+      }
+    },
+    {
+      "id": "docs-chg-008#1",
+      "case_id": "docs-chg-008",
+      "attempt": 1,
+      "type": "changed_default",
+      "area": "ai_ml",
+      "label_side": "judge-dev",
+      "v3_informed": false,
+      "question": "Is SageMaker Clarify available if my account has never used it before?",
+      "reference_answer": "No. Amazon SageMaker Clarify is no longer open to new customers. Existing customers can continue to use it as normal, with no new features planned.",
+      "answer": "Probably not. The SageMaker Clarify documentation says the service is no longer open to new customers, so an account that has never used Clarify should not expect to be able to start using it. Existing customers can keep using it as normal. The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify, and the linked \"Clarify availability change\" page is not in the documentation snapshot I could access, so I could not check its details or any exceptions.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
+          "quote": "Amazon SageMaker Clarify is no longer open to new customers."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-model-explainability.html",
+          "quote": "Existing customers can continue to use the service as normal."
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "yes",
+        "responsive": "yes",
+        "note": ""
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The claim that the linked \"Clarify availability change\" page is not in the documentation snapshot is unsupported, because neither quote mentions that page or a snapshot. The core claims (Clarify is closed to new customers, and existing customers can continue to use it) are both quoted.",
+        "responsive_reason": "The answer says Clarify is no longer open to new customers while existing customers can keep using it, which matches the reference. Its hedging doesn't change that conclusion."
+      },
+      "judge_v3": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The core claims are quoted: Clarify is no longer open to new customers, and existing customers can keep using it. The statement that the \"Clarify availability change\" page is linked in the docs but not in the accessible snapshot is not in either quote, so the answer is not fully supported.",
+        "responsive_reason": "The answer says Clarify is no longer open to new customers while existing customers can keep using it, which matches the reference. Its hedging doesn't change that conclusion."
+      }
+    }
+  ]
+}

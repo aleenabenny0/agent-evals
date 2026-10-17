@@ -1,0 +1,295 @@
+{
+  "run": "docs-20261016-214710-02abb7",
+  "labeler": "aleena",
+  "n_labels": 40,
+  "verdicts": {
+    "core_supported": {
+      "n": 40,
+      "human_fail": 3,
+      "v2": {
+        "kappa": 0.7872340425531912,
+        "kappa_ci": [
+          0.0,
+          1.0
+        ],
+        "agree": 39,
+        "agree_ci": [
+          0.8711863103652591,
+          0.9955731684973186
+        ],
+        "tpr": [
+          0.6666666666666666,
+          0.20765960080204782,
+          0.9385080552796038
+        ],
+        "tnr": [
+          1.0,
+          0.9059421741627975,
+          1.0
+        ],
+        "tp_fp_fn_tn": [
+          2,
+          0,
+          1,
+          37
+        ],
+        "judge_pass_rate": 0.95
+      },
+      "v3": {
+        "kappa": 0.6396396396396391,
+        "kappa_ci": [
+          -0.03448275862068733,
+          1.0
+        ],
+        "agree": 38,
+        "agree_ci": [
+          0.8349612263085903,
+          0.9861793326138516
+        ],
+        "tpr": [
+          0.6666666666666666,
+          0.20765960080204782,
+          0.9385080552796038
+        ],
+        "tnr": [
+          0.972972972972973,
+          0.861759301362695,
+          0.9952130255480596
+        ],
+        "tp_fp_fn_tn": [
+          2,
+          1,
+          1,
+          36
+        ],
+        "judge_pass_rate": 0.925
+      },
+      "only_v2_agrees": 1,
+      "only_v3_agrees": 0,
+      "mcnemar_p": 1.0,
+      "delta_kappa_v3_minus_v2": -0.14759440291355208,
+      "delta_kappa_ci": [
+        -1.0,
+        0.0
+      ],
+      "judges_disagree_with_each_other": 1,
+      "subsets": {
+        "judge-test side, not v3-informed": {
+          "n": 22,
+          "human_fail": 1,
+          "v2_agree": 22,
+          "v3_agree": 22,
+          "v2_kappa": 1.0,
+          "v3_kappa": 1.0
+        },
+        "judge-test side, v3-informed": {
+          "n": 3,
+          "human_fail": 1,
+          "v2_agree": 2,
+          "v3_agree": 1,
+          "v2_kappa": 0.0,
+          "v3_kappa": -0.5000000000000001
+        },
+        "judge-dev side": {
+          "n": 15,
+          "human_fail": 1,
+          "v2_agree": 15,
+          "v3_agree": 15,
+          "v2_kappa": 1.0,
+          "v3_kappa": 1.0
+        }
+      }
+    },
+    "supported": {
+      "n": 40,
+      "human_fail": 22,
+      "v2": {
+        "kappa": 0.7959183673469388,
+        "kappa_ci": [
+          0.5844155844155845,
+          0.95
+        ],
+        "agree": 36,
+        "agree_ci": [
+          0.7694822477247771,
+          0.9604204713173936
+        ],
+        "tpr": [
+          0.9545454545454546,
+          0.7820195416134269,
+          0.9919305723787363
+        ],
+        "tnr": [
+          0.8333333333333334,
+          0.6077796189608428,
+          0.9416342319413854
+        ],
+        "tp_fp_fn_tn": [
+          21,
+          3,
+          1,
+          15
+        ],
+        "judge_pass_rate": 0.4
+      },
+      "v3": {
+        "kappa": 0.7959183673469388,
+        "kappa_ci": [
+          0.5844155844155845,
+          0.95
+        ],
+        "agree": 36,
+        "agree_ci": [
+          0.7694822477247771,
+          0.9604204713173936
+        ],
+        "tpr": [
+          0.9545454545454546,
+          0.7820195416134269,
+          0.9919305723787363
+        ],
+        "tnr": [
+          0.8333333333333334,
+          0.6077796189608428,
+          0.9416342319413854
+        ],
+        "tp_fp_fn_tn": [
+          21,
+          3,
+          1,
+          15
+        ],
+        "judge_pass_rate": 0.4
+      },
+      "only_v2_agrees": 0,
+      "only_v3_agrees": 0,
+      "mcnemar_p": 1.0,
+      "delta_kappa_v3_minus_v2": 0.0,
+      "delta_kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "judges_disagree_with_each_other": 0,
+      "subsets": {
+        "judge-test side, not v3-informed": {
+          "n": 22,
+          "human_fail": 10,
+          "v2_agree": 20,
+          "v3_agree": 20,
+          "v2_kappa": 0.8196721311475409,
+          "v3_kappa": 0.8196721311475409
+        },
+        "judge-test side, v3-informed": {
+          "n": 3,
+          "human_fail": 3,
+          "v2_agree": 2,
+          "v3_agree": 2,
+          "v2_kappa": -3.3306690738754706e-16,
+          "v3_kappa": -3.3306690738754706e-16
+        },
+        "judge-dev side": {
+          "n": 15,
+          "human_fail": 9,
+          "v2_agree": 14,
+          "v3_agree": 14,
+          "v2_kappa": 0.8571428571428572,
+          "v3_kappa": 0.8571428571428572
+        }
+      }
+    },
+    "responsive": {
+      "n": 40,
+      "human_fail": 0,
+      "v2": {
+        "kappa": 1.0,
+        "kappa_ci": [
+          1.0,
+          1.0
+        ],
+        "agree": 40,
+        "agree_ci": [
+          0.9123783988027133,
+          1.0
+        ],
+        "tpr": null,
+        "tnr": [
+          1.0,
+          0.9123783988027133,
+          1.0
+        ],
+        "tp_fp_fn_tn": [
+          0,
+          0,
+          0,
+          40
+        ],
+        "judge_pass_rate": 1.0
+      },
+      "v3": {
+        "kappa": 1.0,
+        "kappa_ci": [
+          1.0,
+          1.0
+        ],
+        "agree": 40,
+        "agree_ci": [
+          0.9123783988027133,
+          1.0
+        ],
+        "tpr": null,
+        "tnr": [
+          1.0,
+          0.9123783988027133,
+          1.0
+        ],
+        "tp_fp_fn_tn": [
+          0,
+          0,
+          0,
+          40
+        ],
+        "judge_pass_rate": 1.0
+      },
+      "only_v2_agrees": 0,
+      "only_v3_agrees": 0,
+      "mcnemar_p": 1.0,
+      "delta_kappa_v3_minus_v2": 0.0,
+      "delta_kappa_ci": [
+        0.0,
+        0.0
+      ],
+      "judges_disagree_with_each_other": 0,
+      "subsets": {
+        "judge-test side, not v3-informed": {
+          "n": 22,
+          "human_fail": 0,
+          "v2_agree": 22,
+          "v3_agree": 22,
+          "v2_kappa": 1.0,
+          "v3_kappa": 1.0
+        },
+        "judge-test side, v3-informed": {
+          "n": 3,
+          "human_fail": 0,
+          "v2_agree": 3,
+          "v3_agree": 3,
+          "v2_kappa": 1.0,
+          "v3_kappa": 1.0
+        },
+        "judge-dev side": {
+          "n": 15,
+          "human_fail": 0,
+          "v2_agree": 15,
+          "v3_agree": 15,
+          "v2_kappa": 1.0,
+          "v3_kappa": 1.0
+        }
+      }
+    }
+  },
+  "decision": {
+    "rule1_core_v3_better_beyond_chance": false,
+    "rule2_fully_not_worse": true,
+    "adopt_v3": false
+  }
+}

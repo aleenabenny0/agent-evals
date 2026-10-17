@@ -399,6 +399,17 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   answers: `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --limit 40`; then
   the agent runs `judge-validate` for both judges and picks the one with the higher core kappa
   (fully is already at 1.00 for the validated one).
+- **Judge v2 vs v3 settled (2026-10-16 late).** Aleena labeled 40 fresh answers of the champion
+  run. Rule committed first (`38c786f`, validation doc section 6), then scored once
+  (`scripts/judge_compare.py`, `results/judge-v2-vs-v3/`): core v2 39/40 vs v3 38/40, fully 36/40
+  both (kappa 0.80), responsive 40/40 both (no failures to catch). **v2 stays; v3 rejected.**
+  Blind adjudication workflow (32 agents) on the 5 disputed answers: both judges wrong on
+  docs-ai-007 (headerless rows matched to columns by elimination); docs-ai-023 depends on the
+  rubric (v3's billing sentence was written against the labeler's reading, a revision error);
+  docs-chg-003/004/008 labels look like slips under the rubric's plain reading. Open for Aleena:
+  (1) recheck those three labels on the screen without the judge:
+  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --revisit all --case docs-chg-003 --case docs-chg-004 --case docs-chg-008`;
+  (2) decide whether "the docs don't say X" is a hedge or a claim.
 
 ## Target: the three project briefs
 

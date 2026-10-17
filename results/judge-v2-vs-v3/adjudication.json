@@ -1,0 +1,843 @@
+{
+  "workflow": "adjudicate-judge-disagreements",
+  "run_id": "wf_6eb0e797-8e7",
+  "agents": 32,
+  "logs": [
+    "docs-ai-007#1: panel 5/5; 4 defense(s) to run",
+    "docs-ai-023#1: panel 5/5; 0 defense(s) to run",
+    "docs-chg-003#1: panel 5/5; 1 defense(s) to run",
+    "docs-chg-004#1: panel 5/5; 1 defense(s) to run",
+    "docs-chg-008#1: panel 5/5; 1 defense(s) to run"
+  ],
+  "result": [
+    {
+      "id": "docs-ai-007#1",
+      "disputed": [
+        "core_supported",
+        "fully_supported"
+      ],
+      "raters": {
+        "human": {
+          "core_supported": "fail",
+          "fully_supported": "fail"
+        },
+        "judge_v2": {
+          "core_supported": "pass",
+          "fully_supported": "pass"
+        },
+        "judge_v3": {
+          "core_supported": "pass",
+          "fully_supported": "pass"
+        }
+      },
+      "panel_size": 5,
+      "tallies": {
+        "core_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        },
+        "fully_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        }
+      },
+      "ambiguous_votes": 0,
+      "ambiguity_notes": [],
+      "exemptions": [
+        [
+          "Also check SCPs"
+        ],
+        [
+          "Also check SCPs"
+        ],
+        [
+          "Also check SCPs"
+        ],
+        [
+          "Also check SCPs"
+        ],
+        [
+          "Also check SCPs"
+        ]
+      ],
+      "panel_claims": [
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\"",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\""
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\"",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\""
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "Global profiles can route to \"any supported AWS commercial Region worldwide,\" so they don't satisfy EU data-residency rules.",
+            "first_unsupported_other_claim": "Geographic profiles require allowing all destination Regions in the profile, whereas Global profiles need \"aws:RequestedRegion\": \"unspecified\"."
+          }
+        }
+      ],
+      "defenses": [
+        {
+          "verdict": "core_supported",
+          "who": "judge_v2",
+          "rv": "v2",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.",
+            "argument": "Rubric v2 counts a claim as supported when \"a quote states it\" or when it follows by \"plain rewording\", and it limits a row without its header only to \"what it literally says\". The direct answer is in the quotes word for word: quote 2's row says \"Choose Geographic for compliance requirements\" and \"Within geographic boundaries (such as US, EU, and APAC)\", and quote 1 says a profile tied to a geography processes requests \"within that geography\". The cell set against it, \"Any supported AWS commercial Region worldwide\", carries its own identifying word, because \"worldwide\" is a plain rewording of \"Global\", the only other option the quotes name (\"Choose Global for cost optimization\"). In the same way, quote 3's row puts \"Approximately 10% savings\" next to choosing Global for cost, and quote 4 states that routing costs nothing extra and that the price depends on the calling Region, so every core claim is either stated or plainly reworded, which is what judge v2's \"Every claim is quoted\" claims.",
+            "weakness": "No quote includes the Geographic/Global column header, and quote 2 never mentions Global, so assigning the \"worldwide\" cell to Global (and \"Standard pricing\" to Geographic) means working out the columns by elimination across quotes. That is exactly what \"a row of dates does not establish which date is the deprecation date\" and \"The header counts only when it is inside a quote\" forbid, and no quote states \"so they don't satisfy EU data-residency rules\" either. Judge v2's reason doesn't even make this argument: it cites quote 2 as if that row said Global profiles route worldwide, which misreads a row quoted without its header."
+          }
+        },
+        {
+          "verdict": "core_supported",
+          "who": "judge_v3",
+          "rv": "v3",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.",
+            "argument": "Rubric v3 says \"A claim is supported when a quote states it, or when it follows from the quotes by ... plain rewording.\" Quote [2]'s own cells state the direct answer: it is a \"Data residency\" row whose advice cell reads \"Choose Geographic for compliance requirements,\" and quote [1] backs it with \"a commercial AWS Region within that geography.\" These cells also describe themselves, unlike the rubric's bare \"Yes\", row of dates or \"75\": \"Within geographic boundaries (such as US, EU, and APAC)\" is the geographic scope, \"Any supported AWS commercial Region worldwide\" is a worldwide (that is, global) scope, and quote [3] names the other option \"Global\". So reading that cell as the Global profile's can be called plain rewording rather than a fact only a header could supply, and \"so they don't satisfy EU data-residency rules\" then just restates the row's own advice to choose Geographic for compliance.",
+            "weakness": "Rubric v3 says a row \"quoted without its column header supports only what it literally says,\" and that what a column means is a claim \"which only a quoted header can supply.\" Quote [2] never names Global, so giving its worldwide cell to Global profiles takes elimination across rows rather than plain rewording, the move the rubric bars with \"a row of dates does not establish which date is the deprecation date.\" Because this is the answer's stated reason for \"not a Global profile,\" it is a core fact the direct answer rests on, so core should fail."
+          }
+        },
+        {
+          "verdict": "fully_supported",
+          "who": "judge_v2",
+          "rv": "v2",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.",
+            "argument": "Rubric v2 counts a claim as supported \"when a quote states it, or when it follows from the quotes by ... plain rewording,\" and each sentence of the answer matches a cited quote. Quote [1] says a profile tied to a geography is processed \"within that geography,\" quote [4] covers the no-extra-routing-cost and calling-Region pricing points, and rows [2], [3] and [5] supply the residency, cost and SCP values. The headerless-row rule limits a row to \"what it literally says,\" but these rows are not bare values like a lone \"Yes\": their own cells say \"Within geographic boundaries (such as US, EU, and APAC),\" \"Choose Geographic for compliance requirements\" and \"Choose Global for cost optimization,\" so the quoted text names both options itself. On that reading, \"Any supported AWS commercial Region worldwide\" is the worldwide (global) counterpart of the geographic cell, so assigning it to the Global profile, and the 10% savings to the option the row says to choose \"for cost optimization,\" is plain rewording rather than a guess about columns.",
+            "weakness": "Rubric v2 says the header \"counts only when it is inside a quote\" and that a headerless row does not establish \"which date is the deprecation date.\" No cited quote has the Geographic/Global header and the word \"Global\" never appears in row [2], so saying which cell belongs to which profile is exactly the column inference the rubric forbids. Row [5] names neither option, so the answer's SCP split fails even on the self-labeling reading, and the judge's reason (\"global profiles route to any commercial Region (quote 2)\") misreads a quote that never mentions global profiles."
+          }
+        },
+        {
+          "verdict": "fully_supported",
+          "who": "judge_v3",
+          "rv": "v3",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.",
+            "argument": "Rubric v3 counts a claim as supported when it \"follows from the quotes by ... plain rewording\", and it limits a headerless row only to \"what it literally says\". Row [2] contrasts \"Within geographic boundaries (such as US, EU, and APAC)\" with \"Any supported AWS commercial Region worldwide\" under \"Data residency\", and the same row says \"Choose Geographic for compliance requirements\". Quote [1] already ties Geographic profiles to a Region \"within that geography\", so the worldwide cell reads as the global option by plain rewording (\"worldwide\" is \"global\"), and the row's own advice points compliance away from it. The rubric's examples (a bare \"Yes\", a row of dates, a bare quota number 75) are values that mean nothing without a header, while these cells describe themselves; row [3] also names \"Global\" as the cost choice next to \"Approximately 10% savings\", and quotes [1] and [4] state the remaining claims directly.",
+            "weakness": "No quoted cell names Global, so tying \"Any supported AWS commercial Region worldwide\" to Global profiles means working out which column is which by elimination: that is the rubric's \"row of dates\" case, and among the \"claims about the column, which only a quoted header can supply\"; \"so they don't satisfy EU data-residency rules\" is also a conclusion no quote states. Row [5] names no profile type at all, so the rater's \"SCP requirements for each profile type\" depends on a header that none of the quotes contain."
+          }
+        }
+      ]
+    },
+    {
+      "id": "docs-ai-023#1",
+      "disputed": [
+        "core_supported"
+      ],
+      "raters": {
+        "human": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        },
+        "judge_v2": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        },
+        "judge_v3": {
+          "core_supported": "fail",
+          "fully_supported": "fail"
+        }
+      },
+      "panel_size": 5,
+      "tallies": {
+        "core_supported": {
+          "v2": {
+            "pass": 3,
+            "fail": 2,
+            "majority": "pass"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        },
+        "fully_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        }
+      },
+      "ambiguous_votes": 5,
+      "ambiguity_notes": [
+        "Rubric v2 says \"Core claims are the statements that answer the question: the direct answer and the facts it rests on.\" It does not say whether, in an answer to \"How is ... billed?\", the price factors and commitment options are part of the direct answer or just \"added context\" and \"extra numbers\". I read the direct answer as hourly billing that continues until you delete the Provisioned Throughput. Quotes [1] and [4] support that, including \"for as long as you hold it\" as a plain rewording of [4], so v2 core passes. A careful reader could instead count the factor list as part of how it is billed. That reader would fail v2 core, because no quote gives the count \"three\", the \"number of Model Units (MUs)\" factor, or the \"no commitment (deletable any time), 1 month, or 6 months\" options; quote [2] stops at \"the following factors:\" with no list. v3 closes this question with \"Billing factors, commitment terms and option lists are core claims when the question asks how something is billed\", so neither v3 verdict is open. fully_supported fails under both rubrics either way. One more judgment call, which changes no verdict: I counted \"per-MU pricing is available from your AWS account manager\" as a factual claim, not advice. If it is advice, v3's first unsupported non-core claim becomes \"none\".",
+        "The question is v2's line \"Core claims are the statements that answer the question: the direct answer and the facts it rests on.\" I read the direct answer to \"How is ... billed?\" as the claim that it is billed hourly until you delete it, which quotes [1] and [4] support. Under that reading the factor and option lists are \"added context, extra numbers, names of APIs or parameters\", which makes them peripheral, so v2 core passes. A careful reader could instead say the billing-factor sentence also \"answers the question\". On that view \"three factors\" and \"the number of Model Units (MUs) you purchase\", which no quote supports, would be core and v2 core would fail. v3 settles this with \"Billing factors, commitment terms and option lists are core claims when the question asks how something is billed or what the options are; otherwise they are peripheral.\" That makes the MU factor and the option list \"no commitment (deletable any time), 1 month, or 6 months\" unsupported core claims. Quote [2] stops at \"the following factors:\" and lists none. v3 is not ambiguous here. None of the verdicts depend on two minor points: whether [5] supports \"the model\" as a factor, and whether the account-manager clause is advice.",
+        "The open question is v2's core_supported. v2 says: \"Core claims are the statements that answer the question: the direct answer and the facts it rests on.\" It doesn't say whether, for \"How is ... billed?\", the price-factor list (\"three factors\", \"the number of Model Units (MUs) you purchase\") and the commitment options (\"no commitment (deletable any time), 1 month, or 6 months\") count as part of the direct answer or as \"added context, extra numbers\". I read the direct answer as \"billed hourly for as long as you hold it\" plus \"Billing continues until you delete\", which quotes [1] and [4] support, so v2 core passes. A careful reader could instead count the factors and options as core, and then v2 core fails. v3's added sentence settles this (\"Billing factors, commitment terms and option lists are core claims when the question asks how something is billed\"), so the v3 verdicts are not ambiguous. Under every reading, v2 fully_supported fails: no quote gives the number of factors, mentions MUs, or lists the commitment options.",
+        "Rubric v2: \"Core claims are the statements that answer the question: the direct answer and the facts it rests on.\" On my reading, the three-factor sentence answers \"How is ... billed?\". Quote [2] stops at \"depends on the following factors:\" and gives no count and no list, and no quote mentions Model Units, so \"the number of Model Units (MUs) you purchase\" is clearly unsupported. That makes v2 core fail. But a careful reader could treat the direct answer as only \"billed hourly for as long as you hold it\" plus \"Billing continues until you delete\", which [1] and [4] support. That reader would count the factor list, the MU factor and the option list (no commitment, 1 month, 6 months) as \"added context\" or \"extra numbers\", so v2 core_supported would pass. v2 fully_supported fails either way. v3 settles the core question with \"Billing factors, commitment terms and option lists are core claims when the question asks how something is billed or what the options are\", so v3 core fail and v3 fully fail are not open to the opposite verdict.",
+        "The open question is v2 core_supported. v2 says: \"Core claims are the statements that answer the question: the direct answer and the facts it rests on. Peripheral claims are everything else factual: added context, extra numbers, names of APIs or parameters, descriptions of other features, statements about what the documentation says or where.\" My reading is that the factor list answers \"how is it billed\", so it is core and unsupported: quote [2] stops at \"the following factors:\" and no quote gives \"three\" or \"the number of Model Units (MUs) you purchase\". But a careful reader could take the direct answer to be only \"billed hourly for as long as you hold it\" and \"Billing continues until you delete the Provisioned Throughput\", which quotes [1] and [4] support. That reader could call the factor list and the \"no commitment (deletable any time), 1 month, or 6 months\" options added context or extra numbers, and v2 core_supported would then pass. v3 settles this with \"Billing factors, commitment terms and option lists are core claims when the question asks how something is billed\", so v3 has no ambiguity. Both rubrics' fully_supported verdicts are clear-cut either way."
+      ],
+      "exemptions": [
+        [
+          "For exact rates, see the Amazon Bedrock pricing page"
+        ],
+        [
+          "For exact rates, see the Amazon Bedrock pricing page"
+        ],
+        [
+          "For exact rates, see the Amazon Bedrock pricing page"
+        ],
+        [
+          "For exact rates, see the Amazon Bedrock pricing page"
+        ],
+        [
+          "For exact rates, see the Amazon Bedrock pricing page"
+        ]
+      ],
+      "panel_claims": [
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The hourly price depends on three factors: the model ..., the number of Model Units (MUs) you purchase, and the commitment duration"
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors: the model ..., the number of Model Units (MUs) you purchase, and the commitment duration",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The hourly price depends on three factors: ... the number of Model Units (MUs) you purchase"
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors: ... the number of Model Units (MUs) you purchase",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The hourly price depends on three factors"
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors",
+            "first_unsupported_other_claim": "Commitment options are no commitment (deletable any time), 1 month, or 6 months"
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          },
+          "v3": {
+            "core_supported": "fail",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "The hourly price depends on three factors",
+            "first_unsupported_other_claim": "per-MU pricing is available from your AWS account manager"
+          }
+        }
+      ],
+      "defenses": []
+    },
+    {
+      "id": "docs-chg-003#1",
+      "disputed": [
+        "fully_supported"
+      ],
+      "raters": {
+        "human": {
+          "core_supported": "pass",
+          "fully_supported": "pass"
+        },
+        "judge_v2": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        },
+        "judge_v3": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        }
+      },
+      "panel_size": 5,
+      "tallies": {
+        "core_supported": {
+          "v2": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          },
+          "v3": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          }
+        },
+        "fully_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        }
+      },
+      "ambiguous_votes": 1,
+      "ambiguity_notes": [
+        "\"A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.\" This sentence is the same in v2 and v3. Neither rubric says whether two changes count as plain rewording. The first drops the hedge in quote [2]: \"AWS may no longer apply security patches\" becomes \"stops providing patches\". The second narrows quote [4]: \"Block function update\" becomes updating \"code and configuration\". A reader who counts both as plain rewording could pass fully_supported. A second sentence also leaves a question open: \"A table row or cell quoted without its column header supports only what it literally says.\" It is unclear whether headerless rows [3] and [4] literally say when each block takes effect. v3's added sentence covers only quota rows, so it does not settle these rows. core_supported is not open: quote [1] states that functions can still be invoked indefinitely, and the staged blocks are about creating and updating functions, not invoking them."
+      ],
+      "exemptions": [
+        [
+          "Check the exact dates for your runtime in the deprecated runtimes table",
+          "plan to upgrade your function to a supported runtime"
+        ],
+        [
+          "Check the exact dates for your runtime in the deprecated runtimes table",
+          "plan to upgrade your function to a supported runtime",
+          "you may be close to the create block"
+        ],
+        [
+          "Check the exact dates for your runtime in the deprecated runtimes table",
+          "plan to upgrade your function to a supported runtime"
+        ],
+        [
+          "Check the exact dates for your runtime in the deprecated runtimes table",
+          "plan to upgrade your function to a supported runtime"
+        ],
+        [
+          "Since your runtime was deprecated last month, you may be close to the create block",
+          "Check the exact dates for your runtime in the deprecated runtimes table",
+          "plan to upgrade your function to a supported runtime"
+        ]
+      ],
+      "panel_claims": [
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches and technical support"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches and technical support"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches and technical support"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches and technical support"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "stops providing patches"
+          }
+        }
+      ],
+      "defenses": [
+        {
+          "verdict": "fully_supported",
+          "who": "human",
+          "rv": "v2",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "A claim is supported when a quote states it, or when it follows from the quotes by simple arithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording.",
+            "argument": "Rubric v2 counts a claim as supported when \"a quote states it, or when it follows from the quotes by ... plain rewording,\" and each factual claim in the answer matches a quote. Continued invocation and the advice to migrate come from [1]. The create and update blocks come from rows [3] and [4], whose cells (\"At least 30 days after deprecation\") explain themselves. The rollback warning comes from [5], which the answer even softens to \"may.\" The disputed clause \"stops providing patches and technical support\" sums up quote [2]: \"no longer eligible for technical support\" plainly rewords to AWS no longer giving support, and \"may no longer apply security patches or updates\" covers patches, with the same subject, timing (after deprecation) and direction. Read that way, with \"code and configuration\" taken as spelling out what row [4]'s \"Block function update\" blocks, the answer adds no fact the quotes lack.",
+            "weakness": "Quote [2] says only that AWS \"may no longer apply security patches or updates,\" and the flat \"stops providing patches\" turns that possibility into a certainty. A stronger claim is not \"plain rewording,\" and under \"a true claim that no quote states is unsupported\" the clause is unsupported, so \"fully supported\" must fail. The added \"code and configuration\" is arguably a second gap, since headerless row [4] \"supports only what it literally says\" (\"Block function update\")."
+          }
+        }
+      ]
+    },
+    {
+      "id": "docs-chg-004#1",
+      "disputed": [
+        "fully_supported"
+      ],
+      "raters": {
+        "human": {
+          "core_supported": "pass",
+          "fully_supported": "pass"
+        },
+        "judge_v2": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        },
+        "judge_v3": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        }
+      },
+      "panel_size": 5,
+      "tallies": {
+        "core_supported": {
+          "v2": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          },
+          "v3": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          }
+        },
+        "fully_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        }
+      },
+      "ambiguous_votes": 2,
+      "ambiguity_notes": [
+        "\"Advice (\"check the console\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no support.\" Set against \"Peripheral claims are everything else factual: added context, extra numbers, names of APIs or parameters, descriptions of other features, statements about what the documentation says or where,\" this sentence leaves two things open. First, is \"The docs don't state the starting number\" a hedge or a claim about what the docs say? Second, are \"Service Quotas console\" and \"aws lambda get-account-settings\", which sit inside the advice, claims that name APIs? I treated both as unsupported peripheral claims: no quote says the docs omit the number, quote [4] stops at \"navigate to the\", and no quote names the CLI command. A reader who exempts both would mark fully_supported as pass under v2 and v3. The core verdict is not open: \"Not necessarily\", the 1,000-per-Region default and the reduced quotas that AWS raises automatically all follow from quotes [1]-[3]. v3's added paragraphs do not apply: quote [1] is prose that says \"By default\" and \"limit\", not a row without a header, and the question is not about billing or options.",
+        "The open sentence is: \"Advice (\\\"check the console\\\"), hedges (\\\"I could not confirm\\\"), and offers to help are not factual claims and need no support.\" It overlaps with the definition of peripheral claims (\"names of APIs or parameters ... statements about what the documentation says or where\"), and the rubric does not say which wins when a phrase fits both. \"The docs don't state the starting number\" can be read as a hedge or as a statement about what the documentation says, and no quote supports it. \"Service Quotas console\" and \"aws lambda get-account-settings\" sit inside \"check ...\" advice but are also names of APIs. No quote supports either name, because quote [4] stops at \"navigate to the\" before naming anything. A reader who exempts all three would give fully_supported a pass under both rubrics. The core claims are supported under any reading: the 1,000 default by [1], reduced quotas for new accounts by [2], and automatic raises by [3]. The two v3 paragraphs do not apply here, because every quote is prose (no quota rows without headers) and the question is not about billing or options."
+      ],
+      "exemptions": [
+        [
+          "check your account's actual value",
+          "request an increase if you need more now"
+        ],
+        [
+          "so check your account's actual value",
+          "request an increase if you need more now"
+        ],
+        [
+          "so check your account's actual value",
+          "request an increase if you need more now"
+        ],
+        [
+          "check your account's actual value",
+          "request an increase if you need more now"
+        ],
+        [
+          "check your account's actual value",
+          "request an increase if you need more now"
+        ]
+      ],
+      "panel_claims": [
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs don't state the starting number"
+          }
+        }
+      ],
+      "defenses": [
+        {
+          "verdict": "fully_supported",
+          "who": "human",
+          "rv": "v2",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "Advice (\"check the console\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no support.",
+            "argument": "Every core claim is quoted nearly word for word: the 1,000-per-Region default is quote [1], the reduced quotas for new accounts are quote [2], and the automatic raises based on usage are quote [3], so \"Not necessarily\" follows by plain rewording. The rest of the answer reads as a hedge plus advice rather than new fact. \"The docs don't state the starting number\" works like the rubric's hedge \"I could not confirm\": it admits a gap, and it fits quote [2], which says \"reduced\" but gives no number. \"Check your account's actual value in the Service Quotas console ... and request an increase\" is almost the rubric's own advice example, \"check the console\", and rubric v2 says advice and hedges \"are not factual claims and need no support.\"",
+            "weakness": "Rubric v2 lists \"statements about what the documentation says or where\" as peripheral factual claims, and \"The docs don't state the starting number\" is exactly that kind of statement: no quote states it, and four cited sentences that give no number can't show, by arithmetic or plain rewording, that the documentation as a whole gives none (\"a true claim that no quote states is unsupported\"). The answer also names the `aws lambda get-account-settings` API and the Service Quotas console, and no quote contains either one, since quote [4] stops at \"navigate to the\"."
+          }
+        }
+      ]
+    },
+    {
+      "id": "docs-chg-008#1",
+      "disputed": [
+        "fully_supported"
+      ],
+      "raters": {
+        "human": {
+          "core_supported": "pass",
+          "fully_supported": "pass"
+        },
+        "judge_v2": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        },
+        "judge_v3": {
+          "core_supported": "pass",
+          "fully_supported": "fail"
+        }
+      },
+      "panel_size": 5,
+      "tallies": {
+        "core_supported": {
+          "v2": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          },
+          "v3": {
+            "pass": 5,
+            "fail": 0,
+            "majority": "pass"
+          }
+        },
+        "fully_supported": {
+          "v2": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          },
+          "v3": {
+            "pass": 0,
+            "fail": 5,
+            "majority": "fail"
+          }
+        }
+      },
+      "ambiguous_votes": 2,
+      "ambiguity_notes": [
+        "\"Advice (\"check the console\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no support.\" This sentence doesn't say whether the whole closing caveat counts as a hedge. That caveat makes two statements about the docs: that they do not explicitly define \"new customer\" for an account that has never used Clarify, and that they link to a \"Clarify availability change\" page. Under \"statements about what the documentation says or where\", both can be read as peripheral claims, and no quote states either one. That is my reading, so fully_supported fails. A careful reader who treats the whole sentence as a hedge would find every remaining claim supported and pass fully_supported under both rubrics. On the core claims, \"Probably not\" and \"an account that has never used Clarify should not expect to be able to start using it\" follow from quotes [1] and [2] by plain rewording, so the core verdict is not in doubt. The paragraphs v3 adds (quota rows, billing and options) don't apply to this item.",
+        "Both rubrics give the same verdict here, because v3's added paragraphs on quota rows and billing do not apply to this item. The open point is fully_supported, and it turns on this sentence, present in both rubrics: \"Advice (\\\"check the console\\\"), hedges (\\\"I could not confirm\\\"), and offers to help are not factual claims and need no support.\" The answer's last sentence explains what the assistant could not check. A careful reader could count that whole sentence as a hedge, including 'the linked \"Clarify availability change\" page', and so pass fully_supported. My reading is that the sentence states as fact that the documentation links to a page with that title. That makes it a statement \"about what the documentation says or where\" under \"Peripheral claims are everything else factual\", and neither quote mentions the page, so fully_supported fails. The core pass is the firmer verdict. Quote [1] says Clarify is \"no longer open to new customers\"; reading that as \"an account that has never used Clarify\" can't start using it is plain rewording, and the answer hedges it with \"Probably not\". Quote [2] directly supports \"Existing customers can keep using it as normal.\""
+      ],
+      "exemptions": [
+        [
+          "is not in the documentation snapshot I could access",
+          "so I could not check its details or any exceptions"
+        ],
+        [
+          "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify",
+          "so I could not check its details or any exceptions"
+        ],
+        [
+          "is not in the documentation snapshot I could access",
+          "so I could not check its details or any exceptions"
+        ],
+        [
+          "so I could not check its details or any exceptions",
+          "is not in the documentation snapshot I could access"
+        ],
+        [
+          "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify",
+          "so I could not check its details or any exceptions"
+        ]
+      ],
+      "panel_claims": [
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify"
+          }
+        },
+        {
+          "v2": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access"
+          },
+          "v3": {
+            "core_supported": "pass",
+            "fully_supported": "fail",
+            "first_unsupported_core_claim": "none",
+            "first_unsupported_other_claim": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access"
+          }
+        }
+      ],
+      "defenses": [
+        {
+          "verdict": "fully_supported",
+          "who": "human",
+          "rv": "v2",
+          "partyVerdict": "pass",
+          "majority": "fail",
+          "votes": "5 to 0",
+          "result": {
+            "defensible": false,
+            "rubric_sentence": "Advice (\"check the console\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no support.",
+            "argument": "Both statements that answer the question are quoted. Quote [1] says Clarify \"is no longer open to new customers\", and an account that has never used it is a new customer by plain rewording; quote [2] says \"Existing customers can continue to use the service as normal.\" The panel faults only the answer's caveat about what it could not verify, which ends \"so I could not check its details or any exceptions\". That is nearly the rubric's own hedge example, \"I could not confirm\", and rubric v2 says hedges \"are not factual claims and need no support\". Read as a single hedge, the caveat says nothing about whether Clarify is available, its remark that \"new customer\" is undefined matches quotes that use the term without defining it, and so every factual claim is either quoted or exempt.",
+            "weakness": "Rubric v2 counts \"statements about what the documentation says or where\" as peripheral factual claims, and the caveat states as fact that the docs link to a page titled \"Clarify availability change\" and that they do not define \"new customer\". No quote mentions a link or a page, and no quote says the docs lack a definition, so under \"a true claim that no quote states is unsupported\" only the closing \"I could not check\" clause is exempt and \"fully supported\" has to fail."
+          }
+        }
+      ]
+    }
+  ]
+}

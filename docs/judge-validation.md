@@ -328,6 +328,19 @@ answers but matters for any per-answer use. The next judge version should set th
 temperature to 0 (the config leaves it at the API default) together with the quota-row example;
 both change the judge version and both are validated on new labels, not these.
 
+## 4. Decision
+
+- Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
+  rubric that the judge applies literally and the labels apply leniently and unevenly. Next
+  step is the two-question rubric above, not a prompt tweak. "Responsive" is untested.
+- Mutation tests and bias probes: mutants **passed** in every round; stability probes passed in
+  round three (0.95) and slipped to 0.84 against the final, stricter judge (round four). Reported
+  as such; temperature 0 is the planned fix for the next version.
+- Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and
+  no judge number appears in a headline, until kappa is reported on judge-test.
+- What the judge is already allowed to do: flag dev answers where code says fail and the judge
+  says responsive, as suspected grader misses for human confirmation (failure taxonomy, A).
+
 ## 5. Candidate judge v3 (2026-10-16, unvalidated)
 
 Rubric v3 adds the quota-row example and the core/peripheral line for billing details that the
@@ -379,16 +392,74 @@ large difference, so rule 1 is unlikely to be met unless v3 corrects several ans
 wrong. If v3 looks better without meeting the rule, the number of further labels needed to decide
 is computed from the observed discordance and reported.
 
-## 4. Decision
+## 7. Judge v2 vs v3 on 40 fresh labels: result and blind adjudication (2026-10-16)
 
-- Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
-  rubric that the judge applies literally and the labels apply leniently and unevenly. Next
-  step is the two-question rubric above, not a prompt tweak. "Responsive" is untested.
-- Mutation tests and bias probes: mutants **passed** in every round; stability probes passed in
-  round three (0.95) and slipped to 0.84 against the final, stricter judge (round four). Reported
-  as such; temperature 0 is the planned fix for the next version.
-- Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and
-  no judge number appears in a headline, until kappa is reported on judge-test.
-- What the judge is already allowed to do: flag dev answers where code says fail and the judge
-  says responsive, as suspected grader misses for human confirmation (failure taxonomy, A).
+Scored once, after the rule in section 6 was committed (`38c786f`), with
+`scripts/judge_compare.py`; numbers in `results/judge-v2-vs-v3/scores.json`.
 
+| Verdict | n | labeler fails | v2 agree | v2 kappa (95% CI) | v3 agree | v3 kappa (95% CI) | only v2 / only v3 agrees | McNemar p |
+|---|---|---|---|---|---|---|---|---|
+| core supported | 40 | 3 | 39 | 0.79 (0.00 to 1.00) | 38 | 0.64 (-0.03 to 1.00) | 1 / 0 | 1.0 |
+| fully supported | 40 | 22 | 36 | 0.80 (0.58 to 0.95) | 36 | 0.80 (0.58 to 0.95) | 0 / 0 | 1.0 |
+| responsive | 40 | 0 | 40 | undefined (no failures) | 40 | undefined | 0 / 0 | 1.0 |
+
+The two judges gave identical fully-supported and responsive verdicts on all 40 and differ on
+core on one answer.
+
+**Decision under the rule: v2 stays the validated judge; v3 is not adopted.** Rule 1 fails (v3
+agrees on fewer core answers, not more); rule 2 holds trivially. `configs/judge-v3.yaml` stays as
+the record of a rejected candidate.
+
+Pre-declared subsets:
+
+| Subset | n | core: labeler fails / v2 agree / v3 agree | fully: labeler fails / v2 agree / v3 agree |
+|---|---|---|---|
+| judge-test side, not v3-informed | 22 | 1 / 22 / 22 | 10 / 20 / 20 |
+| judge-test side, v3-informed | 3 | 1 / 2 / 1 | 3 / 2 / 2 |
+| judge-dev side | 15 | 1 / 15 / 15 | 9 / 14 / 14 |
+
+What the 40 add to v2's validation:
+
+- **Fully supported** on fresh answers from the shipped v3 agent prompt: kappa 0.80 (0.58 to
+  0.95), TPR 0.95, TNR 0.83. Above the 0.7 bar on the point estimate, below the 1.00 of the 65
+  blind judge-test labels, and the interval reaches below the bar.
+- **Core supported:** kappa 0.79 on these 40, but with only 3 labeler fails the interval spans
+  0.00 to 1.00, so it neither confirms nor overturns the 0.37 on judge-test. Core stays advisory.
+- **Responsive:** still untested on the agent's own answers; none of the 40 failed it.
+
+### Blind adjudication of the 5 disputed answers
+
+Workflow `adjudicate-judge-disagreements` (script and full output in `results/judge-v2-vs-v3/`),
+32 agents: five independent reviewers per answer who saw only the rubrics, the question, the
+answer and the cited quotes (never the labels or verdicts), then a defense of each rater the
+panel overruled, arguing that rater's verdict from the rubric's own words and judging whether it
+holds. This is diagnostic only: the hand labels remain the reference, and nothing here changes a
+label or the scores above.
+
+| Answer | Verdict | Panel, rubric v2 / v3 | Labeler | Judge v2 | Judge v3 | Reading |
+|---|---|---|---|---|---|---|
+| docs-ai-007 #1 | core | fail 5-0 / fail 5-0 | fail | pass | pass | both judges wrong: they assign headerless table cells to Geographic and Global by elimination across rows; both defenses failed |
+| docs-ai-007 #1 | fully | fail 5-0 / fail 5-0 | fail | pass | pass | as above |
+| docs-ai-023 #1 | core | pass 3-2 / fail 5-0 | pass | pass | fail | rubric-dependent: all five reviewers called v2's core definition ambiguous for "how is X billed?"; v3's billing sentence settles it against the labeler, and judge v3 applied it correctly |
+| docs-chg-003 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | label likely a slip: "stops providing patches" hardens the quote's "may no longer apply"; the defense of the label failed |
+| docs-chg-004 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | label likely a slip under the plain reading: "The docs don't state the starting number" is a statement about what the documentation says; 2 of 5 reviewers called the hedge exemption ambiguous; the defense failed |
+| docs-chg-008 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | as chg-004, on "The docs do not say explicitly how 'new customer' is defined"; 2 of 5 flagged the hedge exemption; the defense failed |
+
+Findings:
+
+1. **Rubric v3 failed on both of its changes.** Its quota-row paragraph did not change either
+   judge's verdict on docs-ai-007, one of the cases it was written for. Its billing paragraph was
+   written in the judge's direction, the opposite of the labeler's reading in the judge-test
+   diagnosis, and it cost v3 the one answer it lost. That is an error in the revision step, not in
+   the judge, and it is why a candidate is scored on fresh labels under a rule fixed in advance.
+2. **A judge error neither rubric fixes:** matching cells to columns by elimination across
+   headerless rows. A future judge version could name it explicitly; it would need fresh labels,
+   because these 40 are now its development data.
+3. **A rubric question for the labeler:** is a statement that the documentation does not say
+   something ("the docs don't state the starting number") a hedge, which needs no support, or a
+   statement about what the documentation says, which the rubric counts as a claim? The panel and
+   both judges read it as a claim; two labels read it as a hedge. The answer decides those two
+   labels and, if it is "hedge", a rubric change validated on new labels.
+4. **Three fully-supported labels** (docs-chg-003, docs-chg-004, docs-chg-008) are offered back to
+   the labeler for a second look on the label screen, without the judge in view. Any change is
+   recorded as a correction made after adjudication, and the scores above stay as first computed.
