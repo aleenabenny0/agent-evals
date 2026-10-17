@@ -250,6 +250,20 @@ def test_prompt_v4_adds_the_iteration_3_rules_and_keeps_v3_intact(corpus: Corpus
             assert line in SYSTEM_PROMPT_V4, line
 
 
+def test_prompt_v5_is_v4_plus_the_abstention_guard(corpus: Corpus) -> None:
+    from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V4, SYSTEM_PROMPT_V5
+
+    v5 = make_agent(ScriptedLLM([]), corpus, prompt_version="v5")
+    assert v5.system_prompt == SYSTEM_PROMPT_V5
+    assert v5.version != make_agent(ScriptedLLM([]), corpus, prompt_version="v4").version
+    assert "that you have not read yet" in SYSTEM_PROMPT_V5
+    assert "abstained means you give no answer" in SYSTEM_PROMPT_V5
+    # Every v4 rule except the abstention rule survives word for word.
+    for line in SYSTEM_PROMPT_V4.splitlines():
+        if line.startswith("- ") and not line.startswith("- If the documentation you can reach"):
+            assert line in SYSTEM_PROMPT_V5, line
+
+
 def test_number_coverage_rejects_unquoted_numbers_then_accepts_the_fix(
     corpus: Corpus, case: Case
 ) -> None:
