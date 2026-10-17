@@ -412,10 +412,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   Aleena's decisions (2026-10-16): "the docs don't say X" is a hedge (written into draft rubric
   v4, `configs/judge-v4.yaml`, judge `c6a0e804f415`); price factors are not core for billing
   questions (wording: Aleena will add it to rubric v4). These settle docs-chg-004, docs-chg-008
-  and docs-ai-023. Left for Aleena: (1) recheck one label, docs-chg-003:
-  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --revisit all --case docs-chg-003`;
-  (2) add the billing wording to rubric v4. Then judge v4 is validated on fresh labels; v2 stays
-  the gate's judge until then.
+  and docs-ai-023. docs-chg-003 rechecked 2026-10-17 and kept as "fully supported: yes" (stands).
+  Left: (1) the billing wording for rubric v4 (not in `graders/judge_prompts.py` as of 2026-10-17
+  02:50 UTC); (2) then 40 fresh labels with the v4 rubric on screen:
+  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --limit 40 -c configs/judge-v4.yaml`;
+  (3) the agent runs judge v4 and the probes and scores under the rule committed in validation doc
+  section 8. v2 stays the gate's judge until then.
 
 ## Target: the three project briefs
 

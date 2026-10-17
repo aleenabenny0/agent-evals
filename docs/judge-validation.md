@@ -508,3 +508,34 @@ What follows from them:
   31.8% on test) are v2-judge numbers and stay labelled as such until a re-judge under an adopted
   v4.
 
+Recheck result (2026-10-17): Aleena re-opened docs-chg-003 on the label screen, without the judge
+in view, and kept "fully supported: yes". The label stands as the reference; the panel's and both
+judges' reading ("stops providing patches" is stronger than the quote's "may no longer apply")
+is recorded as a disagreement with it, not a correction.
+
+## 8. Judge v4 (draft): decision rule, committed before any v4 scoring (2026-10-17)
+
+Judge v4 is rubric v2 plus the labeler's two decisions of 2026-10-16: a statement that the
+documentation does not say something is a hedge, and price factors are peripheral for billing
+questions (wording pending). Unlike v3, v4 is not a tuning attempt: it changes the definition the
+labeler applies, so v2 is now known to diverge from the reference on a named pattern. The test is
+whether v4 implements the revised definition at least as well as v2 implemented the old one.
+
+**Labels.** The next 40 unlabeled attempt-1 answers of the champion dev run
+(`docs-20261016-214710-02abb7`, in case-id order, so none of the 40 used in section 7), labeled with
+`-c configs/judge-v4.yaml` so the label screen shows rubric v4 and no judge. Judge v2 has already
+graded these answers; judge v4 grades them once its billing wording is final, before scoring.
+
+**Rule.**
+
+1. **Fully supported** (the headline, validated verdict): v4's kappa on the 40 is at least 0.7, v4
+   agrees with the labels on at least as many answers as v2, and exact McNemar on the answers where
+   exactly one judge agrees with the label does not favour v2 at p < 0.05.
+2. **Core supported:** v4 agrees with the labels on no fewer answers than v2 minus one.
+3. **Probes:** on the champion run, v4's number, qualifier and citation mutants are each caught at
+   least 90% of the time, with v2's probes run on the same run for comparison; resample
+   stability is reported for both, not gated (v2 measured 0.84 on the original dev run).
+4. If 1 to 3 hold, **v4 replaces v2**: every run reported in the changelog and README is re-judged
+   with v4, and their numbers are restated under v4 with the v2 numbers kept beside them. If any
+   fails, v2 stays and the miss is recorded here.
+
