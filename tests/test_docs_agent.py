@@ -228,6 +228,28 @@ def test_prompt_version_selects_the_system_prompt_and_changes_the_version(corpus
         make_agent(ScriptedLLM([]), corpus, prompt_version="v9")
 
 
+def test_prompt_v4_adds_the_iteration_3_rules_and_keeps_v3_intact(corpus: Corpus) -> None:
+    from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V3, SYSTEM_PROMPT_V4
+
+    v3 = make_agent(ScriptedLLM([]), corpus, prompt_version="v3")
+    v4 = make_agent(ScriptedLLM([]), corpus, prompt_version="v4")
+    assert v4.system_prompt == SYSTEM_PROMPT_V4 and v3.system_prompt == SYSTEM_PROMPT_V3
+    assert v3.version != v4.version
+    # The changes: a sentence-by-sentence check, whole-unit quotes instead of "one sentence or
+    # less", no added reasoning, facts stated directly, missing context is no reason to abstain.
+    assert "one sentence at a time" in SYSTEM_PROMPT_V4
+    assert "Quote whole units" in SYSTEM_PROMPT_V4
+    assert "one sentence or less" not in SYSTEM_PROMPT_V4
+    assert "Say only what your quotes say" in SYSTEM_PROMPT_V4
+    assert "Missing context is never a reason to abstain" in SYSTEM_PROMPT_V4
+    # Statements that the docs leave something out are not targeted (the labeler's hedge rule).
+    assert "leaves out" not in SYSTEM_PROMPT_V4 and "leave out" not in SYSTEM_PROMPT_V4
+    # Every v3 rule but the quote-length one survives word for word.
+    for line in SYSTEM_PROMPT_V3.splitlines():
+        if line.startswith("- ") and "one sentence or less" not in line and "header" not in line:
+            assert line in SYSTEM_PROMPT_V4, line
+
+
 def test_number_coverage_rejects_unquoted_numbers_then_accepts_the_fix(
     corpus: Corpus, case: Case
 ) -> None:
