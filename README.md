@@ -84,8 +84,9 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   cut the measured flip rate from 10% to 3%, most of the noise having been the keyword grader.
 - LLM judge (Sonnet 5.5, run after the fact on the stored answers), **validated against 65 hand
   labels made blind**: on "fully supported" (every claim in the answer is in the quotes it cites)
-  the judge and the human labeler agree on all 65, kappa 1.00, and on 36 of 40 fresh answers in a
-  second check (kappa 0.80, 95% CI 0.58 to 0.95). That is this project's claim-level
+  the judge and the human labeler agree on all 65, kappa 1.00, on 36 of 40 fresh answers in a
+  second check (kappa 0.80, 95% CI 0.58 to 0.95), and on 38 of 40 more in a third, labeled under
+  the revised rubric (kappa 0.86, 0.61 to 1.00). That is this project's claim-level
   hallucination rate. **Iteration 1** (one prompt change: quote every sentence, cite table
   headers) moved it on the frozen test split from **10.6% to 31.8%** of answers fully supported
   (+21 points, 95% CI +14 to +30, p = 8e-7) with correctness unchanged (0.987 to 0.980, interval
@@ -93,11 +94,14 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   to 93%) and the grader fix it exposed are in [CHANGELOG.md](CHANGELOG.md) and ADR 0008.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
   advisory: kappa 0.37 on the 65, 0.79 on the 40 fresh answers but with only 3 failures among
-  them, so the interval spans 0 to 1. A candidate judge with a revised rubric was tested on the 40
-  under a rule fixed in advance and rejected. "Responsive"
+  them, so the interval spans 0 to 1. Two candidate judges with revised rubrics were each tested
+  on 40 fresh labels under a rule fixed in advance, and neither replaced it: the second tied on
+  the labels and missed one planted error, on a mutant later found to plant none. "Responsive"
   (0.997 pass) is validated on 61 closed-book answers at kappa 0.68 to 0.84. Planted-error
-  mutants were caught 100% of the time; verdict stability under re-sampling is 84% on this
-  version. Everything, including the rounds that failed: [docs/judge-validation.md](docs/judge-validation.md).
+  mutants were caught 100% of the time on the first dev run and 55 of 56 on the current
+  champion's run (the miss planted no error); verdict stability under re-sampling is 84% and 95%
+  on those runs. Everything, including the rounds that failed:
+  [docs/judge-validation.md](docs/judge-validation.md).
 - What broke: all 32 failing dev attempts were read. None states a wrong fact. 13 are keyword
   grader misses, 12 are the agent answering correctly while marking itself abstained, 6 are case
   defects. Details and two traces per category in [docs/failure-taxonomy.md](docs/failure-taxonomy.md).

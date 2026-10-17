@@ -414,11 +414,21 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   questions (wording: Aleena will add it to rubric v4). These settle docs-chg-004, docs-chg-008
   and docs-ai-023. docs-chg-003 rechecked 2026-10-17 and kept as "fully supported: yes" (stands).
   Billing wording approved by Aleena and written into rubric v4 on 2026-10-17 (judge v4 =
-  `bf1a8e9f376a`). Left: (1) Aleena labels 40 fresh answers with the v4 rubric on screen:
-  `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --limit 40 -c configs/judge-v4.yaml`;
-  (2) then the agent runs judge v4 on the champion run, the probes for both judges on that run,
-  and scores once under the rule committed in validation doc section 8. v2 stays the gate's judge
-  until then.
+  `bf1a8e9f376a`).
+- **Judge v2 vs v4 settled (2026-10-17): v2 stays.** Aleena labeled 40 more fresh answers
+  (docs-chg-010 to docs-int-037) with rubric v4 on screen; a judge-free audit found them complete
+  and consistent; exported (`7bb575c`) before judge v4 graded anything. Scored once under the
+  section 8 rule (`scripts/judge_compare_v4.py`, `results/judge-v2-vs-v4/`): fully 38/40 both
+  (kappa 0.86 v2, 0.87 v4), core v2 38/40 vs v4 39/40, but v4 caught 8 of 9 qualifier mutants
+  (bar 90%), so rule 3 fails. The one miss is shared with v2 and is a broken mutant ("this is
+  about opt-in" flipped to "exactly"); the generator now flips "about" and "approximately"
+  only before a figure. Over all 349 answers v4 would read fully supported 0.326 vs 0.308.
+  Also fixed: summaries, `evals compare` and `evals gate` averaged every judge's grades on a run
+  (the champion run carries judge, judge-v3 and judge-v4); they now read only the configured
+  judge (`-c` picks another) and the report names it. No published number changed
+  (recomputed; both gates on that run were saved before a second judge graded it). Open for
+  Aleena: keep v2 (the rule's verdict; recommended, since v4 measured no better on her labels) or
+  one fresh probe test of v4 under a new rule committed first. Then iteration 3.
 
 ## Target: the three project briefs
 

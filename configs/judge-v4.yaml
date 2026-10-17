@@ -1,7 +1,8 @@
 # Candidate judge v4 (wording final 2026-10-17): rubric v2 plus Aleena's two decisions after the
 # v2-vs-v3 adjudication ("the docs don't say X" is a hedge; price factors are peripheral for
-# billing questions). Judge version bf1a8e9f376a. Not used by any gate until it passes the rule in
-# docs/judge-validation.md section 8. Label with it: evals label RUN --labeler NAME -c this file.
+# billing questions). Judge version bf1a8e9f376a. NOT ADOPTED (2026-10-17): it tied v2 on 40
+# fresh labels but caught 8 of 9 qualifier mutants against a 90% bar (docs/judge-validation.md
+# section 8). v2 stays the validated judge. Report a run under v4: evals report RUN -c this file.
 
 paths:
   corpus_dir: data/snapshots/aws-docs

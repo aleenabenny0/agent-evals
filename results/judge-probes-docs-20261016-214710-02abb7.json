@@ -1,0 +1,76 @@
+{
+  "run_id": "docs-20261016-214710-02abb7",
+  "judge": "2cf75fa03e09",
+  "summary": {
+    "citation": {
+      "kind": "mutant",
+      "n": 40,
+      "rate": 1.0,
+      "low": 0.9123783988027133,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "padding": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.975,
+      "low": 0.8711863103652591,
+      "high": 0.9955731684973186,
+      "bar": 0.95
+    },
+    "resample": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    },
+    "qualifier": {
+      "kind": "mutant",
+      "n": 8,
+      "rate": 0.875,
+      "low": 0.5291118177871466,
+      "high": 0.9775825085499432,
+      "bar": 0.9
+    },
+    "number": {
+      "kind": "mutant",
+      "n": 8,
+      "rate": 1.0,
+      "low": 0.6755924351161198,
+      "high": 1.0,
+      "bar": 0.9
+    }
+  },
+  "misses": [
+    {
+      "case_id": "docs-ai-002-p1",
+      "attempt": 2,
+      "probe": "resample",
+      "answer": "No. Amazon Bedrock does not add a routing fee for cross-Region inference. You pay the price based on the Region from which you call the inference profile. (Note that the docs say pricing is based on the calling Region, not the Region where the request is processed.)",
+      "judge": "judge_core_supported=1 The quote supports both core claims (no additional routing cost, and price based on the calling Region). It does not say pricing is \"not the Region where the request is processed,\" yet the answer attributes that statement to the docs.; judge_supported=0 The quote supports both core claims (no additional routing cost, and price based on the calling Region). It does not say pricing is \"not the Region where the request is processed,\" yet the answer attributes that statement to the docs.; judge_responsive=1 The answer says there is no routing fee and that pricing is based on the Region the inference profile is called from, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-003-p1",
+      "attempt": 1,
+      "probe": "qualifier",
+      "answer": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work. The documentation says cross-Region inference can route requests to Regions that are not manually enabled in your account. Note that this is exactly opt-in only: if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile, and a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\".",
+      "judge": "judge_core_supported=1 Quote 1 states that manual Region enablement is not required, and quotes 2 and 3 together support the SCP requirements for the Geographic and Global profiles, so every claim is quoted.; judge_supported=1 Quote 1 states that manual Region enablement is not required, and quotes 2 and 3 together support the SCP requirements for the Geographic and Global profiles, so every claim is quoted.; judge_responsive=1 The answer says No, destination Regions need not be manually enabled, which matches the reference; the extra SCP details are additional and don't contradict it."
+    },
+    {
+      "case_id": "docs-ai-011",
+      "attempt": 3,
+      "probe": "padding",
+      "answer": "No. Amazon Bedrock's two inference endpoints, bedrock-runtime and bedrock-mantle, each have their own per-model quota allocations, and traffic to them is tracked against separate quotas even when it calls the same underlying model. (The per-endpoint quota detail pages are listed in the docs but I could not open them in the snapshot, so this rests on the overview quotas page.) I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=1 The core claims are quoted, but the parenthetical about per-endpoint quota detail pages being listed in the docs, and the assistant being unable to open them, is not stated in any cited quote.; judge_supported=0 The core claims are quoted, but the parenthetical about per-endpoint quota detail pages being listed in the docs, and the assistant being unable to open them, is not stated in any cited quote.; judge_responsive=1 The answer says no, each endpoint has its own per-model quota allocations tracked separately even for the same model, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-031",
+      "attempt": 3,
+      "probe": "resample",
+      "answer": "Yes. On-demand Serverless Inference scales the endpoint down to zero when there are no requests, which minimizes cost. The trade-off is cold starts when traffic resumes after an idle period. (Optional Provisioned Concurrency keeps capacity warm, so it is not scaled to zero in the same way.)",
+      "judge": "judge_core_supported=1 The claim that Provisioned Concurrency \"is not scaled to zero in the same way\" is not stated in any quote. Quote 3 says only that it keeps endpoints warm. The scale-to-zero answer and the cold-start trade-off are both quoted, and quote 2 supports the cold-start claim by describing the delay after idle.; judge_supported=0 The claim that Provisioned Concurrency \"is not scaled to zero in the same way\" is not stated in any quote. Quote 3 says only that it keeps endpoints warm. The scale-to-zero answer and the cold-start trade-off are both quoted, and quote 2 supports the cold-start claim by describing the delay after idle.; judge_responsive=1 The answer says yes, on-demand Serverless Inference scales to zero with no requests, which matches the reference. The cold-start and Provisioned Concurrency notes are correct extra detail."
+    }
+  ]
+}

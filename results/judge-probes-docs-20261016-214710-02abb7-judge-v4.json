@@ -1,0 +1,76 @@
+{
+  "run_id": "docs-20261016-214710-02abb7",
+  "judge": "bf1a8e9f376a",
+  "summary": {
+    "citation": {
+      "kind": "mutant",
+      "n": 40,
+      "rate": 1.0,
+      "low": 0.9123783988027133,
+      "high": 1.0,
+      "bar": 0.9
+    },
+    "padding": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.95,
+      "low": 0.8349612263085903,
+      "high": 0.9861793326138516,
+      "bar": 0.95
+    },
+    "resample": {
+      "kind": "probe",
+      "n": 40,
+      "rate": 0.975,
+      "low": 0.8711863103652591,
+      "high": 0.9955731684973186,
+      "bar": 0.95
+    },
+    "qualifier": {
+      "kind": "mutant",
+      "n": 9,
+      "rate": 0.8888888888888888,
+      "low": 0.5650002944233441,
+      "high": 0.9801091123614551,
+      "bar": 0.9
+    },
+    "number": {
+      "kind": "mutant",
+      "n": 9,
+      "rate": 1.0,
+      "low": 0.7008549515804562,
+      "high": 1.0,
+      "bar": 0.9
+    }
+  },
+  "misses": [
+    {
+      "case_id": "docs-ai-003-p1",
+      "attempt": 1,
+      "probe": "qualifier",
+      "answer": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work. The documentation says cross-Region inference can route requests to Regions that are not manually enabled in your account. Note that this is exactly opt-in only: if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile, and a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\".",
+      "judge": "judge_core_supported=1 Every claim is quoted: quote 1 says manual Region enablement isn't required, and quotes 2 and 3 give the SCP requirements for Geographic and Global profiles.; judge_supported=1 Every claim is quoted: quote 1 says manual Region enablement isn't required, and quotes 2 and 3 give the SCP requirements for Geographic and Global profiles.; judge_responsive=1 The answer says No, destination Regions need not be manually enabled, which matches the reference; the extra SCP details are additional and don't contradict it."
+    },
+    {
+      "case_id": "docs-ai-004",
+      "attempt": 3,
+      "probe": "padding",
+      "answer": "Global cross-Region inference is roughly 10% cheaper than geographic cross-Region inference. The AWS docs list geographic inference at standard pricing and global inference at approximately 10% savings. Exact per-model rates are on the Amazon Bedrock pricing page, which the docs don't reproduce. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=1 The cost row with its column headers supports the core claim (geographic is standard pricing, global is about 10% savings). However, the claim that exact per-model rates are on the Amazon Bedrock pricing page appears in neither quote.; judge_supported=0 The cost row with its column headers supports the core claim (geographic is standard pricing, global is about 10% savings). However, the claim that exact per-model rates are on the Amazon Bedrock pricing page appears in neither quote.; judge_responsive=1 The answer says global cross-Region inference is roughly 10% cheaper than geographic (standard pricing), which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-005-p2",
+      "attempt": 1,
+      "probe": "padding",
+      "answer": "Look at the CloudTrail event for the request in your source Region and check the additionalEventData.inferenceRegion field, which identifies the Region where the request was processed. CloudTrail logs all cross-Region inference requests in the source Region, so you search there rather than in the destination Region. I could only confirm this from the Bedrock cross-Region inference page; I did not find a separate CloudTrail page describing the field. I hope this helps; let me know if you need anything else about this topic.",
+      "judge": "judge_core_supported=0 The quote about additionalEventData.inferenceRegion cuts off at \"to identify\", so no quote says the field identifies the Region where the request was processed. The claim that you search the source Region \"rather than the destination Region\" is also not quoted.; judge_supported=0 The quote about additionalEventData.inferenceRegion cuts off at \"to identify\", so no quote says the field identifies the Region where the request was processed. The claim that you search the source Region \"rather than the destination Region\" is also not quoted.; judge_responsive=1 The answer names additionalEventData.inferenceRegion in the CloudTrail event in the source Region, which matches the reference."
+    },
+    {
+      "case_id": "docs-ai-005-p2",
+      "attempt": 1,
+      "probe": "resample",
+      "answer": "Look at the CloudTrail event for the request in your source Region and check the additionalEventData.inferenceRegion field, which identifies the Region where the request was processed. CloudTrail logs all cross-Region inference requests in the source Region, so you search there rather than in the destination Region. I could only confirm this from the Bedrock cross-Region inference page; I did not find a separate CloudTrail page describing the field.",
+      "judge": "judge_core_supported=0 The quote about additionalEventData.inferenceRegion cuts off at \"to identify\", so no quote says the field identifies the Region where the request was processed. That is the central claim of the answer.; judge_supported=0 The quote about additionalEventData.inferenceRegion cuts off at \"to identify\", so no quote says the field identifies the Region where the request was processed. That is the central claim of the answer.; judge_responsive=1 The answer names additionalEventData.inferenceRegion in the source Region's CloudTrail log, which matches the reference."
+    }
+  ]
+}

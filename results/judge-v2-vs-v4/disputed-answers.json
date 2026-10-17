@@ -1,0 +1,354 @@
+{
+  "rubric_v2": "Core claims are the statements that answer the question: the direct answer and the facts it\nrests on. Peripheral claims are everything else factual: added context, extra numbers, names\nof APIs or parameters, descriptions of other features, statements about what the documentation\nsays or where.\n\nA claim is supported when a quote states it, or when it follows from the quotes by simple\narithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table row or cell\nquoted without its column header supports only what it literally says: a bare \"Yes\" does not\nestablish \"adjustable\", and a row of dates does not establish which date is the deprecation date.\nThe header counts only when it is inside a quote: a quoted header fragment that names the column\n(for example \"Deprecation date\") does establish the meaning of that value. Advice (\"check the\nconsole\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no\nsupport. Judge support, not truth: a true claim that no quote states is unsupported.",
+  "rubric_v4": "Core claims are the statements that answer the question: the direct answer and the facts it\nrests on. Peripheral claims are everything else factual: added context, extra numbers, names\nof APIs or parameters, descriptions of other features, statements about what the documentation\nsays or where.\n\nA claim is supported when a quote states it, or when it follows from the quotes by simple\narithmetic, a unit conversion (900 seconds is 15 minutes), or plain rewording. A table row or cell\nquoted without its column header supports only what it literally says: a bare \"Yes\" does not\nestablish \"adjustable\", and a row of dates does not establish which date is the deprecation date.\nThe header counts only when it is inside a quote: a quoted header fragment that names the column\n(for example \"Deprecation date\") does establish the meaning of that value. Advice (\"check the\nconsole\"), hedges (\"I could not confirm\"), and offers to help are not factual claims and need no\nsupport. Judge support, not truth: a true claim that no quote states is unsupported.\n\nStatements about what the documentation says or where are claims, but a statement that it does\nnot say something (\"the docs don't state the starting number\", \"the docs don't define a new\ncustomer\") is a hedge and needs no support.\n\nWhen a question asks how something is billed, the core claims are how and when you are charged\n(for example, billed hourly until you delete it). The factors that set the price, such as the\nmodel, the number of units bought or the length of a commitment, are peripheral.",
+  "responsive_prompt": "You are checking whether an answer responds to the question that was asked.\n\nYou will be given a user's question about AWS documentation, a reference answer written by a\nperson from the documentation, and an assistant's answer. Decide one thing only: does the\nassistant's answer address the question as asked and agree with the reference on substance?\n\n- \"pass\" when the answer covers what was asked and says what the reference says, in any wording.\n  A multi-part question needs every part answered. A question built on a false premise needs the\n  premise rejected, as the reference does. Extra correct detail is not a failure.\n- \"fail\" when the answer addresses a nearby question instead, leaves a part out, or contradicts\n  the reference on substance.\n- Do not judge citations, formatting or tone.\n\nCall submit_verdict with \"pass\" or \"fail\" and a one-sentence reason.",
+  "items": [
+    {
+      "id": "docs-core-028#1",
+      "case_id": "docs-core-028",
+      "attempt": 1,
+      "type": "multi_step",
+      "area": "databases",
+      "label_side": "judge-dev",
+      "question": "I am creating a new DynamoDB table and a new S3 bucket for an application. Which capacity mode does the table get by default, and is Block Public Access on for the new bucket?",
+      "reference_answer": "The table defaults to on-demand capacity mode. New S3 buckets, access points and objects don't allow public access by default; Block Public Access settings enforce that regardless of bucket policies.",
+      "answer": "DynamoDB: a new table uses on-demand capacity mode by default. The docs say \"On-demand mode is the default and recommended throughput option for most DynamoDB workloads.\"\n\nS3: I could not confirm from the documentation I can reach that Block Public Access is switched on for a new bucket. The docs say \"By default, new buckets, access points, and objects don't allow public access,\" but they also say users can modify bucket policies or object permissions to allow public access, and they recommend turning on all four Block Public Access settings for each bucket. So check the bucket's Block Public Access settings after creation rather than assuming they are on.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html",
+          "quote": "On-demand mode is the default and recommended throughput option for most DynamoDB workloads."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+          "quote": "By default, new buckets, access points, and objects don't allow public access."
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/access-control-block-public-access.html",
+          "quote": "we recommend that you also turn on all four settings for each bucket"
+        }
+      ],
+      "disputed": [
+        "responsive"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Fully n: \"users can modify bucket policies or object permissions to allow public access\" is not supported; quote 2 stops at \"don't allow public access\" and that sentence is only in the dim page context. Quote 3 (\"turn on all four settings for each bucket\") also never names Block Public Access, so attributing it to those settings relies on the dim text. Core y: quote 1 supports on-demand as the default for DynamoDB, and quote 2 supports that new buckets don't allow public access; the \"could not confirm\" is a hedge."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "fail",
+        "support_reason": "The claim that the docs say users can modify bucket policies or object permissions to allow public access is not in any cited quote. The DynamoDB default and the S3 default-no-public-access and four-settings recommendation claims are quoted.",
+        "responsive_reason": "The DynamoDB part matches the reference (on-demand), but the answer says it could not confirm Block Public Access is on for a new S3 bucket and advises not assuming it, whereas the reference says new buckets don't allow public access by default with Block Public Access enforcing that."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "fail",
+        "support_reason": "The claim that the docs say users can modify bucket policies or object permissions to allow public access is not in any cited quote. The DynamoDB default and the S3 \"don't allow public access\" and four-settings recommendation claims are quoted.",
+        "responsive_reason": "The DynamoDB part matches the reference (on-demand), but the answer says it could not confirm Block Public Access is on for a new S3 bucket and advises not assuming it, whereas the reference says new buckets don't allow public access by default with Block Public Access enforcing that."
+      }
+    },
+    {
+      "id": "docs-int-002#1",
+      "case_id": "docs-int-002",
+      "attempt": 1,
+      "type": "multi_step",
+      "area": "integration",
+      "label_side": "judge-dev",
+      "question": "My state machine was created as an Express workflow and I now need 90 days of execution history. Can I switch its type?",
+      "reference_answer": "No. The workflow type cannot be changed after creation, so create a new Standard state machine; Standard executions keep retrievable history for up to 90 days after completion.",
+      "answer": "No, you can't switch it. The workflow type can't be updated after you create a state machine. To get 90 days of execution history, create a new Standard state machine with the same definition and point your callers at the new ARN. Standard workflows let you retrieve full execution history via the Step Functions API for up to 90 days after an execution completes. Express history is only available in CloudWatch Logs or the console if you enable logging, so your retention would depend on your CloudWatch Logs settings.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html",
+          "quote": "The workflow type can **not** be updated after you create a state machine."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html",
+          "quote": "You can retrieve the full execution history using the [Step Functions API](https://docs.aws.amazon.com/step-functions/latest/apireference) for up to 90 days after your execution completes."
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/choosing-workflow-type.html",
+          "quote": "Executions can be inspected in CloudWatch Logs or the Step Functions console by enabling logging on your state machine."
+        }
+      ],
+      "disputed": [
+        "core_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Fully n: \"Standard workflows let you retrieve full execution history ... up to 90 days\" is not supported because quote 2 has no subject (the Standard Workflows sentence is only in the dim page context); \"Express history is only available in CloudWatch Logs or the console if you enable logging\" is not supported because quote 3 never mentions Express or \"only\"; \"retention would depend on your CloudWatch Logs settings\" appears in no quote. Core y: quote 1 says the workflow type cannot be updated after you create a state machine."
+      },
+      "judge_v2": {
+        "core_supported": "fail",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The inability to change the workflow type is quoted, but no quote says the 90-day API history applies to Standard workflows, and no quote says the CloudWatch Logs inspection applies to Express or that retention depends on CloudWatch Logs settings.",
+        "responsive_reason": "The answer says the type can't be changed, recommends creating a new Standard state machine, and notes Standard keeps history for up to 90 days, matching the reference."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The core claim that the workflow type can't be changed after creation is quoted, but \"your retention would depend on your CloudWatch Logs settings\" and the claim that Express history is \"only\" available in CloudWatch Logs or the console are not stated in any quote, and the quotes never name Express.",
+        "responsive_reason": "The answer says the type can't be changed, recommends creating a new Standard state machine, and notes Standard keeps history for up to 90 days, matching the reference."
+      }
+    },
+    {
+      "id": "docs-int-009#1",
+      "case_id": "docs-int-009",
+      "attempt": 1,
+      "type": "multi_step",
+      "area": "analytics",
+      "label_side": "judge-test",
+      "question": "My Firehose stream reads from Amazon MSK and has a Lambda transformation enabled. What is the largest record it accepts, and what happens to larger ones?",
+      "reference_answer": "6 MB with Lambda enabled (10 MB without). Records above 6 MB are not transformed; Firehose delivers them to the error S3 bucket.",
+      "answer": "With Amazon MSK as the source and Lambda transformation enabled, the largest record Firehose accepts is 6 MB. Records above 6 MB are forwarded to an S3 error bucket rather than being transformed and delivered to the destination. (If Lambda were disabled, the limit would be 10 MB.)",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/firehose/latest/dev/limits.html",
+          "quote": "there is a 6 MB maximum record size if AWS Lambda is enabled, and 10 MB maximum record size if Lambda is disabled."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/firehose/latest/dev/limits.html",
+          "quote": "Amazon Data Firehose forwards records above 6Mb to an error S3 bucket."
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "yes",
+        "responsive": "yes",
+        "note": ""
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The claim that records above 6 MB are forwarded to an S3 error bucket \"rather than being transformed and delivered to the destination\" is not stated in the quotes. The quotes also never mention MSK as the source, so the answer's link between the 6 MB limit and an MSK source rests on the user's own framing.",
+        "responsive_reason": "The answer gives the same 6 MB limit with Lambda (10 MB without) and says larger records go to the S3 error bucket instead of being transformed and delivered, which matches the reference."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Every claim is quoted: the 6 MB limit with Lambda enabled, the 10 MB limit with Lambda disabled, and the forwarding of records above 6 MB to an error S3 bucket. The quotes don't name MSK, but the question supplies that context.",
+        "responsive_reason": "The answer gives the same 6 MB limit with Lambda (10 MB without) and says larger records go to the S3 error bucket instead of being transformed and delivered, which matches the reference."
+      }
+    },
+    {
+      "id": "docs-int-020#1",
+      "case_id": "docs-int-020",
+      "attempt": 1,
+      "type": "false_premise",
+      "area": "management",
+      "label_side": "judge-dev",
+      "question": "Parameter Store bills per parameter per month like Secrets Manager, so how should I estimate the cost of 500 parameters?",
+      "reference_answer": "The premise is wrong: the Parameter Store standard tier is free; only the advanced tier and higher throughput are billed. Secrets Manager is the service billed per secret per month.",
+      "answer": "Your premise is incorrect: Parameter Store does not charge per parameter per month like Secrets Manager. Standard-tier parameters have no charge, and only advanced-tier parameters (and higher throughput) are billed. For 500 standard parameters, the parameter cost is $0, and that fits within the 10,000 standard-parameter limit per account and Region. If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page; I could not find that rate in the documentation snapshot, so I cannot give a dollar figure. Secrets Manager, by contrast, is billed per secret per month plus per API call.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "quote": "Cost | No additional charge | Charges apply"
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "quote": "| Maximum parameters  (per AWS account and AWS Region) | 10,000 | 100,000 |"
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "quote": "Standard tier free; advanced tier and higher throughput billed"
+        },
+        {
+          "n": 4,
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "quote": "Billed per secret per month and per API call"
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Fully n: \"fits within the 10,000 standard-parameter limit\" is not supported because quote 2 (\"Maximum parameters | 10,000 | 100,000\") has no column header in the quote, so it doesn't say which value is standard. \"Advanced per-parameter monthly rate\" and \"on the Systems Manager pricing page\" are also not in the quotes (quote 3 says advanced is billed but not per parameter per month, and the pricing page link is only in the dim context). Core y: quote 3 says standard tier is free and advanced tier and higher throughput are billed, and quote 4 says Secrets Manager is billed per secret per month and per API call."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Every claim is quoted or follows from the quotes: standard tier is free and advanced is billed (quotes 1 and 3), the 10,000 standard limit (quote 2), and Secrets Manager billing per secret per month plus per API call (quote 4). The statement that the rate could not be found is a hedge and needs no support.",
+        "responsive_reason": "The answer rejects the false premise, says the standard tier is free and only the advanced tier and higher throughput are billed, and notes that Secrets Manager is billed per secret, which matches the reference."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Every claim is quoted: standard tier is free and advanced tier and higher throughput are billed (quotes 1 and 3), the standard limit is 10,000 per account and Region (quote 2), and Secrets Manager is billed per secret per month and per API call (quote 4). The statement that the advanced rate wasn't found is a hedge, so it needs no support.",
+        "responsive_reason": "The answer rejects the false premise, says the standard tier is free and only the advanced tier and higher throughput are billed, and notes that Secrets Manager is billed per secret, which matches the reference."
+      }
+    },
+    {
+      "id": "docs-int-023#1",
+      "case_id": "docs-int-023",
+      "attempt": 1,
+      "type": "unanswerable",
+      "area": "integration",
+      "label_side": "judge-test",
+      "question": "On what date will Step Functions raise the 1 MB state machine definition limit?",
+      "reference_answer": "Not answerable: no documentation page announces a future change to that hard quota. The agent should abstain rather than speculate.",
+      "answer": "There is no date to give, because the premise is wrong. Step Functions does not plan to raise the 1 MB state machine definition limit. The quotas page lists it as 1 MB with \"Hard quota\" in the \"Can be increased to\" column, so it cannot be raised through a quota increase request. The documentation I could reach says nothing about a future change.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/service-quotas.html",
+          "quote": "| Resource | Default quota | Can be increased to |"
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/service-quotas.html",
+          "quote": "| Maximum size of state machine definition | 1 MB | Hard quota |"
+        }
+      ],
+      "disputed": [
+        "responsive"
+      ],
+      "human": {
+        "core_supported": "no",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Core n: \"Step Functions does not plan to raise the 1 MB state machine definition limit\" is not supported. No quote says anything about plans or future changes; quotes 1 and 2 show the limit as 1 MB with \"Hard quota\" under \"Can be increased to,\" which supports only that it cannot be raised through a quota increase request. The answer's own last sentence says the docs say nothing about a future change, which contradicts the confident claim."
+      },
+      "judge_v2": {
+        "core_supported": "fail",
+        "fully_supported": "fail",
+        "responsive": "fail",
+        "support_reason": "The claim \"Step Functions does not plan to raise the 1 MB state machine definition limit\" is not in the quotes, which show only a 1 MB limit marked \"Hard quota\" and say nothing about future plans.",
+        "responsive_reason": "The answer gives no date and notes the docs are silent, but it also states as fact that Step Functions \"does not plan to raise\" the limit and calls the premise wrong. The documentation doesn't support that claim, and the reference says to abstain rather than speculate."
+      },
+      "judge_v4": {
+        "core_supported": "fail",
+        "fully_supported": "fail",
+        "responsive": "fail",
+        "support_reason": "The claim that \"Step Functions does not plan to raise the 1 MB state machine definition limit\" is unsupported. The quotes show only a 1 MB default with \"Hard quota\" in the \"Can be increased to\" column, and they say nothing about future plans.",
+        "responsive_reason": "The answer gives no date and notes the docs are silent, but it also states as fact that Step Functions \"does not plan to raise\" the limit and calls the premise wrong. The documentation doesn't support that claim, and the reference says to abstain rather than speculate."
+      }
+    },
+    {
+      "id": "docs-int-029#1",
+      "case_id": "docs-int-029",
+      "attempt": 1,
+      "type": "changed_default",
+      "area": "security",
+      "label_side": "judge-test",
+      "question": "Does rotating a managed secret such as an RDS database credential in Secrets Manager require a Lambda rotation function?",
+      "reference_answer": "No. For most managed secrets you use managed rotation, which the service configures for you and which does not use a Lambda function. Lambda rotation functions remain for other secret types.",
+      "answer": "No. For managed secrets, Secrets Manager uses \"managed rotation,\" in which the service configures and manages rotation for you, and that form doesn't use a Lambda function. A Lambda rotation function is only needed for other types of secrets that aren't covered by managed rotation. I could not open the managed rotation page itself (it isn't in the snapshot), so I can't confirm the RDS-specific steps from it; the answer rests on the general rotation overview.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html",
+          "quote": "For most managed secrets, you use managed rotation, where the service configures and manages rotation for you. Managed rotation doesn't use a Lambda function."
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html",
+          "quote": "Rotation by Lambda function – For other types of secrets, Secrets Manager rotation uses a Lambda function to update the secret and the database or service."
+        }
+      ],
+      "disputed": [
+        "fully_supported"
+      ],
+      "human": {
+        "core_supported": "yes",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Fully n: \"A Lambda rotation function is only needed for other types of secrets that aren't covered by managed rotation\" is stronger than quote 2, which says only that for other types of secrets rotation uses a Lambda function; \"only\" and \"aren't covered by managed rotation\" are not stated. The answer also drops \"most\" from \"most managed secrets.\" Core y: quote 1 says managed rotation, where the service configures and manages rotation, doesn't use a Lambda function."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The answer says managed secrets use managed rotation without Lambda, but the quote says \"most managed secrets\". The claim that Lambda is \"only\" needed for secrets not covered by managed rotation also goes beyond what the quotes state.",
+        "responsive_reason": "The answer says no, explains that managed rotation is configured by the service without a Lambda function, and says Lambda rotation functions are for other secret types, which matches the reference."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "pass",
+        "responsive": "pass",
+        "support_reason": "Quote 1 says managed rotation doesn't use a Lambda function, and quote 2 says other types of secrets use a Lambda function, so every claim is quoted or a plain rewording; the \"I could not open the page\" statement is a hedge.",
+        "responsive_reason": "The answer says no, explains that managed rotation is configured by the service without a Lambda function, and says Lambda rotation functions are for other secret types, which matches the reference."
+      }
+    },
+    {
+      "id": "docs-int-035#1",
+      "case_id": "docs-int-035",
+      "attempt": 1,
+      "type": "lookup",
+      "area": "integration",
+      "label_side": "judge-dev",
+      "question": "How many custom event buses can my account own per Region by default in EventBridge?",
+      "reference_answer": "5, adjustable through Service Quotas.",
+      "answer": "By default, your account can own 5 event buses per Region in the Custom Event Bus offering. Buses shared with your account do not count toward this. This quota is adjustable through Service Quotas (the \"[EventsV2] Event Buses\" quota). Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+      "citations": [
+        {
+          "n": 1,
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html",
+          "quote": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes"
+        },
+        {
+          "n": 2,
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html",
+          "quote": "To raise the bus limit, for example, request an increase to `[EventsV2] Event Buses`."
+        },
+        {
+          "n": 3,
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-quota.html",
+          "quote": "| Event buses | Each supported Region: 100 | [Yes]"
+        }
+      ],
+      "disputed": [
+        "core_supported"
+      ],
+      "human": {
+        "core_supported": "no",
+        "fully_supported": "no",
+        "responsive": "yes",
+        "note": "Core n: the quotes never say 5 is the default or that it is per Region. Quote 1 (\"Event buses owned by the account. Buses shared with the account do not count | 5 | Yes\") is a row without its header; \"Default\", \"Adjustable\" and \"per account per Region\" appear only in the dim page context. Quote 2 says you can request an increase to [EventsV2] Event Buses, which shows a limit exists but does not give the number. Quote 3 (\"Each supported Region: 100\") is a different offering and supports only that 100 figure."
+      },
+      "judge_v2": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The quotes never name the \"Custom Event Bus - Classic\" offering, so the claim that its default is 100 per account per Region is unsupported. The core claim of 5 owned buses, with shared buses excluded, is quoted.",
+        "responsive_reason": "The answer states the default of 5 custom event buses per Region and says the quota is adjustable through Service Quotas, which matches the reference. The extra details about shared buses and the Classic offering don't contradict it."
+      },
+      "judge_v4": {
+        "core_supported": "pass",
+        "fully_supported": "fail",
+        "responsive": "pass",
+        "support_reason": "The 5-bus figure, the exclusion of shared buses, and the Service Quotas increase are quoted. However, no quote names a \"Custom Event Bus - Classic\" offering, and quote 3 is a bare \"Event buses | Each supported Region: 100\" row, so tying the 100 figure to that offering is unsupported.",
+        "responsive_reason": "The answer states the default of 5 custom event buses per Region and says the quota is adjustable through Service Quotas, which matches the reference. The extra details about shared buses and the Classic offering don't contradict it."
+      }
+    }
+  ]
+}

@@ -540,3 +540,52 @@ graded these answers; judge v4 grades them once its billing wording is final, be
    with v4, and their numbers are restated under v4 with the v2 numbers kept beside them. If any
    fails, v2 stays and the miss is recorded here.
 
+### Result (2026-10-17): v4 fails rule 3 by one probe, so v2 stays
+
+Scored once with `scripts/judge_compare_v4.py`; the output is in `results/judge-v2-vs-v4/`. The
+40 labels are docs-chg-010 to docs-int-037, made 03:13 to 03:55 UTC with rubric v4 on the label
+screen, and exported (`7bb575c`) before judge v4 graded anything. A judge-free audit before
+scoring found every "no" noted, "core no" always paired with "fully no", and no note written for
+another answer. Judge v4 graded all 349 answers of the run as `bf1a8e9f376a` (its "responsive"
+prompt is v2's, so those verdicts came from the call cache and are identical).
+
+| Check | v2 | v4 | Bar | Result |
+|---|---|---|---|---|
+| 1. fully supported: agreement, kappa (95% CI) | 38/40, 0.86 (0.61 to 1.00) | 38/40, 0.87 (0.64 to 1.00) | v4 kappa at least 0.7, agreement at least v2's, McNemar not for v2 | pass |
+| 2. core supported: agreement | 38/40 | 39/40 | at least v2 minus one | pass |
+| 3. number mutants caught | 8/8 | 9/9 | at least 90% | pass |
+| 3. qualifier mutants caught | 7/8 | 8/9 (89%) | at least 90% | **fail** |
+| 3. citation mutants caught | 40/40 | 40/40 | at least 90% | pass |
+| resample stability (reported, not gated) | 0.95 | 0.97 | | |
+| padding (reported, not gated) | 0.97 | 0.95 | | |
+
+Under the rule, **v2 stays the validated judge** and nothing is re-judged. The miss is recorded
+here.
+
+On fully supported the two judges err on different answers: v2 has one false fail and one false
+pass, v4 two false passes and no false fail (exactly one judge right on two answers, one each way;
+McNemar p = 1). Over all 349 answers of the run they agree on 94.3% of fully-supported verdicts:
+v4 passes 13 answers that v2 fails and v2 passes 7 that v4 fails. That would move the run's
+headline from 0.308 to 0.326 (per case, n = 118), inside either interval. Detecting v4's one-answer
+gain on core supported at 80% power would take about 314 labels.
+
+**What the miss was** (diagnosed after scoring, so it does not change the result). The one
+qualifier mutant v4 passed is the one v2 passed too: docs-ai-003-p1 attempt 1, where the
+generator turned "Note that this is about opt-in only" into "this is exactly opt-in only".
+"About" there means "concerning", so the mutant plants no false fact, and passing it was
+defensible. The generator now flips "about" and "approximately" only before a figure (probe
+round five, with a test). Without that mutant both judges catch every planted error; that is a
+post-hoc observation and is not used to overturn the rule.
+
+**Disputed answers.** Seven answers where the labeler and either judge differ on any verdict are
+packaged in `results/judge-v2-vs-v4/disputed-answers.json`: two on responsive (both judges fail
+answers the labeler passed; the two judges' responsive verdicts are identical), two on core and
+three on fully supported. They were not adjudicated, since no outcome could change the decision.
+
+**Reporting fix found during this round.** Run summaries, `evals compare` and `evals gate` read
+grades by metric name, so on a run graded by more than one judge they averaged the judges'
+verdicts as if they were extra attempts. Only the champion run carries more than one judge (v2,
+v3 and v4). Recomputed with the fix, every published number is unchanged: both gates that use
+this run were saved before the second judge graded it. They now read only the configured judge
+(`-c` picks another), and the report names which one it shows.
+
