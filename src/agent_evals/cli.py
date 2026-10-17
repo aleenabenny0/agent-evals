@@ -982,7 +982,7 @@ def judge_probe(
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
-    from agent_evals.judge_probes import MUTANTS, Variant, behaved, variants
+    from agent_evals.judge_probes import MUTANTS, Variant, behaved, report_path, variants
     from agent_evals.stats.core import wilson_ci
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
@@ -1080,7 +1080,7 @@ def judge_probe(
         f"{len(passed_both)} passed answers, {len(jobs)} variants, {u.model_calls} judge calls "
         f"({u.cached_calls} from cache), {u.input_tokens} in / {u.output_tokens} out tokens"
     )
-    out = Path("results") / f"judge-probes-{run_id}.json"
+    out = report_path(run_id, cfg.judge.grader_name)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(
         json.dumps(

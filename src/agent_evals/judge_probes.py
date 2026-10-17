@@ -24,6 +24,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from agent_evals.entities import NUMBER
@@ -44,6 +45,14 @@ BOUND_FLIPS = (
     ("about", "exactly"),
 )
 PADDING = " I hope this helps; let me know if you need anything else about this topic."
+
+
+def report_path(run_id: str, grader_name: str) -> Path:
+    """Where `evals judge-probe` writes its details. The validated judge ("judge") keeps the
+    original file name; a candidate judge gets its own, so probing two judges on one run keeps
+    both reports instead of the second overwriting the first."""
+    suffix = "" if grader_name == "judge" else f"-{grader_name}"
+    return Path("results") / f"judge-probes-{run_id}{suffix}.json"
 
 
 def mutate_number(answer: str) -> str | None:

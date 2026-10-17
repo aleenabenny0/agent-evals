@@ -9,6 +9,7 @@ from agent_evals.judge_probes import (
     flip_bound,
     mutate_number,
     pad_answer,
+    report_path,
     swap_citations,
     variants,
 )
@@ -78,3 +79,9 @@ def test_behaved_demands_failure_from_mutants_and_stability_from_probes() -> Non
     assert not behaved(probe, original, {"judge_supported": 0.0, "judge_responsive": 1.0})
     assert not behaved(probe, original, {})  # the judge errored: not stable
     assert not behaved(mutant, original, {})
+
+
+def test_each_judge_gets_its_own_probe_report() -> None:
+    validated = report_path("docs-1", "judge")
+    assert validated.name == "judge-probes-docs-1.json"  # unchanged for the validated judge
+    assert report_path("docs-1", "judge-v4").name == "judge-probes-docs-1-judge-v4.json"
