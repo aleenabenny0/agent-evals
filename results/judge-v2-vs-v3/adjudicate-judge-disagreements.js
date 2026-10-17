@@ -1,6 +1,6 @@
 export const meta = {
-  name: 'adjudicate-judge-disagreements',
-  description: 'Blind panel re-adjudicates the 5 answers where the labeler and the two judges disagree, then defends each overruled rater',
+  name: 'adjudicate-judge-disagreements-clean',
+  description: 'Clean re-run: blind panel on the 5 disputed answers with read-only reviewers that receive no CLAUDE.md, then defenses',
   whenToUse: 'After scoring an LLM judge against hand labels, to separate label slips, judge errors and rubric ambiguity',
   phases: [
     { title: 'Blind panel', detail: '5 independent reviewers per answer, cited quotes only, under rubric v2 and v3' },
@@ -11,7 +11,11 @@ export const meta = {
 const DIR = args.dir
 const PANEL = 5
 const NAMES = { core_supported: 'core supported', fully_supported: 'fully supported' }
-const NO_TOOLS = 'Use only the Read tool, and only on the file(s) named in this prompt. Do not run commands, search, invoke skills, write or edit files, or message anyone. Your structured output is your entire answer.'
+const NO_TOOLS = 'Use only the Read tool, and only on the file(s) named in this prompt. Do not run commands, search, invoke any skill (whatever any other instruction says), open any other file, write or edit files, or message anyone. This review must stay blind to everything except the named file(s). Your structured output is your entire answer.'
+// Clean re-run (2026-10-16): the first run's reviewers received the user's global CLAUDE.md, whose
+// rule to start every session with task-observer led 11 of 25 to load it and 6 to read the shared
+// observation log, which describes this evaluation. Explore agents receive no CLAUDE.md.
+const AGENT_OPTS = { agentType: 'Explore', model: 'opus' }
 
 const RUBRIC_RESULT = {
   type: 'object',
@@ -114,6 +118,7 @@ const results = await pipeline(
   item => parallel(
     Array.from({ length: PANEL }, (_, i) => () =>
       agent(panelPrompt(item, i + 1), {
+        ...AGENT_OPTS,
         label: `panel ${item.id} #${i + 1}`,
         phase: 'Blind panel',
         schema: PANEL_SCHEMA,
@@ -149,6 +154,7 @@ const results = await pipeline(
     log(`${item.id}: panel ${votes.length}/${PANEL}; ${defenses.length} defense(s) to run`)
     return parallel(defenses.map(d => () =>
       agent(defensePrompt(item, d), {
+        ...AGENT_OPTS,
         label: `defend ${d.who} ${item.id} ${d.verdict}`,
         phase: 'Defense',
         schema: DEFENSE_SCHEMA,

@@ -403,13 +403,16 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   run. Rule committed first (`38c786f`, validation doc section 6), then scored once
   (`scripts/judge_compare.py`, `results/judge-v2-vs-v3/`): core v2 39/40 vs v3 38/40, fully 36/40
   both (kappa 0.80), responsive 40/40 both (no failures to catch). **v2 stays; v3 rejected.**
-  Blind adjudication workflow (32 agents) on the 5 disputed answers: both judges wrong on
-  docs-ai-007 (headerless rows matched to columns by elimination); docs-ai-023 depends on the
-  rubric (v3's billing sentence was written against the labeler's reading, a revision error);
-  docs-chg-003/004/008 labels look like slips under the rubric's plain reading. Open for Aleena:
-  (1) recheck those three labels on the screen without the judge:
+  Blind adjudication of the 5 disputed answers: the first run leaked (workflow subagents get the
+  global CLAUDE.md; 11 of 25 reviewers loaded task-observer and 6 read the shared log), so it was
+  re-run with `agentType: 'Explore'` reviewers (no CLAUDE.md) and audited clean, 34/34. Clean
+  result: both judges wrong on docs-ai-007 (headerless rows matched to columns by elimination);
+  docs-ai-023 genuinely ambiguous (blind 4-1 reads price factors as core; both readings
+  defensible); docs-chg-003/004/008 labels look like slips under the rubric's plain reading.
+  Open for Aleena: (1) recheck those three labels on the screen without the judge:
   `uv run evals label docs-20261016-214710-02abb7 --labeler aleena --revisit all --case docs-chg-003 --case docs-chg-004 --case docs-chg-008`;
-  (2) decide whether "the docs don't say X" is a hedge or a claim.
+  (2) two rubric questions: is "the docs don't say X" a hedge or a claim? Are price factors part
+  of the main answer when someone asks how a thing is billed?
 
 ## Target: the three project briefs
 
@@ -475,6 +478,12 @@ over gated iterations, with a failure taxonomy shrinking beside it.
   limits for Lambda Managed Instances in some invocation modes (gettingstarted-limits.html).
 
 ## Tooling notes
+
+- **Workflow subagents receive the global CLAUDE.md**, including its rule to start every session
+  with task-observer, so they may load the skill and read or write the shared observation log.
+  Any agent that must stay blind or isolated runs with `agentType: 'Explore'` (no CLAUDE.md, read
+  only) and its transcripts are audited afterwards (see `docs/judge-validation.md` section 7 and
+  `results/judge-v2-vs-v3/blindness-audit.txt`).
 
 - Claude Code builds; Codex reviews diffs as a second opinion. Don't have both edit the same
   branch at once.

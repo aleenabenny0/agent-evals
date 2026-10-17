@@ -429,37 +429,56 @@ What the 40 add to v2's validation:
 
 ### Blind adjudication of the 5 disputed answers
 
-Workflow `adjudicate-judge-disagreements` (script and full output in `results/judge-v2-vs-v3/`),
-32 agents: five independent reviewers per answer who saw only the rubrics, the question, the
-answer and the cited quotes (never the labels or verdicts), then a defense of each rater the
-panel overruled, arguing that rater's verdict from the rubric's own words and judging whether it
-holds. This is diagnostic only: the hand labels remain the reference, and nothing here changes a
-label or the scores above.
+Workflow `adjudicate-judge-disagreements`: five independent reviewers per disputed answer, shown
+only the rubrics, the question, the answer and the cited quotes, each applying rubric v2 and
+rubric v3 separately; then, for each rater the panel's majority overruled, a defender who argues
+that rater's verdict from the rubric's own words and says whether the case holds. Diagnostic
+only: the hand labels remain the reference, and nothing here changes a label or the scores above.
 
-| Answer | Verdict | Panel, rubric v2 / v3 | Labeler | Judge v2 | Judge v3 | Reading |
+**The first run was not blind, and was re-run.** Workflow subagents receive the user's global
+CLAUDE.md, whose rule to start every task-oriented session with the task-observer skill led 11 of
+the 25 first-run reviewers to load that skill; 9 located or searched the shared observation log
+and 6 read it in full. That log describes this evaluation, including (observation 14) which way the
+labeler read billing details. On docs-ai-023 all five reviewers had loaded the skill, and one of
+them wrote observation 15 about the problem. The re-run used read-only reviewers that receive no
+CLAUDE.md (`agentType: 'Explore'`, same model) and an audit of every transcript: 34 of 34 agents
+made no tool call other than reading their named files, 77 calls in all, exactly the number the
+task needs. Both runs' outputs, the hardened script and the audit are in
+`results/judge-v2-vs-v3/`; only the clean run is reported below.
+
+| Answer | Verdict | Clean panel, rubric v2 / v3 | Labeler | Judge v2 | Judge v3 | Reading |
 |---|---|---|---|---|---|---|
-| docs-ai-007 #1 | core | fail 5-0 / fail 5-0 | fail | pass | pass | both judges wrong: they assign headerless table cells to Geographic and Global by elimination across rows; both defenses failed |
+| docs-ai-007 #1 | core | fail 5-0 / fail 5-0 | fail | pass | pass | both judges wrong: they match headerless table cells to Geographic and Global by elimination across rows; all four judge defenses failed |
 | docs-ai-007 #1 | fully | fail 5-0 / fail 5-0 | fail | pass | pass | as above |
-| docs-ai-023 #1 | core | pass 3-2 / fail 5-0 | pass | pass | fail | rubric-dependent: all five reviewers called v2's core definition ambiguous for "how is X billed?"; v3's billing sentence settles it against the labeler, and judge v3 applied it correctly |
+| docs-ai-023 #1 | core | fail 4-1 / fail 5-0 | pass | pass | fail | genuinely ambiguous: all five reviewers flagged v2's core definition for "how is X billed?"; the blind majority reads the price factors as core, and the defenses of both the labeler's and judge v2's reading held |
 | docs-chg-003 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | label likely a slip: "stops providing patches" hardens the quote's "may no longer apply"; the defense of the label failed |
-| docs-chg-004 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | label likely a slip under the plain reading: "The docs don't state the starting number" is a statement about what the documentation says; 2 of 5 reviewers called the hedge exemption ambiguous; the defense failed |
-| docs-chg-008 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | as chg-004, on "The docs do not say explicitly how 'new customer' is defined"; 2 of 5 flagged the hedge exemption; the defense failed |
+| docs-chg-004 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | label likely a slip under the plain reading: "The docs don't state the starting number" is a statement about what the documentation says; the defense failed |
+| docs-chg-008 #1 | fully | fail 5-0 / fail 5-0 | pass | fail | fail | as chg-004, on "the linked 'Clarify availability change' page" and "The docs do not say explicitly how 'new customer' is defined"; the defense failed |
+
+Against the contaminated first run, one majority changed: docs-ai-023 core under rubric v2, from
+3-2 pass to 1-4 fail, the answer on which every first-run reviewer had loaded the skill and the
+one the log described. That is consistent with the log having steered those reviewers, though
+five votes cannot prove it. Every other verdict and every defense outcome repeated.
 
 Findings:
 
-1. **Rubric v3 failed on both of its changes.** Its quota-row paragraph did not change either
-   judge's verdict on docs-ai-007, one of the cases it was written for. Its billing paragraph was
-   written in the judge's direction, the opposite of the labeler's reading in the judge-test
-   diagnosis, and it cost v3 the one answer it lost. That is an error in the revision step, not in
-   the judge, and it is why a candidate is scored on fresh labels under a rule fixed in advance.
+1. **Rubric v3 did not do what it was for.** Its quota-row paragraph changed neither judge's
+   verdict on docs-ai-007, one of the cases it was written for. Its billing paragraph takes the
+   reading that blind reviewers also take from v2's own definition, but it is the opposite of the
+   labeler's, and the labeler is the reference: it cost v3 the one answer it lost.
 2. **A judge error neither rubric fixes:** matching cells to columns by elimination across
    headerless rows. A future judge version could name it explicitly; it would need fresh labels,
    because these 40 are now its development data.
-3. **A rubric question for the labeler:** is a statement that the documentation does not say
-   something ("the docs don't state the starting number") a hedge, which needs no support, or a
-   statement about what the documentation says, which the rubric counts as a claim? The panel and
-   both judges read it as a claim; two labels read it as a hedge. The answer decides those two
-   labels and, if it is "hedge", a rubric change validated on new labels.
+3. **Two rubric questions for the labeler**, each settling a disagreement that belongs to the
+   rubric, not to anyone's mistake:
+   - Is "the docs don't say X" a hedge, which needs no support, or a statement about what the
+     documentation says, which the rubric counts as a claim? (docs-chg-004, docs-chg-008)
+   - When a question asks how something is billed, are the price factors part of the main
+     answer? (docs-ai-023)
 4. **Three fully-supported labels** (docs-chg-003, docs-chg-004, docs-chg-008) are offered back to
    the labeler for a second look on the label screen, without the judge in view. Any change is
    recorded as a correction made after adjudication, and the scores above stay as first computed.
+5. **Isolation must be checked, not assumed.** A subagent told to read one named file still
+   followed a standing user rule to load a skill and read a shared log. Blind or isolated agents
+   now run as an agent type without CLAUDE.md, and their transcripts are audited; the expected
+   tool-call count is a cheap leak detector.

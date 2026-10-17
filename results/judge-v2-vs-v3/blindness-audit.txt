@@ -1,0 +1,23 @@
+Blindness audit of the adjudication workflow transcripts (scratchpad/audit_blindness.py), 2026-10-16
+
+== Run 1, wf_6eb0e797-8e7 (workflow subagents, global CLAUDE.md injected) ==
+32 agent transcripts
+used the Skill tool: 11; touched the observation log: 9; wrote something: 1
+  panel docs-ai-023#1 #1: 4 tool calls ['SKILL', 'READ-LOG']
+  panel docs-ai-007#1 #2: 4 tool calls ['SKILL', 'READ-LOG']
+  panel docs-chg-003#1 #1: 4 tool calls ['SKILL', 'READ-LOG']
+  panel docs-chg-008#1 #2: 4 tool calls ['SKILL', 'READ-LOG']
+  panel docs-chg-003#1 #2: 5 tool calls ['SKILL', 'READ-LOG']
+  panel docs-ai-023#1 #2: 5 tool calls ['SKILL', 'READ-LOG']
+  panel docs-ai-023#1 #5: 5 tool calls ['SKILL', 'READ-LOG']
+  panel docs-chg-004#1 #5: 5 tool calls ['SKILL', 'READ-LOG']
+  panel docs-ai-023#1 #4: 3 tool calls ['SKILL']
+  panel docs-chg-008#1 #4: 3 tool calls ['SKILL']
+  panel docs-ai-023#1 #3: 6 tool calls ['SKILL', 'READ-LOG', 'WROTE']
+agents by kind: {'panel': 25, 'defense': 7}
+
+== Run 2 (clean), wf_85d1b218-ed5 (Explore agents, no CLAUDE.md, model opus) ==
+34 agent transcripts
+used the Skill tool: 0; touched the observation log: 0; wrote something: 0
+agents by kind: {'defense': 9, 'panel': 25}
+tool calls other than Read of a named item file or StructuredOutput: none (77 calls = 25 x 2 + 9 x 3)
