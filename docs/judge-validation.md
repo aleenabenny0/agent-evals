@@ -589,3 +589,62 @@ v3 and v4). Recomputed with the fix, every published number is unchanged: both g
 this run were saved before the second judge graded it. They now read only the configured judge
 (`-c` picks another), and the report names which one it shows.
 
+## 9. Judge v2.1: rubric v2 plus one paragraph on reporting phrases (rule committed 2026-10-17, before any v2.1 grading or scoring)
+
+**Why.** Iteration 4's pre-registered spot check (`docs/plans/iteration-4.md`) found the
+validated judge passing 3 of 30 v5 answers that Aleena failed. Two were attributions the judge
+credited from the cited URL: "according to the Amazon Bedrock cross-Region inference
+documentation", and "this is stated in the Aurora Serverless v2 user guide, so this applies to
+Aurora Serverless v2". Her earlier labels pass plain reporting frames ("The documentation says
+...", "According to the Amazon Bedrock docs ..."). Rubric v2.1 adds one paragraph that states
+the line, in `src/agent_evals/graders/judge_prompts.py`, with judge version `88db72ba4022` and
+config `configs/judge-v2.1.yaml`.
+
+**Review before commit.** Two isolated reviewer agents checked a draft against all 224 labeled
+answers. They found 101 with an attribution, and the draft matched her verdicts on 95. The final
+wording fixes the six disagreements. The publisher, the service's own name and generic words for a
+kind of page add nothing. The question can clear only the source a phrase names. Pointers to
+other pages are reported content. The test applies only to names a reporting phrase introduces.
+Spot checks of the final wording: docs-ai-045, docs-ai-032, docs-core-039, docs-ai-004, docs-ai-011
+and docs-ai-028 come out supported, as she labeled them; docs-ai-001-p2, docs-mix-049 and
+docs-core-028 come out unsupported, as she labeled them. Known residual risk: a question that
+names the wrong version clears "according to the v1 docs" for the source name.
+
+**Labels.** The 30 fresh labels are the next 30 answered attempt-1 answers of
+`docs-20261017-174739-1c0e8e` in the spot check's hash order, positions 31 to 60: docs-ai-005-p1, docs-ai-002, docs-int-020, docs-mix-055, docs-chg-023, docs-ai-005, docs-ai-005-p2, docs-int-041, docs-ai-033, docs-mix-056, docs-core-011, docs-ai-029, docs-chg-013, docs-int-029, docs-ai-002-p2, docs-int-007, docs-core-034, docs-mix-050, docs-core-018, docs-core-025, docs-ai-038, docs-core-039, docs-mix-060, docs-mix-085, docs-chg-010, docs-ai-001, docs-chg-019, docs-ai-007, docs-core-016, docs-mix-077.
+They are labeled with rubric v2 on screen and no judge in view, and none was used to write the
+paragraph.
+
+**Agreement** is counted per verdict, fully supported and core supported separately, over
+labeled attempts that have citations. Ties count as "at least as many". A false pass is a judge
+pass on an answer the labeler failed.
+
+**Rule.**
+
+1. **Fresh labels.** On the 30 fresh labels, v2.1's agreement is at least v2's on fully supported
+   and on core supported. Its false passes on fully supported are no more than v2's and at most 2.
+   If v2 and v2.1 give identical fully-supported verdicts on all 30, the 30 cannot tell them apart.
+   Aleena then labels positions 61 to 90 under the same conditions, and this criterion is applied
+   to all 60.
+2. **Earlier labels.** The earlier sets are 114 labels on `docs-20261011-223111-702e87`, 80 on
+   `docs-20261016-214710-02abb7` and the 30 spot-check labels on `docs-20261017-174739-1c0e8e`.
+   v2.1 is graded once with the default salt and compared with the stored v2 verdicts. In each
+   set, v2.1's agreement on each support verdict is not lower than v2's by more than 1. Summed
+   over the three sets, it is not lower than v2's on either verdict. The spot-check 30 produced
+   the paragraph, so v2.1's expected gain there is not evidence for adoption; they enter only as a
+   non-inferiority check.
+3. **Probes.** Probes run on `docs-20261017-174739-1c0e8e`, built from the answers both judges
+   pass on both verdicts (the first 40 in case-id order), and both judges grade the same variants.
+   For each mutant kind (number, qualifier, citation), v2.1 catches at least as many as v2 minus
+   one. Two things are reported but not gated: resample stability, and a harmless-attribution
+   probe that prefixes each passed answer with "According to the documentation, ". Its verdicts
+   should not change.
+4. **If 1 to 3 hold:** v2.1 becomes the validated judge. `default.yaml` gets rubric_version v2.1
+   and grader_name judge-v2.1. Every reported run is re-judged with v2.1, and its numbers are
+   restated with v2's beside them. The iteration-4 gate is re-read under v2.1, and the fresh 30
+   count as v2.1's spot check on v5's answers, under the same bar of at most 2 false passes. If the
+   gate's outcome flips under v2.1, both readings are reported and only the new one is acted on.
+5. **If any criterion fails, even narrowly:** v2 stays, iteration 4's number stays untrusted, and
+   the miss is recorded here. A revised paragraph may be tested only on labels collected after it
+   is written, positions 61 onward.
+

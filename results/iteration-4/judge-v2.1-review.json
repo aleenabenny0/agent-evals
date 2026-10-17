@@ -1,0 +1,156 @@
+{
+  "summary": "Check a one-paragraph judge rubric fix against all 224 hand labels and attack its adoption rule",
+  "agentCount": 2,
+  "logs": [],
+  "result": {
+    "audit": {
+      "attributions_found": 101,
+      "consistent_cases": 95,
+      "disagreements": [
+        {
+          "run": "docs-20261011-223111-702e87",
+          "case_id": "docs-ai-045",
+          "attempt": 1,
+          "phrase": "Per the Polly quotas page, requests over the quota \"would return a response with HTTP status 400, and a response header indicating ThrottlingException.\"",
+          "labeler_fully": "yes",
+          "paragraph_verdict": "unsupported",
+          "why": "The question (\"What HTTP status code does Amazon Polly return when it throttles SynthesizeSpeech requests?\") and the only quote (\"These requests would return a response with HTTP status 400...\") never say quota or quotas. The page is limits.html, and the paragraph says a URL is not a quote. So \"quotas page\" is a name the phrase adds that appears in neither the question nor a quote, and the paragraph makes it unsupported. She passed the answer and her note is empty. This is the only clear contradiction."
+        },
+        {
+          "run": "docs-20261011-223111-702e87",
+          "case_id": "docs-ai-032",
+          "attempt": 1,
+          "phrase": "The SageMaker AI documentation says Serverless Inference \"integrates with AWS Lambda ...\"",
+          "labeler_fully": "yes",
+          "paragraph_verdict": "unclear",
+          "why": "The question says \"SageMaker Serverless Inference\" and the quote says \"Serverless Inference\". Neither says \"SageMaker AI\". Read literally, the paragraph treats \"SageMaker AI\" as an added name with no support. Read loosely, it is the same product under its current name, which counts as plain rewording. She passed the answer. The paragraph does not say which reading applies."
+        },
+        {
+          "run": "docs-20261011-223111-702e87",
+          "case_id": "docs-core-039",
+          "attempt": 1,
+          "phrase": "AWS KMS documents that \"On-demand rotations do not change existing automatic rotation schedules.\"",
+          "labeler_fully": "yes",
+          "paragraph_verdict": "unclear",
+          "why": "The question says only \"KMS\" and neither quote contains \"AWS\". Read literally, the paragraph makes the \"AWS\" in \"AWS KMS\" an added name with no support. It does not say whether naming the publisher, or the full product name, counts as an added name. She passed the answer. The same issue runs through answers she failed for other reasons while crediting the attribution: docs-mix-024 in 702e87 (\"AWS recommends against using layers\"; her note says the recommendation is quoted, and the quote says \"we recommend\"), docs-chg-019 in 702e87 (\"AWS says it will enforce this in phases\"; the quote says \"We will start enforcing\"), docs-core-001 in 702e87, docs-chg-010 in both runs, and docs-chg-017 and docs-chg-027 in 02abb7."
+        },
+        {
+          "run": "docs-20261016-214710-02abb7",
+          "case_id": "docs-ai-004",
+          "attempt": 1,
+          "phrase": "The comparison table lists geographic inference at \"Standard pricing\" and global inference at \"Approximately 10% savings\".",
+          "labeler_fully": "yes",
+          "paragraph_verdict": "unclear",
+          "why": "\"Comparison\" is in neither the question nor a quote. The quoted header row \"| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |\" does show a table comparing the two options. Most judges would call \"comparison table\" plain rewording, but the paragraph does not say whether a description of the source's form (a table, a comparison table, a quotas page) counts as an added \"name\". This is the same gap behind the docs-ai-045 contradiction. She passed the answer."
+        },
+        {
+          "run": "docs-20261011-223111-702e87",
+          "case_id": "docs-chg-008",
+          "attempt": 1,
+          "phrase": "The documentation says this in a note on the Clarify pages, and it points to a \"Clarify availability change\" page for details.",
+          "labeler_fully": "no",
+          "paragraph_verdict": "unclear",
+          "why": "Her note lists \"note on the Clarify pages\" as one of the failures, saying it appears only in uncited page context. \"Clarify\" is in both the question and the quotes. \"In a note\" is a claim about where the text sits, not a name, version or scope. Since the paragraph exempts the reporting frame, it would probably make that part supported, which contradicts her. The answer still fails on \"points to a ... page\", because that is reported content with no quote. So the answer-level label agrees, but the paragraph gets this phrase wrong or leaves it open."
+        },
+        {
+          "run": "docs-20261016-214710-02abb7",
+          "case_id": "docs-core-028",
+          "attempt": 1,
+          "phrase": "they recommend turning on all four Block Public Access settings for each bucket",
+          "labeler_fully": "no",
+          "paragraph_verdict": "unclear",
+          "why": "Her note says quote 3 (\"turn on all four settings for each bucket\") never names Block Public Access, so tying the recommendation to those settings relies on dim text. The question does name Block Public Access. Under \"appears in neither the question nor a quote\", the name would be cleared by the question. The paragraph does not say that this clearance applies only to the frame's source name and not to the reported content. A judge could therefore mark this supported, which contradicts her. The answer still fails on \"users can modify bucket policies\"."
+        }
+      ],
+      "amendments": [
+        "Clear the publisher and product names (fixes docs-core-039 and docs-ai-032, and keeps every 'AWS recommends/says/points' case consistent with her notes). Add after the first sentence: \"Naming the publisher (AWS, or the 'we' of a quote) or the product that the question or a quote names, in any form of its name (AWS KMS for KMS, SageMaker AI for SageMaker), adds nothing.\"",
+        "Clear generic words for the kind of source, but not features, versions or locations (fixes docs-ai-045 and docs-ai-004 in 02abb7, and makes docs-chg-008 in 702e87 match her note). Change 'But a name, version or scope that such a phrase adds' to 'But a feature, version or scope name that such a phrase adds, or a claim about where on a page the text sits (in a note)'. Then add: \"A generic word for the kind of source (documentation, docs, page, guide, quotas page, table, comparison table) adds nothing.\" This keeps docs-ai-001-p1 in 02abb7, docs-ai-001-p2 in 1c0e8e and docs-mix-049 in 1c0e8e unsupported, because cross-Region inference and v2 are feature and version names. It also keeps docs-ai-004-p3 in 702e87 ('cross-Region inference guide') unsupported, which is consistent because she failed that answer.",
+        "Limit what the question can clear to the frame (fixes docs-core-028 in 02abb7, without changing docs-ai-028 in 702e87, which she passed and where only the question names 'Amazon Bedrock Guardrails'). Add: \"The question can clear only the source named in the frame. What the frame reports must still be in a quote, so a quote saying 'all four settings' does not support 'all four Block Public Access settings' even when the question names Block Public Access.\"",
+        "State that pointers are content, not frame (makes docs-chg-008 in 702e87 explicit and keeps docs-core-038 in both runs, docs-chg-019 in both runs, docs-ai-010, docs-ai-023 and docs-int-020 consistent). Add: \"That the documentation points to, links to or contains something else (a pricing page, a blog post, an availability-change page) is reported content and needs a quote of its own.\""
+      ]
+    },
+    "adversary": {
+      "verdict": "weakened",
+      "wording_problems": [
+        "Read literally, the paragraph fails answers the labeler passed. docs-ai-045 on run 702e87 says \"Per the Polly quotas page\": \"quotas\" is in neither the question nor the quote, and not even in the URL (limits.html). docs-ai-032 on run 702e87 says \"The SageMaker AI documentation says\", and \"AI\" is in neither. She passed both on fully supported, and so did v2. On that run v2 agrees with her on fully supported 114 of 114, so these two alone would cost v2.1 two answers there and fail (b), whose margin is 1.",
+        "The phrase \"name, version or scope\" does not separate the cases she passes from the ones she fails. Her labels draw the line at feature and version names (\"cross-Region inference\", \"v2\") versus the service's own name (\"Amazon Bedrock\", \"SageMaker AI\") and generic page words (\"docs\", \"user guide\", \"quotas page\"). Nothing in the paragraph says this, so a judge could treat \"quotas page\" as a page name and fail it, or treat \"cross-Region inference\" as a generic topic and pass it.",
+        "\"Appears in\" is undefined. Does a quote containing \"quotas\" cover \"quotas page\"? Does \"Bedrock\" in the question cover \"Amazon Bedrock\"? Does \"inference profiles\" in the question cover \"cross-Region inference\", which is world knowledge? Is a match exact text or the same concept? Also, \"adds\" does not say what it is compared against: the reported content, or the rest of the answer.",
+        "The paragraph does not say whether an added name counts as core or peripheral; it only calls it \"a claim like any other\". She marked core as supported in both motivating cases. v2 already calls \"statements about what the documentation says or where\" peripheral. A judge could still read \"so this applies to v2\" as a scope claim on the answer and fail core. The paragraph should say \"peripheral\" outright, which would also tie it to the v2 clause instead of leaving an apparent conflict.",
+        "The question exemption is a loophole for false-premise and wrong-version questions, which the suite contains (docs-int and docs-chg cases). If the question names v1 and the quotes come from a v2 page, \"according to the v1 docs\" passes because the question used the name. The exemption can't simply be dropped: docs-ai-028 needs it, because \"Guardrails\" is in the question but not the quote, and she passed it. This should be listed as a known residual risk.",
+        "\"Page title\" is mentioned, but the judge prompt shows only the URL and the quote (judge_prompts.py line 172). The phrase is harmless, but it implies the judge sees page titles. The labeler sees one more source the paragraph doesn't name, the dim page context, which her notes cite as the source of \"cross-Region inference\". The human and judge rubrics are meant to be the same text, so the paragraph should cover what each of them actually sees.",
+        "There is some risk of new strictness on claims that are not attributions. A presence test (\"appears in neither the question nor a quote\") is easy to generalise, so a judge could start failing API or parameter names and plain rewordings that v2 accepted. The test should be explicitly limited to names introduced by a reporting phrase."
+      ],
+      "rule_problems": [
+        "(a) barely tests the paragraph. The spot check had only 2 attribution misses in 30, so the fresh 30 may contain 0 to 3 cases where the paragraph matters. The bar of at most 2 false passes is absolute, and v2 itself may meet it (v2 had 3 on the spot check and 2 on the 80). So (a) can pass with v2.1 giving exactly v2's verdicts, and then the only evidence that v2.1 helps comes from the spot check that produced it.",
+        "The rule is circular. The spot-check 30 produced the paragraph, and the 12 plain-frame passes from earlier sets were used to place the line, yet both feed (b). As non-inferiority checks that is acceptable, but the expected gain of 2 on the spot check must not be counted as evidence for adoption, and the rule should say so.",
+        "\"Agreement\" is undefined. (a) does not say whether it means fully supported, core supported, or both. It does not say whether answers without citations count (for those, supported is not asked) or whether answered means not abstained. Ties are implicitly allowed (\"at least as many\") but not stated. (a) caps false passes and says nothing about false fails, which is exactly the error a stricter judge adds.",
+        "(b) gives a slack of 1 on each of 3 sets and 2 verdicts, up to 6 answers in total, against an expected gain of about 2. That allows a net regression. The rule also doesn't fix what \"v2's agreement\" is: the stored validated verdicts, or a fresh v2 run. Resample noise of about 1 answer per set falls entirely on v2.1 if v2's figures are the stored ones.",
+        "(c) compares counts drawn from different bases. v2.1 is stricter, so it passes fewer answers, gets fewer mutants and catches fewer in absolute terms. The probes should be built from the answers both judges pass. (c) also has no check for over-strictness on harmless attribution wording, which is the new risk this paragraph brings.",
+        "Outcomes that should be fixed in advance are missing. If (a) passes and (b) fails narrowly, v2 stays, but the rule doesn't forbid rewording the paragraph and retesting it on the same 224+30 labels. It doesn't say what happens when v2 and v2.1 give identical verdicts on all fresh 30. It doesn't say what follows if re-reading the iteration-4 gate under v2.1 flips its outcome."
+      ],
+      "amendments": [
+        "Replace the paragraph: \"Reporting what the documentation says ('the documentation says ...', 'according to the Amazon Bedrock docs, ...') needs no support beyond a quote of what it reports. The service's own name, with or without its prefix or suffix (Bedrock, Amazon Bedrock; SageMaker, SageMaker AI), and generic words for a kind of page (docs, user guide, quotas page) add nothing. But a feature, version or edition name that such a phrase introduces, and that neither the question nor a quote uses, is an unsupported peripheral claim: 'according to the cross-Region inference documentation' is unsupported when no quote mentions cross-Region inference, and 'this is stated in the v2 user guide, so it applies to v2' is unsupported when no quote names v2. A citation's URL, page title or surrounding page text is not a quote. This test applies only to names introduced by a reporting phrase.\"",
+        "Before running anything, check the new wording by hand against docs-ai-045, docs-ai-032, docs-ai-011 and docs-ai-028 (all passes) and docs-ai-001-p2 and docs-mix-049 (both fails).",
+        "Define agreement once, in the rule: per verdict, over answered attempts that have citations, with fully supported and core supported counted separately, and ties counting as \"at least as many\".",
+        "Make (a) relative: on the fresh 30, v2.1's fully-supported agreement and core-supported agreement are each at least v2's, and its false passes on fully supported are no more than v2's. If v2 and v2.1 give identical verdicts on all fresh 30, label positions 61 to 90 before deciding. Gains on the spot-check 30 are not evidence for adoption.",
+        "Add to (b): compare against the stored validated v2 verdicts, and run v2.1 once with the default salt. Summed over the three sets, v2.1 must not fall below v2 on either verdict, in addition to the per-set margin of 1.",
+        "Change (c): build the mutants from answers both judges pass on both verdicts, and compare catches on the same variants. Also report, without gating, a harmless-attribution probe that prefixes passed answers with \"According to the documentation,\"; v2.1's verdicts should not change.",
+        "Add: \"If any criterion fails, even narrowly, v2 stays. A revised paragraph can be tested only on labels collected after it is written (positions 61 onward). If the iteration-4 gate's outcome flips under v2.1, report both readings and act only on the new one.\""
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "consistency audit (224 labels)",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a44222d5f2ef12500",
+      "agentType": "Explore",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792263215166,
+      "queuedAt": 1792263214955,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "promptPreview": "Read C:/Users/Vineetha/AppData/Local/Temp/claude/c--Users-Vineetha-projects-agent-evals/b25f8976-4835-4c68-b90d-cafb979c3679/scratchpad/judgefix/draft.md in full. Then read the labeled data file it names (all 224 hand-labeled answers) and the dev questions file. Your job: test whether the draft paragraph matches how this labeler actually judges attributions.\n\nFind EVERY labeled answer whose text c…",
+      "promptFramed": true,
+      "lastProgressAt": 1792263577807,
+      "tokens": 99722,
+      "toolCalls": 13,
+      "durationMs": 362640,
+      "resultPreview": "{\"attributions_found\":101,\"consistent_cases\":95,\"disagreements\":[{\"run\":\"docs-20261011-223111-702e87\",\"case_id\":\"docs-ai-045\",\"attempt\":1,\"phrase\":\"Per the Polly quotas page, requests over the quota \\\"would return a response with HTTP status 400, and a response header indicating ThrottlingException.\\\"\",\"labeler_fully\":\"yes\",\"paragraph_verdict\":\"unsupported\",\"why\":\"The question (\\\"What HTTP status …"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "adversary (wording and rule)",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a4fd1ebcc2f4db959",
+      "agentType": "Explore",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792263215166,
+      "queuedAt": 1792263214956,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "weakened",
+      "promptPreview": "Read C:/Users/Vineetha/AppData/Local/Temp/claude/c--Users-Vineetha-projects-agent-evals/b25f8976-4835-4c68-b90d-cafb979c3679/scratchpad/judgefix/draft.md in full. You are an adversary reviewing a one-paragraph clarification to a validated LLM judge's rubric and the rule for adopting it, before any money or labeling time is spent. Try to REFUTE it.\n\nOn the wording: will an LLM judge apply it consis…",
+      "promptFramed": true,
+      "lastProgressAt": 1792263499713,
+      "tokens": 51926,
+      "toolCalls": 13,
+      "durationMs": 284543,
+      "resultPreview": "{\"verdict\":\"weakened\",\"wording_problems\":[\"Read literally, the paragraph fails answers the labeler passed. docs-ai-045 on run 702e87 says \\\"Per the Polly quotas page\\\": \\\"quotas\\\" is in neither the question nor the quote, and not even in the URL (limits.html). docs-ai-032 on run 702e87 says \\\"The SageMaker AI documentation says\\\", and \\\"AI\\\" is in neither. She passed both on fully supported, and s…"
+    }
+  ],
+  "totalTokens": 151648,
+  "totalToolCalls": 26
+}

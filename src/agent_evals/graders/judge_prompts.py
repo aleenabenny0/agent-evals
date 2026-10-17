@@ -82,7 +82,38 @@ When a question asks how something is billed, the core claims are how and when y
 model, the number of units bought or the length of a commitment, are peripheral."""
 )
 
-SUPPORT_RUBRICS = {"v2": SUPPORT_RUBRIC, "v3": SUPPORT_RUBRIC_V3, "v4": SUPPORT_RUBRIC_V4}
+# V2.1 of the rubric (candidate, 2026-10-17): rubric v2 plus one paragraph on reporting phrases.
+# The labeler's 30-answer spot check of prompt v5's answers found the judge passing two she failed,
+# both attributions credited from the cited URL ("according to the cross-Region inference
+# documentation"; "stated in the v2 user guide, so it applies to v2"), while her earlier labels
+# pass plain reporting frames. The paragraph states that line; two isolated reviewers checked it
+# against all 224 labels before it was fixed (docs/judge-validation.md section 9). Not used by any
+# gate unless it passes the rule committed there.
+SUPPORT_RUBRIC_V2_1 = (
+    SUPPORT_RUBRIC
+    + """
+
+Reporting what the documentation says ("the documentation says ...", "according to the Amazon
+Bedrock docs, ...", "AWS recommends ...") needs no support beyond a quote of what it reports.
+The publisher (AWS, or the "we" of a quote), the service's own name in any form (Bedrock or
+Amazon Bedrock, KMS or AWS KMS, SageMaker or SageMaker AI) and generic words for a kind of source
+(documentation, docs, page, guide, quotas page, table, comparison table) add nothing. But a
+feature, version or edition name that such a phrase introduces, and that neither the question nor
+a quote uses, is an unsupported peripheral claim: "according to the cross-Region inference
+documentation" is unsupported when no quote mentions cross-Region inference, and "this is stated
+in the v2 user guide, so it applies to v2" is unsupported when no quote names v2. The question
+can clear only the source a phrase names; what the phrase reports must still be in a quote. That
+the documentation points to or links to something else (a pricing page, a blog post) is reported
+content and needs a quote of its own. A citation's URL and the page text around a quote are not
+quotes. This paragraph applies only to names introduced by a reporting phrase."""
+)
+
+SUPPORT_RUBRICS = {
+    "v2": SUPPORT_RUBRIC,
+    "v2.1": SUPPORT_RUBRIC_V2_1,
+    "v3": SUPPORT_RUBRIC_V3,
+    "v4": SUPPORT_RUBRIC_V4,
+}
 
 
 def supported_prompt(rubric: str) -> str:

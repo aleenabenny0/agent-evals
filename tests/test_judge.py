@@ -212,3 +212,20 @@ def test_rubric_v4_adds_the_labelers_two_decisions_to_v2() -> None:
         llm, JudgeConfig.model_validate({"grader_name": "judge-v4", "rubric_version": "v4"})
     )
     assert draft.name == "judge-v4" and draft.version != JudgeGrader(llm, JudgeConfig()).version
+
+
+def test_rubric_v2_1_is_v2_plus_the_reporting_phrase_paragraph() -> None:
+    from agent_evals.graders.judge_prompts import SUPPORT_RUBRICS
+
+    v2, v21 = SUPPORT_RUBRICS["v2"], SUPPORT_RUBRICS["v2.1"]
+    assert v21.startswith(v2) and v21 != v2
+    added = v21[len(v2) :]
+    assert "needs no support beyond a quote of what it reports" in added
+    assert "is an unsupported peripheral claim" in added
+    assert "A citation's URL and the page text around a quote are not\nquotes" in added
+    assert "applies only to names introduced by a reporting phrase" in added
+    llm = ScriptedLLM([])
+    cfg = JudgeConfig.model_validate({"grader_name": "judge-v2.1", "rubric_version": "v2.1"})
+    candidate = JudgeGrader(llm, cfg)
+    assert candidate.name == "judge-v2.1"
+    assert candidate.version != JudgeGrader(llm, JudgeConfig()).version
