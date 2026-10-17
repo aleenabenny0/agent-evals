@@ -46,7 +46,7 @@ headline. The agent is deliberately simple, as the brief demands; the eval syste
 - **Every claim with a number, baseline, n, CI:** Wilson and bootstrap intervals, paired comparisons, baselines agents built. The README headline numbers still have to be written once the dev run exists.
 - **Show failures:** README "What broke" section, after the first dev run.
 - **One command:** `scripts/check.py` runs everything offline; add `make demo` once a dev run exists.
-- **Vendor-neutral, OpenAI-compatible layer:** we call the Anthropic SDK behind the `LLMClient` protocol. This is a conscious deviation: one protocol, one provider, no gateway dependency yet. Brief 03 needs several models anyway, so the OpenAI-compatible client (LiteLLM or raw OpenAI SDK) joins as a second `LLMClient` implementation then, and this becomes an ADR. The harness, graders and store never see provider types.
+- **Vendor-neutral, OpenAI-compatible layer:** we call the Anthropic SDK behind the `LLMClient` protocol. This is a conscious deviation: one protocol, one provider, no gateway dependency yet. Brief 03 needs several models anyway, so the OpenAI-compatible client (LiteLLM or raw OpenAI SDK) joins as a second `LLMClient` implementation then, and this becomes an ADR. The harness, graders and store never see provider types. Confirmed by Aleena on 2026-10-17.
 - **Spend control:** per-run budget cap live, every call cached. **Missing: a hard monthly limit set in the Anthropic console** (Aleena's action).
 - **Secrets:** `.env` ignored, history checked; add a `gitleaks` step to CI (Brief 01 red flag).
 
@@ -75,4 +75,4 @@ Order follows the briefs' own recommendation.
 
 - Verification, the split seed, the judge approval and hand labels, and every paid run (unchanged).
 - A hard monthly spend limit in the Anthropic console.
-- A decision on the vendor-neutral deviation: keep the Anthropic SDK behind `LLMClient` until Brief 03, or add the OpenAI-compatible client now.
+- ~~A decision on the vendor-neutral deviation~~ Decided 2026-10-17 (Aleena): keep the Anthropic SDK behind `LLMClient` until Brief 03; the OpenAI-compatible client is added there as a second implementation, with an ADR.

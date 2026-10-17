@@ -447,8 +447,9 @@ over gated iterations, with a failure taxonomy shrinking beside it.
    20261011 (see status above); (d) approve `docs/plans/llm-judge.md` and answer its three open
    questions, then hand-label 100-200 dev answers split into judge-dev and judge-test;
    (e) done: runs approved; dev docs run complete (see status), closed-book, oracle and the
-   single test run were chained after it; (f) done: $100/month cap; (g) decide whether to keep
-   the Anthropic SDK behind `LLMClient` until Brief 03 or add an OpenAI-compatible client now;
+   single test run were chained after it; (f) done: $100/month cap; (g) done 2026-10-17: Aleena
+   decided to keep the Anthropic SDK behind `LLMClient` until Brief 03, where the
+   OpenAI-compatible client joins as a second implementation with its ADR;
    (h) done 2026-10-16: judge validated (see status). **Next: the first gated improvement
    iteration** (phase 5 / Brief 02 M6), agent-side, no labeling needed: (1) a submit-time rule
    that an abstention carries no answer and an answer is not marked abstained (taxonomy B); (2)
