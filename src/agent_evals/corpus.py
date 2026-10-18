@@ -165,7 +165,8 @@ class Corpus:
         path = directory / "pages.jsonl"
         if not path.exists():
             raise FileNotFoundError(
-                f"No snapshot at {path}. Run `evals snapshot` first to build one."
+                f"No snapshot at {path}. If you are not in the project folder (the one with "
+                "pyproject.toml), cd there first; otherwise run `evals snapshot` to build one."
             )
         lines = path.read_text(encoding="utf-8").splitlines()
         return cls([Page.model_validate(json.loads(line)) for line in lines if line.strip()])
@@ -214,3 +215,12 @@ class Corpus:
         """Whole-phrase match of a short key phrase on a page (see `phrase_in`)."""
         haystack = self._normalized.get(url)
         return haystack is not None and phrase_in(haystack, phrase)
+
+    def page_chunks(self, url: str, query: str) -> list[Chunk]:
+        """One page's chunks, best match for the query first, by the BM25 scores `search` uses."""
+        indexes = [i for i, c in enumerate(self.chunks) if c.url == url]
+        terms = tokenize(query)
+        if not terms or not indexes:
+            return [self.chunks[i] for i in indexes]
+        scores = self._bm25.get_scores(terms)
+        return [self.chunks[i] for i in sorted(indexes, key=lambda i: -scores[i])]

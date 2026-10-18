@@ -176,7 +176,10 @@ Format:
   pilot verdicts. No question comes from a test case's evidence page or from a page holding a
   test support sentence, and outside-snapshot services are checked against page text and test
   questions. An isolated code review found 16 problems, all fixed (plan, "Code review of part 1").
-  Day 0, the pilot day, is generated; nothing is graded yet.
+  Day 0, the pilot day, is generated; nothing is graded yet. Then `evals pilot-review` was tested
+  end to end on a copy of day 0, after the command as first given failed; all 10 problems found
+  are fixed, each with a command-line test. The pilot sample is now stratified by intent and its bar weighted by
+  traffic share, both fixed before any answer exists.
 - 2026-10-18: the improvement chart and the cause breakdown for Brief 02 M6 (`docs/charts/`),
   rebuilt from the results store by `scripts/improvement_chart.py`, plotted numbers in
   `docs/charts/improvement.json`; reviewed for honesty by an isolated reviewer against this file

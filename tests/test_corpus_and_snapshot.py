@@ -147,3 +147,10 @@ def test_contains_phrase_is_whole_word(corpus: Corpus) -> None:
     assert corpus.contains_phrase(BUCKETS_URL, "63") and corpus.contains_phrase(BUCKETS_URL, "3")
     assert not corpus.contains_phrase(BUCKETS_URL, "6")
     assert not corpus.contains_phrase("https://missing.test", "63")
+
+
+def test_page_chunks_rank_one_pages_chunks_by_the_query(corpus: Corpus) -> None:
+    ranked = corpus.page_chunks(LAMBDA_URL, "memory limit")
+    assert ranked and {ch.url for ch in ranked} == {LAMBDA_URL}
+    assert "10,240 MB" in ranked[0].text
+    assert corpus.page_chunks("https://docs.example.test/missing.html", "memory") == []

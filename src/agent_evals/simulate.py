@@ -581,23 +581,38 @@ def load_traffic(path: Path) -> list[TrafficQuestion]:
 
 # --- The pilot review (`evals pilot-review`) -------------------------------------------------
 
+# Per persona, 6 questions stratified by intent, so every intent gets at least 5 reviews in all:
+# a plain random 30 held one outside-snapshot question. The rare intents are over-sampled, so the
+# realism bar weighs each intent's rate by its share of a day's traffic.
+PILOT_PER_PERSONA: dict[str, int] = {
+    "lookup": 3,
+    "comparison": 1,
+    "false_premise": 1,
+    "outside_snapshot": 1,
+}
+TRAFFIC_SHARE = {intent: n / sum(QUOTA.values()) for intent, n in QUOTA.items()}
+# The right answer to "could the snapshot answer it?" (for a false premise: show it wrong).
+EXPECTED_ANSWERABLE = {
+    "lookup": "y",
+    "comparison": "y",
+    "false_premise": "y",
+    "outside_snapshot": "n",
+}
+
 
 def question_sha(q: TrafficQuestion) -> str:
     return sha256_text(q.question)[:16]
 
 
-def pilot_sample(
-    questions: Sequence[TrafficQuestion], day: int, sample: int
-) -> list[TrafficQuestion]:
-    """`sample // 5` questions per persona, drawn reproducibly and capped at what each has."""
-    per = sample // len(PERSONAS)
-    if per < 1:
-        raise ValueError(f"sample must be at least {len(PERSONAS)}, one per persona")
+def pilot_sample(questions: Sequence[TrafficQuestion], day: int) -> list[TrafficQuestion]:
+    """PILOT_PER_PERSONA questions from each persona, drawn reproducibly, in shuffled order."""
     rng = random.Random(f"pilot-{day}")
     picked: list[TrafficQuestion] = []
     for persona in PERSONAS:
-        mine = [q for q in questions if q.persona == persona]
-        picked.extend(rng.sample(mine, min(per, len(mine))))
+        for intent, n in PILOT_PER_PERSONA.items():
+            cell = [q for q in questions if q.persona == persona and q.intent == intent]
+            picked.extend(rng.sample(cell, min(n, len(cell))))
+    rng.shuffle(picked)
     return picked
 
 
@@ -617,6 +632,14 @@ def load_verdicts(path: Path) -> dict[str, dict[str, Any]]:
     return out
 
 
+def append_verdict(path: Path, record: Mapping[str, Any]) -> None:
+    """Append one verdict on its own line. After a torn last line, a newline goes first, so the
+    new verdict cannot fuse with the torn text and be skipped with it."""
+    torn = path.exists() and path.stat().st_size > 0 and not path.read_bytes().endswith(b"\n")
+    with path.open("a", encoding="utf-8") as f:
+        f.write(("\n" if torn else "") + json.dumps(record) + "\n")
+
+
 def current_verdicts(
     picked: Sequence[TrafficQuestion], verdicts: Mapping[str, Mapping[str, Any]]
 ) -> dict[str, Mapping[str, Any]]:
@@ -632,37 +655,63 @@ def current_verdicts(
 def pilot_summary(
     picked: Sequence[TrafficQuestion], verdicts: Mapping[str, Mapping[str, Any]]
 ) -> dict[str, Any]:
-    """The pilot's rates over the current sample only."""
-    recs = list(current_verdicts(picked, verdicts).values())
-    realistic = sum(1 for r in recs if r["realistic"])
-
-    def answerable(outside: bool) -> dict[str, int]:
-        rs = [r for r in recs if (r["intent"] == "outside_snapshot") == outside]
-        return {
-            "yes": sum(1 for r in rs if r["answerable"] == "y"),
-            "no": sum(1 for r in rs if r["answerable"] == "n"),
-            "unsure": sum(1 for r in rs if r["answerable"] == "u"),
-            "of": len(rs),
+    """The pilot's rates over the current sample. The bar is the traffic-weighted realistic
+    share, and it is decided only once every question is reviewed."""
+    current = current_verdicts(picked, verdicts)
+    by_intent: dict[str, dict[str, Any]] = {}
+    for intent in QUOTA:
+        asked = [q for q in picked if q.intent == intent]
+        if not asked:
+            continue
+        recs = [current[q.id] for q in asked if q.id in current]
+        by_intent[intent] = {
+            "reviewed": len(recs),
+            "of": len(asked),
+            "realistic": sum(1 for r in recs if r["realistic"]),
+            "answerable": {a: sum(1 for r in recs if r["answerable"] == a) for a in "ynu"},
+            "answerable_expected": EXPECTED_ANSWERABLE[intent],
         }
-
+    rated = {i: c for i, c in by_intent.items() if c["reviewed"]}
+    weighted = None
+    if rated:
+        share = sum(TRAFFIC_SHARE[i] for i in rated)
+        weighted = sum(TRAFFIC_SHARE[i] * c["realistic"] / c["reviewed"] for i, c in rated.items())
+        weighted /= share
+    reviewed = len(current)
+    complete = bool(picked) and reviewed == len(picked)
+    realistic = sum(c["realistic"] for c in by_intent.values())
     return {
-        "reviewed": len(recs),
+        "reviewed": reviewed,
         "sample": len(picked),
+        "complete": complete,
         "realistic": realistic,
-        "realistic_share": round(realistic / len(recs), 3) if recs else None,
-        "meets_two_thirds": 3 * realistic >= 2 * len(recs) if recs else None,
-        "in_snapshot_answerable": answerable(outside=False),  # should be yes
-        "outside_snapshot_answerable": answerable(outside=True),  # should be no
+        "realistic_share": round(realistic / reviewed, 3) if reviewed else None,
+        "realistic_share_weighted": round(weighted, 3) if weighted is not None else None,
+        # Decided on the unrounded share, and only on a finished pilot.
+        "meets_two_thirds": weighted >= 2 / 3 - 1e-9 if complete and weighted is not None else None,
+        "by_intent": by_intent,
     }
 
 
-def source_passage(corpus: Corpus, q: TrafficQuestion, max_chars: int = 700) -> str:
-    """The chunk of the question's source page sharing the most words with it."""
+def _window(text: str, terms: set[str], size: int) -> str:
+    """The stretch of about `size` characters of a passage that holds the most query words."""
+    flat = " ".join(text.split())
+    if len(flat) <= size:
+        return flat
+    starts = [m.start() for m in re.finditer(r"\S+", flat)]
+    best = max(starts, key=lambda s: len(set(tokenize(flat[s : s + size])) & terms))
+    start = max(0, best - 80)  # a little context before the densest stretch
+    piece = flat[start : start + size]
+    return ("... " if start else "") + piece + (" ..." if start + size < len(flat) else "")
+
+
+def source_passages(
+    corpus: Corpus, q: TrafficQuestion, k: int = 2, size: int = 600
+) -> list[tuple[str, str]]:
+    """The k passages of the question's source page that best match it, ranked as the agent's
+    search ranks them, each as (heading, its best stretch). They can still miss the answer."""
+    if not q.source_url:
+        return []
     terms = set(tokenize(q.question))
-    chunks = [c for c in corpus.chunks if c.url == q.source_url]
-    if not chunks:
-        return ""
-    best = max(chunks, key=lambda c: len(terms & set(tokenize(f"{c.heading} {c.text}"))))
-    text = " ".join(best.text.split())
-    cut = text[:max_chars] + (" ..." if len(text) > max_chars else "")
-    return f"{best.heading}: {cut}" if best.heading else cut
+    chunks = corpus.page_chunks(q.source_url, q.question)[:k]
+    return [(c.heading, _window(c.text, terms, size)) for c in chunks]

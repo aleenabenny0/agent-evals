@@ -10,13 +10,16 @@ import pytest
 from agent_evals.corpus import Corpus
 from agent_evals.simulate import (
     AREA_MAP_PATH,
+    CASE_TYPE,
     MAX_ATTEMPTS,
     OUTSIDE_PER_DAY,
     PERSONAS,
+    PILOT_PER_PERSONA,
     QUOTA,
     SYMPTOM_PER_PERSONA,
     Slot,
     TrafficQuestion,
+    append_verdict,
     day_summary,
     factual_sentences,
     generate_day,
@@ -33,6 +36,7 @@ from agent_evals.simulate import (
     plan_day,
     protected_pages,
     question_sha,
+    source_passages,
     title_overlap,
 )
 from agent_evals.types import Area, Gold
@@ -228,40 +232,82 @@ def test_a_slot_stuck_on_duplicates_moves_to_another_page(corpus: Corpus) -> Non
     assert redo["duplicate"] == MAX_ATTEMPTS and redo["redrawn_page"] == 1
 
 
-def _question(i: int, persona: str) -> TrafficQuestion:
-    return TrafficQuestion(
-        id=f"online-d00-{i:03d}",
+def _day() -> list[TrafficQuestion]:
+    """A day of minimal questions, QUOTA per persona."""
+    out: list[TrafficQuestion] = []
+    for persona in PERSONAS:
+        for intent, n in QUOTA.items():
+            for k in range(n):
+                out.append(
+                    TrafficQuestion(
+                        id=f"online-d00-{len(out):03d}",
+                        day=0,
+                        persona=persona,
+                        intent=intent,
+                        type=CASE_TYPE[intent],
+                        question=f"{persona} asks {intent} question {k}?",
+                    )
+                )
+    return out
+
+
+def _verdict(q: TrafficQuestion, realistic: bool, answerable: str = "y") -> dict[str, object]:
+    return {
+        "id": q.id,
+        "question_sha": question_sha(q),
+        "intent": q.intent,
+        "realistic": realistic,
+        "answerable": answerable,
+    }
+
+
+def test_pilot_sample_is_stratified_by_persona_and_intent_and_reproducible() -> None:
+    picked = pilot_sample(_day(), day=0)
+    assert len(picked) == 30 and pilot_sample(_day(), 0) == picked
+    cells = Counter((q.persona, q.intent) for q in picked)
+    assert all(cells[(p, i)] == n for p in PERSONAS for i, n in PILOT_PER_PERSONA.items())
+
+
+def test_pilot_bar_weighs_intents_by_traffic_and_waits_for_the_last_answer() -> None:
+    picked = pilot_sample(_day(), day=0)
+    # Every lookup realistic and nothing else: 15 of 30 unweighted, 70% of traffic weighted.
+    summary = pilot_summary(picked, {q.id: _verdict(q, q.intent == "lookup") for q in picked})
+    assert summary["complete"] and summary["realistic_share"] == 0.5
+    assert summary["realistic_share_weighted"] == 0.7 and summary["meets_two_thirds"] is True
+    assert summary["by_intent"]["outside_snapshot"]["answerable_expected"] == "n"
+    flipped = {q.id: _verdict(q, q.intent != "lookup") for q in picked}  # 30% weighted
+    assert pilot_summary(picked, flipped)["meets_two_thirds"] is False
+    # One answer short of the end, the bar is undecided, however good the rate so far.
+    partial = pilot_summary(picked, {q.id: _verdict(q, True) for q in picked[:-1]})
+    assert not partial["complete"] and partial["meets_two_thirds"] is None
+
+
+def test_stale_and_torn_verdicts_are_skipped_and_the_next_answer_survives(tmp_path: Path) -> None:
+    picked = pilot_sample(_day(), day=0)
+    good = _verdict(picked[0], True)
+    stale = _verdict(picked[1], False) | {"question_sha": "0" * 16}  # question since regenerated
+    path = tmp_path / "pilot.jsonl"
+    lines = [json.dumps(good), json.dumps(stale), '{"id": "torn']  # the last one has no end
+    path.write_text("\n".join(lines), encoding="utf-8")
+    append_verdict(path, _verdict(picked[2], True))  # written after the torn last line
+    verdicts = load_verdicts(path)
+    assert set(verdicts) == {picked[0].id, picked[1].id, picked[2].id}
+    summary = pilot_summary(picked, verdicts)
+    assert summary["reviewed"] == 2 and not summary["complete"]  # the stale one does not count
+
+
+def test_source_passages_rank_the_page_by_the_question(corpus: Corpus) -> None:
+    q = TrafficQuestion(
+        id="online-d00-000",
         day=0,
-        persona=persona,
+        persona="on-call",
         intent="lookup",
         type="lookup",
-        question=f"question {i}",
+        question="what is the memory limit",
+        source_url=LAMBDA_URL,
     )
-
-
-def test_pilot_sample_resume_and_summary(tmp_path: Path) -> None:
-    questions = [_question(10 * n + k, p) for n, p in enumerate(PERSONAS) for k in range(3)]
-    picked = pilot_sample(questions, day=0, sample=30)  # 6 asked per persona; only 3 exist
-    assert len(picked) == 15 and pilot_sample(questions, 0, 30) == picked
-    with pytest.raises(ValueError):
-        pilot_sample(questions, 0, len(PERSONAS) - 1)
-    good = {
-        "id": picked[0].id,
-        "question_sha": question_sha(picked[0]),
-        "intent": "lookup",
-        "realistic": True,
-        "answerable": "y",
-    }
-    # A verdict on a question since regenerated under the same id.
-    stale = good | {"id": picked[1].id, "question_sha": "0" * 16, "realistic": False}
-    path = tmp_path / "pilot.jsonl"
-    path.write_text(f'{json.dumps(good)}\n{json.dumps(stale)}\n{{"id": "torn', encoding="utf-8")
-    verdicts = load_verdicts(path)
-    assert set(verdicts) == {picked[0].id, picked[1].id}  # the torn last line is skipped
-    summary = pilot_summary(picked, verdicts)
-    assert summary["reviewed"] == 1 and summary["realistic"] == 1  # the stale one is ignored
-    assert summary["meets_two_thirds"] is True
-    assert summary["in_snapshot_answerable"] == {"yes": 1, "no": 0, "unsure": 0, "of": 1}
+    passages = source_passages(corpus, q)
+    assert passages and "10,240 MB" in passages[0][1]
 
 
 def test_similarity_helpers(corpus: Corpus) -> None:

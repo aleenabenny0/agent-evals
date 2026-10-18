@@ -49,12 +49,18 @@ tested blind.
   rebuilt exactly. `day-NN.meta.json` records hashes of the questions and of every input
   (snapshot, test split, area map, slot plan), and `evals simulate` refuses to overwrite a day
   with different questions unless given `--force`.
-- **Pilot before day 1** (`evals pilot-review`). Aleena reads 30 generated questions, 6 per
-  persona, and marks each realistic or not, and answerable from the snapshot or not.
-  Outside-snapshot questions are asked too, and should be "not". The tool shows the closest
-  passage on the source page and the top snapshot search hits, saves each answer as it is given,
-  and exits non-zero if fewer than two thirds are realistic. The rates are published; below two
-  thirds, the prompts are revised before day 1.
+- **Pilot before day 1** (`evals pilot-review 0`). Aleena reviews 30 generated questions, 6 per
+  persona, stratified by intent: 3 lookups, 1 comparison, 1 false premise and 1 outside-snapshot
+  question each, so every intent gets at least 5 reviews (a plain random 30 held one
+  outside-snapshot question). She marks each realistic or not, and answerable from the snapshot
+  or not; outside-snapshot questions should be "not", and for a false premise the question is
+  whether the snapshot shows the premise wrong. The tool shows the two passages of the source
+  page that the agent's own search ranks best, with the page link, because they can miss the
+  answer; she answers "unsure" rather than guess. Each answer is saved as it is given.
+- **The pilot's bar, fixed before any answer exists.** The realistic share is weighted by each
+  intent's share of a day (70/10/10/10), because the sample over-samples the rare intents. It is
+  decided only once all 30 are reviewed. Below two thirds, the generator prompts are revised
+  before day 1. The rates are published, per intent.
 
 ## 2. Online runs (grader guards, to agree first)
 
@@ -181,3 +187,23 @@ then regenerated; its first version had never been reviewed.
 | The area map was rebuilt from the suites, and a third of pages had no area | Committed, covering every page; a gap is an error |
 | The pilot judged the source page from its headings and skipped outside questions | Asks about the snapshot for every question, shows the closest passage, enforces the bar |
 | Minor: stopwords in the overlap, headings inside code, pilot resume and torn writes, silent overwrites, unnamed services, the judge's strict flag reused | All fixed |
+
+Then the pilot command itself was tested the way Aleena runs it, after the command as first
+given to her failed (the day was an option) and a markup crash turned up while fixing it. One
+agent drove `evals pilot-review` on a copy of day 0, a second parsed every command in the docs,
+and an independent agent reproduced each failure. That confirmed 6 problems in the command, left
+4 more unverified, and found 3 outdated commands in old notes. All 10 command problems are fixed,
+each with an end-to-end test in `tests/test_cli_pilot.py`. Two of the old commands are
+corrected; the third is left as a superseded record (`docs/judge-validation.md`, section 2). No
+current instruction failed to parse.
+
+| Problem | Fix |
+|---|---|
+| The day was an option, so `evals pilot-review 0` failed | The day is an argument |
+| Rich markup dropped "[error]" from questions and crashed on "[/dim]" | Generated and page text printed as plain text |
+| An answer typed after a torn last line fused with it and was lost | A newline is written first after a torn line |
+| The passage shown often missed the answer on the page | The two best passages by the agent's search ranking, the page link, and "unsure" |
+| A partial run's summary read as passing the bar | The bar is decided only when all 30 are reviewed |
+| The sample held one outside-snapshot question | Stratified by intent; the bar weighted by traffic share |
+| From the wrong folder, a traceback advised rebuilding the snapshot | A plain message with the `cd` to run |
+| Minor: a missing day, `--sample` 0 or 4, upper-case answers, q at the note, repeated search hits, "()" in a prompt | Plain messages, a fixed sample, all fixed |

@@ -1374,81 +1374,117 @@ def simulate(
     console.print_json(json.dumps(meta))
 
 
+def _interactive() -> bool:
+    import sys
+
+    return sys.stdin.isatty()
+
+
 @app.command("pilot-review")
 def pilot_review(
-    day: int = 0,
-    sample: Annotated[int, typer.Option(help="Questions to review, spread over personas.")] = 30,
+    day: Annotated[int, typer.Argument(help="Simulated day to review.")] = 0,
     reviewer: Annotated[str, typer.Option(help="Your name; stored with each answer.")] = "aleena",
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Review a sample of simulated questions: would a real person ask it, and could the snapshot
-    answer it? Answers are saved one by one, so you can stop with q and resume later."""
+    """Review 30 simulated questions, 6 per persona across all four intents: would a real
+    person ask it, and could the snapshot answer it? Each answer is saved as you give it, so you
+    can stop with q and rerun the same command to continue."""
     import json
-    import sys
 
+    from rich.markup import escape
     from rich.panel import Panel
     from rich.prompt import Prompt
+    from rich.text import Text
 
     from agent_evals.corpus import Corpus
     from agent_evals.simulate import (
-        PERSONAS,
+        append_verdict,
         current_verdicts,
         load_traffic,
         load_verdicts,
         pilot_sample,
         pilot_summary,
         question_sha,
-        source_passage,
+        source_passages,
     )
 
-    if not sys.stdin.isatty():
+    if not _interactive():
         console.print("[red]evals pilot-review needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
-    if sample % len(PERSONAS):
-        console.print(
-            f"[yellow]The sample is split evenly over {len(PERSONAS)} personas, so "
-            f"{sample // len(PERSONAS) * len(PERSONAS)} questions will be reviewed.[/yellow]"
-        )
     cfg = _config(config)
+    project = Path(__file__).resolve().parents[2]
+    if not (cfg.paths.corpus_dir / "pages.jsonl").exists():
+        console.print(
+            f"[red]No docs snapshot at {escape(str(cfg.paths.corpus_dir))}. Run this from the "
+            f"project folder, the one with pyproject.toml:[/red]\n  cd {project.as_posix()}"
+        )
+        raise typer.Exit(code=2)
+    traffic_path = TRAFFIC_DIR / f"day-{day:02d}.jsonl"
+    if not traffic_path.exists():
+        console.print(
+            f"[red]No simulated traffic for day {day} at {escape(str(traffic_path))}.[/red] "
+            f"Generate it first: uv run evals simulate {day}"
+        )
+        raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
-    picked = pilot_sample(load_traffic(TRAFFIC_DIR / f"day-{day:02d}.jsonl"), day, sample)
+    picked = pilot_sample(load_traffic(traffic_path), day)
     out_path = TRAFFIC_DIR.parent / f"pilot-day-{day:02d}.jsonl"
     verdicts = load_verdicts(out_path)
     for i, q in enumerate(picked, 1):
         if q.id in current_verdicts([q], verdicts):
             continue
         console.rule(f"{i}/{len(picked)}   {q.persona}, {q.intent}")
-        console.print(Panel(q.question, title="simulated question"))
+        # Generated and page text is printed as plain text: rich reads "[error]" as markup and
+        # drops it from the screen, and a stray "[/dim]" crashes the review.
+        console.print(Panel(Text(q.question), title="simulated question"))
         if q.intent == "outside_snapshot":
             console.print(
-                f"[dim]About {q.service}, which no snapshot page names. The agent should "
-                "decline, unless the snapshot answers it anyway.[/dim]"
+                f"[dim]About {escape(q.service or '')}, which no snapshot page names. The agent "
+                "should decline, unless the snapshot answers it anyway.[/dim]"
             )
         elif (page := corpus.pages.get(q.source_url or "")) is None:
-            console.print(f"[yellow]Source page not in the snapshot: {q.source_url}[/yellow]")
-        else:
             console.print(
-                Panel(source_passage(corpus, q), title=f"closest passage on its page: {page.title}")
+                f"[yellow]Source page not in the snapshot: {escape(q.source_url or '')}[/yellow]"
+            )
+        else:
+            passages = source_passages(corpus, q)
+            body = "\n\n".join(f"{h}: {t}" if h else t for h, t in passages)
+            title = escape(f"best-matching passages on its page: {page.title}")
+            console.print(Panel(Text(body), title=title))
+            console.print(
+                f"[dim]These can miss the answer. The page: {escape(q.source_url or '')} "
+                "(if unsure, open it or answer u)[/dim]"
             )
             if q.contradicts:
-                console.print(
-                    Panel(q.contradicts, title="the page sentence it should wrongly contradict")
-                )
-        hits = "; ".join(h.title for h in corpus.search(q.question, k=3))
-        console.print(f"[dim]top snapshot search hits: {hits}[/dim]")
-        answer_prompt = "Could the snapshot answer it? (y/n/u unsure)"
+                premise_title = "the page sentence it should wrongly contradict"
+                console.print(Panel(Text(q.contradicts), title=premise_title))
+        pages: dict[str, str] = {}
+        for hit in corpus.search(q.question, k=10):  # several hits can share a page
+            pages.setdefault(hit.url, hit.title)
+        hits = "; ".join(list(pages.values())[:3])
+        console.print(f"[dim]top snapshot search hits: {escape(hits)}[/dim]")
+        answer_prompt = "Could the snapshot answer it? (y/n/u unsure, q quits)"
         if q.intent == "false_premise":
-            answer_prompt = "Could the snapshot show the premise is wrong? (y/n/u unsure)"
+            answer_prompt = "Could the snapshot show the premise is wrong? (y/n/u unsure, q quits)"
         try:
             realistic = Prompt.ask(
-                "Would a real person ask this? (y/n, q quits)", choices=["y", "n", "q"]
-            )
+                "Would a real person ask this? (y/n, q quits)",
+                choices=["y", "n", "q"],
+                case_sensitive=False,
+            ).lower()
             if realistic == "q":
                 break
-            answerable = Prompt.ask(answer_prompt, choices=["y", "n", "u"])
-            note = Prompt.ask("note (optional)", default="")
-        except EOFError:
+            answerable = Prompt.ask(
+                answer_prompt, choices=["y", "n", "u", "q"], case_sensitive=False
+            ).lower()
+            if answerable == "q":
+                break
+            note = Prompt.ask(
+                "note (optional; Enter skips, q saves and quits)", default="", show_default=False
+            )
+        except (EOFError, KeyboardInterrupt):  # this question is unsaved; earlier ones are kept
             break
+        quit_after = note.strip().lower() == "q"
         record = {
             "id": q.id,
             "question_sha": question_sha(q),
@@ -1456,20 +1492,28 @@ def pilot_review(
             "intent": q.intent,
             "realistic": realistic == "y",
             "answerable": answerable,
-            "note": note,
+            "note": "" if quit_after else note,
             "reviewer": reviewer,
         }
         verdicts[q.id] = record
-        with out_path.open("a", encoding="utf-8") as f:  # one line per answer: crash-safe
-            f.write(json.dumps(record) + "\n")
+        append_verdict(out_path, record)
+        if quit_after:
+            break
     summary = pilot_summary(picked, verdicts)
     console.print_json(json.dumps(summary))
-    if summary["reviewed"] == len(picked) and summary["meets_two_thirds"] is False:
+    if not summary["complete"]:
         console.print(
-            "[red]Fewer than two thirds are realistic: the generator prompts get revised before "
-            "day 1.[/red]"
+            f"Not finished: {summary['reviewed']} of {summary['sample']} reviewed. Run the same "
+            "command to continue."
+        )
+    elif summary["meets_two_thirds"] is False:
+        console.print(
+            "[red]Fewer than two thirds are realistic (weighted by traffic share): the generator "
+            "prompts get revised before day 1.[/red]"
         )
         raise typer.Exit(code=1)
+    else:
+        console.print("[green]Pilot complete: at least two thirds are realistic.[/green]")
 
 
 def _print_summary(store: ResultsStore, run_id: str, judge: str = "judge") -> None:

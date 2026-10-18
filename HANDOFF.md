@@ -134,7 +134,7 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
 - Phase 2 step 3 done (ADR 0006): `area`, `verified_by`, `gold.support` on cases; `split`
   `unassigned`; `evals run` refuses drafts/unassigned without `--allow-drafts`; `evals validate`
   with a snapshot errors on missing evidence pages and unfound support quotes, warns on absent
-  must_include phrases and missing area; `evals split --dev N --test M --seed S` assigns splits
+  must_include phrases and missing area; `evals split SOURCE --dev N --test M --seed S` assigns splits
   within (type, area) strata. Drafting workflow: drafts in `suites/docs/<name>.drafts.jsonl`
   with `provenance: synthetic`, `split: unassigned`, a verbatim `support` quote; Aleena verifies
   and sets `verified_by`; then `evals split`.
@@ -142,7 +142,7 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   `gold.support` is now a list, one verbatim quote per fact; `evals validate` warns when a
   required phrase group appears in none of the quotes; `evals review` highlights every quote.
   75 cases gained quotes; core-028's gold was corrected to what the Block Public Access page
-  actually says ("don't allow public access by default"). Also: `evals review --restore <id>`
+  actually says ("don't allow public access by default"). Also: `evals review SUITE --reviewer NAME --restore <id>`
   undoes a rejection, and a rejection now needs a reason of at least four characters.
 - Pilot draft batch: `suites/docs/ai-ml.drafts.jsonl`, 49 cases (40 lookup, 2 false_premise,
   2 multi_step, 1 changed_default, 4 unanswerable) drafted from 13 AI/ML pages (Bedrock
@@ -458,9 +458,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   online evals with a simulated user), then Brief 01, Brief 03 and the code agent.
   **Phase 7 part 1 done (2026-10-18):** `evals simulate` and `evals pilot-review`
   (`src/agent_evals/simulate.py`, area map `configs/online-area-map.json`); code-reviewed, 16
-  findings fixed; day 0, the pilot day, generated (100 questions, exact mix). Next: Aleena runs the
-  pilot (`uv run evals pilot-review 0`) and makes the three plan decisions (plan, "Decisions for
-  Aleena"); then part 2, the grader guards, once she approves them.
+  findings fixed; day 0, the pilot day, generated (100 questions, exact mix). The pilot command
+  failed as first given (the day was an option); it was then tested end to end by an adversarial
+  agent with independent reproduction, and all 10 problems found in it are fixed (plan, "Code
+  review of part 1"). Next: Aleena runs the pilot from the project folder (`uv run evals pilot-review 0`) and
+  makes the three plan decisions (plan, "Decisions for Aleena"); then part 2, the grader guards,
+  once she approves them.
 
 ## Target: the three project briefs
 
