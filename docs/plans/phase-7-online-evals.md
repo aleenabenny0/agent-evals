@@ -30,11 +30,13 @@ tested blind.
   test split stays clean even if online failures later feed an iteration. 245 pages remain. Every
   page has an area in the committed `configs/online-area-map.json`, and the area mix is reported
   per day.
-- **What the generator sees.** `claude-sonnet-5-5` sees the page's title and headings. For a
-  false premise it also sees one prose sentence with a checkable fact (a number with a unit, or a
-  default, limit or prohibition), verified to be on the page word for word. The question must
-  contradict it, and it is stored as the question's minimal key (`contradicts`, which becomes
-  `gold.support` in part 2).
+- **What the generator sees** (v2, after the pilot; see "Pilot and generator v2" at the end).
+  For a lookup or comparison, `claude-sonnet-5-5` sees the page's title and one section of the
+  page, and a checker call confirms that the section answers every part of the question before it
+  is kept. For a false premise it sees the title and headings and one prose sentence with a
+  checkable fact (a number with a unit, or a default, limit or prohibition), verified to be on the
+  page word for word. The question must contradict it, and it is stored as the question's minimal
+  key (`contradicts`, which becomes `gold.support` in part 2).
 - **Outside-snapshot services.** Each question names a service that no snapshot page mentions, in
   its title, URL or text, and that no test question names, so declining it is known to be right.
   `evals validate` checks only titles and URLs: five of the twelve `suites.held_out_services` are
@@ -137,8 +139,8 @@ tested blind.
 ## Cost and Aleena's time
 
 - **Money:** about $25 in all. That covers 5 days of 100 questions and 6 days of 200 with
-  shadows. Each 100 questions costs about $1.20: $0.05 for the generator, $0.25 for the agent and
-  $0.90 for the judge.
+  shadows. Each 100 questions costs about $1.65: about $0.50 for the generator and its checker,
+  $0.25 for the agent and $0.90 for the judge.
 - **Aleena's time:** about 40 minutes, in three short tasks: the pilot of 30 questions, 30 judge
   labels from reference days, and sealing the blind configs.
 
@@ -207,3 +209,38 @@ current instruction failed to parse.
 | The sample held one outside-snapshot question | Stratified by intent; the bar weighted by traffic share |
 | From the wrong folder, a traceback advised rebuilding the snapshot | A plain message with the `cd` to run |
 | Minor: a missing day, `--sample` 0 or 4, upper-case answers, q at the note, repeated search hits, "()" in a prompt | Plain messages, a fixed sample, all fixed |
+
+## Pilot and generator v2 (2026-10-18)
+
+**The pilot.** Aleena reviewed the 30 sampled questions of day 0. All 30 were realistic, so the
+bar was met. Her answerability answers were then checked against the whole snapshot: one agent
+per 6 questions searched and read it, every quote was verified on its page, and a second agent
+re-checked each disagreement from scratch (all 10 re-checks held). The check found two things.
+The tool did not say what to do with an outside-snapshot question, which has no page to open, so
+she answered "unsure" on all 5; she then changed them to "no". More important, the questions
+often asked more than the docs say. The whole snapshot fully answered only 6 of the 20 lookups
+and comparisons, answered 10 partly and 4 not at all. Generator v1 saw only a page's title and
+headings, so it asked about the topic, not about what the text says. Those answers would muddy
+the online numbers: a correct decline would count as an in-scope abstention. Her answers, the
+check and v1's traffic are kept in `results/online/pilot-v1/`.
+
+**The change, one only (v2).** A lookup or comparison is written from one section of its page,
+which the generator sees: at least 300 characters, and not a callout, a list of links or mostly
+code. The system prompt adds that the person has not read the docs, so it must not copy their
+phrases. A checker call to the same model then judges, from the section alone, whether it answers
+every part of the question. A question it calls partial or none is retried with the gap named.
+False premises and outside-snapshot questions are unchanged, except that a false premise must ask
+nothing its sentence does not settle.
+
+**Checks, fixed before v2's day 0 exists:**
+
+1. Answerability: the pilot's evidence check, the same method, on the 20 lookups and comparisons
+   of v2's pilot sample (15 and 5, the same strata). Pass: at least 17 fully answered by the
+   snapshot, and at most 1 not answered at all (v1: 6 and 4).
+2. Copying: at most 10% of the in-snapshot questions share 6 or more consecutive words with their
+   page (v1: 1 of 90).
+3. Realism, if Aleena opts in: she reads 10 of v2's questions, 2 per persona. Fewer than 7
+   realistic means the prompt is revised.
+
+If check 1 or 2 fails, the prompt is revised and the day regenerated, and every attempt is
+reported here.

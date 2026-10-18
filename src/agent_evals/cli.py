@@ -1312,6 +1312,7 @@ def simulate(
     from agent_evals.simulate import (
         AREA_MAP_PATH,
         EXTRA_OUTSIDE_SERVICES,
+        GENERATOR_VERSION,
         day_summary,
         generate_day,
         load_area_map,
@@ -1340,6 +1341,7 @@ def simulate(
     meta = day_summary(questions) | {
         "day": day,
         "generator": model,
+        "generator_version": GENERATOR_VERSION,
         "traffic_sha256": sha256_text(traffic),
         "inputs": {
             "corpus": corpus.fingerprint,

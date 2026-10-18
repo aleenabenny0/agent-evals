@@ -5,7 +5,10 @@ the same quota of each intent, so days differ in their questions, not their comp
 
 The frozen test split stays clean. An in-snapshot question comes from one source page, and a page
 is never a source if it is gold evidence for a test case or holds a test case's support sentence
-word for word. An outside-snapshot question names a service that no snapshot page mentions (in
+word for word. A lookup or comparison is written from one section of its page, and a checker
+model confirms that the section answers every part of it before it is kept (generator v2; v1 saw
+only the title and headings, and the snapshot fully answered 6 of its 20 piloted lookups and
+comparisons). An outside-snapshot question names a service that no snapshot page mentions (in
 its title, URL or text) and no test question names, so declining it is known to be right and it
 cannot echo a test case. A false premise contradicts one prose sentence from its page, kept as its
 minimal key; it becomes the online case's `gold.support` when online cases are built (part 2).
@@ -24,12 +27,12 @@ import re
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, get_args
+from typing import Any, Literal, get_args
 from urllib.parse import urlparse
 
 from pydantic import BaseModel, ConfigDict, ValidationError
 
-from agent_evals.corpus import Corpus, Page, tokenize
+from agent_evals.corpus import Chunk, Corpus, Page, tokenize
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.llm import LLMClient
 from agent_evals.types import Area
@@ -84,13 +87,21 @@ AREA_MAP_PATH = Path("configs/online-area-map.json")
 DUPLICATE_JACCARD = 0.6
 MAX_ATTEMPTS = 6  # per source page, each under its own sub-salt
 MAX_REDRAWS = 2  # then an in-snapshot slot's page is redrawn, at most this many times
+GENERATOR_VERSION = "v2"
+MIN_SECTION_CHARS = 300  # shorter sections are mostly fragments and one-line callouts
 
 SYSTEM = """\
 You write one question that a real person would ask an AWS documentation assistant.
 You are {persona}.
-Write the question in that person's own voice and words. Do not copy the wording of any page
-title or heading you are shown, and do not mention that you were shown one. Ask exactly one
-question, at most 40 words. Call submit_question with it."""
+Write the question in that person's own voice, about their own situation. They have not read
+the documentation, so do not copy its phrases or its title, and do not mention that you were
+shown any. Ask exactly one question, at most 40 words. Call submit_question with it."""
+
+CHECK_SYSTEM = """\
+You check whether a passage from AWS documentation answers a user's question. Judge only from the
+passage, not from what you know. "full": the passage states the answer to every part of the
+question. "partial": it answers some parts but not all. "none": it answers no part. In
+"missing", name each part the passage does not answer, or leave it empty. Call submit_check."""
 
 _WORD = re.compile(r"[a-z0-9]+")
 _SPLIT = re.compile(r"(?<=[.!?])\s+(?=[A-Z])")
@@ -136,7 +147,11 @@ class TrafficQuestion(BaseModel):
     symptom: bool = False
     # False premise: the page sentence the question contradicts; the online case's gold.support.
     contradicts: str | None = None
+    # Lookup or comparison: the section of its page it was written from, which the checker found
+    # answers every part of it.
+    section: str | None = None
     title_overlap: float = 0.0
+    copied_run: int = 0  # the longest run of words it shares with its page
     attempt: int = 0
     redraw: int = 0  # how many times the slot's source page was redrawn
 
@@ -151,11 +166,18 @@ class Slot:
     service: str | None
     sentence: str | None
     symptom: bool
+    section: str | None = None  # lookup or comparison: "heading\n\ntext" of one page section
 
 
 class _Submitted(BaseModel):
     model_config = ConfigDict(extra="forbid")
     question: str
+
+
+class _Checked(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    verdict: Literal["full", "partial", "none"]
+    missing: str
 
 
 def words(text: str) -> set[str]:
@@ -326,20 +348,36 @@ def factual_sentence(corpus: Corpus, url: str, rng: random.Random) -> str | None
     return rng.choice(candidates) if candidates else None
 
 
+def key_sections(corpus: Corpus, url: str) -> list[Chunk]:
+    """Sections of a page that a lookup or comparison can rest on: substantive text, not a callout
+    such as "Note", a list of links, mostly code, or a fragment."""
+    out: list[Chunk] = []
+    for chunk in corpus.chunks:
+        if chunk.url != url or chunk.heading.strip().lower() in _NOISE_HEADINGS:
+            continue
+        text = chunk.text.strip()
+        if len(text) < MIN_SECTION_CHARS or text.count("](") * 80 > len(text):
+            continue  # a fragment, or more than one link per 80 characters
+        code = sum(len(block) for block in re.findall(r"```.*?```", text, re.S))
+        if 2 * code <= len(text):
+            out.append(chunk)
+    return out
+
+
 def _draw_page(
     intent: str, corpus: Corpus, pool: Sequence[str], rng: random.Random
-) -> tuple[str, str | None]:
-    """A source page, and for a false premise a factual sentence from it; a page with none is
-    replaced by another draw."""
-    url = rng.choice(pool)
-    if intent != "false_premise":
-        return url, None
+) -> tuple[str, str | None, str | None]:
+    """A source page and what the question rests on: a factual sentence for a false premise, one
+    section for a lookup or comparison. A page without one is replaced by another draw."""
     for _ in range(50):
-        sentence = factual_sentence(corpus, url, rng)
-        if sentence:
-            return url, sentence
         url = rng.choice(pool)
-    raise ValueError("no page with a factual sentence for a false premise")
+        if intent == "false_premise":
+            if sentence := factual_sentence(corpus, url, rng):
+                return url, sentence, None
+        elif sections := key_sections(corpus, url):
+            chunk = rng.choice(sections)
+            return url, None, f"{chunk.heading}\n\n{chunk.text.strip()}"
+    raise ValueError(f"no page with something a {intent} question can rest on")
 
 
 def plan_day(
@@ -372,9 +410,11 @@ def plan_day(
                     n_outside += 1
                     slots.append(Slot(day, index, persona, intent, None, service, None, False))
                     continue
-                url, sentence = _draw_page(intent, corpus, pool, rng)
+                url, sentence, section = _draw_page(intent, corpus, pool, rng)
                 symptom = intent == "lookup" and k in symptoms
-                slots.append(Slot(day, index, persona, intent, url, None, sentence, symptom))
+                slots.append(
+                    Slot(day, index, persona, intent, url, None, sentence, symptom, section)
+                )
     return slots
 
 
@@ -382,8 +422,8 @@ def _redraw(slot: Slot, corpus: Corpus, pool: Sequence[str], redraw: int) -> Slo
     """The same slot (persona, intent) on another page, drawn from its own seed."""
     rng = random.Random(f"online-day-{slot.day}-slot-{slot.index}-redraw-{redraw}")
     others = [u for u in pool if u != slot.source_url] or list(pool)
-    url, sentence = _draw_page(slot.intent, corpus, others, rng)
-    return dataclasses.replace(slot, source_url=url, sentence=sentence)
+    url, sentence, section = _draw_page(slot.intent, corpus, others, rng)
+    return dataclasses.replace(slot, source_url=url, sentence=sentence, section=section)
 
 
 def generation_request(
@@ -395,27 +435,41 @@ def generation_request(
             f"name {slot.service} in it. Ask about {slot.service} itself, not about how it works "
             "with other AWS services."
         )
-    else:
+    elif slot.intent == "false_premise":
         assert page is not None
         topic = (
             f"The documentation page is titled '{page.title}'. Its sections include: "
             + "; ".join(headings(page)[:12])
             + "."
         )
+        ask = (
+            f'Here is a sentence from the page: "{slot.sentence}" Ask a question that wrongly '
+            "assumes the opposite of that sentence, the way a confused user would, without "
+            "saying you are unsure. Ask nothing that the sentence does not settle."
+        )
+        task = f"{topic}\n{ask}"
+    else:
+        assert page is not None and slot.section, "a lookup or comparison needs a section"
+        topic = (
+            f"The documentation page is titled '{page.title}'. Here is one section of it:\n"
+            f"<section>\n{slot.section}\n</section>"
+        )
         if slot.intent == "lookup":
-            ask = "Ask one specific question that this page could answer."
+            ask = (
+                "Ask one specific question that this section answers completely: one thing "
+                "only, and nothing the section does not say."
+            )
             if slot.symptom:
                 ask += (
                     " Phrase it as a problem you ran into, for example an error message or "
-                    "something that behaved differently than you expected."
+                    "something that behaved differently than you expected. The section must "
+                    "still answer it completely."
                 )
-        elif slot.intent == "comparison":
-            ask = "Ask a question comparing two options, settings or approaches this page covers."
         else:
             ask = (
-                f'Here is a sentence from the page: "{slot.sentence}" Ask a question that wrongly '
-                "assumes the opposite of that sentence, the way a confused user would, without "
-                "saying you are unsure."
+                "Ask a question comparing two options, settings or approaches that this section "
+                "describes. The section must answer the whole comparison, so do not ask which "
+                "one to choose unless it says how to choose."
             )
         task = f"{topic}\n{ask}"
     if hint:
@@ -457,6 +511,61 @@ def _ask(llm: LLMClient, request: dict[str, Any], salt: str) -> str:
     raise ValueError(f"generator returned no question (stop_reason={resp.stop_reason!r})")
 
 
+def check_request(question: str, section: str, model: str) -> dict[str, Any]:
+    tool: dict[str, Any] = {
+        "name": "submit_check",
+        "description": "Submit the verdict.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "verdict": {"type": "string", "enum": ["full", "partial", "none"]},
+                "missing": {"type": "string"},
+            },
+            "required": ["verdict", "missing"],
+            "additionalProperties": False,
+        },
+        "strict": True,
+    }
+    return {
+        "model": model,
+        "max_tokens": 2048,  # room to think before the tool call, as the judge needs
+        "system": CHECK_SYSTEM,
+        "tools": [tool],
+        "messages": [
+            {
+                "role": "user",
+                "content": f"<passage>\n{section}\n</passage>\n\nQuestion: {question}",
+            }
+        ],
+    }
+
+
+def _check(llm: LLMClient, request: dict[str, Any], salt: str) -> _Checked:
+    resp = llm.create(request, salt=salt)
+    if resp.stop_reason == "max_tokens":
+        raise ValueError("checker hit max_tokens before its verdict")
+    for block in resp.content:
+        if block.get("type") == "tool_use" and block.get("name") == "submit_check":
+            try:
+                return _Checked.model_validate(block.get("input", {}))
+            except ValidationError as exc:
+                raise ValueError(f"checker output failed validation: {exc}") from exc
+    raise ValueError(f"checker returned no verdict (stop_reason={resp.stop_reason!r})")
+
+
+def longest_shared_run(question: str, text: str) -> int:
+    """Length in words of the longest word sequence the question shares with the text."""
+    q = _WORD.findall(question.lower())
+    haystack = " " + " ".join(_WORD.findall(text.lower())) + " "
+    best = 0
+    for i in range(len(q)):
+        for j in range(i + best + 1, len(q) + 1):  # only runs longer than the best so far
+            if " " + " ".join(q[i:j]) + " " not in haystack:
+                break
+            best = j - i
+    return best
+
+
 def _fill(
     llm: LLMClient,
     slot: Slot,
@@ -496,10 +605,29 @@ def _fill(
                 (q.question for q in earlier if jaccard(question, q.question) >= DUPLICATE_JACCARD),
                 None,
             )
-            if clash is None:
-                return slot, question, attempt, redraw
-            redo["duplicate"] += 1
-            hint = f'Someone already asked this, so ask something different: "{clash}"'
+            if clash is not None:
+                redo["duplicate"] += 1
+                hint = f'Someone already asked this, so ask something different: "{clash}"'
+                continue
+            if slot.section:
+                try:
+                    checked = _check(
+                        llm,
+                        check_request(question, slot.section, model),
+                        f"{base}-try{attempt}-check",
+                    )
+                except ValueError:
+                    redo["failed"] += 1
+                    continue
+                if checked.verdict != "full":
+                    redo["unanswerable"] += 1
+                    gap = f" ({checked.missing})" if checked.missing.strip() else ""
+                    hint = (
+                        f'The section does not answer every part of "{question}"{gap}. Ask only '
+                        "what the section answers."
+                    )
+                    continue
+            return slot, question, attempt, redraw
     raise ValueError(
         f"slot {planned.index} ({planned.intent}): no usable question after every retry; {redo}"
     )
@@ -514,13 +642,14 @@ def generate_day(
     pool: Sequence[str] = (),
 ) -> tuple[list[TrafficQuestion], dict[str, int]]:
     """Generate every slot in order. A slot is retried under a new sub-salt when the generator
-    gives no question, when an outside-snapshot question leaves out its service, or when the
-    question is a near-duplicate of an earlier one that day (with the clash quoted back). After
+    gives no question, when an outside-snapshot question leaves out its service, when the
+    question is a near-duplicate of an earlier one that day (with the clash quoted back), or when
+    the checker finds its section does not answer every part of it (with the gap named). After
     MAX_ATTEMPTS on one page an in-snapshot slot's page is redrawn from `pool`, keeping persona
     and intent. A day so gets its full quota or fails loudly. `areas` maps page URL to area.
     Returns the questions and the retry counts by reason."""
     out: list[TrafficQuestion] = []
-    redo = {"failed": 0, "unnamed_service": 0, "duplicate": 0, "redrawn_page": 0}
+    redo = {"failed": 0, "unnamed_service": 0, "duplicate": 0, "unanswerable": 0, "redrawn_page": 0}
     for planned in slots:
         slot, question, attempt, redraw = _fill(llm, planned, corpus, model, out, pool, redo)
         page = corpus.pages.get(slot.source_url) if slot.source_url else None
@@ -537,7 +666,9 @@ def generate_day(
                 area=areas.get(slot.source_url) if slot.source_url else None,
                 symptom=slot.symptom,
                 contradicts=slot.sentence,
+                section=slot.section,
                 title_overlap=round(title_overlap(question, page), 3) if page else 0.0,
+                copied_run=longest_shared_run(question, page.text) if page else 0,
                 attempt=attempt,
                 redraw=redraw,
             )
@@ -565,6 +696,10 @@ def day_summary(questions: Sequence[TrafficQuestion]) -> dict[str, Any]:
         "most_questions_from_one_page": max(per_page.values(), default=0),
         "symptom_phrased": sum(1 for q in questions if q.symptom),
         "mean_title_overlap": round(sum(q.title_overlap for q in inside) / len(inside), 3)
+        if inside
+        else 0.0,
+        "copied_6_or_more_words": sum(1 for q in inside if q.copied_run >= 6),
+        "mean_copied_run": round(sum(q.copied_run for q in inside) / len(inside), 2)
         if inside
         else 0.0,
         "regenerated": sum(1 for q in questions if q.attempt or q.redraw),

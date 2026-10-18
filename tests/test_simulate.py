@@ -26,8 +26,10 @@ from agent_evals.simulate import (
     generation_request,
     headings,
     jaccard,
+    key_sections,
     load_area_map,
     load_verdicts,
+    longest_shared_run,
     mentions,
     outside_services,
     page_areas,
@@ -45,29 +47,92 @@ from conftest import BUCKETS_URL, LAMBDA_URL, ScriptedLLM, make_case, make_page,
 SERVICES = [f"Service{n:02d}" for n in range(12)]
 MEMORY = "Functions can use between 128 MB and 10,240 MB of memory."
 PROSE_URL = "https://docs.example.test/s3/objects.html"
+OBJECTS_URL = "https://docs.example.test/s3/object-size.html"
+MEMORY_URL = "https://docs.example.test/lambda/memory.html"
+ODD_URL = "https://docs.example.test/misc/odd.html"
+SIZE_SECTION = (
+    "An object can be up to 5 TB in size. To upload an object larger than 5 GB, you must use "
+    "multipart upload, which splits the object into parts of at least 5 MB each and uploads "
+    "them in parallel. You can upload up to 10,000 parts for each object, and a failed part "
+    "can be uploaded again on its own, without restarting the parts that already succeeded."
+)
+CLASSES_SECTION = (
+    "S3 Standard stores objects in at least three Availability Zones by default. S3 One "
+    "Zone-IA stores objects in a single Availability Zone, so it costs less, but the data is "
+    "lost if that zone is destroyed. Use One Zone-IA only for data that you can recreate, such "
+    "as thumbnails, or for copies of data that is already stored safely in another AWS Region."
+)
+MEMORY_SECTION = (
+    "Functions can use between 128 MB and 10,240 MB of memory. Lambda allocates CPU power in "
+    "proportion to the memory you configure, so a function with more memory also gets more "
+    "CPU. You set memory in 1 MB increments, and a new function gets 128 MB by default unless "
+    "you choose another value when you create it or update it later."
+)
+MEMORY_SEC = f"Memory settings\n\n{MEMORY_SECTION}"
+
+
+@pytest.fixture
+def pages() -> Corpus:
+    """Two pages with sections long enough to write a lookup from (the shared fixture's pages are
+    fragments), plus a callout and a list of links that must never be used."""
+    objects = (
+        "# Amazon S3 objects\n\n"
+        f"## Object size\n\n{SIZE_SECTION}\n\n"
+        f"## Storage classes\n\n{CLASSES_SECTION}\n\n"
+        "## Note\n\nObject keys are case sensitive, so photo.jpg and Photo.jpg are two objects.\n\n"
+        "## Topics\n\n* [Upload](./u.html)\n* [Copy](./c.html)\n* [Delete](./d.html)\n"
+    )
+    memory = f"# Lambda memory\n\n## Memory settings\n\n{MEMORY_SECTION}\n"
+    return Corpus(
+        [
+            make_page(OBJECTS_URL, "Amazon S3 objects", objects),
+            make_page(MEMORY_URL, "Lambda memory", memory),
+        ]
+    )
 
 
 def ask(q: str) -> list[dict[str, object]]:
     return [tool_use("submit_question", {"question": q})]
 
 
-def test_plan_day_has_exact_quotas_distinct_outside_services_and_no_excluded_page(
-    corpus: Corpus,
+def checked(verdict: str, missing: str = "") -> list[dict[str, object]]:
+    return [tool_use("submit_check", {"verdict": verdict, "missing": missing})]
+
+
+def test_key_sections_keep_substance_and_skip_callouts_links_code_and_fragments(
+    pages: Corpus,
 ) -> None:
-    slots = plan_day(1, corpus, excluded_urls={BUCKETS_URL}, outside=SERVICES)
+    headings_used = [c.heading for c in key_sections(pages, OBJECTS_URL)]
+    assert headings_used == ["Object size", "Storage classes"]  # not "Note", not "Topics"
+    code = "```\n" + "aws s3 cp local.txt s3://bucket/key.txt\n" * 20 + "```"
+    links = " ".join(f"[link {n}](./{n}.html)" for n in range(30))
+    odd = (
+        f"# Odd\n\n## Code\n\n{code}\n\n## Links\n\n{links}\n\n"
+        "## Short\n\nToo short to rest a question on.\n"
+    )
+    assert key_sections(Corpus([make_page(ODD_URL, "Odd", odd)]), ODD_URL) == []
+
+
+def test_plan_day_has_exact_quotas_distinct_outside_services_and_no_excluded_page(
+    pages: Corpus,
+) -> None:
+    slots = plan_day(1, pages, excluded_urls={OBJECTS_URL}, outside=SERVICES)
     assert len(slots) == 20 * len(PERSONAS)
     by_cell = Counter((s.persona, s.intent) for s in slots)
     for persona in PERSONAS:
         for intent, n in QUOTA.items():
             assert by_cell[(persona, intent)] == n
         assert sum(1 for s in slots if s.persona == persona and s.symptom) == SYMPTOM_PER_PERSONA
-    assert {s.source_url for s in slots if s.intent != "outside_snapshot"} == {LAMBDA_URL}
+    assert {s.source_url for s in slots if s.intent != "outside_snapshot"} == {MEMORY_URL}
     outside = [s for s in slots if s.intent == "outside_snapshot"]
     assert len(outside) == len({s.service for s in outside}) == OUTSIDE_PER_DAY
     assert all(s.source_url is None and s.service in SERVICES for s in outside)
-    # The page's only prose fact; its table row is never a premise's key.
-    assert {s.sentence for s in slots if s.intent == "false_premise"} == {MEMORY}
-    assert plan_day(1, corpus, {BUCKETS_URL}, SERVICES) == slots  # a day can be rebuilt exactly
+    grounded = [s for s in slots if s.intent in ("lookup", "comparison")]
+    assert grounded and all(s.section == MEMORY_SEC for s in grounded)  # its only real section
+    premises = [s for s in slots if s.intent == "false_premise"]
+    assert premises and all(s.sentence and s.section is None for s in premises)
+    assert all(s.sentence and s.sentence in MEMORY_SECTION for s in premises)
+    assert plan_day(1, pages, {OBJECTS_URL}, SERVICES) == slots  # a day can be rebuilt exactly
 
 
 def test_plan_day_refuses_without_pages_or_ten_distinct_services(corpus: Corpus) -> None:
@@ -142,55 +207,106 @@ def test_factual_sentences_keep_prose_facts_and_skip_code_lists_tables_and_point
     assert headings(corpus.pages[PROSE_URL]) == ["Objects"]  # not the comment in the fence
 
 
-def test_requests_carry_persona_task_hint_and_a_strict_tool(corpus: Corpus) -> None:
-    page = corpus.pages[LAMBDA_URL]
-    premise = Slot(1, 0, "on-call", "false_premise", LAMBDA_URL, None, MEMORY, False)
+def test_requests_carry_persona_task_hint_and_a_strict_tool(pages: Corpus) -> None:
+    page = pages.pages[MEMORY_URL]
+    premise = Slot(1, 0, "on-call", "false_premise", MEMORY_URL, None, MEMORY, False)
     req = generation_request(premise, page, "m")
-    assert "on-call engineer" in req["system"]
-    assert MEMORY in req["messages"][0]["content"]
+    assert "on-call engineer" in req["system"] and "have not read" in req["system"]
+    premise_task = req["messages"][0]["content"]
+    assert (
+        MEMORY in premise_task and "Ask nothing that the sentence does not settle" in premise_task
+    )
     assert req["tools"][0]["name"] == "submit_question" and req["tools"][0]["strict"] is True
     assert "tool_choice" not in req  # claude-sonnet-5-5 rejects a forced tool call
     outside = Slot(1, 1, "cost-manager", "outside_snapshot", None, "Braket", None, False)
     content = generation_request(outside, None, "m", hint="Ask another.")["messages"][0]["content"]
     assert "name Braket in it" in content and content.endswith("\nAsk another.")
-    symptom = Slot(1, 2, "new-developer", "lookup", LAMBDA_URL, None, None, True)
+    symptom = Slot(1, 2, "new-developer", "lookup", MEMORY_URL, None, None, True, MEMORY_SEC)
     symptom_task = generation_request(symptom, page, "m")["messages"][0]["content"]
+    assert MEMORY_SECTION in symptom_task and "answers completely" in symptom_task
     assert "problem you ran into" in symptom_task
 
 
 def test_a_near_duplicate_is_retried_under_a_new_salt_with_the_clash_quoted(
-    corpus: Corpus,
+    pages: Corpus,
 ) -> None:
     slots = [
-        Slot(3, 0, "new-developer", "lookup", LAMBDA_URL, None, None, False),
-        Slot(3, 1, "security-reviewer", "lookup", LAMBDA_URL, None, None, False),
+        Slot(3, 0, "new-developer", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
+        Slot(3, 1, "security-reviewer", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
         Slot(3, 2, "cost-manager", "outside_snapshot", None, "Braket", None, False),
     ]
-    first = "What is the maximum timeout for a Lambda function?"
+    first = "How much memory can a Lambda function have at most?"
     llm = ScriptedLLM(
         [
             ask(first),
-            ask(first),  # a duplicate: retried
-            ask("Who can change the memory setting of a function?"),
-            ask("How much does a Braket task cost per shot?"),
+            checked("full"),
+            ask(first),  # a duplicate: retried before any check
+            ask("Does giving a function more memory also give it more CPU?"),
+            checked("full"),
+            ask("How much does a Braket task cost per shot?"),  # outside: nothing to check
         ]
     )
-    questions, redo = generate_day(llm, slots, corpus, {LAMBDA_URL: "compute"}, "m")
+    questions, redo = generate_day(llm, slots, pages, {MEMORY_URL: "compute"}, "m")
     assert llm.salts == [
         "online-day03-slot000-try0",
+        "online-day03-slot000-try0-check",
         "online-day03-slot001-try0",
         "online-day03-slot001-try1",
+        "online-day03-slot001-try1-check",
         "online-day03-slot002-try0",
     ]
-    assert first in llm.requests[2]["messages"][0]["content"]  # the retry quotes the clash
+    assert first in llm.requests[3]["messages"][0]["content"]  # the retry quotes the clash
     assert [q.attempt for q in questions] == [0, 1, 0]
-    assert redo == {"failed": 0, "unnamed_service": 0, "duplicate": 1, "redrawn_page": 0}
+    assert redo == {
+        "failed": 0,
+        "unnamed_service": 0,
+        "duplicate": 1,
+        "unanswerable": 0,
+        "redrawn_page": 0,
+    }
     assert questions[0].area == "compute" and questions[2].area is None
+    assert questions[0].section == MEMORY_SEC and questions[2].section is None
     assert questions[2].type == "unanswerable" and questions[2].service == "Braket"
     assert questions[1].id == "online-d03-001"
     summary = day_summary(questions)
     assert summary["questions"] == 3 and summary["regenerated"] == 1
     assert summary["by_area"] == {"compute": 2} and summary["outside_services"] == ["Braket"]
+
+
+def test_a_question_its_section_does_not_fully_answer_is_retried_with_the_gap_named(
+    pages: Corpus,
+) -> None:
+    slot = [Slot(5, 0, "cost-manager", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC)]
+    vague = "How much memory can a function use, and what does each MB cost?"
+    llm = ScriptedLLM(
+        [
+            ask(vague),
+            checked("partial", "the price per MB"),
+            ask("What is the most memory I can give a Lambda function?"),
+            checked("full"),
+        ]
+    )
+    questions, redo = generate_day(llm, slot, pages, {}, "m")
+    assert questions[0].attempt == 1 and redo["unanswerable"] == 1
+    assert llm.salts == [
+        "online-day05-slot000-try0",
+        "online-day05-slot000-try0-check",
+        "online-day05-slot000-try1",
+        "online-day05-slot000-try1-check",
+    ]
+    check = llm.requests[1]
+    assert check["system"].startswith("You check whether a passage")
+    assert (
+        MEMORY_SECTION in check["messages"][0]["content"]
+        and vague in check["messages"][0]["content"]
+    )
+    retry = llm.requests[2]["messages"][0]["content"]
+    assert vague in retry and "the price per MB" in retry
+
+
+def test_longest_shared_run_counts_words_copied_in_a_row() -> None:
+    assert longest_shared_run("can I go above 10,240 MB of memory?", MEMORY_SECTION) == 5
+    assert longest_shared_run("totally unrelated words", MEMORY_SECTION) == 0
 
 
 def test_failed_replies_and_unnamed_services_are_retried_not_fatal(corpus: Corpus) -> None:
@@ -217,18 +333,24 @@ def test_a_slot_that_never_yields_a_question_fails_loudly(corpus: Corpus) -> Non
     assert len(llm.salts) == MAX_ATTEMPTS  # an outside slot has no page to redraw
 
 
-def test_a_slot_stuck_on_duplicates_moves_to_another_page(corpus: Corpus) -> None:
+def test_a_slot_stuck_on_duplicates_moves_to_another_page(pages: Corpus) -> None:
     slots = [
-        Slot(4, 0, "on-call", "lookup", LAMBDA_URL, None, None, False),
-        Slot(4, 1, "on-call", "lookup", LAMBDA_URL, None, None, False),
+        Slot(4, 0, "on-call", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
+        Slot(4, 1, "on-call", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
     ]
-    same = "lambda timeout max??"
-    llm = ScriptedLLM([ask(same)] * (1 + MAX_ATTEMPTS) + [ask("why is my bucket name rejected")])
-    questions, redo = generate_day(llm, slots, corpus, {}, "m", pool=[BUCKETS_URL, LAMBDA_URL])
+    same = "lambda memory max??"
+    script = [ask(same), checked("full")] + [ask(same)] * MAX_ATTEMPTS
+    llm = ScriptedLLM([*script, ask("biggest s3 object i can upload"), checked("full")])
+    questions, redo = generate_day(llm, slots, pages, {}, "m", pool=[OBJECTS_URL, MEMORY_URL])
     moved = questions[1]
-    assert moved.source_url == BUCKETS_URL and moved.redraw == 1 and moved.attempt == 0
+    assert moved.source_url == OBJECTS_URL and moved.redraw == 1 and moved.attempt == 0
+    assert moved.section is not None
+    assert moved.section.startswith(("Object size", "Storage classes"))
     assert moved.persona == "on-call" and moved.intent == "lookup"
-    assert llm.salts[-1] == "online-day04-slot001-redo1-try0"
+    assert llm.salts[-2:] == [
+        "online-day04-slot001-redo1-try0",
+        "online-day04-slot001-redo1-try0-check",
+    ]
     assert redo["duplicate"] == MAX_ATTEMPTS and redo["redrawn_page"] == 1
 
 
