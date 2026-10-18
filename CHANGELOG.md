@@ -170,6 +170,13 @@ Format:
 
 ## Unreleased
 
+- 2026-10-18: phase 7 part 1, the simulated user. `evals simulate DAY` writes a day of 100
+  questions (5 personas, each with 14 lookup, 2 comparison, 2 false-premise and 2
+  outside-snapshot questions) to `results/online/traffic/`, and `evals pilot-review` records the
+  pilot verdicts. No question comes from a test case's evidence page or from a page holding a
+  test support sentence, and outside-snapshot services are checked against page text and test
+  questions. An isolated code review found 16 problems, all fixed (plan, "Code review of part 1").
+  Day 0, the pilot day, is generated; nothing is graded yet.
 - 2026-10-18: the improvement chart and the cause breakdown for Brief 02 M6 (`docs/charts/`),
   rebuilt from the results store by `scripts/improvement_chart.py`, plotted numbers in
   `docs/charts/improvement.json`; reviewed for honesty by an isolated reviewer against this file

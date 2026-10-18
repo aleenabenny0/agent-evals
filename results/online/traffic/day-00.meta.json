@@ -1,0 +1,74 @@
+{
+  "questions": 100,
+  "by_intent": {
+    "comparison": 10,
+    "false_premise": 10,
+    "lookup": 70,
+    "outside_snapshot": 10
+  },
+  "by_persona": {
+    "cost-manager": 20,
+    "new-developer": 20,
+    "non-native": 20,
+    "on-call": 20,
+    "security-reviewer": 20
+  },
+  "by_area": {
+    "ai_ml": 19,
+    "analytics": 1,
+    "compute": 10,
+    "databases": 5,
+    "devtools": 6,
+    "integration": 9,
+    "management": 9,
+    "networking": 5,
+    "security": 16,
+    "storage": 10
+  },
+  "outside_services": [
+    "Braket",
+    "Device Farm",
+    "HealthLake",
+    "IoT SiteWise",
+    "Location Service",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "RoboMaker",
+    "Snowball",
+    "Wickr"
+  ],
+  "source_pages": 72,
+  "most_questions_from_one_page": 3,
+  "symptom_phrased": 20,
+  "mean_title_overlap": 0.132,
+  "regenerated": 1,
+  "day": 0,
+  "generator": "claude-sonnet-5-5",
+  "traffic_sha256": "20ad28ce2ec7ea1fb2aa0f759fd8ee427483a3551fe5817649eb624c5f232aa3",
+  "inputs": {
+    "corpus": "b6343e2afd9cd7e8e5f5ef6a566477a4b0d77cb9ec321105e063f5fb238f6678",
+    "test_suite": "283fad51a7ec0b0c6ef260a8149ad6cb24f22a8ecc815889696cf01c72fe388c",
+    "area_map": "1a99a7837ed93d44f4a29ebfd38b0a4295de39217824b5703828894a48f6a9cc",
+    "plan": "e6423fabe9db5306cad01c2bb5daebe719a4676ddcf5df6b46f738b7963d9bdc"
+  },
+  "allowed_source_pages": 245,
+  "excluded_pages": {
+    "test_evidence": 72,
+    "test_support_sentence": 17
+  },
+  "outside_services_dropped": {
+    "GameLift": "named by a test question",
+    "Ground Station": "named by a test question",
+    "Chime": "named on a snapshot page",
+    "Greengrass": "named on a snapshot page",
+    "WorkSpaces": "named on a snapshot page",
+    "MediaConvert": "named on a snapshot page",
+    "Outposts": "named on a snapshot page"
+  },
+  "retries": {
+    "failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 1,
+    "redrawn_page": 0
+  }
+}

@@ -456,6 +456,11 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   **Improvement chart done (2026-10-18)** for Brief 02 M6: `docs/charts/improvement.svg` and
   `causes.svg` in the README, rebuilt by `scripts/improvement_chart.py`. Next: phase 7 (Brief 02 M7,
   online evals with a simulated user), then Brief 01, Brief 03 and the code agent.
+  **Phase 7 part 1 done (2026-10-18):** `evals simulate` and `evals pilot-review`
+  (`src/agent_evals/simulate.py`, area map `configs/online-area-map.json`); code-reviewed, 16
+  findings fixed; day 0, the pilot day, generated (100 questions, exact mix). Next: Aleena runs the
+  pilot (`uv run evals pilot-review 0`) and makes the three plan decisions (plan, "Decisions for
+  Aleena"); then part 2, the grader guards, once she approves them.
 
 ## Target: the three project briefs
 

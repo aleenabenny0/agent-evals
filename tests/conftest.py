@@ -89,9 +89,11 @@ class ScriptedLLM:
         self.script = list(script)
         self.stop_reason = stop_reason
         self.requests: list[dict[str, Any]] = []
+        self.salts: list[str] = []
 
     def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
         self.requests.append(copy.deepcopy(request))  # the agent keeps mutating its list
+        self.salts.append(salt)
         content = self.script.pop(0)
         has_tool = any(b["type"] == "tool_use" for b in content)
         return LLMResponse(

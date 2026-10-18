@@ -1290,6 +1290,188 @@ def power(
     )
 
 
+TRAFFIC_DIR = Path("results/online/traffic")
+
+
+@app.command()
+def simulate(
+    day: int,
+    model: Annotated[str, typer.Option(help="Generator model.")] = "claude-sonnet-5-5",
+    force: Annotated[
+        bool, typer.Option("--force", help="Replace an existing day whose questions differ.")
+    ] = False,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Generate one simulated day of online traffic (phase 7). One call per question."""
+    import dataclasses
+    import json
+
+    from agent_evals.corpus import Corpus
+    from agent_evals.harness.cache import CallCache, sha256_text
+    from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.simulate import (
+        AREA_MAP_PATH,
+        EXTRA_OUTSIDE_SERVICES,
+        day_summary,
+        generate_day,
+        load_area_map,
+        outside_services,
+        page_areas,
+        plan_day,
+        protected_pages,
+    )
+    from agent_evals.suites import load_suite
+
+    load_dotenv()
+    cfg = _config(config)
+    corpus = Corpus.load(cfg.paths.corpus_dir)
+    test_path = cfg.paths.suites_dir / "docs" / "test.jsonl"
+    test_cases = load_suite(test_path)
+    protected = protected_pages(corpus, test_cases)
+    excluded = set().union(*protected.values())
+    pool = sorted(set(corpus.pages) - excluded)
+    areas = page_areas(load_area_map(AREA_MAP_PATH), pool)
+    candidates = [*cfg.suites.held_out_services, *EXTRA_OUTSIDE_SERVICES]
+    services, dropped = outside_services(candidates, corpus, [c.question for c in test_cases])
+    slots = plan_day(day, corpus, excluded, services)
+    llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
+    questions, redo = generate_day(llm, slots, corpus, areas, model, pool)
+    traffic = "".join(q.model_dump_json() + "\n" for q in questions)
+    meta = day_summary(questions) | {
+        "day": day,
+        "generator": model,
+        "traffic_sha256": sha256_text(traffic),
+        "inputs": {
+            "corpus": corpus.fingerprint,
+            "test_suite": sha256_text(test_path.read_text(encoding="utf-8")),
+            "area_map": sha256_text(AREA_MAP_PATH.read_text(encoding="utf-8")),
+            "plan": sha256_text(json.dumps([dataclasses.asdict(s) for s in slots])),
+        },
+        "allowed_source_pages": len(pool),
+        "excluded_pages": {reason: len(urls) for reason, urls in protected.items()},
+        "outside_services_dropped": dropped,
+        "retries": redo,
+    }
+    traffic_path = TRAFFIC_DIR / f"day-{day:02d}.jsonl"
+    meta_path = TRAFFIC_DIR / f"day-{day:02d}.meta.json"
+    if meta_path.exists() and not force:
+        old = json.loads(meta_path.read_text(encoding="utf-8"))
+        if old.get("traffic_sha256") != meta["traffic_sha256"]:
+            recorded = old.get("inputs")
+            if recorded is None:
+                why = "the existing day records no input hashes"
+            else:
+                changed = [k for k, v in meta["inputs"].items() if recorded.get(k) != v]
+                why = "inputs changed: " + (", ".join(changed) or "none, so the generator did")
+            console.print(
+                f"[red]Day {day} already exists with different questions ({why}). Nothing was "
+                "written; pass --force to replace it.[/red]"
+            )
+            raise typer.Exit(code=1)
+    TRAFFIC_DIR.mkdir(parents=True, exist_ok=True)
+    traffic_path.write_text(traffic, encoding="utf-8")
+    meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+    console.print_json(json.dumps(meta))
+
+
+@app.command("pilot-review")
+def pilot_review(
+    day: int = 0,
+    sample: Annotated[int, typer.Option(help="Questions to review, spread over personas.")] = 30,
+    reviewer: Annotated[str, typer.Option(help="Your name; stored with each answer.")] = "aleena",
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Review a sample of simulated questions: would a real person ask it, and could the snapshot
+    answer it? Answers are saved one by one, so you can stop with q and resume later."""
+    import json
+    import sys
+
+    from rich.panel import Panel
+    from rich.prompt import Prompt
+
+    from agent_evals.corpus import Corpus
+    from agent_evals.simulate import (
+        PERSONAS,
+        current_verdicts,
+        load_traffic,
+        load_verdicts,
+        pilot_sample,
+        pilot_summary,
+        question_sha,
+        source_passage,
+    )
+
+    if not sys.stdin.isatty():
+        console.print("[red]evals pilot-review needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    if sample % len(PERSONAS):
+        console.print(
+            f"[yellow]The sample is split evenly over {len(PERSONAS)} personas, so "
+            f"{sample // len(PERSONAS) * len(PERSONAS)} questions will be reviewed.[/yellow]"
+        )
+    cfg = _config(config)
+    corpus = Corpus.load(cfg.paths.corpus_dir)
+    picked = pilot_sample(load_traffic(TRAFFIC_DIR / f"day-{day:02d}.jsonl"), day, sample)
+    out_path = TRAFFIC_DIR.parent / f"pilot-day-{day:02d}.jsonl"
+    verdicts = load_verdicts(out_path)
+    for i, q in enumerate(picked, 1):
+        if q.id in current_verdicts([q], verdicts):
+            continue
+        console.rule(f"{i}/{len(picked)}   {q.persona}, {q.intent}")
+        console.print(Panel(q.question, title="simulated question"))
+        if q.intent == "outside_snapshot":
+            console.print(
+                f"[dim]About {q.service}, which no snapshot page names. The agent should "
+                "decline, unless the snapshot answers it anyway.[/dim]"
+            )
+        elif (page := corpus.pages.get(q.source_url or "")) is None:
+            console.print(f"[yellow]Source page not in the snapshot: {q.source_url}[/yellow]")
+        else:
+            console.print(
+                Panel(source_passage(corpus, q), title=f"closest passage on its page: {page.title}")
+            )
+            if q.contradicts:
+                console.print(
+                    Panel(q.contradicts, title="the page sentence it should wrongly contradict")
+                )
+        hits = "; ".join(h.title for h in corpus.search(q.question, k=3))
+        console.print(f"[dim]top snapshot search hits: {hits}[/dim]")
+        answer_prompt = "Could the snapshot answer it? (y/n/u unsure)"
+        if q.intent == "false_premise":
+            answer_prompt = "Could the snapshot show the premise is wrong? (y/n/u unsure)"
+        try:
+            realistic = Prompt.ask(
+                "Would a real person ask this? (y/n, q quits)", choices=["y", "n", "q"]
+            )
+            if realistic == "q":
+                break
+            answerable = Prompt.ask(answer_prompt, choices=["y", "n", "u"])
+            note = Prompt.ask("note (optional)", default="")
+        except EOFError:
+            break
+        record = {
+            "id": q.id,
+            "question_sha": question_sha(q),
+            "persona": q.persona,
+            "intent": q.intent,
+            "realistic": realistic == "y",
+            "answerable": answerable,
+            "note": note,
+            "reviewer": reviewer,
+        }
+        verdicts[q.id] = record
+        with out_path.open("a", encoding="utf-8") as f:  # one line per answer: crash-safe
+            f.write(json.dumps(record) + "\n")
+    summary = pilot_summary(picked, verdicts)
+    console.print_json(json.dumps(summary))
+    if summary["reviewed"] == len(picked) and summary["meets_two_thirds"] is False:
+        console.print(
+            "[red]Fewer than two thirds are realistic: the generator prompts get revised before "
+            "day 1.[/red]"
+        )
+        raise typer.Exit(code=1)
+
+
 def _print_summary(store: ResultsStore, run_id: str, judge: str = "judge") -> None:
     from agent_evals.report import LOWER_IS_BETTER, NEUTRAL, other_judges, summarize
 

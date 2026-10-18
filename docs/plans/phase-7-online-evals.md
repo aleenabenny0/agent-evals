@@ -15,28 +15,46 @@ tested blind.
 
 - **Exact quotas.** Every day has the same mix: 5 personas with 20 questions each. Each persona
   writes 14 lookup or how-to questions, 2 comparisons, 2 false premises and 2 outside-snapshot
-  questions, so 70/10/10/10. If the leakage guard drops a question, its cell is regenerated with a
-  sub-salt until full, so every day has the same N and mix.
+  questions, so 70/10/10/10. A slot is retried under a new sub-salt when the generator gives no
+  question, when an outside-snapshot question leaves out its service, or when the question is a
+  near-duplicate (word-set Jaccard 0.6 or more) of an earlier one that day, with the clash quoted
+  back. After 6 tries an in-snapshot slot moves to a redrawn page, keeping persona and intent.
+  Every day so has the same N and mix, or fails loudly.
 - **Personas:** a new developer; an on-call engineer, terse, with error messages and typos; a
   security reviewer; a cost-conscious manager; a non-native English speaker. At least one in four
   how-to questions is phrased as a symptom ("I get AccessDenied when ..."), not in the docs' own
   words.
 - **Sources.** Each in-snapshot question comes from one source page, drawn uniformly from the
-  pages. Every gold evidence page of a test case is excluded, so the test split stays clean even
-  if online failures later feed an iteration. The page-to-area map is committed, and the area mix
-  is reported per day.
+  allowed pages. A page is excluded if it is gold evidence for a test case (72 pages) or holds a
+  test case's support sentence word for word (17 more, mostly quota pages), so the
+  test split stays clean even if online failures later feed an iteration. 245 pages remain. Every
+  page has an area in the committed `configs/online-area-map.json`, and the area mix is reported
+  per day.
 - **What the generator sees.** `claude-sonnet-5-5` sees the page's title and headings. For a
-  false premise it also sees one sampled sentence, which it must contradict; that sentence is
-  stored as the question's minimal key (`gold.support`). Outside-snapshot questions name a service
-  from `suites.held_out_services`, which `evals validate` guarantees is absent, so declining them
-  is known to be right.
-- **Recorded per question:** source page, persona, intent, and word overlap with the page's title
-  and headings. Within a day, near-duplicates (word-set Jaccard 0.6 or more) are dropped.
+  false premise it also sees one prose sentence with a checkable fact (a number with a unit, or a
+  default, limit or prohibition), verified to be on the page word for word. The question must
+  contradict it, and it is stored as the question's minimal key (`contradicts`, which becomes
+  `gold.support` in part 2).
+- **Outside-snapshot services.** Each question names a service that no snapshot page mentions, in
+  its title, URL or text, and that no test question names, so declining it is known to be right.
+  `evals validate` checks only titles and URLs: five of the twelve `suites.held_out_services` are
+  mentioned in passing (Outposts on ten pages, as in "On Outposts, gp3 volumes support sizes up
+  to 16 TiB"), and two more are named by test questions. So `simulate.py` adds eight candidates,
+  every candidate is checked when a day is planned, and each dropped one is recorded with its
+  reason. 13 remain, and a day's 10 outside questions name 10 different services.
+- **Recorded per question:** source page, persona, intent, area, and the share of its content
+  words (stopwords dropped) that appear in the page's title or headings.
 - **Storage.** `results/online/traffic/day-NN.jsonl`, outside `suites/`, so snapshot checks and
-  evidence indexes never load it. Generation is cached by day, so a day can be rebuilt exactly.
-- **Pilot before day 1.** Aleena reads 30 generated questions and marks each realistic or not, and
-  answerable from the snapshot or not. The rates are published. If fewer than two thirds are
-  realistic, the prompts are revised before day 1.
+  evidence indexes never load it. Generation is cached by day, slot and attempt, so a day can be
+  rebuilt exactly. `day-NN.meta.json` records hashes of the questions and of every input
+  (snapshot, test split, area map, slot plan), and `evals simulate` refuses to overwrite a day
+  with different questions unless given `--force`.
+- **Pilot before day 1** (`evals pilot-review`). Aleena reads 30 generated questions, 6 per
+  persona, and marks each realistic or not, and answerable from the snapshot or not.
+  Outside-snapshot questions are asked too, and should be "not". The tool shows the closest
+  passage on the source page and the top snapshot search hits, saves each answer as it is given,
+  and exits non-zero if fewer than two thirds are realistic. The rates are published; below two
+  thirds, the prompts are revised before day 1.
 
 ## 2. Online runs (grader guards, to agree first)
 
@@ -145,3 +163,21 @@ tested blind.
 | Day-level traffic confounds fault days (design) | Shadow runs of the champion |
 | Cached replays break latency; online runs as latest (design) | Cache hits refused for latency; online runs never latest |
 | "Service area" sampling undefined (design) | Pages sampled uniformly, a committed area map, area mix reported |
+
+## Code review of part 1 (2026-10-18)
+
+An isolated agent reviewed the code against part 1 and found 16 problems: 7 bugs, 2 mismatches
+with this plan and 7 minor ones. All are fixed and covered by `tests/test_simulate.py`. Day 0 was
+then regenerated; its first version had never been reviewed.
+
+| Problem | Fix |
+|---|---|
+| A failed generator reply is cached, so that day could never be rebuilt | Retried under the next sub-salt (sonnet-5-5 rejects a forced tool call) |
+| Outside services cycled by slot index: a day used 6 of the 12 | A separate counter: 10 distinct services a day |
+| Five held-out services are mentioned in page text | Checked against page text and test questions; eight candidates added |
+| Premise keys included code, lists, table cells and text not on the page | Prose paragraphs only, a fact pattern, checked word for word |
+| 17 non-evidence pages hold test support sentences | Excluded as sources |
+| A duplicate was retried with the identical request | The clash is quoted back; after 6 tries the page is redrawn |
+| The area map was rebuilt from the suites, and a third of pages had no area | Committed, covering every page; a gap is an error |
+| The pilot judged the source page from its headings and skipped outside questions | Asks about the snapshot for every question, shows the closest passage, enforces the bar |
+| Minor: stopwords in the overlap, headings inside code, pilot resume and torn writes, silent overwrites, unnamed services, the judge's strict flag reused | All fixed |
