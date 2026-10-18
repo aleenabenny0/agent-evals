@@ -1,0 +1,177 @@
+{
+  "summary": "Adversarial review of the phase 7 online-evals plan: statistics and alert rule, and simulated-user validity and demo design",
+  "agentCount": 2,
+  "logs": [],
+  "result": {
+    "stats": {
+      "verdict": "weakened",
+      "problems": [
+        {
+          "severity": "serious",
+          "problem": "(1) Power on day 7 is decent, not assured, and the plan never states it. judge_supported is only graded on answered, cited, error-free attempts (judge.py:82-88). With the out-of-scope 10% plus a few percent abstentions and uncited answers, that is about 85 graded answers a day and about 425 in the reference, not 100 and 500. Fisher vs reference, simulated, with p0=0.31 and a 5-point floor: if the online drop matches dev (0.31 to 0.11), power is 0.85 one-sided or 0.81 two-sided at alpha 0.01/7, and 0.78 or 0.75 at 0.01/14. If v2's online gap is smaller, power falls fast: 0.50 at p1=0.15 and 0.25 at p1=0.18 (m=7, one-sided). At n=85 the smallest drop the rule can detect is about 17 points, so the 5-point floor never binds. A pre-registered 'must alert' therefore fails 15-25% of the time even if dev transfers, and roughly half the time if the gap shrinks to 16 points. With 170 answers on day 7, power is 0.99 at p1=0.11 and 0.87 at p1=0.15.",
+          "fix": "Use one-sided tests in the bad direction, since the rule only alerts that way. After day 5, pre-register the power using the reference's observed online judge_supported and the graded n. Run day 7 (and day 8) at 200 questions (about +$1.20 a day), or state the expected power next to the 'must alert' claim."
+        },
+        {
+          "severity": "serious",
+          "problem": "The Holm family is undefined. 'Across the monitored metrics' could mean the 7 metrics that have floors or all of about 14 listed in part 2. Several of those have no floor (tool_errors, repeated_calls, rejected_submissions, citation_valid_rate, malformed_output, unsupported_entity, judge_core_supported). judge_core_supported is advisory (kappa 0.37 on the 65 labels) and should not be able to alert. m moves the day-7 power by about 7 points (see above).",
+          "fix": "Name the alert family and fix it in the plan. Suggested: judge_supported, uncited_answer, fabricated_citation, in-scope abstention, error rate, model_calls, latency, cost (m=8). Every other metric is reported but cannot alert."
+        },
+        {
+          "severity": "serious",
+          "problem": "(2) Pooling assumes all 500 reference answers are iid from one mixture. That breaks if the roughly 10 generator calls a day each produce one persona, service or intent cluster of about 10 questions. If intents are assigned per call, the daily out-of-scope count has sd 9.5 instead of 3 (simulated: 10*Bin(10,0.1) vs Bin(100,0.1)). About 26% of days would then carry 20 or more out-of-scope questions, which moves abstention by about 10 points, near the alert threshold, on a normal day 6. Even mild clustering in judge_supported (intra-cluster correlation 0.08, clusters of 10) raises the per-metric false-alarm rate from 0.14% to 0.7%, so roughly 5% per day across the family instead of 1%. The leakage guard also drops questions unevenly by intent, so the realised mix drifts. The mix guard only reports a shift and uses no stated test, so it corrects nothing.",
+          "fix": "Fix quotas per day by design: exactly 70/10/10/10 intents, 20 questions per persona, and a fixed rotation of service areas. Top up after leakage drops so the quotas still hold. Before day 6, run a leave-one-day-out check on days 1-5 (each day against the other four with the full rule). It must produce zero alerts, or the reference is overdispersed. The mix guard then just verifies the quotas held."
+        },
+        {
+          "severity": "serious",
+          "problem": "Abstention has no bad direction: report.py treats 'abstained' as NEUTRAL. Abstaining more on out-of-scope questions is good, and more on lookups is bad. A pooled abstention rate with a one-direction alert is ill-posed. Day 8 (one search result) will probably raise abstention, but neither the direction nor the cause can be read from the pooled rate.",
+          "fix": "Split by the generator's intent label: abstention on lookup and comparison questions (higher is bad, a proxy for wrong abstention) and answering on outside-snapshot questions (higher is bad, a proxy for missed abstention). Alert on the first. Report the second as a diagnostic, because the generator's label is unverified."
+        },
+        {
+          "severity": "moderate",
+          "problem": "Errored attempts disappear. The judge skips them, store.latencies keeps only error IS NULL, and abstention ignores them. A fault that pushes attempts into the 12-turn limit (plausible on day 8) removes them from every metric. It can even raise judge_supported and lower p95 latency, because the hard cases drop out. judge_supported is also conditional on answering with citations, so more abstention or uncited answers change its denominator.",
+          "fix": "Add error rate (attempts with an error out of all attempts) to the alert family. Print the graded n beside every rate. Also report an unconditional supported share: supported answers out of all in-scope questions, counting abstained, uncited and errored as not supported."
+        },
+        {
+          "severity": "moderate",
+          "problem": "(3) Latency and cost are mismatched and fragile. The test is a permutation test on the mean, but the floor is on p95. On 100 values, p95 is about the 5th-largest value and very noisy. One long-tail attempt dominates the mean. Latency also includes SDK retries (max_retries=5 on 429 and 529 responses) and API load, which are not agent changes. Cache hits record latency_ms=0.0 (llm.py:48), so any re-run day looks faster. Holm thresholds near 0.0007 also need at least 10,000 permutations, with p computed as (k+1)/(R+1).",
+          "fix": "Test latency and cost on the log scale (a permutation test on the mean of the log, i.e. the geometric mean) and set the floor on that same statistic, e.g. a 25% ratio. Show p95 for display only. Exclude or flag cache-hit attempts, and refuse to score a day with cache hits for latency. Use tokens per answer rather than dollars for cost. Use R ≥ 20,000 permutations. Fisher stays right for per-answer binary rates. citation_valid_rate is a per-answer fraction, so it gets the permutation test, not Fisher."
+        },
+        {
+          "severity": "moderate",
+          "problem": "(4) Floors: the 5-point floor never binds for judge_supported (the smallest detectable drop is about 17 points) or for fabricated_citation. Against a 6/500 reference, one-sided Fisher p is 0.0073 at 6 of 100, 0.0021 at 7 and 0.00058 at 8. Under Holm at 0.01/7 to 0.01/14, fabricated_citation alerts only at 8 or more per day, about 6 times its 1.3% baseline. A zero-tolerance safety metric is effectively unmonitored. The p95 floor sits on a different statistic from the test, and the unlisted metrics have no floor at all.",
+          "fix": "Take fabricated_citation out of the Holm family into its own safety rule. One option: alert at one-sided p<0.01 with no floor, which fires at 6 or more of 100. Another: a cumulative count across days since the reference. State that floors only bind for model_calls and latency or cost, and give every family member a floor or drop it from the family."
+        },
+        {
+          "severity": "serious",
+          "problem": "(5) The judge is a non-stationary instrument. Iteration 4 showed it passes source attributions ('according to the ... documentation') 70% of the time on v5's shorter answers, against 37% on v3's. It has been validated only on dev-style questions, not on persona questions with typos or non-native phrasing. A regression that shortens answers or changes their style can be masked by the judge's leniency (false negative). The day-7 rollback changes answer style (v2 does not quote every sentence), so the size of the drop the judge measures is unknown. The asymmetry: a detected drop is robust, because leniency biases toward pass; a non-alert under a style shift is not evidence of 'no regression'.",
+          "fix": "Pin the judge fingerprint (2cf75fa03e09, rubric v2) in monitor and refuse to compare days judged by different fingerprints. Monitor median answer length and the share of answers naming their source page per day. If either moves more than 25% from the reference (the iteration-4 trigger), mark that day's judge_supported 'untrusted, spot check required': an alert still stands, but a non-alert does not clear the day. Before day 6, have Aleena blind-label 20 reference-day answers to confirm the judge holds on persona traffic."
+        },
+        {
+          "severity": "minor",
+          "problem": "(6) Two smaller gaps before the demo. Day 8's expected alerts are to be 'written down before it runs', but nothing says which direction each metric is expected to move or with what power. The reference is 'the first 5 normal days', with no rule for what happens if one of them turns out abnormal.",
+          "fix": "Pre-register day 8 with expected metrics, directions and approximate power, including the judge_supported denominator effect. State that the reference is frozen as days 1-5 and that a reference day failing the leave-one-day-out check halts the demo instead of being silently replaced."
+        }
+      ]
+    },
+    "design": {
+      "verdict": "weakened",
+      "problems": [
+        {
+          "severity": "serious",
+          "problem": "The plan says the keyword grader \"refuses\" online cases, but the only `abstained` grade comes from AnswerGrader (deterministic.py:57-58). If that grader is skipped or raises, the abstention rate, which the plan monitors with a 5-point floor, is never recorded for online runs. There is also a quiet failure the other way: if someone lets online cases load by giving them an empty Gold instead of None, AnswerGrader's must_include loop has nothing to miss, so every non-abstained answer is scored correct=1.0. That 'correct' would then get into the store and reports.",
+          "fix": "For a case with gold None (or suite 'online'), have AnswerGrader return only the `abstained` grade and never `correct`, `wrong_abstention` or `missed_abstention`. Add one test that checks an online case gets `abstained` and no `correct`, and one that checks an online case with an empty Gold is rejected when it loads."
+        },
+        {
+          "severity": "serious",
+          "problem": "Making gold optional breaks every place that reads `case.gold` directly: TrajectoryGrader (`case.gold.evidence`, line 196), the judge's responsive call (`case.gold.answer`), load_suite's answerable/must_include check, check_against_corpus, and evidence_index. evidence_index runs over `suites_dir.rglob('*.jsonl')`, so `evals snapshot --check` would load suites/online/*.jsonl. It only catches SuiteError/OSError, so an AttributeError would crash the drift check. The Case model also needs changes the plan doesn't list: `suite` is Literal[smoke, capability, robustness, red_team] with no 'online', `split` has no online value, and synthetic cases with no verified_by count as drafts, which `evals run` refuses (cli.py:395) unless --allow-drafts is passed. That flag is documented as never for a release decision.",
+          "fix": "List the full set of model changes: add suite 'online', split 'online' and provenance 'simulated', with is_draft false for simulated cases. Make every `case.gold` access guard on None (TrajectoryGrader skips evidence metrics, evidence_index skips the case, load_suite skips the must_include check only for suite 'online'). Either keep suites/online outside suites_dir or have evidence_index skip it."
+        },
+        {
+          "severity": "serious",
+          "problem": "The leakage guard does not catch paraphrases. On the 15 hand-made robustness paraphrases in dev, the word-set Jaccard against the source question was 0.22 to 0.54, and 14 of 15 were below 0.5. So rewording the same fact passes the guard almost every time. The guard is also too strict where it doesn't matter: different facts asked with the same template score high (Kendra vs Cloud9 'new customer today?' is 0.44). Typos from the on-call persona break word matching completely. Keeping dev and test out matters because online failures will feed later iterations.",
+          "fix": "Dedupe by target fact, not wording. Record the source page for each generated question. Drop or flag any question whose source page is a gold evidence page of a test case (93 of the 334 pages are evidence pages for dev, test or smoke, so most pages stay usable). Keep Jaccard only for exact near-duplicates within a day. Report the share of questions sitting on test evidence pages."
+        },
+        {
+          "severity": "serious",
+          "problem": "Questions written from titles and section headings will use the docs' own words. Search is BM25 over title + heading + text chunks (corpus.py:175), so these questions retrieve unusually well. That makes online traffic easier than real traffic (no error messages, no multi-page tasks, no product names written wrong). It also hides the day-8 fault: with title-echoing queries the right chunk is usually top-1 already, and the agent can search again, so search_k=1 may cause little or no alert. Nobody yet knows how many title-derived questions the page bodies actually answer, so the reference abstention rate is unknown too.",
+          "fix": "Before day 1, run a pilot of about 30 generated questions labeled by hand for answerable-from-snapshot and realistic, and publish the rates. Record each question's word overlap with its source title and headings, and cap or report it. Ask for a share of symptom or error-message questions. Predict day 8's alerts by running search_k=1 on the dev split offline before day 8; that is honest and gives the pre-registration a number."
+        },
+        {
+          "severity": "serious",
+          "problem": "The plan has no way to tell whether the agent was right to decline. 'Outside the snapshot' questions are generated from titles of pages that are in the snapshot, so the generator cannot know a topic is missing; the body of another page may cover it. 'False premise' questions written from titles alone rest on the generator's own AWS knowledge. The premise may actually be true in the snapshot, or not covered at all, so the right behavior is unknown. With no key, these 20% of questions only add noise to the abstention rate.",
+          "fix": "Draw outside-snapshot questions only from config `suites.held_out_services`, which `evals validate` already guarantees are absent. Then declining is known to be correct and `missed_abstention` can be monitored for that intent. For false premise, give the generator one sampled page sentence, have it contradict that sentence, and store the sentence as `gold.support`, which is a minimal key. Otherwise, report false premise per intent but leave it out of alerting."
+        },
+        {
+          "severity": "moderate",
+          "problem": "Rolling back to prompt v2 proves the plumbing works, not that the monitor is sensitive. Its effect is already known and large (0.106 to 0.318 on dev, CHANGELOG), so the alert is certain. With 100 answers against 500 and Holm at 0.01 over about 10 metrics, a two-proportion test only detects drops of about 15 to 20 points or more. The 5-point practical floor never limits anything, and a realistic subtle regression would pass unnoticed. Choosing the fault and knowing which day it lands on also lets the operator tune thresholds after the fact.",
+          "fix": "Keep v2 as day 7. Add a blind phase: Aleena seals in a committed hash a config for each of days 9 to 11, and one may be unchanged or a subtle fault near the floor. The monitor operator calls alert or no alert before the seal is opened. Publish the minimum detectable effect per metric at n=100 vs 500 next to the floors."
+        },
+        {
+          "severity": "moderate",
+          "problem": "`judge_supported` is computed only on answers that were not abstained and have citations. A fault that raises abstention, or that drops citations (those are caught by uncited_answer and skipped by the judge), changes the denominator. That can make judge_supported look stable or even better. v2 and search_k=1 both change abstention, so their judge_supported shifts mix agent quality with which answers survive to be judged.",
+          "fix": "Also monitor 'supported over all questions' (abstained or uncited counted as not supported), or show the denominator next to each rate and alert on it."
+        },
+        {
+          "severity": "moderate",
+          "problem": "Day-to-day mix noise and leakage drops: shares are drawn at random, and the guard removes a different number of questions per intent and persona each day. N and the mix then vary from day to day, and the abstention rate moves with the mix, since 10% of questions are designed to be declined.",
+          "fix": "Use exact quotas per (persona, intent) cell, for example 14/2/2/2 per persona, and regenerate with a new sub-salt until each cell is full. N and the mix are then the same every day, and the mix guard only has to check the generator's realized intent."
+        },
+        {
+          "severity": "moderate",
+          "problem": "Support verdicts are trusted on online traffic without evidence that they hold there. The judge was validated on answers to curated dev and test questions. Online questions add typos, comparisons and non-native phrasing, and the judge's false-pass rate was already sensitive to the answer distribution (7 of 60 on v5's answers vs 2 of 80 on v3's).",
+          "fix": "Label about 30 answers from reference days 1 to 5 by hand and report the judge's agreement and false-pass rate on them before using judge_supported as an alert metric."
+        },
+        {
+          "severity": "minor",
+          "problem": "Day-7 and day-8 alerts cannot be separated from a change in traffic, because those days have new questions and only the faulty config runs. If the generator happens to produce a harder day, it looks like a regression.",
+          "fix": "On fault days, also run the champion on the same questions as a shadow (about $1.20 more per day) and report the paired difference beside the alert."
+        },
+        {
+          "severity": "minor",
+          "problem": "Cached replays break the latency and cost metrics: re-running a day from the LLM cache gives near-zero latency_ms, and the run becomes `latest_run_id`. That shifts p95 latency and can make bare `evals report` show an online run. The alert's latency test is also a permutation test on the mean while its floor is on p95.",
+          "fix": "Have the monitor refuse attempts where cached_calls > 0 when computing latency, test the same statistic that the floor is defined on, and keep online runs out of the default `latest_run_id` (filter on suite != 'online')."
+        },
+        {
+          "severity": "minor",
+          "problem": "\"For a service area of the snapshot\" is not defined. Pages have no area field (only url, title, text, fetched_at, sha256). The 334 pages are spread over 103 services, and sagemaker plus bedrock make up 45 of them. Sampling areas uniformly would over-weight thin areas such as devtools, while sampling pages uniformly would over-weight ai_ml.",
+          "fix": "State the sampling unit, for example pages sampled uniformly with a committed url-to-area map, and report the area mix per day."
+        }
+      ]
+    }
+  },
+  "workflowProgress": [
+    {
+      "type": "workflow_phase",
+      "index": 1,
+      "title": "Review"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 1,
+      "label": "statistics review",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "a9fdb72b17efc3b86",
+      "agentType": "Explore",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792327748347,
+      "queuedAt": 1792327748215,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "weakened",
+      "promptPreview": "Read the plan C:/Users/Vineetha/projects/agent-evals/agent-evals/docs/plans/phase-7-online-evals.md. You review its monitoring statistics before anything is coded; try to REFUTE them. The project's statistics live in C:/Users/Vineetha/projects/agent-evals/agent-evals/src/agent_evals/stats/ and its reporting in C:/Users/Vineetha/projects/agent-evals/agent-evals/src/agent_evals/report.py; read what …",
+      "promptFramed": true,
+      "lastProgressAt": 1792328049816,
+      "tokens": 62751,
+      "toolCalls": 17,
+      "durationMs": 301467,
+      "resultPreview": "{\"verdict\":\"weakened\",\"problems\":[{\"severity\":\"serious\",\"problem\":\"(1) Power on day 7 is decent, not assured, and the plan never states it. judge_supported is only graded on answered, cited, error-free attempts (judge.py:82-88). With the out-of-scope 10% plus a few percent abstentions and uncited answers, that is about 85 graded answers a day and about 425 in the reference, not 100 and 500. Fisher…"
+    },
+    {
+      "type": "workflow_agent",
+      "index": 2,
+      "label": "design review",
+      "phaseIndex": 1,
+      "phaseTitle": "Review",
+      "agentId": "ae5538e4be024b4ab",
+      "agentType": "Explore",
+      "model": "claude-opus-5-5",
+      "state": "done",
+      "startedAt": 1792327748348,
+      "queuedAt": 1792327748217,
+      "attempt": 1,
+      "lastToolName": "StructuredOutput",
+      "lastToolSummary": "weakened",
+      "promptPreview": "Read the plan C:/Users/Vineetha/projects/agent-evals/agent-evals/docs/plans/phase-7-online-evals.md. You review its simulated user and its regression demo before anything is built; try to REFUTE them. The docs agent and its prompts are in C:/Users/Vineetha/projects/agent-evals/agent-evals/src/agent_evals/agents/docs/; cases and suites in C:/Users/Vineetha/projects/agent-evals/agent-evals/src/agent…",
+      "promptFramed": true,
+      "lastProgressAt": 1792327982224,
+      "tokens": 66758,
+      "toolCalls": 16,
+      "durationMs": 228870,
+      "resultPreview": "{\"verdict\":\"weakened\",\"problems\":[{\"severity\":\"serious\",\"problem\":\"The plan says the keyword grader \\\"refuses\\\" online cases, but the only `abstained` grade comes from AnswerGrader (deterministic.py:57-58). If that grader is skipped or raises, the abstention rate, which the plan monitors with a 5-point floor, is never recorded for online runs. There is also a quiet failure the other way: if someon…"
+    }
+  ],
+  "totalTokens": 129509,
+  "totalToolCalls": 33
+}
