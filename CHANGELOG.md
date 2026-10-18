@@ -17,6 +17,30 @@ Format:
 - Runs: baseline <run id>, candidate <run id>
 ```
 
+## Not shipped: iteration 4 (2026-10-17) - system prompt v5: v4 plus an abstention guard
+
+- Change: `docs_agent.prompt_version` v3 -> v5 (`configs/challenger-v5.yaml`, commit 8922746).
+  v5 is v4 plus two rules: read the first, unread result of each search before concluding the docs
+  are silent; abstained means no answer. Pre-registered in `docs/plans/iteration-4.md` after an
+  adversarial review of the wording.
+- Dev, paired against v3, judged by v2 (`results/gates/iteration-4-dev-gate.txt`, run
+  `docs-20261017-174739-1c0e8e`, $1.01): judge_supported **0.308 -> 0.612** (+0.304, 95% CI
+  +0.240 to +0.370); correct 0.969 -> 0.967, wrong_abstention 0.017 -> 0.008, missed_abstention
+  0.056 -> 0.028, fabricated_citation 0.013 -> 0.005, all no detectable change; no category
+  regressed; no errors. **Gate passed.**
+- Pre-registered spot check (answers 28% shorter): the judge passed 3 of 30 answers Aleena
+  failed, against a bar of 2, so its number was not trusted and the test split was not run. Two
+  repair attempts on the judge (rubric v2.1, validation doc sections 9 and 10) each failed their
+  pre-registered rule by one answer: the first on core supported, the second on fully supported.
+  The judge's leniency on v5's answers is real: false passes 9/90 on v5's answers against 2/80 on
+  v3's.
+- Human evidence, dev only: Aleena's labels give fully supported **54/90 (0.60)** on v5's answers,
+  hash-sampled, against 27/80 (0.34) on v3's, which are case-id ordered, so the two samples differ.
+- Decision: **not shipped**. v3 stays the champion. By the rule, iteration 4 is better by the
+  labeler's 90 labels but not proven by the judge. v5 stays selectable for a later test under a
+  judge validated on its answers.
+- Runs: champion `docs-20261016-214710-02abb7`, challenger `docs-20261017-174739-1c0e8e`.
+
 ## Instrument (2026-10-17): 10 more dev keyword lists widened; all six dev runs regraded
 
 - Change: the keyword lists of 10 dev cases gained the correct wordings that the iteration-3

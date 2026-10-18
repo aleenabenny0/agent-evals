@@ -97,7 +97,11 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   to 93%) and the grader fix it exposed are in [CHANGELOG.md](CHANGELOG.md) and ADR 0008.
   Iterations 2 and 3 were rejected by the gate and are recorded there too. Iteration 3's prompt
   doubled the dev fully-supported rate (0.31 to 0.60), but it abstained on more answerable
-  questions and correctness slipped, so v3 stays.
+  questions and correctness slipped, so v3 stays. Iteration 4 (v4 plus an abstention guard)
+  passed the dev gate, but a pre-registered human spot check found the judge too lenient on its
+  shorter answers. Two attempts to repair the judge each missed their rule by one answer, so it
+  is not shipped. By the labeler's own 90 labels its answers are fully supported 60% of the time,
+  against 34% for v3.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
   advisory: kappa 0.37 on the 65, 0.79 on the 40 fresh answers but with only 3 failures among
   them, so the interval spans 0 to 1. Two candidate judges with revised rubrics were each tested

@@ -727,3 +727,31 @@ citations, ties count, and a false pass is a judge pass the labeler failed.
 6. **If any fails:** v2 stays. There is no further judge revision in this iteration, and iteration
    4 is recorded as better by the labeler's 90 v5 labels but not proven by the judge.
 
+### Result (2026-10-17): the retest fails criterion 1 by one answer, so v2 stays
+
+Scored once with `scripts/judge_retest_v2_1.py`; outputs are in `results/judge-v2-vs-v2.1/retest-*`.
+The labels were exported (`b1b56ca`) before scoring. On the new 30, fully supported, v2 agrees
+with the labeler on 24 and v2.1 on 23, with 2 false passes each. Criterion 1 needed v2.1 to
+agree at least as often, so it fails. The core guard (29 against 29), the earlier sets and the
+probes all hold.
+
+The judges differ on three answers:
+
+| Answer | Statement | Labeler | v2 | v2.1 |
+|---|---|---|---|---|
+| docs-chg-004 | "The docs don't state the reduced number" | pass | pass | fail |
+| docs-chg-008 | "I could not open the linked 'Clarify availability change' page" | pass | pass | fail |
+| docs-mix-022 | (no such statement) | pass | fail | pass |
+
+On the first two the labeler is right and v2.1 wrong; on the third, v2.1 is right. The paragraph
+does what it was for, catching names that attributions add, but it also reaches hedges about the
+documentation, which the labeler treats as no claim at all (her rubric decision of section 7).
+
+Over the 60 labels collected after the paragraph was written (positions 31 to 90), v2 agrees on
+50 and v2.1 on 51. False passes are 6 for v2 and 4 for v2.1; false fails are 4 for v2 and 5 for
+v2.1. The fix trades one error for another.
+
+Under the rule, **v2 stays the validated judge**, and there is no further judge revision in
+iteration 4. Lesson for any later revision: the paragraph has to leave hedges and absence
+statements untouched, and it has to be tested on labels collected after it is written.
+

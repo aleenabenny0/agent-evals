@@ -146,3 +146,11 @@ the false passes on 30 fresh v5 answers but failed its pre-registered rule on co
 stays, and the v5 number stays untrusted. Her 60 labels on v5's answers give 0.58 fully
 supported, against 0.34 on v3's. The next step is her decision.
 
+## Closed (2026-10-17): not shipped
+
+The retest of judge v2.1 under the corrected rule (validation doc section 10) failed by one answer,
+so v2 stays the validated judge and its v5 number stays untrusted. Under section 10's rule
+iteration 4 closes as **better by the labeler's 90 v5 labels but not proven by the judge**. Her
+labels give fully supported 54/90 (0.60) on v5's answers against 27/80 (0.34) on v3's. The test
+split was not run. v3 stays the champion; v5 stays selectable (`configs/challenger-v5.yaml`).
+

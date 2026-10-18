@@ -451,6 +451,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   **Judge v2.1 not adopted (2026-10-17).** It halved false passes on fully supported on 30 fresh
   labels, but scored 27 against v2's 29 on core supported (validation doc section 9). v2 stays;
   the v5 number stays untrusted. Her 60 v5 labels: 0.58 fully supported. Next is her decision.
+  **Retest failed too (section 10, 23 against 24); iteration 4 closed, not shipped.** v3 stays the
+  champion; v5 is better by her 90 labels (0.60 against 0.34) but not proven by the judge.
+  Next (agent's proposal): the improvement chart for Brief 02 M6, then phase 7 (M7).
 
 ## Target: the three project briefs
 
