@@ -170,6 +170,11 @@ Format:
 
 ## Unreleased
 
+- 2026-10-18: the improvement chart and the cause breakdown for Brief 02 M6 (`docs/charts/`),
+  rebuilt from the results store by `scripts/improvement_chart.py`, plotted numbers in
+  `docs/charts/improvement.json`; reviewed for honesty by an isolated reviewer against this file
+  and by a cold reader shown only the images. v5's cause breakdown added
+  (`results/iteration-4/v5-error-analysis.json`, same instrument as v3's and v4's).
 - Phase 1 and phase 2 scaffolding; no gated iteration yet.
 - 2026-10-11: reliability and grounding metrics (ADR 0007): flip rate, pass@k, `repeated_calls`,
   `evidence_precision`, `unsupported_entity`. Trajectory grader v3, new grounding grader. No

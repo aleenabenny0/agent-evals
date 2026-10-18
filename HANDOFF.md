@@ -453,7 +453,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   the v5 number stays untrusted. Her 60 v5 labels: 0.58 fully supported. Next is her decision.
   **Retest failed too (section 10, 23 against 24); iteration 4 closed, not shipped.** v3 stays the
   champion; v5 is better by her 90 labels (0.60 against 0.34) but not proven by the judge.
-  Next (agent's proposal): the improvement chart for Brief 02 M6, then phase 7 (M7).
+  **Improvement chart done (2026-10-18)** for Brief 02 M6: `docs/charts/improvement.svg` and
+  `causes.svg` in the README, rebuilt by `scripts/improvement_chart.py`. Next: phase 7 (Brief 02 M7,
+  online evals with a simulated user), then Brief 01, Brief 03 and the code agent.
 
 ## Target: the three project briefs
 

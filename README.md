@@ -10,9 +10,11 @@ The platform evaluates two agents that engineers use every day:
 | **AWS docs agent** *(built)* | Answers AWS questions using a dated docs snapshot, citing each claim with a verbatim quote | Every quote is checked against the cited page; invented pages and misquotes are flagged by code, not by an LLM |
 | **AWS code agent** *(next)* | Writes boto3 code for AWS tasks | Every API call is checked against botocore's service models; code runs against moto in a no-network sandbox |
 
-> Status: **Foundations phase.** The harness, docs agent, deterministic graders, statistics and
-> results store work end to end. The LLM judge, code agent and learning loops are next (see
-> [Roadmap](#roadmap)).
+> Status: **measurement and the first improvement loop are done for the docs agent.** The
+> harness, graders, statistics, results store, an LLM judge validated against a human, and four
+> gated improvement iterations (one shipped) work end to end; the charts below summarize them.
+> Next: online evals with a simulated user, then the LLM Ops and routing briefs, then the code
+> agent (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -61,7 +63,20 @@ Before your first real run, set a monthly spend limit in the Claude Console and 
 ## Results so far (updated 2026-10-17)
 
 Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every number has its
-95% interval and n; the test split is frozen and was run once.
+95% interval and n; the test split is frozen and was run once per shipped version.
+
+![Gated improvement loop: holdout results for each shipped version and dev results for every
+iteration, with 95% intervals](docs/charts/improvement.svg)
+
+![Why answers are not fully supported, by cause, for v3, v4 and v5 on the dev split](docs/charts/causes.svg)
+
+The first chart is the improvement loop. One change shipped (v3, cite every sentence): it lifted
+the holdout's fully-supported rate from 11% to 32%, with correctness unchanged. Three later
+changes were tried on dev and not kept; the chart gives each one's reason, from the gate or from
+the human spot check of the judge. The second chart shows why answers fall short: mostly text
+the agent had read but did not quote, which the stricter citation prompts cut by more than half,
+although those prompts were not shipped. Both charts are rebuilt from the results store by
+`scripts/improvement_chart.py`, and every plotted number is in `docs/charts/improvement.json`.
 
 | Run | Split | Cases | Attempts | correct (95% CI) | fabricated_citation | Cost |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -71,6 +86,10 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
 | docs agent v2 | dev | 130 | 3 | 0.956 (0.921 to 0.985) | 0.021 | $0.97 |
 | closed-book baseline (no tools) | dev | 130 | 1 | 0.585 (0.499 to 0.666) | n/a | $0.06 |
 | oracle baseline (gold pages given) | dev | 130 | 1 | 0.938 (0.883 to 0.968) | 0.000 | $0.07 |
+
+Rates in this table are per run. The CHANGELOG pairs the cases two runs share, so a figure can
+differ slightly: v3's test fabricated_citation is 0.035 over its 143 cited cases and 0.028 over
+the 142 it shares with v2.
 
 - Retrieval is worth 37 points: closed-book minus the docs agent (v2) on the same dev cases is
   -0.372 (95% CI -0.462 to -0.282, McNemar p = 3e-12).
@@ -101,7 +120,8 @@ Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every
   passed the dev gate, but a pre-registered human spot check found the judge too lenient on its
   shorter answers. Two attempts to repair the judge each missed their rule by one answer, so it
   is not shipped. By the labeler's own 90 labels its answers are fully supported 60% of the time,
-  against 34% for v3.
+  against 34% for v3, on different samples (a random 90 for v5, the first 80 in case-id order
+  for v3), so not a paired comparison.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
   advisory: kappa 0.37 on the 65, 0.79 on the 40 fresh answers but with only 3 failures among
   them, so the interval spans 0 to 1. Two candidate judges with revised rubrics were each tested

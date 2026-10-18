@@ -1,0 +1,228 @@
+{
+  "judge": "v2 (2cf75fa03e09)",
+  "holdout": [
+    {
+      "label": "v2 baseline",
+      "status": "baseline",
+      "reason": "",
+      "run": "docs-20261011-225715-b67388",
+      "judge_trusted": true,
+      "fully": {
+        "mean": 0.10526315789473684,
+        "low": 0.06374468227971236,
+        "high": 0.1689440006319231,
+        "n": 133
+      },
+      "correct": {
+        "mean": 0.9866666666666667,
+        "low": 0.9526930912996325,
+        "high": 0.9963358708487731,
+        "n": 150
+      },
+      "human_fully": null,
+      "cost_per_success": 0.0023977175675675686
+    },
+    {
+      "label": "v3: cite every sentence (iteration 1)",
+      "status": "shipped",
+      "reason": "",
+      "run": "docs-20261016-222256-04f0f4",
+      "judge_trusted": true,
+      "fully": {
+        "mean": 0.3181818181818182,
+        "low": 0.24482924496614558,
+        "high": 0.4018176593242575,
+        "n": 132
+      },
+      "correct": {
+        "mean": 0.98,
+        "low": 0.9428533167296139,
+        "high": 0.9931752486770326,
+        "n": 150
+      },
+      "human_fully": null,
+      "cost_per_success": 0.0024007272108843535
+    }
+  ],
+  "dev": [
+    {
+      "label": "v2 baseline",
+      "status": "baseline",
+      "reason": "",
+      "run": "docs-20261011-223111-702e87",
+      "judge_trusted": true,
+      "fully": {
+        "mean": 0.11396011396011395,
+        "low": 0.06837606837606837,
+        "high": 0.1623931623931624,
+        "n": 117
+      },
+      "correct": {
+        "mean": 0.9564102564102563,
+        "low": 0.9205128205128206,
+        "high": 0.9846153846153847,
+        "n": 130
+      },
+      "human_fully": {
+        "mean": 0.08771929824561403,
+        "low": 0.0483451054110099,
+        "high": 0.15397298415856125,
+        "n": 114
+      }
+    },
+    {
+      "label": "v3: cite every sentence (iteration 1)",
+      "status": "shipped",
+      "reason": "passed the gate and the test split",
+      "run": "docs-20261016-214710-02abb7",
+      "judge_trusted": true,
+      "fully": {
+        "mean": 0.3079096045197741,
+        "low": 0.24435028248587573,
+        "high": 0.37288135593220334,
+        "n": 118
+      },
+      "correct": {
+        "mean": 0.9692307692307692,
+        "low": 0.9435897435897436,
+        "high": 0.9897435897435897,
+        "n": 130
+      },
+      "human_fully": {
+        "mean": 0.3375,
+        "low": 0.24345612608081607,
+        "high": 0.44643476601823034,
+        "n": 80
+      }
+    },
+    {
+      "label": "number check at submit (iteration 2)",
+      "status": "rejected",
+      "reason": "gain not detectable; more rejected submissions",
+      "run": "docs-20261016-225705-5447b9",
+      "judge_trusted": true,
+      "fully": {
+        "mean": 0.3276836158192091,
+        "low": 0.2640889830508477,
+        "high": 0.39265536723163835,
+        "n": 118
+      },
+      "correct": {
+        "mean": 0.9615384615384616,
+        "low": 0.9333333333333335,
+        "high": 0.9846153846153847,
+        "n": 130
+      },
+      "human_fully": null
+    },
+    {
+      "label": "v4: check each sentence (iteration 3)",
+      "status": "rejected",
+      "reason": "more wrong abstentions; lookup slipped",
+      "run": "docs-20261017-163240-f5782a",
+      "judge_trusted": false,
+      "fully": {
+        "mean": 0.603988603988604,
+        "low": 0.5341880341880342,
+        "high": 0.6709401709401711,
+        "n": 117
+      },
+      "correct": {
+        "mean": 0.958974358974359,
+        "low": 0.9282051282051282,
+        "high": 0.9820512820512821,
+        "n": 130
+      },
+      "human_fully": null
+    },
+    {
+      "label": "v5: v4 + abstention guard (iteration 4)",
+      "status": "not shipped",
+      "reason": "passed the gate; judge not trusted on it",
+      "run": "docs-20261017-174739-1c0e8e",
+      "judge_trusted": false,
+      "fully": {
+        "mean": 0.6064425770308123,
+        "low": 0.5406162464985994,
+        "high": 0.6722689075630253,
+        "n": 119
+      },
+      "correct": {
+        "mean": 0.9666666666666666,
+        "low": 0.9435897435897436,
+        "high": 0.9846153846153847,
+        "n": 130
+      },
+      "human_fully": {
+        "mean": 0.6,
+        "low": 0.4967030736405095,
+        "high": 0.6951098012466251,
+        "n": 90
+      }
+    }
+  ],
+  "holdout_paired": {
+    "judge_supported": {
+      "diff": [
+        0.21212121212121213,
+        0.13636363636363635,
+        0.29545454545454547
+      ],
+      "p": 7.660128176212311e-07,
+      "n": 132,
+      "verdict": "improved"
+    },
+    "correct": {
+      "diff": [
+        -0.006666666666666667,
+        -0.03333333333333333,
+        0.013333333333333334
+      ],
+      "p": 1.0,
+      "n": 150,
+      "verdict": "no detectable change"
+    }
+  },
+  "v5_human_failing": [
+    36,
+    90
+  ],
+  "causes": [
+    {
+      "label": "v3",
+      "answered": 115,
+      "failing": 82,
+      "counts": {
+        "on a page it read, not quoted": 57,
+        "goes beyond its quote": 25,
+        "about the docs themselves": 21,
+        "table value without its header": 13,
+        "on no page it read": 4
+      }
+    },
+    {
+      "label": "v4",
+      "answered": 114,
+      "failing": 46,
+      "counts": {
+        "on a page it read, not quoted": 33,
+        "goes beyond its quote": 10,
+        "about the docs themselves": 12,
+        "table value without its header": 6,
+        "on no page it read": 3
+      }
+    },
+    {
+      "label": "v5",
+      "answered": 116,
+      "failing": 37,
+      "counts": {
+        "on a page it read, not quoted": 23,
+        "goes beyond its quote": 12,
+        "about the docs themselves": 8,
+        "table value without its header": 7,
+        "on no page it read": 1
+      }
+    }
+  ]
+}
