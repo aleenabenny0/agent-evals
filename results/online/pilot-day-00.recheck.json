@@ -1,0 +1,1065 @@
+{
+  "summary": {
+    "checked_answers_sha256": "090bca767e66f5ec7655c8c69cfd6d66bc8712a259e6a357f495e61bb4e67e74",
+    "date": "2026-10-18",
+    "method": "Workflow wf_e79fda0e-0cf: one agent per 6 questions searched the whole snapshot (the agent's BM25 search, several phrasings, grep) and read the pages; every quote passed Corpus.contains_quote. Each disagreement with Aleena's answer was re-checked from scratch by a second agent. Realism was not judged; that is hers alone.",
+    "agreement_with_her_answers": {
+      "agrees": 20,
+      "depends on the rule": 4,
+      "disagrees": 6
+    },
+    "rechecks_holding": 10,
+    "rechecks_run": 10,
+    "lookup_and_comparison_snapshot_verdict": {
+      "full": 6,
+      "none": 4,
+      "partial": 10
+    },
+    "lookup_and_comparison_source_page_verdict": {
+      "full": 5,
+      "none": 7,
+      "partial": 8
+    },
+    "false_premise_contradicted": 5,
+    "outside_snapshot_none": 5
+  },
+  "items": [
+    {
+      "id": "online-d00-022",
+      "intent": "lookup",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+          "quote": "iam:UpdateAccountPasswordPolicy` – Allows the entity to create or change the custom password policy for their account",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+          "quote": "You must configure permissions to allow an IAM entity (user or role) to view or edit their account password policy.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The source page names iam:UpdateAccountPasswordPolicy as the permission needed to create or change the password policy. It also gives an example policy and the CLI command, update-account-password-policy. The lockout part is only background to the question, and the page also covers it: expiration takes effect immediately, and there is no lockout policy.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-073",
+      "intent": "lookup",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/WhatIsCloudTrail-Limits.html",
+          "quote": "the TPS quota for the CloudTrail `LookupEvents` API is 2",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/WhatIsCloudTrail-Limits.html",
+          "quote": "CloudTrail has no adjustable quotas.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The source page gives the LookupEvents limit as 2 TPS and says CloudTrail has no adjustable quotas. That answers both parts: the rate cannot be raised, so they have to poll less often. No other snapshot page covers LookupEvents throttling.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-014",
+      "intent": "comparison",
+      "her_answer": "n",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "none",
+      "missing": "No page explains what continued pre-training is, how it differs from fine-tuning, or how to choose between them. The term appears only as a row name in the Bedrock quotas table, which gives record limits for Titan models.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html",
+          "quote": "Provide *labeled* data to train a model to improve performance on specific tasks.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/general/latest/gr/bedrock.html",
+          "quote": "The maximum combined number of training and validation records allowed for a Titan Text Express Continued Pre-Training job.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "n",
+      "explanation": "The source page covers supervised fine-tuning, reinforcement fine-tuning and distillation, but not continued pre-training. In the whole snapshot, continued pre-training appears only as quota row names on the Bedrock General Reference page. Without a description of continued pre-training, the comparison and the advice on choosing cannot be answered.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-036",
+      "intent": "false_premise",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "contradicted",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html",
+          "quote": "The maximum concurrency for an individual endpoint prevents that endpoint from taking up all of the invocations allowed for your account, and any endpoint invocations beyond the maximum are throttled.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/serverless-endpoints.html",
+          "quote": "You can set the maximum concurrency for a single endpoint up to 200",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The stored contradicts sentence appears word for word on the source page. It says invocations beyond an endpoint's maximum concurrency are throttled, not borrowed from the account pool, so the premise really is false. The same section explains the real fix: raise the endpoint's maximum concurrency (up to 200) or request a quota increase.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-024",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "No page names the StorageResolution parameter or the value to set (1), so the user's guess cannot be confirmed. The closest is cloudwatch_concepts, which mentions a 'storage resolution of 1 second' but not as a PutMetricData parameter.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html",
+          "quote": "When you publish a custom metric, you can define it as either standard resolution or high resolution.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/publishingMetrics.html",
+          "quote": "calling `PutMetricData` more often on a high-resolution metric can lead to higher charges",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "quote": "Only custom metrics that you define with a storage resolution of 1 second support sub-minute periods.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "The snapshot says you can publish a custom metric as high resolution (1 second) and that more frequent PutMetricData calls cost more, which answers the cost part. It never names StorageResolution or shows how to set it, so the main how-to part is only answered in general terms. Her note names exactly that gap, so her n is an informed call on a partial answer.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-001",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "No Textract default quota values (for example TPS per API) appear anywhere in the snapshot. The limits-quotas-explained and General Reference textract pages are linked but are not in the snapshot. ProvisionedThroughputExceededException is not explained for Textract.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+          "quote": "*Default quotas*, discussed in the section [Default Quotas](./limits-quotas-explained.html), can be viewed or changed via the [Service quotas console](https://console.aws.amazon.com/servicequotas).",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html",
+          "quote": "Amazon Textract's API operations have quotas that limit how quickly and how often you can use them.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html",
+          "quote": "If the limit set for your account is frequently exceeded, you can request a limit increase.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "The source page and the Textract what-is page both say default quotas can be raised through the Service Quotas console, which answers the 'can they be increased' part. Neither gives the default limit values, and no snapshot page does. Her note names exactly that gap, so her n is an informed call on a partial answer.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-091",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "none",
+      "missing": "No snapshot page names Polly's supported output formats (no MP3, OGG, PCM or OutputFormat text anywhere). Streaming is only implied, by quota text about an 'output audio stream' and a StartSpeechSynthesisStream operation; no page explains how streaming works.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/polly/latest/dg/limits.html",
+          "quote": "The output audio stream (synthesis) is limited to 10 minutes.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/polly/latest/dg/limits.html",
+          "quote": "For StartSpeechSynthesisStream, Amazon Polly supports up to 8 concurrent requests.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/polly/latest/dg/what-is.html",
+          "quote": "Common use cases for Amazon Polly include, but are not limited to: mobile applications such as newsreaders",
+          "verified": true
+        }
+      ],
+      "agreement": "depends on the rule",
+      "supported_answer": "depends",
+      "explanation": "She is right about the source page: it mentions mobile use cases but not streaming or formats. The Polly quotas page does show that SynthesizeSpeech returns an output audio stream and that a StartSpeechSynthesisStream operation exists, so the streaming half is answered in general terms. The formats half is answered nowhere, so the whole snapshot is partial, not none.",
+      "recheck": {
+        "id": "online-d00-091",
+        "first_check_holds": true,
+        "snapshot_verdict": "partial",
+        "supported_answer": "depends",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/limits.html",
+            "quote": "The output audio stream (synthesis) is limited to 10 minutes.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/limits.html",
+            "quote": "For StartSpeechSynthesisStream, Amazon Polly supports up to 8 concurrent requests.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/limits.html",
+            "quote": "| `StartSpeechSynthesisStream` | Generative voice: 8 tps |",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/what-is.html",
+            "quote": "Common use cases for Amazon Polly include, but are not limited to: mobile applications such as newsreaders",
+            "verified": true
+          }
+        ],
+        "explanation": "I searched on my own first, with 8 phrasings (output formats MP3/OGG/PCM, OutputFormat SynthesizeSpeech, audio stream, speech marks, sample rate, ogg_vorbis, StartSpeechSynthesisStream). I also grepped every page for mp3, ogg, vorbis, pcm, 'output format' and 'audio format'. Only three Polly pages exist (what-is, limits, available-voices). No page names a Polly output format. pages.jsonl has zero matches for mp3, pcm, vorbis or the word ogg; every 'ogg' hit was inside 'logging', and the only 'output format' hits are Bedrock and MSK. The limits page does cover the streaming half in general terms: SynthesizeSpeech produces an 'output audio stream' capped at 10 minutes, and a StartSpeechSynthesisStream operation exists with its own tps and concurrency limits. It never explains how streaming works or which formats it supports. Her note is right about the source page (what-is.html mentions only mobile use cases). It covers only that page, though, so she likely did not see the limits page. Across the whole snapshot the main ask (can it stream) gets a thin, implied answer and the formats part gets none, so the verdict is partial and her n is 'depends on the rule'. Same conclusion as the first checker."
+      }
+    },
+    {
+      "id": "online-d00-076",
+      "intent": "false_premise",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "Nothing needed to show the premise is wrong. As her note says, no page talks about engineering effort or cost.",
+      "premise": "contradicted",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html",
+          "quote": "If you include periods in a bucket's name, you can't use virtual-host-style addressing over HTTPS, unless you perform your own certificate validation.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/bucketnamingrules.html",
+          "quote": "The security certificates used for virtual hosting of buckets don't work for buckets with periods in their names.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The stored 'contradicts' sentence is on the source page word for word, and it states the opposite of the premise. The premise (dotted names work over virtual-host HTTPS by default) really is false, so the snapshot can show it is wrong.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-097",
+      "intent": "false_premise",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "contradicted",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html",
+          "quote": "The current month's data is available for viewing in about 24 hours.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html",
+          "quote": "Cost Explorer refreshes your cost data at least once every 24 hours.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The stored 'contradicts' sentence is on the source page and says the opposite of the premise: current-month data takes about 24 hours to appear. The page also says data refreshes about once a day, not in real time. The premise is false, and the page explains why the dashboard is empty.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-063",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "none",
+      "missing": "No snapshot page says whether identity pools cost anything by themselves. The Cognito overview only links to the external pricing page.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+          "quote": "For information about Amazon Cognito pricing, see",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html",
+          "quote": "When Amazon Cognito calculates user pool billing, it charges you a rate for each monthly active user (MAU).",
+          "verified": true
+        }
+      ],
+      "agreement": "depends on the rule",
+      "supported_answer": "depends",
+      "explanation": "She is right that the source page only links out for pricing. But the Cognito quotas page says user pools are billed per monthly active user, which answers the 'or are the charges coming from user pools' half. Identity pool cost is not covered anywhere, so the snapshot is partial. Her note covers only the source page, so she likely did not see the quotas page.",
+      "recheck": {
+        "id": "online-d00-063",
+        "first_check_holds": true,
+        "snapshot_verdict": "partial",
+        "supported_answer": "depends",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+            "quote": "For information about Amazon Cognito pricing, see",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html",
+            "quote": "When Amazon Cognito calculates user pool billing, it charges you a rate for each monthly active user (MAU).",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html",
+            "quote": "the local user will count as an enterprise directory MAU or `EnterpriseMAU`, regardless of whether the user signs in directly or via federation.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html",
+            "quote": "You can purchase an increase to adjustable Amazon Cognito user pools API request rate quotas.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/quotas.html",
+            "quote": "You are billed for provisioned capacity above the default rate, prorated based on actual usage time.",
+            "verified": true
+          }
+        ],
+        "explanation": "I searched on my own first, with 6 phrasings (identity pool pricing/charges, identity pool cost free, user pool MAU billing, Cognito pricing, federated identities charge, MAU billing). I also grepped every page for identity pool near charge/cost/price/bill/free, 'federated identit' and Cognito near charge/price/bill. Only two Cognito pages exist: what-is-amazon-cognito and quotas. The source page only links to the external pricing page, as her note says. The quotas page answers the user-pool side: user pools bill per MAU, a federated user linked to a local user counts as an EnterpriseMAU, and provisioned rate-limit capacity above the default is billed. That capacity can be bought only for user-pool quotas; identity-pool quota increases go through 'Contact your account team', with no price stated. No page says whether identity pools cost anything by themselves. The identity-pool half is missing and the user-pool half is answered, so the verdict is partial. One caveat: if you read the identity-pool cost as the only main ask, none would also be defensible. The question asks whether the charges come from identity pools or user pools, and the snapshot answers the user-pool side, so I keep partial. Her note covers only the source page and does not show she saw the quotas page, so her n is 'depends on the rule'. Same conclusion as the first checker."
+      }
+    },
+    {
+      "id": "online-d00-042",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "none",
+      "missing": "No page says which IAM role a batch transform job uses for S3 access, or how SageMaker encrypts transform output. The batch transform page never mentions roles, KMS or encryption, and no other SageMaker page does either.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/batch-transform.html",
+          "quote": "Batch Transform partitions the Amazon S3 objects in the input by key and maps Amazon S3 objects to instances.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html",
+          "quote": "Amazon S3 now applies server-side encryption with Amazon S3 managed keys (SSE-S3) as the base level of encryption for every bucket in Amazon S3.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "n",
+      "explanation": "I searched with several phrasings (execution role, AccessDenied, KmsKeyId, encryption) and grepped every SageMaker page. Nothing covers the role a transform job uses or how its output is encrypted. The only related text is general S3 default encryption (SSE-S3), which is not about SageMaker and does not answer the main ask about the role, so none is correct.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-035",
+      "intent": "comparison",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "Nothing needed for the asked comparison. The snapshot does not walk through other causes of a KMS AccessDenied, such as IAM policies or grants, but it does note that AWS managed keys cannot be used directly in cryptographic operations.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "quote": "you cannot change any properties of AWS managed keys, rotate them, change their key policies, or schedule them for deletion.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "quote": "Customer manages rotation, deletion and Regional location",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "quote": "you cannot use AWS managed keys in cryptographic operations directly; the service that creates them uses them on your behalf.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/rotate-keys.html",
+          "quote": "Rotation period defines the number of days after you enable automatic key rotation that AWS KMS will rotate your key material",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The source page says AWS managed key policies cannot be changed and AWS rotates those keys every year, while customers control policy and rotation for customer managed keys. The rotate-keys page adds a custom rotation period for customer managed keys. That answers whether switching is needed to edit the policy and set your own schedule, matching her y.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-059",
+      "intent": "outside_snapshot",
+      "her_answer": "u",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "not applicable",
+      "missing": "All of it. No snapshot page mentions Snowball, Snowball Edge, Snowcone or Snow Family (grep count 0), so nothing covers default on-device encryption, who holds the keys, or whether AWS staff can read the data. Search returns only general S3 and KMS encryption pages.",
+      "premise": "not applicable",
+      "evidence": [],
+      "agreement": "disagrees",
+      "supported_answer": "n",
+      "explanation": "This is an outside-snapshot question and no page in the snapshot mentions Snowball, so the evidence supports n. She put u because the question had no source URL, but for an outside-snapshot question the expected answer is n. A u never counts as a match.",
+      "recheck": {
+        "id": "online-d00-059",
+        "first_check_holds": true,
+        "snapshot_verdict": "none",
+        "supported_answer": "n",
+        "evidence": [],
+        "explanation": "I searched on my own first, with five BM25 phrasings (Snowball Edge import job encryption keys; data encrypted on device in transit AWS staff cannot read; offline data transfer device encryption KMS key import job; Snowball; physical device ship data to AWS import) and case-insensitive greps of pages.jsonl. 'snowball', 'snowcone', 'snow edge', 'offline data transfer' and 'data transfer device' each match 0 times. The only 'Snow' hits are Snowflake on the SageMaker Data Wrangler page. Search returns only general S3 encryption, KMS, VPN and MFA pages, and none of them covers on-device encryption, who holds the keys, or whether AWS staff can read a Snow device. So the verdict is none and the evidence supports n. Her u never counts as a match. Her note says she had no source page to open, but an outside-snapshot question is meant to come back n. I agree with the first checker."
+      }
+    },
+    {
+      "id": "online-d00-095",
+      "intent": "comparison",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "quote": "When you enable GuardDuty in an AWS account, GuardDuty automatically starts ingesting the foundational data sources associated with that account.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "quote": "These data sources include AWS CloudTrail management events, VPC flow logs (from Amazon EC2 instances), and DNS logs.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "quote": "You don't need to enable anything else for GuardDuty to start analyzing and processing these data sources to generate associated security findings.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "quote": "GuardDuty offers dedicated protection plans that you can choose to enable.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+          "quote": "To use all other protection plans, you must enable the GuardDuty service.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The source page covers both parts. Foundational sources are ingested automatically with nothing else to enable, and protection plans such as S3 and EKS Protection are optional add-ons that need GuardDuty itself. Her y and her note match the page.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-054",
+      "intent": "comparison",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "No page directly compares L1 and L2 encryption defaults. No page says which level to prefer for least privilege. The difference is described only in general terms (L2 has sensible defaults, best-practice security policies and permission helpers or grant methods). The only encryption detail is one example where Bucket creates a KMS key when none is given.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
+          "quote": "L2 constructs include sensible default property configurations, best practice security policies, and generate a lot of the boilerplate code and glue logic for you.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
+          "quote": "L1 constructs are great to use when you are familiar with AWS CloudFormation and need complete control over defining your AWS resource properties.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
+          "quote": "methods that you can use to grant AWS Identity and Access Management (IAM) permissions on that construct to a principal.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/constructs.html",
+          "quote": "Since it does not explicitly specify an encryption key, the `Bucket` construct defines a new `kms.Key` and associates it with the bucket.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "quote": "Use high-level constructs to quickly define larger components of your application, with sensible, secure defaults",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "In general terms the snapshot does say how L2 differs from L1 on security: secure defaults, best-practice policies and grant helpers. It never compares encryption defaults or recommends a level for least privilege. Her note names exactly those gaps, so her n holds once the missing parts are counted, but a lenient rule would call this partial.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-023",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "none",
+      "missing": "No page says how to add a manual approval before a deploy stage, and no page lists the supported source and deploy action providers. The CodePipeline quotas page only shows indirectly that a manual approval action exists (it has a configurable timeout). It names some providers in passing: CodeCommit, S3 and GitHub sources; CloudFormation, CodeDeploy, CodeDeployToECS, S3, ECS and Elastic Beanstalk deploys.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+          "quote": "You can quickly model and configure the different stages of a software release process.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+          "quote": "Manual approval action account level default timeout: 7 days",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+          "quote": "The default timeout for the manual approval action can be overridden for a specific action in the pipeline",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+          "quote": "CodeDeploy and CodeDeploy ECS (blue/green) deployment actions: 5 days",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+          "quote": "To update a GitHub source action",
+          "verified": true
+        }
+      ],
+      "agreement": "depends on the rule",
+      "supported_answer": "depends",
+      "explanation": "She is right about the source page: the welcome page is a short topic list with nothing on approvals or providers. But the CodePipeline quotas page shows that a manual approval action exists and names several source and deploy providers in passing, so the whole snapshot gives a partial answer. Her note covers only the source page and does not show she saw this.",
+      "recheck": {
+        "id": "online-d00-023",
+        "first_check_holds": true,
+        "snapshot_verdict": "partial",
+        "supported_answer": "depends",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "The default timeout for the manual approval action can be overridden for a specific action in the pipeline",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "Manual approval action account level default timeout: 7 days",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "To update a CodeCommit source action",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "To update an Amazon S3 source action",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "To update a GitHub source action",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "For a CodePipeline deploy action with CloudFormation as the provider",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "CodeDeploy and CodeDeploy ECS (blue/green) deployment actions: 5 days",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/limits.html",
+            "quote": "Exception: If you are using AWS Elastic Beanstalk to deploy applications, the maximum artifact size is always 512 MB.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+            "quote": "You can quickly model and configure the different stages of a software release process.",
+            "verified": true
+          }
+        ],
+        "explanation": "I ran five BM25 phrasings and grepped for 'approval', 'provider' and 'CodePipeline' across every page. The source page (welcome.html) is only an intro paragraph and a list of topic links, with nothing on approvals or providers, so she is right about that page. Outside the codepipeline pages, CodePipeline is mentioned only on the CodeBuild welcome page (CodeBuild as a build or test action) and the Cloud9 page, and neither covers approvals or source and deploy providers. The CodePipeline quotas page (limits.html) does show that a manual approval action exists and can be set per action in a pipeline, so it answers the 'can it do this' part in general terms. It does not say how to place the approval before a deploy stage. It also names providers only in passing: CodeCommit, S3 and GitHub as sources, and CloudFormation, CodeDeploy, CodeDeployToECS, S3, ECS and Elastic Beanstalk as deploy targets. There is no complete list of supported providers. That makes the snapshot partial. Her n with a note about 'the page' shows she judged only the source page and did not see the quotas page, so the result depends on the rule. I agree with the first checker."
+      }
+    },
+    {
+      "id": "online-d00-065",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "The snapshot gives a cap only for jobs in SUBMITTED state (1,000,000). It does not say whether this covers all queued jobs, such as PENDING or RUNNABLE ones, and no other cap on queued jobs appears. The second part is answered: the page says the listed quotas can't be changed.",
+      "premise": "not a false premise",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/batch/latest/userguide/service_limits.html",
+          "quote": "The following table provides the service quotas for AWS Batch that can't be changed.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/batch/latest/userguide/service_limits.html",
+          "quote": "Maximum number of jobs in `SUBMITTED` state",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/batch/latest/userguide/service_limits.html",
+          "quote": "1000000",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "The source page gives the 1,000,000 SUBMITTED-state cap and says these quotas can't be raised, so the raise part is fully answered. Whether SUBMITTED means queued is left open. Her note shows she saw both facts and judged that gap, so her n is defensible, though a looser reading of queued would make this nearly a full answer.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-078",
+      "intent": "outside_snapshot",
+      "her_answer": "u",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "not applicable",
+      "missing": "All of it. No snapshot page covers Amazon Managed Grafana or how it bills users. The only Grafana mention is one line on the Timestream page about visualizing data with Grafana, with nothing on pricing or active versus all users.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html",
+          "quote": "You can visualize data using Quick, Grafana, and business intelligence tools through JDBC.",
+          "verified": true
+        }
+      ],
+      "agreement": "disagrees",
+      "supported_answer": "n",
+      "explanation": "This is an outside-snapshot question. Grafana appears on only one page, a Timestream visualization line, and nothing covers Managed Grafana billing, so the evidence supports n. She put u because there was no source URL, and a u never counts as a match.",
+      "recheck": {
+        "id": "online-d00-078",
+        "first_check_holds": true,
+        "snapshot_verdict": "none",
+        "supported_answer": "n",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/timestream/latest/developerguide/what-is-timestream.html",
+            "quote": "You can visualize data using Quick, Grafana, and business intelligence tools through JDBC.",
+            "verified": true
+          }
+        ],
+        "explanation": "I ran five BM25 phrasings (Amazon Managed Grafana pricing users; billed per active user per month dashboard viewers; Grafana workspace editor viewer license; Grafana; pricing charged per user active users monthly) and case-insensitive greps. 'grafana' appears once in all 334 pages: the Timestream visualization line, which says nothing about billing. 'per user per month' and 'editor license' match 0 times. The 12 'active user' hits and the pages that mention both 'viewer' and pricing are about Cognito, CloudFront and Step Functions, not Managed Grafana. Nothing covers how Managed Grafana bills, or active versus all users. The verdict is none and the evidence supports n. Her u is not a match. I agree with the first checker."
+      }
+    },
+    {
+      "id": "online-d00-039",
+      "intent": "outside_snapshot",
+      "her_answer": "u",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "not applicable",
+      "missing": "All of it. No snapshot page mentions Wickr (0 hits in pages.jsonl), so nothing covers its admin console, its SSO settings or an invalid-token error. The BM25 hits are general pages about IAM Identity Center, STS and Cognito.",
+      "premise": "not applicable",
+      "evidence": [],
+      "agreement": "disagrees",
+      "supported_answer": "n",
+      "explanation": "\"Wickr\" appears 0 times in the 334-page snapshot. Five search phrasings only returned general IAM Identity Center, STS and Cognito pages, and none of them covers Wickr's SSO config. Her 'u' came from having no page URL to open, but outside-snapshot questions never have one, and the evidence supports 'n'.",
+      "recheck": {
+        "id": "online-d00-039",
+        "first_check_holds": true,
+        "snapshot_verdict": "none",
+        "supported_answer": "n",
+        "evidence": [],
+        "explanation": "I searched from scratch. In pages.jsonl (334 pages), 'Wickr', 'AWS Wickr', 'admin console' and 'invalid token' each have 0 hits. I ran six BM25 phrasings, including the full question, 'Wickr single sign-on configuration', 'SSO configuration invalid token error identity provider' and 'configure SSO OIDC client ID secret admin console'. They returned only general IAM Identity Center, STS AssumeRole, Cognito and IAM credential pages. None of them covers Wickr's admin console, its SSO settings or fixing an invalid-token login. There is no source page, as expected for an outside-snapshot question. The first checker is right: the verdict is none and the evidence supports 'n'. Her 'u' came from having no URL to open, so it is not a match."
+      }
+    },
+    {
+      "id": "online-d00-018",
+      "intent": "outside_snapshot",
+      "her_answer": "u",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "not applicable",
+      "missing": "All of it. \"RoboMaker\", \"CreateSimulationJob\" and \"simulation job\" all have 0 hits. The word 'simulation' appears only in passing on the Lambda concurrency, EC2 instance types and Batch pages.",
+      "premise": "not applicable",
+      "evidence": [],
+      "agreement": "disagrees",
+      "supported_answer": "n",
+      "explanation": "No snapshot page mentions RoboMaker or simulation jobs. Five search phrasings returned only unrelated Batch, SageMaker and Lambda pages. Her 'u' was because there was no URL, but the snapshot cannot answer this, so the evidence supports 'n'.",
+      "recheck": {
+        "id": "online-d00-018",
+        "first_check_holds": true,
+        "snapshot_verdict": "none",
+        "supported_answer": "n",
+        "evidence": [],
+        "explanation": "I searched from scratch. 'RoboMaker', 'AWS RoboMaker', 'CreateSimulationJob', 'simulation job', 'robot', 'ROS', 'Gazebo' and 'simulator' each have 0 hits in pages.jsonl. 'Simulation' appears only in passing: the Lambda concurrency example, EC2 instance types ('scientific simulations') and the AWS Batch overview ('simulation, and analytics workloads'). None of these explains RoboMaker simulation jobs or how to start one. I ran six BM25 phrasings, including the full question, 'RoboMaker CreateSimulationJob' and 'robot simulation ROS Gazebo'. They returned unrelated S3 object ownership, Batch, Lambda, SageMaker and ECS pages. The first checker is right: none, which supports 'n'. Her 'u' is not a match."
+      }
+    },
+    {
+      "id": "online-d00-000",
+      "intent": "lookup",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "quote": "The order in which messages are sent and received is strictly preserved",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "quote": "Duplicates aren't introduced into the queue.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-types.html",
+          "quote": "FIFO queues ensure that you receive messages in the order they are sent within each message group.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-queue-types.html",
+          "quote": "or content-based deduplication, you prevent duplicate messages, even when retrying due to network issues or timeouts.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The source page answers both parts: order is strictly preserved and duplicates aren't introduced. The queue-types page adds a detail she partly noted: order is kept within each message group, and deduplication uses MessageDeduplicationId or content-based deduplication. Her 'y' matches.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-099",
+      "intent": "outside_snapshot",
+      "her_answer": "u",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "not applicable",
+      "missing": "All of it. \"Braket\" and \"hybrid job\" have 0 hits, and \"quantum\" appears once, on an S3 encryption page. Nothing covers instance type or count for Braket jobs or their defaults.",
+      "premise": "not applicable",
+      "evidence": [],
+      "agreement": "disagrees",
+      "supported_answer": "n",
+      "explanation": "No snapshot page mentions Braket or hybrid jobs. Five search phrasings returned only general pages on instance types, SageMaker and quotas. The snapshot cannot answer this, so the evidence supports 'n', not 'u'.",
+      "recheck": {
+        "id": "online-d00-099",
+        "first_check_holds": true,
+        "snapshot_verdict": "none",
+        "supported_answer": "n",
+        "evidence": [],
+        "explanation": "I searched from scratch. 'Braket', 'Amazon Braket', 'hybrid job', 'qubit' and 'simulator' each have 0 hits in pages.jsonl. 'Quantum' appears once, on the S3 UsingEncryption page ('hybrid post-quantum key exchange'), which is unrelated. I ran six BM25 phrasings, including the full question, 'Braket hybrid job instance type', 'quantum hybrid job instance count default' and 'hybrid job default instance ml.m5.large'. They returned only general EC2 instance-type, SageMaker and service-quota pages. Nothing covers how to pick the instance type or count for a Braket hybrid job, or the defaults. The first checker is right: none, which supports 'n'. Her 'u' is not a match."
+      }
+    },
+    {
+      "id": "online-d00-007",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "none",
+      "missing": "Why IMDS returns 401 (IMDSv2 needs a session token) and how to fix the curl call (get a token with PUT and send the X-aws-ec2-metadata-token header). Nothing in the snapshot has 'IMDSv2', 'X-aws-ec2-metadata-token', 'HttpTokens', 'metadata token' or a 401 status code, and the IMDS retrieval and configuration subpages are not in the snapshot.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html",
+          "quote": "The ID of this instance.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html",
+          "quote": "the data is not protected by authentication or cryptographic methods.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "n",
+      "explanation": "The source page only lists the instance-id category. It even says the metadata is 'not protected by authentication', which says nothing useful about a 401. Six search phrasings and greps across the whole snapshot found no IMDSv2 or token explanation and no fix, so her 'n' matches.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-016",
+      "intent": "false_premise",
+      "her_answer": "y",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "How to create a custom network ACL. The create-network-acl page is not in the snapshot, so there are no creation steps. The snapshot only covers ACL basics in general terms: numbered allow/deny rules, inbound and outbound rules, stateless behavior, and subnet associations.",
+      "premise": "contradicted",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+          "quote": "You can use the default network ACL for your VPC, or you can create a custom network ACL for your VPC with rules similar to your security group rules.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "quote": "You can update the default network ACL, or create custom network ACLs and associate them with your subnets.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "quote": "The default network ACL allows all inbound and outbound traffic.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The stored contradicting sentence is on the source page word for word, and a second page confirms it. The premise is false: the default ACL can be used, and subnets are tied to it automatically. Her note says she saw the creation steps were missing and applied the false-premise rule, so her 'y' matches the refutation.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-088",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "How to keep software settings and installed packages across maintenance updates. Lifecycle configuration (LCC) scripts are only a topic link on nbi.html, and no page in the snapshot covers them.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+          "quote": "SageMaker AI updates the underlying software for Amazon SageMaker Notebook Instances at least once every 90 days.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+          "quote": "If the notebook instance isn't updated and is running unsecure software, SageMaker AI might periodically update the instance as part of regular maintenance.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+          "quote": "During these updates, data outside of the folder `/home/ec2-user/SageMaker` is not persisted.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "The source page answers the main parts: yes, this is maintenance, it happens at least every 90 days, and files are safe only under /home/ec2-user/SageMaker. Nothing in the snapshot says how to keep software settings, so this is partial. Her note names exactly that gap, so her n is an informed call under an all-parts rule.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-044",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "none",
+      "source_page_verdict": "none",
+      "missing": "Why Inspector skips EC2 instances (SSM Agent or managed-instance status, instance profile or IAM requirements, eligibility). No page connects Inspector scanning to the SSM Agent. The systems-manager page defines managed nodes but never mentions Inspector. For who can view findings, the snapshot only says the delegated administrator sees aggregated member findings, with no IAM permissions.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html",
+          "quote": "Amazon Inspector automatically discovers and begins [scanning your eligible resources](./scanning-resources.html).",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html",
+          "quote": "This includes viewing aggregated findings details for all member accounts, activating or deactivating scans for member accounts, and reviewing scanned resources within the AWS organization.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "n",
+      "explanation": "The main ask is which requirements cause instances to be skipped. The snapshot never answers it: it only mentions 'eligible resources' and links to a scanning page that is not in the snapshot. The only related text is the delegated-administrator line about viewing findings, which is general and secondary, so none fits and her n agrees.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-074",
+      "intent": "comparison",
+      "her_answer": "n",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "Whether IAM users, access keys, roles or STS change what you are charged. No snapshot page states IAM or STS pricing; the only billing line says IAM user activity is billed to the account.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html",
+          "quote": "Alternatively, and as a best practice, you can [use temporary security credentials (IAM roles) instead of long-term access keys]",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "quote": "Require workloads to use temporary credentials with IAM roles to access AWS",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html",
+          "quote": "Any AWS activity performed by IAM users in your account is billed to your account.",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "depends",
+      "explanation": "The source page and best-practices.html support the move: workloads should use temporary credentials through IAM roles instead of long-term keys. The cost part goes unanswered across the whole snapshot, so this is partial. Her note names exactly that missing cost part, so her n is a deliberate strict-rule call.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-041",
+      "intent": "lookup",
+      "her_answer": "n",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "partial",
+      "missing": "Nothing in the snapshot as a whole. The source page id_roles.html alone has no session policies; it mentions permissions boundaries only as a cap on the role, not on a single session.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "quote": "The *trust policy* specifies which trusted account members are allowed to assume the role.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "quote": "A user who assumes a role temporarily gives up his or her own permissions and instead takes on the permissions of the role.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "quote": "The permissions for a session are the intersection of the identity-based policies for the IAM entity (user or role) used to create the session and the session policies.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "quote": "You can pass a single JSON inline session policy document using the `Policy` parameter. You can use the `PolicyArns` parameter to specify up to 10 managed session policies.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+          "quote": "You cannot use session policies to grant more permissions than those allowed by the identity-based policy of the role that is being assumed.",
+          "verified": true
+        }
+      ],
+      "agreement": "disagrees",
+      "supported_answer": "y",
+      "explanation": "Her note is right about the source page, which explains trust and permissions policies but not session policies. But access_policies.html and API_AssumeRole.html fully explain session policies: you pass Policy or PolicyArns, and the session gets the intersection of those with the role's own permissions. The whole snapshot answers both parts, so y is supported.",
+      "recheck": {
+        "id": "online-d00-041",
+        "first_check_holds": true,
+        "snapshot_verdict": "full",
+        "supported_answer": "y",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "When you create a role, you create two policies: a role trust policy that specifies *who* can assume the role, and a permissions policy that specifies *what* can be done with the role.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+            "quote": "A user who assumes a role temporarily gives up his or her own permissions and instead takes on the permissions of the role.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+            "quote": "The permissions for a session are the intersection of the identity-based policies for the IAM entity (user or role) used to create the session and the session policies.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+            "quote": "You can pass a single JSON inline session policy document using the `Policy` parameter. You can use the `PolicyArns` parameter to specify up to 10 managed session policies.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "You cannot use session policies to grant more permissions than those allowed by the identity-based policy of the role that is being assumed.",
+            "verified": true
+          }
+        ],
+        "explanation": "I searched on my own first (5 BM25 phrasings plus reading the pages), and I agree with the first checker. Part 1: API_AssumeRole.html says the trust policy controls who can assume the role and the permissions policy controls what can be done. id_roles.html says the person who assumes the role takes on the role's permissions. Part 2: the 'Session policies' section of access_policies.html and the Policy and PolicyArns parameters on API_AssumeRole.html say you pass session policies when you call AssumeRole. The session then gets the intersection of those policies and the role's policies, so it can never have more than the role allows. The whole snapshot answers both parts, so the verdict is full and y is supported. Her note is right about the source page: id_roles.html has no session policies. But the rule judges the whole snapshot. One small fix: the first checker's 'missing' field reads 'Nothing in the snapshot as a whole'. It means nothing is missing, not that the snapshot has nothing, and the wording could be read the wrong way."
+      }
+    },
+    {
+      "id": "online-d00-056",
+      "intent": "false_premise",
+      "her_answer": "y",
+      "snapshot_verdict": "full",
+      "source_page_verdict": "full",
+      "missing": "",
+      "premise": "contradicted",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-limits.html",
+          "quote": "Per-operation request rate quotas for the ACME protocol are tiered: read operations at 25 requests per second per account, write operations at 20 requests per second per account, and certificate operations (FinalizeOrder, RevokeCertificate) at 1 request per second per account.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-limits.html",
+          "quote": "| `FinalizeOrder` | 1 |",
+          "verified": true
+        }
+      ],
+      "agreement": "agrees",
+      "supported_answer": "y",
+      "explanation": "The stored contradicts sentence is on the source page word for word, and the per-operation table matches it. The premise really is false: FinalizeOrder and RevokeCertificate get the lowest quota, 1 request per second, below reads at 25 and writes at 20. The page also gives the number she asked for, so y agrees.",
+      "recheck": null
+    },
+    {
+      "id": "online-d00-090",
+      "intent": "lookup",
+      "her_answer": "y",
+      "snapshot_verdict": "partial",
+      "source_page_verdict": "partial",
+      "missing": "The actual steps to regain access without the .pem file, such as replacing the key or Session Manager's prerequisites (SSM Agent, instance profile). These are on the linked TroubleshootingInstancesConnecting and session-manager pages, which are not in the snapshot. The systems-manager page only lists Session Manager as a tool.",
+      "premise": "not applicable",
+      "evidence": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "quote": "Because Amazon EC2 doesn't keep a copy of your private key, there is no way to recover a private key if you lose it.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "quote": "However, there can still be a way to connect to instances for which you've lost the private key.",
+          "verified": true
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "quote": "As an alternative to key pairs, you can use [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html) to connect to your instance with an interactive browser-based shell or the AWS Command Line Interface (AWS CLI).",
+          "verified": true
+        }
+      ],
+      "agreement": "depends on the rule",
+      "supported_answer": "depends",
+      "explanation": "The page clearly says EC2 keeps no copy of the key. It answers 'how do I connect again' only in general terms: there may still be a way, and Session Manager is an alternative, but the steps are on a linked page that is not in the snapshot. Her note mentions the link but treats it as part of the answer rather than a gap, so y against partial depends on the rule.",
+      "recheck": {
+        "id": "online-d00-090",
+        "first_check_holds": true,
+        "snapshot_verdict": "partial",
+        "supported_answer": "depends",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+            "quote": "Because Amazon EC2 doesn't keep a copy of your private key, there is no way to recover a private key if you lose it.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+            "quote": "However, there can still be a way to connect to instances for which you've lost the private key.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+            "quote": "As an alternative to key pairs, you can use [AWS Systems Manager Session Manager](https://docs.aws.amazon.com/systems-manager/latest/userguide/session-manager.html) to connect to your instance with an interactive browser-based shell or the AWS Command Line Interface (AWS CLI).",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+            "quote": "which means SSM Agent is installed on the machine and the agent can communicate with the Systems Manager service.",
+            "verified": true
+          }
+        ],
+        "explanation": "I searched on my own first (6 BM25 phrasings, plus grep for Session Manager, Instance Connect, authorized_keys, SSM Agent, serial console and 'lost ... key'), and I agree with the first checker. Part 1 (does Amazon keep a copy?) is fully answered on ec2-key-pairs.html. Part 2 (how do I connect again?) is answered only in general terms. The page says there may still be a way and names Session Manager as an alternative, but the steps are on TroubleshootingInstancesConnecting.html#replacing-lost-key-pair, which is not in the snapshot. The 'replace a public key' page and the Session Manager page are also missing. Across the 15 EC2 and Systems Manager pages, what-is-systems-manager.html is the only other relevant hit. It adds one prerequisite (SSM Agent must be installed on a managed node), but it gives no steps for a lost key. The ec2-instance-metadata.html and security-pillar mentions of EC2 Instance Connect are passing references with no instructions. So the verdict is partial. Her note shows she saw the link but counted it as part of the answer rather than a gap, so her y against partial depends on the rule."
+      }
+    }
+  ]
+}

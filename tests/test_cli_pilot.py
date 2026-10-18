@@ -128,6 +128,23 @@ def test_plain_messages_for_a_missing_day_or_the_wrong_folder(
     assert "Traceback" not in output
 
 
+def test_redo_asks_chosen_questions_again_and_the_newer_answer_wins(pilot_config: Path) -> None:
+    assert _review(pilot_config, ANSWER_ONE * 30)[0] == 0
+    ids = ["online-d02-005", "online-d02-011"]  # two outside-snapshot questions
+    args = ["pilot-review", "2", "--redo", ",".join(ids), "-c", str(pilot_config)]
+    result = CliRunner().invoke(cli.app, args, input="y\nn\nchanged\n" * 2)
+    output = " ".join(result.output.split())
+    assert result.exit_code == 0, output
+    assert output.count("simulated question") == 2 and "Your earlier answer" in output
+    answers = _answers()
+    assert len(answers) == 30
+    assert all(answers[i]["answerable"] == "n" and answers[i]["note"] == "changed" for i in ids)
+    assert sum(1 for a in answers.values() if a["note"] == "changed") == 2
+    bad = ["pilot-review", "2", "--redo", "online-d02-999", "-c", str(pilot_config)]
+    result = CliRunner().invoke(cli.app, bad, input="")
+    assert result.exit_code == 2 and "Not in the pilot sample" in result.output
+
+
 def test_pilot_review_refuses_without_a_terminal(
     pilot_config: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

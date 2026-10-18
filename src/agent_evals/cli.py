@@ -1384,11 +1384,15 @@ def _interactive() -> bool:
 def pilot_review(
     day: Annotated[int, typer.Argument(help="Simulated day to review.")] = 0,
     reviewer: Annotated[str, typer.Option(help="Your name; stored with each answer.")] = "aleena",
+    redo: Annotated[
+        str, typer.Option(help="Comma-separated question ids to ask again, even if answered.")
+    ] = "",
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Review 30 simulated questions, 6 per persona across all four intents: would a real
     person ask it, and could the snapshot answer it? Each answer is saved as you give it, so you
-    can stop with q and rerun the same command to continue."""
+    can stop with q and rerun the same command to continue; --redo asks chosen ones again, and
+    the newer answer replaces the older."""
     import json
 
     from rich.markup import escape
@@ -1428,19 +1432,31 @@ def pilot_review(
         raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
     picked = pilot_sample(load_traffic(traffic_path), day)
+    again = {s.strip() for s in redo.split(",") if s.strip()}
+    if unknown := sorted(again - {q.id for q in picked}):
+        console.print(f"[red]Not in the pilot sample: {escape(', '.join(unknown))}[/red]")
+        raise typer.Exit(code=2)
     out_path = TRAFFIC_DIR.parent / f"pilot-day-{day:02d}.jsonl"
     verdicts = load_verdicts(out_path)
     for i, q in enumerate(picked, 1):
-        if q.id in current_verdicts([q], verdicts):
+        earlier = current_verdicts([q], verdicts).get(q.id)
+        if earlier is not None and q.id not in again:
             continue
         console.rule(f"{i}/{len(picked)}   {q.persona}, {q.intent}")
         # Generated and page text is printed as plain text: rich reads "[error]" as markup and
         # drops it from the screen, and a stray "[/dim]" crashes the review.
         console.print(Panel(Text(q.question), title="simulated question"))
+        if earlier is not None:
+            before = (
+                f"realistic {'y' if earlier['realistic'] else 'n'}, "
+                f"answerable {earlier['answerable']}, note: {earlier.get('note') or '(none)'}"
+            )
+            console.print(f"[dim]Your earlier answer ({escape(q.id)}): {escape(before)}[/dim]")
         if q.intent == "outside_snapshot":
             console.print(
-                f"[dim]About {escape(q.service or '')}, which no snapshot page names. The agent "
-                "should decline, unless the snapshot answers it anyway.[/dim]"
+                f"[dim]No snapshot page names {escape(q.service or '')}, so there is no page to "
+                "open. The search hits below are the closest the snapshot has: answer n unless "
+                "they answer it.[/dim]"
             )
         elif (page := corpus.pages.get(q.source_url or "")) is None:
             console.print(
@@ -1452,8 +1468,9 @@ def pilot_review(
             title = escape(f"best-matching passages on its page: {page.title}")
             console.print(Panel(Text(body), title=title))
             console.print(
-                f"[dim]These can miss the answer. The page: {escape(q.source_url or '')} "
-                "(if unsure, open it or answer u)[/dim]"
+                f"[dim]These can miss the answer, and another page may have it. The page: "
+                f"{escape(q.source_url or '')}. Check it and the search hits below; answer u if "
+                "still unsure.[/dim]"
             )
             if q.contradicts:
                 premise_title = "the page sentence it should wrongly contradict"
