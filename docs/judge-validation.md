@@ -690,3 +690,40 @@ Facts that bear on the next step (post hoc, not part of the rule):
   adoption on it was this rule's choice, made on a reviewer's advice. It is recorded as a lesson,
   not changed after the fact.
 
+## 10. Judge v2.1 retest under a corrected rule (committed 2026-10-17, before the new labels exist)
+
+**What changes and why.** v2.1's wording is unchanged (judge version `88db72ba4022`). Section 9's
+rule gated adoption on core supported as well as fully supported. The project reports core
+supported as advisory: kappa 0.37 on the 65 blind labels, and the improvement gate does not
+monitor it. v2.1 met every criterion on the validated verdict and failed only on core, in two
+answers where it called core a claim the labeler called peripheral. This rule gates on fully
+supported and reports core supported, with only a wide guard against gross breakage. The change
+is made after seeing v2.1 fail, so it is tested only on labels collected after it is written, as
+section 9 provides, and it is disclosed here. Aleena chose this path on 2026-10-17.
+
+**Labels.** Positions 61 to 90 in the same hash order on `docs-20261017-174739-1c0e8e`:
+docs-ai-023, docs-int-034, docs-chg-001, docs-ai-004-p3, docs-mix-067, docs-chg-027, docs-int-037, docs-mix-090, docs-int-045, docs-mix-022, docs-ai-003-p3, docs-ai-005-p3, docs-ai-036, docs-ai-010, docs-chg-003, docs-mix-042, docs-core-028, docs-chg-004, docs-mix-043, docs-chg-007, docs-mix-078, docs-chg-025, docs-core-019, docs-core-037, docs-ai-020, docs-ai-003-p2, docs-chg-008, docs-int-014, docs-ai-001-p1, docs-chg-022. They are labeled with rubric v2 on screen and no judge in view. v2.1's
+verdicts on these answers already exist, from section 9's grading of the whole run. They were
+not read, and are not read before scoring.
+
+**Rule.** Definitions are as in section 9: agreement per verdict over labeled attempts with
+citations, ties count, and a false pass is a judge pass the labeler failed.
+
+1. On the new 30: v2.1's fully-supported agreement is at least v2's, and its false passes on
+   fully supported are no more than v2's and at most 2. If the two judges give identical
+   fully-supported verdicts on all 30, the criterion is decided by those bars as written: ties
+   count, and the new 30 add no evidence against v2.1.
+2. Guard on the advisory verdict: on the new 30, v2.1's core-supported agreement is not lower than
+   v2's by more than 3. Core agreement is reported for every set.
+3. Earlier labels, fully supported only. The sets are the first dev run's 114, the v3 champion
+   run's 80, the spot check's 30 and section 9's fresh 30. In each set v2.1 is not lower than v2
+   by more than 1, and summed over the sets it is not lower than v2. Section 9 measured these as
+   113 against 114, 73 against 74, 30 against 27 and 28 against 26, so this criterion already holds.
+4. Probes: section 9's criterion 3 already holds, and is carried over.
+5. **If 1 to 4 hold:** v2.1 becomes the validated judge, and section 9 step 4 follows. That means
+   `default.yaml` switches to it, every reported run is re-judged and restated with v2's numbers
+   beside, and the iteration-4 gate is re-read under v2.1. The new 30 count as v2.1's spot check
+   on v5's answers, under the bar in criterion 1. Then the test split runs once.
+6. **If any fails:** v2 stays. There is no further judge revision in this iteration, and iteration
+   4 is recorded as better by the labeler's 90 v5 labels but not proven by the judge.
+
