@@ -13,6 +13,7 @@ marks the judge untrusted: an alert still stands, but a quiet judge_supported do
 from __future__ import annotations
 
 import json
+import random
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from math import log
@@ -40,6 +41,9 @@ REFERENCE_DAYS = (1, 2, 3, 4, 5)
 REFERENCE_PATH = Path("results/online/reference.json")
 ALERTS_PATH = Path("results/online/alerts.json")
 JUDGE_CHECK_PATH = Path("results/online/judge-check.json")
+JUDGE_SAMPLE_PATH = Path("results/online/judge-check-sample.json")
+JUDGE_CHECK_PER_DAY = 6  # 30 answers over the five reference days
+JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
 
@@ -293,3 +297,53 @@ def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
     traffic = {q.id: q for q in load_traffic(traffic_dir / f"day-{int(day):02d}.jsonl")}
     cases = {c.id: c for c in load_suite(path)}
     return day_values(store, run_id, cases, traffic)
+
+
+def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str, list[str]]:
+    """Six judged answers per reference day, drawn with a seed per day, as case ids per run.
+    Drawn once and saved before any label exists."""
+    out: dict[str, list[str]] = {}
+    for day, run in sorted(runs.items()):
+        judged = sorted(
+            case
+            for (case, attempt), grades in store.grades_for(run, "judge").items()
+            if attempt == 1 and "judge_supported" in grades
+        )
+        rng = random.Random(f"judge-check-{day}")
+        out[run] = sorted(rng.sample(judged, min(JUDGE_CHECK_PER_DAY, len(judged))))
+    return out
+
+
+def judge_check_score(
+    store: ResultsStore, sample: Mapping[str, Sequence[str]], labeler: str
+) -> dict[str, Any]:
+    """The judge's false passes on the sample: it found an answer fully supported and the labeler
+    did not. The judge may then alert only if the labels are complete and false passes are at
+    most JUDGE_CHECK_MAX_FALSE_PASSES."""
+    rows: list[dict[str, Any]] = []
+    for run, cases in sample.items():
+        labels = {x["case_id"]: x for x in store.labels(run, labeler) if x["attempt"] == 1}
+        judge = store.grades_for(run, "judge")
+        for case in cases:
+            label = labels.get(case)
+            rows.append(
+                {
+                    "run": run,
+                    "case": case,
+                    "judge_supported": judge.get((case, 1), {}).get("judge_supported") == 1.0,
+                    "labeled_supported": None if label is None else label["supported"],
+                }
+            )
+    labeled = [r for r in rows if r["labeled_supported"] is not None]
+    false_passes = [r for r in labeled if r["judge_supported"] and not r["labeled_supported"]]
+    complete = bool(rows) and len(labeled) == len(rows)
+    return {
+        "labeler": labeler,
+        "answers": len(rows),
+        "labeled": len(labeled),
+        "complete": complete,
+        "false_passes": len(false_passes),
+        "max_false_passes": JUDGE_CHECK_MAX_FALSE_PASSES,
+        "passed": complete and len(false_passes) <= JUDGE_CHECK_MAX_FALSE_PASSES,
+        "rows": rows,
+    }

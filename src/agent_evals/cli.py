@@ -1592,6 +1592,92 @@ def monitor(
     console.print(f"[green]Day {day}: no alert.[/green]")
 
 
+@app.command("judge-check")
+def judge_check(
+    action: Annotated[
+        str,
+        typer.Argument(
+            help="label: label the 30 sampled answers, blind; score: count the judge's false passes"
+        ),
+    ],
+    labeler: Annotated[str, typer.Option(help="Your name; stored with each label.")] = "aleena",
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """May judge_supported alert (phase 7 part 3)? Aleena labels 30 judged answers from the
+    reference days, blind; the judge may pass at most 2 of the ones she fails. `label` can be
+    stopped with q and run again to continue; `score` records the result for the monitor."""
+    from agent_evals import monitor as mon
+    from agent_evals.store.db import ResultsStore
+
+    cfg = _config(config)
+    if not mon.REFERENCE_PATH.exists():
+        console.print("[red]Freeze the reference first: uv run evals monitor --freeze[/red]")
+        raise typer.Exit(code=2)
+    runs = {
+        int(d): str(r)
+        for d, r in json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))["days"].items()
+    }
+    if mon.JUDGE_SAMPLE_PATH.exists():
+        sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+    else:  # drawn once, before any label exists
+        store = ResultsStore(cfg.paths.db)
+        try:
+            sample = mon.judge_check_sample(store, runs)
+        finally:
+            store.close()
+        mon.JUDGE_SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
+        mon.JUDGE_SAMPLE_PATH.write_text(json.dumps(sample, indent=2) + "\n", encoding="utf-8")
+    if action == "label":
+        for n, (run, cases) in enumerate(sample.items(), 1):
+            console.print(f"[bold]Reference day {n} of {len(sample)}[/bold] ({run})")
+            label(
+                run_id=run,
+                labeler=labeler,
+                limit=None,
+                attempt=1,
+                revisit=None,
+                split=None,
+                show_judge=False,
+                case_ids=list(cases),
+                fresh=False,
+                config=config,
+            )
+            store = ResultsStore(cfg.paths.db)
+            try:
+                done = {x["case_id"] for x in store.labels(run, labeler)}
+            finally:
+                store.close()
+            if not set(cases) <= done:  # stopped with q: stop here, resume next time
+                console.print("Stopped. Run the same command to continue where you left off.")
+                return
+        console.print("[green]All 30 labeled. Next: uv run evals judge-check score[/green]")
+        return
+    if action != "score":
+        console.print("[red]The action is label or score.[/red]")
+        raise typer.Exit(code=2)
+    store = ResultsStore(cfg.paths.db)
+    try:
+        result = mon.judge_check_score(store, sample, labeler)
+    finally:
+        store.close()
+    if not result["complete"]:
+        console.print(
+            f"[yellow]{result['labeled']} of {result['answers']} labeled; finish with "
+            "uv run evals judge-check label[/yellow]"
+        )
+        raise typer.Exit(code=1)
+    mon.JUDGE_CHECK_PATH.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
+    verdict = (
+        "passes: judge_supported may now alert"
+        if result["passed"]
+        else "fails: judge_supported stays out of the alert family"
+    )
+    console.print(
+        f"The judge passed {result['false_passes']} answer(s) you failed, of {result['answers']} "
+        f"(at most {result['max_false_passes']} allowed): it {verdict}."
+    )
+
+
 @app.command("online-run")
 def online_run(
     day: Annotated[int, typer.Argument(help="Simulated day to run.")],
