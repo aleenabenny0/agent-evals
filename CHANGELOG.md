@@ -170,6 +170,21 @@ Format:
 
 ## Unreleased
 
+- 2026-10-19: prompt caching on every API call, at Aleena's request. The client asks for the
+  API's prompt cache only as it sends a call: a breakpoint on the system prompt (the tools come
+  before it), shared by every call of a run, and for a conversation of more than one message
+  automatic caching too, so each turn of the agent's tool loop reuses the turns before it. A
+  one-message call (judge, generator) caches only its system prompt, because writing its
+  one-time message to the cache would cost 1.25x for nothing. The API documents that the cache
+  never changes the response. The local call-cache key and the agent and judge fingerprints are
+  as before, so past runs still replay from the local cache and the judge is still
+  2cf75fa03e09. Token counts stay whole (input_tokens includes the cached part), and cost prices
+  cache writes at 1.25x and reads at 0.1x the input price (0.05x on Sonnet 5.5); the results
+  store gains two columns for the cached part. Measured live: on one smoke question the agent's
+  3 calls cost 19% less, and from the judge's second answer on, both its system prompts
+  (1,563 tokens) were read from the cache, about 68% less input cost per answer. Latency drops
+  too, so latency from before and after this change is not comparable; every online day runs
+  with it.
 - 2026-10-18: phase 7 part 1, the simulated user. `evals simulate DAY` writes a day of 100
   questions (5 personas, each with 14 lookup, 2 comparison, 2 false-premise and 2
   outside-snapshot questions) to `results/online/traffic/`, and `evals pilot-review` records the

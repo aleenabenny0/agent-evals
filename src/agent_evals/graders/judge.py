@@ -31,7 +31,7 @@ from agent_evals.graders.judge_prompts import (
     verdict_tool,
 )
 from agent_evals.harness.cache import canonical_json, sha256_text
-from agent_evals.harness.llm import LLMClient
+from agent_evals.harness.llm import LLMClient, usage_from
 from agent_evals.types import AgentResult, Case, Grade, Usage
 
 PassFail = Literal["pass", "fail"]
@@ -127,15 +127,7 @@ class JudgeGrader:
             request["temperature"] = cfg.temperature
         resp = self.llm.create(request, salt=salt)
         with self._lock:
-            self.usage = self.usage.add(
-                Usage(
-                    input_tokens=int(resp.usage.get("input_tokens", 0)),
-                    output_tokens=int(resp.usage.get("output_tokens", 0)),
-                    model_calls=1,
-                    cached_calls=1 if resp.cache_hit else 0,
-                    latency_ms=resp.latency_ms,
-                )
-            )
+            self.usage = self.usage.add(usage_from(resp))
         if resp.stop_reason == "max_tokens":
             # A truncated tool input parses as a partial dict; never grade from one.
             raise ValueError(

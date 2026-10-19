@@ -25,7 +25,7 @@ from agent_evals.config import DocsAgentConfig
 from agent_evals.corpus import Corpus
 from agent_evals.entities import numbers_in
 from agent_evals.harness.cache import canonical_json, sha256_text
-from agent_evals.harness.llm import LLMClient, LLMResponse
+from agent_evals.harness.llm import LLMClient, usage_from
 from agent_evals.tool_markup import TOOL_MARKUP, find_tool_markup
 from agent_evals.types import AgentResult, Case, RunContext, Step, Usage
 
@@ -173,16 +173,6 @@ def _sanitize(blocks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return clean
 
 
-def _usage_of(resp: LLMResponse) -> Usage:
-    return Usage(
-        input_tokens=int(resp.usage.get("input_tokens", 0)),
-        output_tokens=int(resp.usage.get("output_tokens", 0)),
-        model_calls=1,
-        cached_calls=1 if resp.cache_hit else 0,
-        latency_ms=resp.latency_ms,
-    )
-
-
 class DocsAgent:
     name = "docs"
     require_citations = True  # the closed-book baseline turns this off
@@ -306,7 +296,7 @@ class DocsAgent:
                 request["temperature"] = cfg.model.temperature
 
             resp = self.llm.create(request, salt=ctx.cache_salt)
-            usage = usage.add(_usage_of(resp))
+            usage = usage.add(usage_from(resp))
             blocks = _sanitize(resp.content)
             steps.append(
                 Step(

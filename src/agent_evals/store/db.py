@@ -64,6 +64,10 @@ CREATE TABLE IF NOT EXISTS labels (
 );
 -- Added 2026-10-12 with the two-question support rubric; NULL on labels made before it.
 ALTER TABLE labels ADD COLUMN IF NOT EXISTS core_supported BOOLEAN;
+-- Added 2026-10-19 with the API's prompt cache: the part of input_tokens it wrote and read.
+-- NULL on attempts recorded before it.
+ALTER TABLE attempts ADD COLUMN IF NOT EXISTS prompt_cache_write_tokens BIGINT;
+ALTER TABLE attempts ADD COLUMN IF NOT EXISTS prompt_cache_read_tokens BIGINT;
 """
 
 
@@ -115,7 +119,10 @@ class ResultsStore:
     ) -> None:
         u = result.usage
         self.con.execute(
-            "INSERT INTO attempts VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO attempts (run_id, case_id, attempt, output, trajectory, input_tokens, "
+            "output_tokens, model_calls, cached_calls, cost_usd, latency_ms, error, "
+            "prompt_cache_write_tokens, prompt_cache_read_tokens) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             [
                 run_id,
                 case_id,
@@ -129,6 +136,8 @@ class ResultsStore:
                 cost_usd,
                 u.latency_ms,
                 result.error,
+                u.prompt_cache_write_tokens,
+                u.prompt_cache_read_tokens,
             ],
         )
         for grader_name, g in grades:
@@ -415,7 +424,8 @@ class ResultsStore:
         row = self.con.execute(
             "SELECT COUNT(*), SUM(input_tokens), SUM(output_tokens), SUM(model_calls), "
             "SUM(cached_calls), SUM(cost_usd), AVG(latency_ms), "
-            "SUM(CASE WHEN error IS NOT NULL THEN 1 ELSE 0 END) "
+            "SUM(CASE WHEN error IS NOT NULL THEN 1 ELSE 0 END), "
+            "SUM(prompt_cache_write_tokens), SUM(prompt_cache_read_tokens) "
             "FROM attempts WHERE run_id = ?",
             [run_id],
         ).fetchone()
@@ -429,5 +439,7 @@ class ResultsStore:
             "cost_usd",
             "mean_latency_ms",
             "errors",
+            "prompt_cache_write_tokens",
+            "prompt_cache_read_tokens",
         ]
         return dict(zip(keys, row, strict=True))

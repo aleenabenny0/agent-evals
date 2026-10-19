@@ -137,8 +137,12 @@ class Case(BaseModel):
 
 
 class Usage(BaseModel):
-    input_tokens: int = 0
+    input_tokens: int = 0  # the whole prompt, however much of it the prompt cache served
     output_tokens: int = 0
+    # Of input_tokens, the part the API's prompt cache wrote or read, which is billed at its own
+    # multiple of the input price. Not to be confused with the local call cache below.
+    prompt_cache_write_tokens: int = 0
+    prompt_cache_read_tokens: int = 0
     model_calls: int = 0
     cached_calls: int = 0  # served from the local call cache: no API spend
     latency_ms: float = 0.0
@@ -147,19 +151,30 @@ class Usage(BaseModel):
         return Usage(
             input_tokens=self.input_tokens + other.input_tokens,
             output_tokens=self.output_tokens + other.output_tokens,
+            prompt_cache_write_tokens=self.prompt_cache_write_tokens
+            + other.prompt_cache_write_tokens,
+            prompt_cache_read_tokens=self.prompt_cache_read_tokens + other.prompt_cache_read_tokens,
             model_calls=self.model_calls + other.model_calls,
             cached_calls=self.cached_calls + other.cached_calls,
             latency_ms=self.latency_ms + other.latency_ms,
         )
 
     def cost_usd(self, pricing: Pricing) -> float | None:
-        """Nominal cost of the tokens, whether or not they were served from cache."""
+        """Nominal cost of the tokens, whether or not the local call cache served them. Prompt
+        cache writes and reads are billed at their own multiples of the input price."""
         if pricing.input_per_mtok is None or pricing.output_per_mtok is None:
             return None
-        return (
-            self.input_tokens * pricing.input_per_mtok
-            + self.output_tokens * pricing.output_per_mtok
-        ) / 1_000_000
+        write, read = self.prompt_cache_write_tokens, self.prompt_cache_read_tokens
+        prompt = (
+            self.input_tokens
+            - write
+            - read
+            + write * pricing.cache_write_multiplier
+            + read * pricing.cache_read_multiplier
+        )
+        return (prompt * pricing.input_per_mtok + self.output_tokens * pricing.output_per_mtok) / (
+            1_000_000
+        )
 
 
 class Step(BaseModel):

@@ -17,6 +17,11 @@ class Pricing(_Strict):
 
     input_per_mtok: float | None = None
     output_per_mtok: float | None = None
+    # The API's prompt cache, as multiples of the input price, for the 5-minute cache. Reads are
+    # 0.1x on claude-haiku-5-5 and 0.05x on claude-sonnet-5-5 (pricing in the prompt caching
+    # docs, read 2026-10-19).
+    cache_write_multiplier: float = 1.25
+    cache_read_multiplier: float = 0.1
 
 
 class ModelConfig(_Strict):

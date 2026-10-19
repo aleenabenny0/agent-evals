@@ -464,6 +464,11 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   review of part 1"). Next: Aleena runs the pilot from the project folder (`uv run evals pilot-review 0`) and
   makes the three plan decisions (plan, "Decisions for Aleena"); then part 2, the grader guards,
   once she approves them.
+  **2026-10-19:** Aleena's decisions: grader guards and alert rule yes, static dashboard, budget ok.
+  Generator v2 (lookups written from one page section, checked) passes its pre-registered checks
+  (20 of 20 fully answered against v1's 6). Part 2 built (`evals online-run DAY`, commit 1e96ed6),
+  under adversarial review. Prompt caching on every API call (CHANGELOG). Next: days 1 to 5 and
+  their online runs, then part 3, the monitor.
 
 ## Target: the three project briefs
 
