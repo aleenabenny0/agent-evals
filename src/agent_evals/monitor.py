@@ -65,6 +65,16 @@ ALERT_FAMILY: tuple[Spec, ...] = (
     Spec("latency", "mean", log(1.25), "latency of uncached attempts (log ms)"),
     Spec("tokens", "mean", log(1.25), "tokens per answer (log)"),
 )
+# Latency and tokens are tested as means of logs, but shown as geometric means in their units.
+SHOWN_LABELS = {
+    "latency": "latency of uncached attempts (geometric mean)",
+    "tokens": "tokens per answer (geometric mean)",
+}
+
+
+def shown_label(spec: Spec) -> str:
+    """The label for a table or chart that shows latency and tokens in their own units."""
+    return SHOWN_LABELS.get(spec.name, spec.label)
 
 
 @dataclass
@@ -124,7 +134,7 @@ def day_values(
         if isfinite(calls):
             v["model_calls"].append(calls)
         judged = judge.get(key, {})
-        if case.type != "unanswerable":  # abstained, uncited and errored count as unsupported
+        if case.type in IN_SCOPE:  # abstained, uncited and errored count as unsupported
             in_scope_supported.append(float(judged.get("judge_supported") == 1.0))
         if failed:
             continue
@@ -254,7 +264,7 @@ def check_day(
     return {
         "run_id": day.run_id,
         "reference_runs": [r.run_id for r in reference],
-        "family_size": len(family),
+        "family_size": len(pvalues),  # what Holm ran over: a metric with no test leaves it
         "metrics": list(rows.values()),
         "fabricated_citation": fab,
         "judge": {"in_family": judge_enabled, "trusted": trusted, "shifts": shifts},

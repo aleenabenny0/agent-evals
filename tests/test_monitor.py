@@ -309,9 +309,43 @@ def test_a_nan_latency_is_skipped_not_tested(tmp_path: Path) -> None:
     assert v.reported["judge_supported_over_all_in_scope"] is None  # nothing judged: unknown
 
 
+def test_in_scope_support_counts_lookups_and_comparisons_not_false_premises(
+    tmp_path: Path,
+) -> None:
+    traffic = [
+        *_traffic(),
+        TrafficQuestion(
+            id="q-prem",
+            day=1,
+            persona="on-call",
+            intent="false_premise",
+            type="false_premise",
+            question="Why does Lambda cap memory at 1 GB?",
+            source_url=LAMBDA_URL,
+            contradicts="You can configure memory between 128 MB and 10,240 MB.",
+        ),
+    ]
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.start_run(
+            "r", agent="docs", agent_version="v", suite="x", attempts=1, manifest={}, online=True
+        )
+        output = {"answer": "a", "citations": [{"url": LAMBDA_URL, "quote": "x"}]}
+        supported = [("judge", Grade(metric="judge_supported", value=1.0))]
+        for q in traffic:
+            result = AgentResult(output=output | {"abstained": False})
+            store.record_attempt("r", q.id, 1, result, 0.0, supported if q.id == "q-look" else [])
+        v = day_values(store, "r", {q.id: online_case(q) for q in traffic}, {})
+    finally:
+        store.close()
+    # the lookup supported, the comparison not; the false premise and outside question left out
+    assert v.reported["judge_supported_over_all_in_scope"] == 0.5
+
+
 def test_an_untested_metric_or_an_untrusted_judge_does_not_clear_a_quiet_day() -> None:
     cached = check_day(_day("d8", cache_hits=3), REFERENCE, judge_enabled=False)
     assert cached["alerts"] == [] and cached["untested"] == ["latency"]
+    assert cached["family_size"] == 5  # Holm ran over the 5 metrics tested, and says so
     assert not_cleared(cached) == ["latency (refused: 3 attempts hit the local call cache)"]
     terse = _day("d9", answer_words=[20] * 80, reported={"median_answer_words": 20.0})
     assert not_cleared(check_day(terse, REFERENCE, judge_enabled=False)) == []  # judge not in

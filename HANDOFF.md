@@ -475,10 +475,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   monitor.
   **2026-10-19, later:** days 1 to 5 ran online (agent $0.96 in all, judge about $0.45 a day)
   and were frozen as the reference: no day alerted against the other four. Parts 3 and 4 built
-  (`evals monitor`, `evals judge-check`, `evals dashboard`); a code review's findings fixed
-  (plan, "Code review of parts 3 and 4"). Next: Aleena's 30 blind labels
-  (`uv run evals judge-check label`, then `uv run evals judge-check score`); then part 5, day 6
-  first. Ask Aleena before spending past $25 (about $8 spent on phase 7 so far).
+  (`evals monitor`, `evals judge-check`, `evals dashboard`). A code review and a statistics
+  review found 21 problems; a verifier confirmed 20, all fixed or written down, except two put
+  to Aleena (plan, "Code review of parts 3 and 4" and decisions 5 and 6). Day 6 ran
+  (`docs-20261019-172814-0cbb95`, $1.30) and is not checked yet: it is checked once decision 5
+  is answered, so its record carries the final numbers. Next: her answers to decisions 5 and 6,
+  then her 30 blind labels (`uv run evals judge-check label`, then
+  `uv run evals judge-check score`). About $9.30 spent on phase 7; ask before passing $25.
 
 ## Target: the three project briefs
 

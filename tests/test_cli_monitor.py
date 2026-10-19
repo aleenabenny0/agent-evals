@@ -163,6 +163,8 @@ def test_a_noisy_reference_is_not_frozen(setup: Path, tmp_path: Path) -> None:
         store.close()
     code, output = _monitor(setup, "--freeze")
     assert code == 1 and "too noisy" in output and not mon.REFERENCE_PATH.exists()
+    code, output = _monitor(setup, "--freeze")  # a stop is a stop: no second draw by default
+    assert code == 2 and "already stopped the demo" in output
 
 
 def test_a_frozen_reference_is_replaced_only_on_purpose(setup: Path) -> None:
@@ -221,3 +223,15 @@ def test_the_dashboard_shows_every_metric_and_the_alert_day(
     assert "Alert:" in page and "uncited_answer" in page and "day 6" in page
     assert "<script" not in page and "http" not in page.split("<main>")[0]  # static, no fetches
     assert "(geometric mean)" in page and "(log" not in page  # captions match the drawn units
+    assert "a normal day of n" in page  # each day over the range a normal day of its n shows
+
+
+def test_the_normal_range_is_as_wide_as_one_day_not_the_pooled_interval() -> None:
+    from agent_evals import dashboard as dash
+
+    rate = mon.ALERT_FAMILY[1]  # uncited_answer, a rate
+    band = dash.normal_range(rate, [1.0, 0.0] * 250, 100, (0, 1))  # 500 values at 50%
+    assert band is not None
+    lo, hi = band  # one day of 100 at 50% spans about 40% to 60%; the pooled mean's +-4 points
+    assert 0.38 <= lo <= 0.42 and 0.58 <= hi <= 0.62
+    assert dash.normal_range(rate, [1.0, 0.0] * 250, 100, (0, 1)) == band  # seeded

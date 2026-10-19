@@ -179,10 +179,12 @@ Format:
   alert only after Aleena's 30 blind labels pass (at most 2 false passes) and the reference
   stays quiet with it. `evals dashboard` writes the static page `docs/dashboard/index.html`.
   The real days 1 to 5 were frozen as the reference; no day alerted against the other four
-  (plan, part 3). A code review found ten problems, nine fixed and one, in `stats/`, put to
-  Aleena first (plan, "Code review of parts 3 and 4"). Most important: an unjudged or empty run
-  no longer reads as a quiet day, the frozen reference cannot be replaced by accident, and each
-  run records the hash of the traffic it ran.
+  (plan, part 3). A code review found ten problems and a statistics review eleven. All are fixed
+  or written into the plan, except two put to Aleena first: the detectable-rise formula (in
+  `stats/`) and the judge check's sample (plan, "Code review of parts 3 and 4"). Most important:
+  an unjudged or empty run no longer reads as a quiet day, and the frozen reference cannot be
+  replaced or re-rolled by accident. Each run records the hash of the traffic it ran. The
+  dashboard's band now shows where a normal day falls.
 - 2026-10-19: prompt caching on every API call, at Aleena's request. The client asks for the
   API's prompt cache only as it sends a call: a breakpoint on the system prompt (the tools come
   before it), shared by every call of a run, and for a conversation of more than one message

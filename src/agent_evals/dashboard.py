@@ -2,10 +2,10 @@
 
 It reads only the stored runs and what the monitor wrote, so it can be rebuilt at any time and
 published as it is (GitHub Pages). For each alert metric, a small chart of every day with its
-95% interval and graded n, over a band for the pooled reference days; then the alert table, the
-judge's trust flags, and each day's five least-supported answers with the judge's reasons.
-Rates are drawn from zero, up is always worse, and latency and tokens are shown in their own
-units (geometric means), not logs.
+95% interval and graded n, each over a band showing where a normal day of that n falls; then the
+alert table, the judge's trust flags, and each day's five least-supported answers with the
+judge's reasons. Rates are drawn from zero, up is always worse, and latency and tokens are shown
+in their own units (geometric means), not logs.
 """
 
 from __future__ import annotations
@@ -17,8 +17,10 @@ from math import exp
 from pathlib import Path
 from typing import Any
 
+import numpy as np
+
 from agent_evals.chart import FONT, GRID, INK, MUTED
-from agent_evals.monitor import ALERT_FAMILY, DayValues, Spec
+from agent_evals.monitor import ALERT_FAMILY, DayValues, Spec, shown_label
 from agent_evals.simulate import TrafficQuestion
 from agent_evals.stats.core import Estimate, bootstrap_ci, wilson_ci
 from agent_evals.store.db import ResultsStore
@@ -26,14 +28,27 @@ from agent_evals.store.db import ResultsStore
 DASHBOARD_PATH = Path("docs/dashboard/index.html")
 REFERENCE_COLOR, CHECKED_COLOR, ALERT_COLOR, BAND = "#0969da", INK, "#cf222e", "#ddf4ff"
 EXTRA = Spec("fabricated_citation", "rate", 0.0, "cited answers with a fabricated citation")
-SHOWN_LABELS = {  # the monitor's labels say "log"; the charts show these in their own units
-    "latency": "latency of uncached attempts (geometric mean)",
-    "tokens": "tokens per answer (geometric mean)",
-}
+RANGE_DRAWS = 2_000  # resampled days behind each normal range
 
 
 def _label(spec: Spec) -> str:
-    return SHOWN_LABELS.get(spec.name, spec.label)
+    return shown_label(spec)
+
+
+def normal_range(
+    spec: Spec, pool: Sequence[float], n: int, seed: tuple[int, ...]
+) -> tuple[float, float] | None:
+    """Where one normal day's value falls 95% of the time, in the units shown: the 2.5th and
+    97.5th percentiles of the mean of n values drawn at random from the reference days' pooled
+    values, over RANGE_DRAWS draws. Unlike the interval of the pooled mean, this is as wide as
+    one day of that n varies, so a normal day falls inside it 19 times in 20."""
+    if not pool or n == 0:
+        return None
+    rng = np.random.default_rng(seed)
+    values = np.asarray(pool, dtype=float)
+    means = values[rng.integers(0, values.size, size=(RANGE_DRAWS, n))].mean(axis=1)
+    lo, hi = (float(v) for v in np.percentile(means, [2.5, 97.5]))
+    return (exp(lo), exp(hi)) if spec.name in ("latency", "tokens") else (lo, hi)
 
 
 @dataclass
@@ -76,14 +91,23 @@ def _fmt(spec: Spec, v: float) -> str:
     return f"{v:.1f}"
 
 
-def metric_chart(spec: Spec, points: Sequence[DayPoint]) -> str:
-    """One metric across the days: a dot and 95% interval per day, over the reference band."""
+def metric_chart(spec: Spec, points: Sequence[DayPoint], index: int = 0) -> str:
+    """One metric across the days: a dot and 95% interval per day, each over the range a normal
+    day of its n shows. A reference day's range comes from the other reference days."""
     width, height, left, right, top, bottom = 340, 170, 46, 12, 14, 34
     shown = [(p, interval(spec, _values(p.values, spec))) for p in points]
     estimates = [e for _, e in shown if e is not None]
-    ref = interval(spec, [x for p in points if p.reference for x in _values(p.values, spec)])
-    highs = [_shown(spec, e)[2] for e in estimates] + ([_shown(spec, ref)[2]] if ref else [])
-    lows = [_shown(spec, e)[1] for e in estimates] + ([_shown(spec, ref)[1]] if ref else [])
+    bands = [
+        normal_range(
+            spec,
+            [x for o in points if o.reference and o is not p for x in _values(o.values, spec)],
+            len(_values(p.values, spec)),
+            (index, p.day),
+        )
+        for p in points
+    ]
+    highs = [_shown(spec, e)[2] for e in estimates] + [b[1] for b in bands if b]
+    lows = [_shown(spec, e)[1] for e in estimates] + [b[0] for b in bands if b]
     if spec.kind == "rate":
         y_min, y_max = 0.0, max(0.1, max(highs, default=0.1) * 1.15)
     else:
@@ -112,12 +136,16 @@ def metric_chart(spec: Spec, points: Sequence[DayPoint]) -> str:
             f'<text x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end" font-size="11" '
             f'fill="{MUTED}">{escape(_fmt(spec, v))}</text>'
         )
-    if ref is not None:
-        _, lo, hi = _shown(spec, ref)
+    step = (width - left - right) / (x_hi - x_lo)
+    for p, band in zip(points, bands, strict=True):
+        if band is None:
+            continue
+        lo, hi = band
         parts.append(
-            f'<rect x="{left}" y="{y(hi):.1f}" width="{width - left - right}" '
-            f'height="{max(1.0, y(lo) - y(hi)):.1f}" fill="{BAND}"><title>reference days, 95% '
-            f"interval: {escape(_fmt(spec, lo))} to {escape(_fmt(spec, hi))}</title></rect>"
+            f'<rect x="{x(p.day) - 0.3 * step:.1f}" y="{y(hi):.1f}" width="{0.6 * step:.1f}" '
+            f'height="{max(1.0, y(lo) - y(hi)):.1f}" fill="{BAND}"><title>a normal day of n '
+            f"{len(_values(p.values, spec))}, 95% of the time: {escape(_fmt(spec, lo))} to "
+            f"{escape(_fmt(spec, hi))}</title></rect>"
         )
     for p, e in shown:
         alerted = bool(p.report and spec.name in p.report.get("alerts", []))
@@ -242,12 +270,12 @@ def render(
         "blind labels."
     )
     figures = []
-    for spec in (*ALERT_FAMILY, EXTRA):
+    for i, spec in enumerate((*ALERT_FAMILY, EXTRA)):
         floor = "" if spec.name == EXTRA.name else f"alert floor {_floor(spec)}; "
         rule = "own rule, p &lt; 0.01" if spec.name == EXTRA.name else "Holm-corrected family"
         figures.append(
             f"<figure><figcaption>{escape(_label(spec))} <span>({floor}{rule}; up is worse)</span>"
-            f"</figcaption>{metric_chart(spec, points)}</figure>"
+            f"</figcaption>{metric_chart(spec, points, i)}</figure>"
         )
     rows = []
     for p in checked:
@@ -281,7 +309,8 @@ def render(
         f'<p class="key muted"><span style="background:{REFERENCE_COLOR}"></span>reference day'
         f'<span style="background:{CHECKED_COLOR}"></span>checked day'
         f'<span style="background:{ALERT_COLOR}"></span>alert'
-        f'<span style="background:{BAND};border-radius:2px"></span>reference 95% interval</p>'
+        f'<span style="background:{BAND};border-radius:2px"></span>where a normal day of that n '
+        "falls, 95% of the time (from the reference days)</p>"
     )
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">

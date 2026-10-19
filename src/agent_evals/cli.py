@@ -1446,9 +1446,14 @@ def _interactive() -> bool:
 
 
 def _print_monitor(report: dict[str, Any], title: str) -> None:
-    """One day's monitor table: every metric with its change, p, floor and blind spot."""
+    """One day's monitor table: every metric with its change, p, floor and blind spot. Rows are
+    labelled by what they count (judge_supported counts answers not fully supported), and
+    latency and tokens are shown as geometric means, their changes as ratios."""
     from math import exp
 
+    from agent_evals import monitor as mon
+
+    labels = {s.name: mon.shown_label(s) for s in mon.ALERT_FAMILY}
     table = Table(show_header=True, header_style="bold", title=title)
     for col in ("metric", "day", "reference", "change", "p", "floor", "detectable", "status"):
         table.add_column(col, justify="left" if col in ("metric", "status") else "right")
@@ -1461,6 +1466,10 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
             return f"{value:.4f}"
         if row["metric"] in ("latency", "tokens") and key in ("effect", "floor", "detectable"):
             return f"{(exp(value) - 1) * 100:+.0f}%"  # a log difference, shown as a ratio
+        if row["metric"] == "latency":
+            return f"{exp(value) / 1000:.1f} s"
+        if row["metric"] == "tokens":
+            return f"{exp(value) / 1000:.1f}k"
         if row["kind"] == "rate" and key in ("day", "ref"):
             return f"{value:.3f}"
         if row["kind"] == "rate":
@@ -1471,7 +1480,7 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
         colour = "red" if row["status"] == "alert" else ""
         status = f"[{colour}]{row['status']}[/{colour}]" if colour else row["status"]
         table.add_row(
-            row["metric"],
+            labels.get(row["metric"], row["metric"]),  # no [ ] in a label: no markup
             fmt(row, "day"),
             fmt(row, "ref"),
             fmt(row, "effect"),
@@ -1511,8 +1520,9 @@ def monitor(
         bool,
         typer.Option(
             "--refreeze",
-            help="With --freeze: replace a frozen reference. What was checked against the old "
-            "one (alerts, the judge check) is moved to results/online/archive/.",
+            help="With --freeze: check again although a reference is frozen, or a check already "
+            "stopped the demo. Everything from before (the reference, its check, alerts, the "
+            "judge check) is first moved to results/online/archive/, never deleted.",
         ),
     ] = False,
     run_id: Annotated[
@@ -1539,11 +1549,14 @@ def monitor(
         raise typer.Exit(code=2) from None
     try:
         if freeze:
-            if mon.REFERENCE_PATH.exists() and not refreeze:
-                console.print(
-                    f"[red]The reference is already frozen ({mon.REFERENCE_PATH}). Pass "
-                    "--refreeze to replace it.[/red]"
+            check_path = mon.REFERENCE_PATH.with_name("reference-check.json")
+            if not refreeze and (mon.REFERENCE_PATH.exists() or check_path.exists()):
+                why = (
+                    f"The reference is already frozen ({mon.REFERENCE_PATH})"
+                    if mon.REFERENCE_PATH.exists()
+                    else f"The reference check already stopped the demo ({check_path})"
                 )
+                console.print(f"[red]{why}. Pass --refreeze to check again.[/red]")
                 raise typer.Exit(code=2)
             try:
                 found = {d: mon.day_run(store, d, champion_only=True) for d in mon.REFERENCE_DAYS}
@@ -1573,19 +1586,20 @@ def monitor(
                 "judge_in_family": False,
                 "leave_one_day_out": checks,
             }
-            if noisy := mon.noisy_days(runs, checks):
-                path = mon.REFERENCE_PATH.with_name("reference-check.json")
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(json.dumps(record, indent=2, allow_nan=False) + "\n", "utf-8")
-                console.print(
-                    f"[red]The reference is too noisy: {noisy}. By the plan the demo stops here; "
-                    f"details in {path}.[/red]"
-                )
-                raise typer.Exit(code=1)
-            if refreeze:
+            if refreeze:  # everything from before goes to the archive, whatever this check finds
                 stamp = now.replace(":", "").replace("+0000", "Z")
                 for moved in mon.archive_reference_files(stamp):
                     console.print(f"archived {moved}")
+            if noisy := mon.noisy_days(runs, checks):
+                check_path.parent.mkdir(parents=True, exist_ok=True)
+                check_path.write_text(
+                    json.dumps(record, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+                )
+                console.print(
+                    f"[red]The reference is too noisy: {noisy}. By the plan the demo stops here; "
+                    f"details in {check_path}.[/red]"
+                )
+                raise typer.Exit(code=1)
             mon.REFERENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
             mon.REFERENCE_PATH.write_text(
                 json.dumps(record, indent=2, allow_nan=False) + "\n", encoding="utf-8"
