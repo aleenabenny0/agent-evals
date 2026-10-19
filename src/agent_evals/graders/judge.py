@@ -3,7 +3,8 @@
 1. `judge_core_supported`: are the claims that answer the question backed by the quotes the
    answer cites? 2. `judge_supported`: is every claim, including added context, backed by them?
    Both come from one call that sees the question, the answer and the citations, never the gold.
-3. `judge_responsive`: does the answer answer the question as asked? This call sees the gold.
+3. `judge_responsive`: does the answer answer the question as asked? This call sees the gold,
+   so an online case, which has none, skips it.
 
 The judge never changes a grade code already decided. It skips errored and abstained attempts,
 and skips the support verdicts when there are no citations, because `uncited_answer` has that
@@ -99,6 +100,8 @@ class JudgeGrader:
             full_ok = s.fully_supported == "pass"
             grades.append(_grade("judge_core_supported", core_ok, s.reason))
             grades.append(_grade("judge_supported", full_ok, s.reason))
+        if case.is_online or case.gold is None:  # no reference answer to judge it against
+            return grades
         r = self._ask(
             JUDGE_RESPONSIVE_V1,
             responsive_message(case.question, case.gold.answer, answer),

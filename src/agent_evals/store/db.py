@@ -275,8 +275,11 @@ class ResultsStore:
         return [dict(zip(keys, r, strict=True)) for r in rows]
 
     def latest_run_id(self) -> str | None:
+        """The newest suite run. An online run (phase 7, suite "online-day-NN") is never the
+        latest, so `evals report` keeps showing suite runs."""
         row = self.con.execute(
-            "SELECT run_id FROM runs ORDER BY started_at DESC LIMIT 1"
+            "SELECT run_id FROM runs WHERE suite NOT LIKE 'online-%' "
+            "ORDER BY started_at DESC LIMIT 1"
         ).fetchone()
         return str(row[0]) if row else None
 

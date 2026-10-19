@@ -42,12 +42,20 @@ def _pages_cited(result: AgentResult) -> set[str]:
 
 
 class AnswerGrader:
-    """Correctness by required phrases, plus abstention behavior."""
+    """Correctness by required phrases, plus abstention behavior. An online case has no
+    reference answer, so it gets only `abstained`: never `correct`, `wrong_abstention` or
+    `missed_abstention`, which would need one."""
 
     name = "answer_keywords"
-    version = "2"  # 2: phrases match whole words and numbers, not substrings
+    version = "3"  # 3: online cases record only abstained; 2: whole-word phrase matching
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
+        if case.is_online:
+            if result.error:
+                return []
+            return [Grade(metric="abstained", value=float(_abstained(result)))]
+        if case.gold is None:  # Case validation makes this impossible offline
+            raise ValueError(f"{case.id}: an offline case without gold")
         if result.error:
             return [
                 Grade(
@@ -193,19 +201,20 @@ class TrajectoryGrader:
             Grade(metric="rejected_submissions", value=float(len(rejected))),
             Grade(metric="repeated_calls", value=float(len(signatures) - len(set(signatures)))),
         ]
-        if case.gold.evidence:
+        gold = case.gold  # absent on an online case: no evidence pages to score
+        if gold is not None and gold.evidence:
             read = _pages_read(result)
             seen = read | _pages_cited(result)
             # One hit per group of alternatives; a group with any URL seen counts as found.
-            found = sum(any(url in seen for url in group) for group in case.gold.evidence)
-            recall = found / len(case.gold.evidence)
+            found = sum(any(url in seen for url in group) for group in gold.evidence)
+            recall = found / len(gold.evidence)
             grades.append(Grade(metric="evidence_recall", value=recall, passed=recall == 1.0))
             # Precision: of the distinct pages read, the share that were gold evidence. Recall
             # asks "did it find the right pages"; this asks "how much else did it read". Left
             # out when nothing was read (the oracle baseline is handed its pages): 0/0 is not
             # a rate.
             if read:
-                on_target = len(read & set(case.gold.evidence_urls)) / len(read)
+                on_target = len(read & set(gold.evidence_urls)) / len(read)
                 grades.append(Grade(metric="evidence_precision", value=on_target))
         return grades
 

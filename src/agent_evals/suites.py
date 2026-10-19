@@ -32,7 +32,8 @@ def load_suite(path: Path) -> list[Case]:
             continue
         if case.id in seen:
             errors.append(f"line {lineno}: duplicate id {case.id!r}")
-        if case.answerable and not case.gold.must_include:
+        # An online case has no reference answer, so no phrases to require.
+        if case.answerable and not case.is_online and not (case.gold and case.gold.must_include):
             errors.append(f"line {lineno}: answerable case {case.id!r} has no must_include")
         seen.add(case.id)
         cases.append(case)
@@ -53,7 +54,7 @@ def evidence_index(paths: Iterable[Path]) -> dict[str, list[tuple[str, str]]]:
         except (SuiteError, OSError):
             continue
         for case in cases:
-            for url in case.gold.evidence_urls:
+            for url in case.gold.evidence_urls if case.gold else []:
                 index.setdefault(url, []).append((path.as_posix(), case.id))
     return index
 
@@ -88,40 +89,43 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
     errors: list[str] = []
     warnings: list[str] = []
     for c in cases:
-        present = [u for u in c.gold.evidence_urls if u in corpus.pages]
-        for url in c.gold.evidence_urls:
+        gold = c.gold
+        if gold is None:  # an online case: no reference answer to check against the snapshot
+            continue
+        present = [u for u in gold.evidence_urls if u in corpus.pages]
+        for url in gold.evidence_urls:
             if url not in corpus.pages:
                 errors.append(f"{c.id}: evidence page not in snapshot: {url}")
-        for quote in c.gold.support:
+        for quote in gold.support:
             if not any(corpus.contains_quote(u, quote) for u in present):
                 errors.append(
                     f"{c.id}: support quote not found on any evidence page: {quote[:60]!r}"
                 )
         if c.answerable and present:
-            quoted = normalize(" ".join(c.gold.support))
-            for group in c.gold.must_include:
+            quoted = normalize(" ".join(gold.support))
+            for group in gold.must_include:
                 if not any(corpus.contains_phrase(u, alt) for u in present for alt in group):
                     warnings.append(
                         f"{c.id}: no must_include alternative found on its evidence pages: "
                         + " | ".join(group)
                     )
-                elif c.gold.support and not any(phrase_in(quoted, alt) for alt in group):
+                elif gold.support and not any(phrase_in(quoted, alt) for alt in group):
                     warnings.append(
                         f"{c.id}: required fact not covered by any support quote: "
                         + " | ".join(group)
                     )
             # Every number the gold answer states should sit in a quote a reviewer can see, and
             # must at least be on the page: a number on no page is a wrong gold answer.
-            claimed = numbers_in(c.gold.answer) - numbers_in(c.question)
+            claimed = numbers_in(gold.answer) - numbers_in(c.question)
             on_pages: set[str] = set().union(*(numbers_in(corpus.pages[u].text) for u in present))
             if off_page := sorted(claimed - on_pages, key=float):
                 warnings.append(
                     f"{c.id}: number in the gold answer not on any evidence page: "
                     + ", ".join(off_page)
                 )
-            quoted_numbers = numbers_in(" ".join(c.gold.support))
+            quoted_numbers = numbers_in(" ".join(gold.support))
             unquoted = sorted((claimed & on_pages) - quoted_numbers, key=float)
-            if c.gold.support and unquoted:
+            if gold.support and unquoted:
                 warnings.append(
                     f"{c.id}: number in the gold answer not covered by any support quote: "
                     + ", ".join(unquoted)

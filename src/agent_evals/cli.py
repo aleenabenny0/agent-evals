@@ -218,21 +218,24 @@ def review(
     tally = {"accepted": 0, "rejected": 0, "skipped": 0}
 
     for i, c in enumerate(drafts, 1):
+        gold = c.gold
+        if gold is None:  # drafts are offline cases, which always have gold
+            continue
         console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(drafts)}")
         console.print(Panel(c.question, title="question"))
-        console.print(Panel(c.gold.answer, title="gold answer"))
-        console.print(f"must_include: {c.gold.must_include}")
-        for url in c.gold.evidence_urls:
+        console.print(Panel(gold.answer, title="gold answer"))
+        console.print(f"must_include: {gold.must_include}")
+        for url in gold.evidence_urls:
             console.print(f"evidence: {url}")
         terms = answer_terms(c)
         missing = uncovered_terms(c)
         if missing:
             console.print("[cyan]answer facts with no support quote: " + ", ".join(missing) + "[/]")
         console.print("[dim]yellow = support quote; cyan = other answer facts on the page[/dim]")
-        for n, quote in enumerate(c.gold.support, 1):
+        for n, quote in enumerate(gold.support, 1):
             shown = False
             if corpus is not None:
-                for url in c.gold.evidence_urls:
+                for url in gold.evidence_urls:
                     page = corpus.pages.get(url)
                     ctx = quote_context(page.text, quote) if page else None
                     if ctx:
@@ -240,12 +243,12 @@ def review(
                         body = Text.assemble(
                             mark(before, terms), (match, "bold yellow"), mark(after, terms)
                         )
-                        title = f"support {n}/{len(c.gold.support)}, in context of {url}"
+                        title = f"support {n}/{len(gold.support)}, in context of {url}"
                         console.print(Panel(body, title=title))
                         shown = True
                         break
             if not shown:
-                console.print(Panel(quote, title=f"support {n}/{len(c.gold.support)}"))
+                console.print(Panel(quote, title=f"support {n}/{len(gold.support)}"))
         if c.notes:
             console.print(f"notes: {c.notes}")
 
@@ -360,7 +363,7 @@ def run(
         ),
     ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
-) -> None:
+) -> str:
     """Run an agent on a suite, grade every attempt, and store the results."""
     load_dotenv()
     from agent_evals.agents.docs.agent import DocsAgent
@@ -435,6 +438,7 @@ def run(
         _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
         store.close()
+    return run_id
 
 
 @app.command()
@@ -543,6 +547,7 @@ def judge(
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
+    from agent_evals.online import ONLINE_JUDGE_VERSION, ONLINE_SUITE_PREFIX
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
     from agent_evals.types import AgentResult
@@ -552,6 +557,15 @@ def judge(
     store = ResultsStore(cfg.paths.db)
     try:
         info = store.run_info(run_id)
+        grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
+        if str(info["suite"]).startswith(ONLINE_SUITE_PREFIX) and (
+            grader.version != ONLINE_JUDGE_VERSION
+        ):
+            console.print(
+                f"[red]An online run is judged only by the validated judge "
+                f"{ONLINE_JUDGE_VERSION}; this config's judge is {grader.version}.[/red]"
+            )
+            raise typer.Exit(code=2)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         if not suite_path.exists():
             console.print(f"[red]The run's suite file {suite_path} is gone; cannot judge.[/red]")
@@ -576,7 +590,6 @@ def judge(
                 raise typer.Exit(code=2)
             store.delete_grades(run_id, cfg.judge.grader_name)
         todo = todo[:limit]
-        grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
 
         def one(a: dict[str, object]) -> tuple[dict[str, object], list[tuple[str, Grade]]]:
             case = cases[str(a["case_id"])]
@@ -830,8 +843,14 @@ def label(
                 console.print(
                     "[dim]no citations: supported is not asked (uncited_answer covers it)[/dim]"
                 )
-            console.print(Panel(c.gold.answer, title="reference answer (gold)"))
-            console.print(f"must_include: {c.gold.must_include}")
+            if c.gold is not None:
+                console.print(Panel(c.gold.answer, title="reference answer (gold)"))
+                console.print(f"must_include: {c.gold.must_include}")
+            else:
+                console.print(
+                    "[dim]online case: no reference answer, so judge responsive from the "
+                    "question alone[/dim]"
+                )
             question = (
                 "responsive: does it answer the question as asked? (y)es, (n)o, (s)kip, (q)uit"
             )
@@ -1380,6 +1399,39 @@ def _interactive() -> bool:
     import sys
 
     return sys.stdin.isatty()
+
+
+@app.command("online-run")
+def online_run(
+    day: Annotated[int, typer.Argument(help="Simulated day to run.")],
+    judge_answers: Annotated[
+        bool,
+        typer.Option("--judge/--no-judge", help="Judge the answers with the pinned judge."),
+    ] = True,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Run the docs agent on one simulated day, grade what needs no reference answer, and judge it
+    with the pinned judge (phase 7 part 2). Costs money. The run is never the latest run."""
+    from agent_evals.online import ONLINE_CASES_DIR, online_case, online_suite_name
+    from agent_evals.simulate import load_traffic
+    from agent_evals.suites import write_suite
+
+    traffic_path = TRAFFIC_DIR / f"day-{day:02d}.jsonl"
+    if not traffic_path.exists():
+        console.print(
+            f"[red]No simulated traffic for day {day} at {traffic_path}.[/red] Generate it "
+            f"first: uv run evals simulate {day}"
+        )
+        raise typer.Exit(code=2)
+    cases_path = ONLINE_CASES_DIR / f"{online_suite_name(day)}.jsonl"
+    write_suite(cases_path, [online_case(q) for q in load_traffic(traffic_path)])
+    run_id = run(
+        suite=cases_path, agent="docs", attempts=1, limit=None, allow_drafts=False, config=config
+    )
+    if judge_answers:
+        judge(
+            run_id=run_id, limit=None, salt="judge", replace=False, only_labeled=None, config=config
+        )
 
 
 @app.command("pilot-review")

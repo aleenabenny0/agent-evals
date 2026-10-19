@@ -44,6 +44,8 @@ class OracleEvidenceAgent(DocsAgent):
         self.tools = _submit_only(config.strict_tools)
 
     def first_message(self, case: Case) -> str:
+        if case.gold is None:
+            raise ValueError(f"{case.id}: the oracle baseline needs gold evidence, and has none")
         parts: list[str] = []
         for url in case.gold.evidence_urls:
             text = self.corpus.read(url, 0, self.config.page_chars)

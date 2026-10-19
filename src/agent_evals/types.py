@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import Any, Literal, Protocol, runtime_checkable
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from agent_evals.config import Pricing
 
@@ -28,7 +28,8 @@ Area = Literal[
     "migration",
 ]
 # "unassigned" is for drafts: `evals split` assigns dev/test, and runs refuse unassigned cases.
-Split = Literal["smoke", "dev", "test", "unassigned"]
+# "online" is simulated traffic (phase 7), which belongs to no offline split.
+Split = Literal["smoke", "dev", "test", "unassigned", "online"]
 
 
 class Gold(BaseModel):
@@ -74,13 +75,16 @@ class Case(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
     id: str
-    suite: Literal["smoke", "capability", "robustness", "red_team"]
+    suite: Literal["smoke", "capability", "robustness", "red_team", "online"]
     agent: str
     type: CaseType
     question: str
-    gold: Gold
+    # Absent only on an online case (simulated traffic has no reference answer); there it may
+    # hold at most a minimal key, a false premise's contradicted sentence as `support`.
+    gold: Gold | None = None
     split: Split
-    provenance: Literal["hand", "synthetic"]
+    # "simulated" is phase 7 traffic: generated, never verified by hand, and not a draft.
+    provenance: Literal["hand", "synthetic", "simulated"]
     area: Area | None = None
     # Who checked this case against its page. A synthetic case without it is a draft and is
     # never scored by accident (see `evals run --allow-drafts`).
@@ -93,6 +97,35 @@ class Case(BaseModel):
     # share the source's gold and live in the dev split; consistency is measured per group.
     paraphrase_of: str | None = None
     notes: str | None = None
+
+    @model_validator(mode="after")
+    def _online_rules(self) -> Case:
+        """Suite, split and provenance mark an online case together or not at all. An offline
+        case must have gold. An online case's gold, when present, holds only `support`: an empty
+        gold, or one with an answer, phrases or evidence, could score it correct by accident."""
+        marks = {self.suite == "online", self.split == "online", self.provenance == "simulated"}
+        if len(marks) != 1:
+            raise ValueError(
+                "an online case has suite 'online', split 'online' and provenance 'simulated'; "
+                "no other case has any of them"
+            )
+        if not self.is_online:
+            if self.gold is None:
+                raise ValueError("gold may be absent only on an online case")
+        elif self.gold is not None:
+            g = self.gold
+            if g.answer.strip() or g.must_include or g.evidence:
+                raise ValueError(
+                    "an online case's gold may hold only `support`, never an answer, phrases "
+                    "or evidence"
+                )
+            if not g.support:
+                raise ValueError("an online case with an empty gold is rejected; leave it out")
+        return self
+
+    @property
+    def is_online(self) -> bool:
+        return self.suite == "online"
 
     @property
     def answerable(self) -> bool:

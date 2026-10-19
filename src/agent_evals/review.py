@@ -78,14 +78,18 @@ def answer_terms(case: Case) -> list[str]:
     """What a reviewer must find on the page: every required phrase, every standalone number and
     every identifier with a digit in it (runtime names, versions, CIDR sizes) from the gold
     answer. Anything the question already states is left out; it is not a claim. Required
-    phrases first, then numbers, then identifiers, no duplicates."""
-    terms = [alt for group in case.gold.must_include for alt in group]
+    phrases first, then numbers, then identifiers, no duplicates. An online case has no gold
+    answer, so no terms."""
+    gold = case.gold
+    if gold is None:
+        return []
+    terms = [alt for group in gold.must_include for alt in group]
     asked = numbers_in(case.question)
-    terms += sorted(numbers_in(case.gold.answer) - asked, key=float)
+    terms += sorted(numbers_in(gold.answer) - asked, key=float)
     asked_ids = {t.lower() for t in _IDENTIFIER.findall(case.question)}
     terms += [
         t.rstrip(".,;:")
-        for t in _IDENTIFIER.findall(case.gold.answer)
+        for t in _IDENTIFIER.findall(gold.answer)
         if t.lower() not in asked_ids and not NUMBER.fullmatch(t.rstrip(".,;:"))
     ]
     return list(dict.fromkeys(t for t in terms if t.strip()))
@@ -124,16 +128,17 @@ def uncovered_terms(case: Case) -> list[str]:
     """Answer facts no support quote states: required-phrase groups with no alternative in the
     quotes, and numbers in the gold answer that are in neither the quotes nor the question.
     Mirrors the warnings `evals validate` prints, so the reviewer sees the same gaps."""
-    if not case.gold.support:
+    gold = case.gold
+    if gold is None or not gold.support:
         return []
-    quoted = normalize(" ".join(case.gold.support))
+    quoted = normalize(" ".join(gold.support))
     gaps = [
         " | ".join(group)
-        for group in case.gold.must_include
+        for group in gold.must_include
         if not any(phrase_in(quoted, alt) for alt in group)
     ]
-    quoted_numbers = numbers_in(" ".join(case.gold.support))
-    loose = numbers_in(case.gold.answer) - numbers_in(case.question) - quoted_numbers
+    quoted_numbers = numbers_in(" ".join(gold.support))
+    loose = numbers_in(gold.answer) - numbers_in(case.question) - quoted_numbers
     return gaps + sorted(loose, key=float)
 
 

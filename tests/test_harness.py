@@ -268,7 +268,9 @@ def test_regrade_rescores_stored_answers_against_changed_cases(tmp_path: Path) -
     s = summarize(store, run)
     assert s.metrics["correct"].mean == 0.5
     assert s.metrics["judge_supported"].mean == 1.0  # the judge's grades were left alone
-    assert store.run_info(run)["manifest"]["regraded"]["graders"] == {"answer_keywords": "2"}
+    assert store.run_info(run)["manifest"]["regraded"]["graders"] == {
+        "answer_keywords": AnswerGrader.version
+    }
     store.close()
 
 
