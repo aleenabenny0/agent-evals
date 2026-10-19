@@ -12,13 +12,15 @@ from agent_evals.harness.manifest import file_sha256
 from agent_evals.monitor import (
     ALERT_FAMILY,
     DayValues,
-    champion_run,
     check_day,
+    day_run,
+    day_runs,
     day_values,
     leave_one_day_out,
     load_day,
+    not_cleared,
 )
-from agent_evals.online import online_case
+from agent_evals.online import ONLINE_JUDGE_VERSION, online_case
 from agent_evals.simulate import TrafficQuestion
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import write_suite
@@ -203,33 +205,117 @@ def test_day_values_reads_the_plan_metrics_from_a_store(tmp_path: Path) -> None:
     assert v.reported["judge_supported_over_all_in_scope"] == 0.0  # the comparison declined
 
 
-def test_the_champion_run_and_a_changed_cases_file(tmp_path: Path) -> None:
-    traffic_dir = tmp_path / "traffic"
-    traffic_dir.mkdir()
-    (traffic_dir / "day-01.jsonl").write_text(
-        "".join(q.model_dump_json() + "\n" for q in _traffic()), encoding="utf-8"
+def _online_run(store: ResultsStore, run_id: str, cases: Path, traffic: Path, **role: Any) -> None:
+    """A complete online run of day 1's three questions: the lookup cited and judged."""
+    manifest = {"suite": {"path": str(cases), "sha256": file_sha256(cases)}}
+    store.start_run(
+        run_id,
+        agent="docs",
+        agent_version="v",
+        suite="day-01",
+        attempts=1,
+        manifest=manifest,
+        online=True,
     )
+    store.annotate_run(
+        run_id,
+        "online",
+        {"day": 1, "champion": True, "traffic_sha256": file_sha256(traffic)} | role,
+    )
+    store.annotate_run(run_id, "judge", {"version": ONLINE_JUDGE_VERSION})
+    usage = Usage(input_tokens=900, output_tokens=100, model_calls=3, latency_ms=2000.0)
+    cited = {"answer": "Up to 10,240 MB.", "citations": [{"url": LAMBDA_URL, "quote": "x"}]}
+    _attempt(
+        store,
+        run_id,
+        "q-look",
+        AgentResult(output=cited | {"abstained": False}, usage=usage),
+        {"judge": [Grade(metric="judge_supported", value=1.0)]},
+    )
+    declined = {"answer": "", "citations": [], "abstained": True}
+    for case in ("q-cmp", "q-out"):
+        _attempt(store, run_id, case, AgentResult(output=declined, usage=usage), {})
+    store.finish_run(run_id, "complete")
+
+
+def _files(tmp_path: Path) -> tuple[Path, Path]:
+    """Day 1's traffic file and the cases file built from it."""
+    traffic = tmp_path / "day-01.jsonl"
+    traffic.write_text("".join(q.model_dump_json() + "\n" for q in _traffic()), "utf-8")
     cases = tmp_path / "online-day-01.jsonl"
     write_suite(cases, [online_case(q) for q in _traffic()])
+    return traffic, cases
+
+
+def test_the_day_run_is_the_one_complete_served_run(tmp_path: Path) -> None:
+    traffic, cases = _files(tmp_path)
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:
-        for run_id, champion in (("old", True), ("challenger", False), ("new", True)):
-            manifest = {"suite": {"path": str(cases), "sha256": file_sha256(cases)}}
-            store.start_run(
-                run_id,
-                agent="docs",
-                agent_version="v",
-                suite="day-01",
-                attempts=1,
-                manifest=manifest,
-                online=True,
-            )
-            store.annotate_run(run_id, "online", {"day": 1, "champion": champion})
-            store.finish_run(run_id, "complete")
-        assert champion_run(store, 1) == "new" and champion_run(store, 2) is None
-        assert load_day(store, "new", traffic_dir).run_id == "new"
-        write_suite(cases, [online_case(q) for q in _traffic()[:2]])
-        with pytest.raises(ValueError, match="changed since it ran"):
-            load_day(store, "new", traffic_dir)
+        _online_run(store, "old", cases, traffic)
+        _online_run(store, "challenger", cases, traffic, champion=False)
+        _online_run(store, "shadow", cases, traffic, shadow=True)
+        assert day_runs(store, 1) == ["old", "challenger"]  # a shadow is never the day's run
+        assert day_runs(store, 1, champion_only=True) == ["old"] and day_run(store, 2) is None
+        with pytest.raises(ValueError, match="2 complete online runs"):
+            day_run(store, 1)  # which one counts is a decision, not a default
+        store.finish_run("challenger", "failed")
+        assert day_run(store, 1) == "old"
     finally:
         store.close()
+
+
+def test_load_day_refuses_a_run_that_would_read_as_a_quiet_day(tmp_path: Path) -> None:
+    traffic, cases = _files(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        _online_run(store, "ok", cases, traffic)
+        assert load_day(store, "ok", tmp_path).values["judge_supported"] == [0.0]
+        _online_run(store, "unjudged", cases, traffic)
+        store.delete_grades("unjudged", "judge")
+        with pytest.raises(ValueError, match="no judge verdict"):
+            load_day(store, "unjudged", tmp_path)
+        _online_run(store, "other-judge", cases, traffic)
+        store.annotate_run("other-judge", "judge", {"version": "0123456789ab"})
+        with pytest.raises(ValueError, match="pinned judge"):
+            load_day(store, "other-judge", tmp_path)
+        _online_run(store, "running", cases, traffic)
+        store.finish_run("running", "running")
+        with pytest.raises(ValueError, match="not complete"):
+            load_day(store, "running", tmp_path)
+        traffic.write_text(traffic.read_text("utf-8").replace("memory", "storage"), "utf-8")
+        with pytest.raises(ValueError, match="traffic file"):
+            load_day(store, "ok", tmp_path)  # questions changed under the same ids
+        write_suite(cases, [online_case(q) for q in _traffic()[:2]])
+        with pytest.raises(ValueError, match="changed since it ran"):
+            load_day(store, "ok", tmp_path)
+    finally:
+        store.close()
+
+
+def test_a_nan_latency_is_skipped_not_tested(tmp_path: Path) -> None:
+    traffic = _traffic()
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.start_run(
+            "r", agent="docs", agent_version="v", suite="x", attempts=1, manifest={}, online=True
+        )
+        for q, latency in zip(traffic, (float("nan"), 0.0, 1500.0), strict=True):
+            usage = Usage(input_tokens=10, output_tokens=1, model_calls=1, latency_ms=latency)
+            store.record_attempt("r", q.id, 1, AgentResult(output={}, usage=usage), 0.0, [])
+        v = day_values(store, "r", {q.id: online_case(q) for q in traffic}, {})
+    finally:
+        store.close()
+    assert v.values["latency"] == [pytest.approx(log(1500.0))]
+    assert v.reported["judge_supported_over_all_in_scope"] is None  # nothing judged: unknown
+
+
+def test_an_untested_metric_or_an_untrusted_judge_does_not_clear_a_quiet_day() -> None:
+    cached = check_day(_day("d8", cache_hits=3), REFERENCE, judge_enabled=False)
+    assert cached["alerts"] == [] and cached["untested"] == ["latency"]
+    assert not_cleared(cached) == ["latency (refused: 3 attempts hit the local call cache)"]
+    terse = _day("d9", answer_words=[20] * 80, reported={"median_answer_words": 20.0})
+    assert not_cleared(check_day(terse, REFERENCE, judge_enabled=False)) == []  # judge not in
+    assert not_cleared(check_day(terse, REFERENCE, judge_enabled=True)) == [
+        "judge_supported (the judge is untrusted today)"
+    ]
+    assert not_cleared(check_day(_day("d10"), REFERENCE, judge_enabled=True)) == []

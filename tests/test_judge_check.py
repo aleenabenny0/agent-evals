@@ -13,6 +13,9 @@ from agent_evals import cli
 from agent_evals import monitor as mon
 from agent_evals.store.db import ResultsStore
 from agent_evals.types import AgentResult, Grade
+from test_monitor import REFERENCE
+from test_monitor import _day as synthetic_day
+from test_monitor import _ones as ones
 
 
 def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[int, str]:
@@ -84,14 +87,31 @@ def _score(tmp_path: Path, labels: dict[str, list[bool]]) -> dict[str, Any]:
 def test_the_score_counts_false_passes_and_needs_every_label(tmp_path: Path) -> None:
     agree = {f"r{d}": [True] * 6 for d in range(1, 6)}  # she passes everything: no false pass
     result = _score(tmp_path / "a", agree)
-    assert result["complete"] and result["false_passes"] == 0 and result["passed"]
+    assert result["complete"] and result["false_passes"] == 0 and result["labels_passed"]
     harsh = {f"r{d}": [False] * 6 for d in range(1, 6)}  # she fails everything the judge passed
     result = _score(tmp_path / "b", harsh)
     assert result["false_passes"] == sum(r["judge_supported"] for r in result["rows"]) > 2
-    assert not result["passed"]
+    assert not result["labels_passed"]
     partial = {"r1": [True] * 6}
     result = _score(tmp_path / "c", partial)
-    assert not result["complete"] and not result["passed"] and result["labeled"] == 6
+    assert not result["complete"] and not result["labels_passed"] and result["labeled"] == 6
+
+
+def test_a_lost_verdict_or_a_thin_day_is_refused_not_counted(tmp_path: Path) -> None:
+    runs = _store(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        sample = mon.judge_check_sample(store, runs)
+        store.delete_grades("r2", "judge", [(sample["r2"][0], 1)])  # e.g. a --replace cut short
+        with pytest.raises(ValueError, match="no judge verdict"):
+            mon.judge_check_score(store, sample, "aleena")  # never read as a judge fail
+        store.delete_grades("r3", "judge")
+        with pytest.raises(ValueError, match="r3 has 0 judged answers"):
+            mon.judge_check_sample(store, runs)  # 24 answers would pass as the check
+        with pytest.raises(ValueError, match="6 answers from each"):
+            mon.judge_check_score(store, {"r1": sample["r1"]}, "aleena")
+    finally:
+        store.close()
 
 
 def _config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runs: dict[int, str]) -> Path:
@@ -107,15 +127,37 @@ def _config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runs: dict[int, str
     return config
 
 
+def _reference_days(monkeypatch: pytest.MonkeyPatch, days: list[mon.DayValues]) -> None:
+    """The reference runs' values, as `load_day` would read them, for the noise check that
+    `score` reruns with judge_supported in the family."""
+    by_run = {f"r{d}": v for d, v in enumerate(days, 1)}
+    monkeypatch.setattr(mon, "load_day", lambda store, run, traffic_dir: by_run[run])
+
+
 def test_score_records_the_result_the_monitor_reads(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
     config = _config(tmp_path, monkeypatch, runs)
+    _reference_days(monkeypatch, REFERENCE)
     result = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
     assert result.exit_code == 0 and "may now alert" in " ".join(result.output.split())
-    assert mon.judge_enabled(mon.JUDGE_CHECK_PATH)
+    assert mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
+    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, ["r1", "r2", "r3", "r4", "other"])
     assert json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))  # the sample was saved
+
+
+def test_the_judge_stays_out_if_the_reference_is_noisy_with_it(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
+    config = _config(tmp_path, monkeypatch, runs)
+    odd = synthetic_day("odd", values={"judge_supported": ones(80, 60)})
+    _reference_days(monkeypatch, [*REFERENCE[:4], odd])
+    result = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
+    output = " ".join(result.output.split())
+    assert result.exit_code == 0 and "the labels pass" in output and "too noisy" in output
+    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
 
 
 def test_label_walks_the_reference_runs_and_stops_when_she_quits(
@@ -153,9 +195,9 @@ def test_label_walks_the_reference_runs_and_stops_when_she_quits(
 
 
 def test_the_monitor_keeps_the_judge_out_until_the_check_passes(tmp_path: Path) -> None:
-    path = tmp_path / "judge-check.json"
-    assert not mon.judge_enabled(path)
-    path.write_text(json.dumps({"passed": False}), encoding="utf-8")
-    assert not mon.judge_enabled(path)
-    path.write_text(json.dumps({"passed": True}), encoding="utf-8")
-    assert mon.judge_enabled(path)
+    path, runs = tmp_path / "judge-check.json", ["r1", "r2"]
+    assert not mon.judge_enabled(path, runs)
+    path.write_text(json.dumps({"passed": False, "reference_runs": runs}), encoding="utf-8")
+    assert not mon.judge_enabled(path, runs)
+    path.write_text(json.dumps({"passed": True, "reference_runs": runs}), encoding="utf-8")
+    assert mon.judge_enabled(path, runs) and not mon.judge_enabled(path, ["r1", "r3"])

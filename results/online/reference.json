@@ -1,0 +1,718 @@
+{
+  "checked_at": "2026-10-19T16:47:55+00:00",
+  "days": {
+    "1": "docs-20261019-161300-f4f40b",
+    "2": "docs-20261019-162038-dd2eba",
+    "3": "docs-20261019-162659-a169f2",
+    "4": "docs-20261019-163359-1bb93d",
+    "5": "docs-20261019-164105-82a046"
+  },
+  "judge_in_family": false,
+  "leave_one_day_out": [
+    {
+      "run_id": "docs-20261019-161300-f4f40b",
+      "reference_runs": [
+        "docs-20261019-162038-dd2eba",
+        "docs-20261019-162659-a169f2",
+        "docs-20261019-163359-1bb93d",
+        "docs-20261019-164105-82a046"
+      ],
+      "family_size": 6,
+      "metrics": [
+        {
+          "metric": "judge_supported",
+          "label": "answers the judge found not fully supported",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 83,
+          "n_ref": 348,
+          "day": 0.6987951807228916,
+          "ref": 0.7586206896551724,
+          "effect": -0.05982550893228078,
+          "p": null,
+          "detectable": null,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+        },
+        {
+          "metric": "uncited_answer",
+          "label": "answers with no citation",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 83,
+          "n_ref": 348,
+          "day": 0.0,
+          "ref": 0.0,
+          "effect": 0.0,
+          "p": 1.0,
+          "detectable": 0.00039524348068246235,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "in_scope_abstention",
+          "label": "lookups and comparisons declined",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 80,
+          "n_ref": 318,
+          "day": 0.0625,
+          "ref": 0.0220125786163522,
+          "effect": 0.040487421383647804,
+          "p": 0.07083783648684601,
+          "detectable": 0.05937997939170654,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "error",
+          "label": "attempts that errored",
+          "kind": "rate",
+          "floor": 0.02,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 0.01,
+          "ref": 0.005,
+          "effect": 0.005,
+          "p": 0.48877031170775287,
+          "detectable": 0.02551564284542822,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "model_calls",
+          "label": "model calls per attempt",
+          "kind": "mean",
+          "floor": 0.5,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 5.05,
+          "ref": 4.755,
+          "effect": 0.29499999999999993,
+          "p": 0.0840457977101145,
+          "detectable": 0.6670337888078951,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "latency",
+          "label": "latency of uncached attempts (log ms)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 9.159350176411548,
+          "ref": 9.191735963605694,
+          "effect": -0.032385787194145976,
+          "p": 0.7376131193440328,
+          "detectable": 0.15961991962996683,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "tokens",
+          "label": "tokens per answer (log)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 83,
+          "n_ref": 348,
+          "day": 10.058962112377554,
+          "ref": 10.000665690775138,
+          "effect": 0.05829642160241555,
+          "p": 0.23893805309734514,
+          "detectable": 0.2591712342466568,
+          "holm_rejected": false,
+          "status": "ok"
+        }
+      ],
+      "fabricated_citation": {
+        "n_day": 83,
+        "n_ref": 348,
+        "p": 1.0,
+        "day": 0.0,
+        "ref": 0.034482758620689655,
+        "alert": false
+      },
+      "judge": {
+        "in_family": false,
+        "trusted": true,
+        "shifts": {
+          "median_answer_words": 0.093,
+          "source_named_share": 0.0013
+        }
+      },
+      "reported": {
+        "judge_supported_over_all_in_scope": 0.2778,
+        "outside_snapshot_answered": 0.0,
+        "false_premise_declined": 0.2,
+        "judge_core_supported": 0.8554,
+        "median_answer_words": 78.0,
+        "source_named_share": 0.9639
+      },
+      "alerts": []
+    },
+    {
+      "run_id": "docs-20261019-162038-dd2eba",
+      "reference_runs": [
+        "docs-20261019-161300-f4f40b",
+        "docs-20261019-162659-a169f2",
+        "docs-20261019-163359-1bb93d",
+        "docs-20261019-164105-82a046"
+      ],
+      "family_size": 6,
+      "metrics": [
+        {
+          "metric": "judge_supported",
+          "label": "answers the judge found not fully supported",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 84,
+          "n_ref": 347,
+          "day": 0.7261904761904762,
+          "ref": 0.7521613832853026,
+          "effect": -0.025970907094826412,
+          "p": null,
+          "detectable": null,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+        },
+        {
+          "metric": "uncited_answer",
+          "label": "answers with no citation",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 84,
+          "n_ref": 347,
+          "day": 0.0,
+          "ref": 0.0,
+          "effect": 0.0,
+          "p": 1.0,
+          "detectable": 0.0003934495047258414,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "in_scope_abstention",
+          "label": "lookups and comparisons declined",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 79,
+          "n_ref": 319,
+          "day": 0.05063291139240506,
+          "ref": 0.025078369905956112,
+          "effect": 0.02555454148644895,
+          "p": 0.198666968998237,
+          "detectable": 0.06358023360630453,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "error",
+          "label": "attempts that errored",
+          "kind": "rate",
+          "floor": 0.02,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 0.01,
+          "ref": 0.005,
+          "effect": 0.005,
+          "p": 0.48877031170775287,
+          "detectable": 0.02551564284542822,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "model_calls",
+          "label": "model calls per attempt",
+          "kind": "mean",
+          "floor": 0.5,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 4.78,
+          "ref": 4.8225,
+          "effect": -0.04249999999999954,
+          "p": 0.5845707714614269,
+          "detectable": 0.6577501958224431,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "latency",
+          "label": "latency of uncached attempts (log ms)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 9.155470923797754,
+          "ref": 9.192705776759142,
+          "effect": -0.0372348529613884,
+          "p": 0.7726113694315284,
+          "detectable": 0.16332778459531416,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "tokens",
+          "label": "tokens per answer (log)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 84,
+          "n_ref": 347,
+          "day": 9.94992759458215,
+          "ref": 10.026892212599956,
+          "effect": -0.07696461801780607,
+          "p": 0.8324583770811459,
+          "detectable": 0.2621768763942468,
+          "holm_rejected": false,
+          "status": "ok"
+        }
+      ],
+      "fabricated_citation": {
+        "n_day": 84,
+        "n_ref": 347,
+        "p": 0.9285834349673635,
+        "day": 0.011904761904761904,
+        "ref": 0.03170028818443804,
+        "alert": false
+      },
+      "judge": {
+        "in_family": false,
+        "trusted": true,
+        "shifts": {
+          "median_answer_words": 0.0465,
+          "source_named_share": 0.0327
+        }
+      },
+      "reported": {
+        "judge_supported_over_all_in_scope": 0.2556,
+        "outside_snapshot_answered": 0.0,
+        "false_premise_declined": 0.1,
+        "judge_core_supported": 0.9286,
+        "median_answer_words": 82.0,
+        "source_named_share": 0.9881
+      },
+      "alerts": []
+    },
+    {
+      "run_id": "docs-20261019-162659-a169f2",
+      "reference_runs": [
+        "docs-20261019-161300-f4f40b",
+        "docs-20261019-162038-dd2eba",
+        "docs-20261019-163359-1bb93d",
+        "docs-20261019-164105-82a046"
+      ],
+      "family_size": 6,
+      "metrics": [
+        {
+          "metric": "judge_supported",
+          "label": "answers the judge found not fully supported",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 87,
+          "n_ref": 344,
+          "day": 0.7701149425287356,
+          "ref": 0.7412790697674418,
+          "effect": 0.028835872761293735,
+          "p": null,
+          "detectable": null,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+        },
+        {
+          "metric": "uncited_answer",
+          "label": "answers with no citation",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 87,
+          "n_ref": 344,
+          "day": 0.0,
+          "ref": 0.0,
+          "effect": 0.0,
+          "p": 1.0,
+          "detectable": 0.0003882885068106201,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "in_scope_abstention",
+          "label": "lookups and comparisons declined",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 80,
+          "n_ref": 318,
+          "day": 0.025,
+          "ref": 0.031446540880503145,
+          "effect": -0.006446540880503143,
+          "p": 0.7323013778030704,
+          "detectable": 0.07062950885646903,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "error",
+          "label": "attempts that errored",
+          "kind": "rate",
+          "floor": 0.02,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 0.0,
+          "ref": 0.0075,
+          "effect": -0.0075,
+          "p": 1.0,
+          "detectable": 0.031210869038178775,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "model_calls",
+          "label": "model calls per attempt",
+          "kind": "mean",
+          "floor": 0.5,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 4.93,
+          "ref": 4.785,
+          "effect": 0.14499999999999957,
+          "p": 0.24913754312284386,
+          "detectable": 0.6737488504569633,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "latency",
+          "label": "latency of uncached attempts (log ms)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 9.26984635419152,
+          "ref": 9.164111919160701,
+          "effect": 0.10573443503081847,
+          "p": 0.016049197540122993,
+          "detectable": 0.1598083677444308,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "tokens",
+          "label": "tokens per answer (log)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 87,
+          "n_ref": 344,
+          "day": 10.087214460134257,
+          "ref": 9.992842609550594,
+          "effect": 0.09437185058366282,
+          "p": 0.11869406529673517,
+          "detectable": 0.25623564299808127,
+          "holm_rejected": false,
+          "status": "ok"
+        }
+      ],
+      "fabricated_citation": {
+        "n_day": 87,
+        "n_ref": 344,
+        "p": 0.20790454350975776,
+        "day": 0.04597701149425287,
+        "ref": 0.023255813953488372,
+        "alert": false
+      },
+      "judge": {
+        "in_family": false,
+        "trusted": true,
+        "shifts": {
+          "median_answer_words": 0.0116,
+          "source_named_share": 0.0034
+        }
+      },
+      "reported": {
+        "judge_supported_over_all_in_scope": 0.2222,
+        "outside_snapshot_answered": 0.0,
+        "false_premise_declined": 0.1,
+        "judge_core_supported": 0.9655,
+        "median_answer_words": 85.0,
+        "source_named_share": 0.9655
+      },
+      "alerts": []
+    },
+    {
+      "run_id": "docs-20261019-163359-1bb93d",
+      "reference_runs": [
+        "docs-20261019-161300-f4f40b",
+        "docs-20261019-162038-dd2eba",
+        "docs-20261019-162659-a169f2",
+        "docs-20261019-164105-82a046"
+      ],
+      "family_size": 6,
+      "metrics": [
+        {
+          "metric": "judge_supported",
+          "label": "answers the judge found not fully supported",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 89,
+          "n_ref": 342,
+          "day": 0.7415730337078652,
+          "ref": 0.7485380116959064,
+          "effect": -0.006964977988041188,
+          "p": null,
+          "detectable": null,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+        },
+        {
+          "metric": "uncited_answer",
+          "label": "answers with no citation",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 89,
+          "n_ref": 342,
+          "day": 0.0,
+          "ref": 0.0,
+          "effect": 0.0,
+          "p": 1.0,
+          "detectable": 0.00038502180620590925,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "in_scope_abstention",
+          "label": "lookups and comparisons declined",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 79,
+          "n_ref": 319,
+          "day": 0.0,
+          "ref": 0.03761755485893417,
+          "effect": -0.03761755485893417,
+          "p": 1.0,
+          "detectable": 0.07736717549592474,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "error",
+          "label": "attempts that errored",
+          "kind": "rate",
+          "floor": 0.02,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 0.01,
+          "ref": 0.005,
+          "effect": 0.005,
+          "p": 0.48877031170775287,
+          "detectable": 0.02551564284542822,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "model_calls",
+          "label": "model calls per attempt",
+          "kind": "mean",
+          "floor": 0.5,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 4.83,
+          "ref": 4.81,
+          "effect": 0.020000000000000462,
+          "p": 0.46342682865856705,
+          "detectable": 0.6693765717674778,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "latency",
+          "label": "latency of uncached attempts (log ms)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 9.234751563998548,
+          "ref": 9.172885616708944,
+          "effect": 0.06186594728960415,
+          "p": 0.10429478526073696,
+          "detectable": 0.1512166591588631,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "tokens",
+          "label": "tokens per answer (log)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 89,
+          "n_ref": 342,
+          "day": 10.04532031839961,
+          "ref": 10.003193004033683,
+          "effect": 0.04212731436592598,
+          "p": 0.29793510324483774,
+          "detectable": 0.24602062579644005,
+          "holm_rejected": false,
+          "status": "ok"
+        }
+      ],
+      "fabricated_citation": {
+        "n_day": 89,
+        "n_ref": 342,
+        "p": 0.22059746372442113,
+        "day": 0.0449438202247191,
+        "ref": 0.023391812865497075,
+        "alert": false
+      },
+      "judge": {
+        "in_family": false,
+        "trusted": true,
+        "shifts": {
+          "median_answer_words": 0.0964,
+          "source_named_share": 0.0102
+        }
+      },
+      "reported": {
+        "judge_supported_over_all_in_scope": 0.2556,
+        "outside_snapshot_answered": 0.0,
+        "false_premise_declined": 0.0,
+        "judge_core_supported": 0.9326,
+        "median_answer_words": 91.0,
+        "source_named_share": 0.9551
+      },
+      "alerts": []
+    },
+    {
+      "run_id": "docs-20261019-164105-82a046",
+      "reference_runs": [
+        "docs-20261019-161300-f4f40b",
+        "docs-20261019-162038-dd2eba",
+        "docs-20261019-162659-a169f2",
+        "docs-20261019-163359-1bb93d"
+      ],
+      "family_size": 6,
+      "metrics": [
+        {
+          "metric": "judge_supported",
+          "label": "answers the judge found not fully supported",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 88,
+          "n_ref": 343,
+          "day": 0.7954545454545454,
+          "ref": 0.7346938775510204,
+          "effect": 0.06076066790352497,
+          "p": null,
+          "detectable": null,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+        },
+        {
+          "metric": "uncited_answer",
+          "label": "answers with no citation",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 88,
+          "n_ref": 343,
+          "day": 0.0,
+          "ref": 0.0,
+          "effect": 0.0,
+          "p": 1.0,
+          "detectable": 0.0003866384021045341,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "in_scope_abstention",
+          "label": "lookups and comparisons declined",
+          "kind": "rate",
+          "floor": 0.05,
+          "n_day": 80,
+          "n_ref": 318,
+          "day": 0.0125,
+          "ref": 0.03459119496855346,
+          "effect": -0.022091194968553458,
+          "p": 0.935135377257729,
+          "detectable": 0.07395650142967616,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "error",
+          "label": "attempts that errored",
+          "kind": "rate",
+          "floor": 0.02,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 0.0,
+          "ref": 0.0075,
+          "effect": -0.0075,
+          "p": 1.0,
+          "detectable": 0.031210869038178775,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "model_calls",
+          "label": "model calls per attempt",
+          "kind": "mean",
+          "floor": 0.5,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 4.48,
+          "ref": 4.8975,
+          "effect": -0.41749999999999954,
+          "p": 0.9803509824508775,
+          "detectable": 0.677450344415192,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "latency",
+          "label": "latency of uncached attempts (log ms)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 100,
+          "n_ref": 400,
+          "day": 9.106875012434953,
+          "ref": 9.204854754599843,
+          "effect": -0.09797974216489003,
+          "p": 0.9787010649467527,
+          "detectable": 0.15734833458113603,
+          "holm_rejected": false,
+          "status": "ok"
+        },
+        {
+          "metric": "tokens",
+          "label": "tokens per answer (log)",
+          "kind": "mean",
+          "floor": 0.22314355131420976,
+          "n_day": 88,
+          "n_ref": 343,
+          "day": 9.918370182677295,
+          "ref": 10.03588612140374,
+          "effect": -0.11751593872644506,
+          "p": 0.9346532673366331,
+          "detectable": 0.25129152256238957,
+          "holm_rejected": false,
+          "status": "ok"
+        }
+      ],
+      "fabricated_citation": {
+        "n_day": 88,
+        "n_ref": 343,
+        "p": 0.4574271050422618,
+        "day": 0.03409090909090909,
+        "ref": 0.026239067055393587,
+        "alert": false
+      },
+      "judge": {
+        "in_family": false,
+        "trusted": true,
+        "shifts": {
+          "median_answer_words": 0.0176,
+          "source_named_share": 0.0255
+        }
+      },
+      "reported": {
+        "judge_supported_over_all_in_scope": 0.2,
+        "outside_snapshot_answered": 0.0,
+        "false_premise_declined": 0.1,
+        "judge_core_supported": 0.8864,
+        "median_answer_words": 86.5,
+        "source_named_share": 0.9432
+      },
+      "alerts": []
+    }
+  ]
+}

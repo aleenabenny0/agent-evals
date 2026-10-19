@@ -14,14 +14,15 @@ from __future__ import annotations
 
 import json
 import random
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
-from math import log
+from math import isfinite, log
 from pathlib import Path
 from statistics import fmean, median, pstdev
 from typing import Any, Literal
 
 from agent_evals.harness.manifest import file_sha256
+from agent_evals.online import ONLINE_JUDGE_VERSION
 from agent_evals.simulate import TrafficQuestion, load_traffic
 from agent_evals.stats.monitor import (
     detectable_mean_rise,
@@ -83,6 +84,11 @@ def _share(xs: Sequence[float]) -> float | None:
     return round(fmean(xs), 4) if xs else None
 
 
+def _positive(x: object) -> bool:
+    """A usable latency: a finite number above zero (None and NaN are not)."""
+    return isinstance(x, int | float) and isfinite(x) and x > 0
+
+
 def day_values(
     store: ResultsStore,
     run_id: str,
@@ -112,11 +118,11 @@ def day_values(
         failed = u["error"] is not None
         v["error"].append(float(failed))
         cache_hits += int(bool(u["cached_calls"]))
-        if not u["cached_calls"] and u["latency_ms"]:
+        if not u["cached_calls"] and _positive(u["latency_ms"]):
             v["latency"].append(log(float(u["latency_ms"])))
-        v["model_calls"].append(
-            trajectory.get(key, {}).get("model_calls", float(u["model_calls"] or 0))
-        )
+        calls = trajectory.get(key, {}).get("model_calls", float(u["model_calls"] or 0))
+        if isfinite(calls):
+            v["model_calls"].append(calls)
         judged = judge.get(key, {})
         if case.type != "unanswerable":  # abstained, uncited and errored count as unsupported
             in_scope_supported.append(float(judged.get("judge_supported") == 1.0))
@@ -153,8 +159,8 @@ def day_values(
                 else set()
             )
             named.append(int(q.source_url in urls))
-    reported: dict[str, float | None] = {
-        "judge_supported_over_all_in_scope": _share(in_scope_supported),
+    reported: dict[str, float | None] = {  # nothing judged is unknown, not 0 supported
+        "judge_supported_over_all_in_scope": _share(in_scope_supported) if judge else None,
         "outside_snapshot_answered": _share(outside_answered),
         "false_premise_declined": _share(premise_declined),
         "judge_core_supported": _share(core),
@@ -254,54 +260,148 @@ def check_day(
         "judge": {"in_family": judge_enabled, "trusted": trusted, "shifts": shifts},
         "reported": day.reported,
         "alerts": alerts,
+        # family metrics with no test today (no data, or latency refused): a quiet day with
+        # any of these is not a clear
+        "untested": [s.name for s in family if rows[s.name]["p"] is None],
     }
 
 
+def not_cleared(report: Mapping[str, Any]) -> list[str]:
+    """Why a day without an alert still does not clear: family metrics left untested, and a
+    judge in the family that is untrusted today. Empty means the day is clear."""
+    reasons = [
+        f"{row['metric']} ({row['status']})"
+        for row in report["metrics"]
+        if row["metric"] in report["untested"]
+    ]
+    if report["judge"]["in_family"] and not report["judge"]["trusted"]:
+        reasons.append("judge_supported (the judge is untrusted today)")
+    return reasons
+
+
 def leave_one_day_out(days: Sequence[DayValues], *, judge_enabled: bool) -> list[dict[str, Any]]:
-    """Each reference day against the other four, with the full rule. Any alert means the
-    reference is too noisy to judge later days by, and the demo stops."""
+    """Each reference day against the other four, with the full rule. Any alert, or a family
+    metric left untested, means the reference is too noisy (or too thin) to judge later days
+    by, and the demo stops."""
     return [
         check_day(d, [o for o in days if o is not d], judge_enabled=judge_enabled) for d in days
     ]
 
 
-def judge_enabled(path: Path = JUDGE_CHECK_PATH) -> bool:
-    """Whether the judge has passed Aleena's 30 blind labels (at most 2 false passes)."""
+def noisy_days(days: Mapping[int, str], checks: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """The leave-one-day-out reports that stop a freeze: day -> its alerts and untested metrics."""
+    out: dict[str, Any] = {}
+    for d, r in zip(sorted(days), checks, strict=True):
+        if r["alerts"] or r["untested"]:
+            out[str(d)] = {"alerts": r["alerts"], "untested": r["untested"]}
+    return out
+
+
+def judge_enabled(path: Path, reference_runs: Iterable[str]) -> bool:
+    """Whether judge_supported is in the alert family: the judge passed Aleena's 30 blind labels
+    (at most 2 false passes) on these reference runs, and the leave-one-day-out check with it in
+    the family raised no alert. A check made on another reference does not count."""
     if not path.exists():
         return False
-    return bool(json.loads(path.read_text(encoding="utf-8")).get("passed"))
+    result = json.loads(path.read_text(encoding="utf-8"))
+    same = sorted(result.get("reference_runs") or []) == sorted(reference_runs)
+    return bool(result.get("passed")) and same
 
 
-def champion_run(store: ResultsStore, day: int) -> str | None:
-    """The newest complete online run of the day made with the champion's config."""
-    found = None
+def day_runs(store: ResultsStore, day: int, *, champion_only: bool = False) -> list[str]:
+    """The day's complete online runs that are not shadows, oldest first."""
+    out = []
     for run in store.online_runs():
         role = run["manifest"].get("online") or {}
-        if role.get("day") == day and role.get("champion") and run["status"] == "complete":
-            found = run["run_id"]
-    return found
+        if role.get("day") != day or run["status"] != "complete" or role.get("shadow"):
+            continue
+        if not champion_only or role.get("champion"):
+            out.append(str(run["run_id"]))
+    return out
+
+
+def day_run(store: ResultsStore, day: int, *, champion_only: bool = False) -> str | None:
+    """The day's one complete online run that is not a shadow. With two or more, which one
+    counts is a decision to make, never a default, so it is refused."""
+    runs = day_runs(store, day, champion_only=champion_only)
+    if len(runs) > 1:
+        raise ValueError(f"day {day} has {len(runs)} complete online runs: {', '.join(runs)}")
+    return runs[0] if runs else None
+
+
+def _stored_path(raw: object) -> Path:
+    """A path recorded in a manifest, which may have been written on Windows."""
+    return Path(str(raw).replace("\\", "/"))
 
 
 def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
-    """An online run's values, refusing a run whose cases file changed since it ran."""
+    """An online run's values. Refused unless the run is complete, has attempts, was judged in
+    full by the pinned judge, and its cases and traffic files are the ones it ran: a gap would
+    otherwise read as a quiet day."""
     info = store.run_info(run_id)
     if not info["online"]:
         raise ValueError(f"{run_id} is not an online run")
-    suite = info["manifest"].get("suite", {})
-    path = Path(str(suite.get("path", "")))
-    if not path.is_file() or file_sha256(path) != suite.get("sha256"):
-        raise ValueError(f"{run_id}: its cases file {path} is missing or has changed since it ran")
-    day = (info["manifest"].get("online") or {}).get("day")
+    if info["status"] != "complete":
+        raise ValueError(f"{run_id} is {info['status']}, not complete")
+    role = info["manifest"].get("online") or {}
+    day = role.get("day")
     if day is None:
         raise ValueError(f"{run_id} records no day; run it with `evals online-run DAY`")
-    traffic = {q.id: q for q in load_traffic(traffic_dir / f"day-{int(day):02d}.jsonl")}
+    suite = info["manifest"].get("suite", {})
+    path = _stored_path(suite.get("path", ""))
+    if not path.is_file() or file_sha256(path) != suite.get("sha256"):
+        raise ValueError(f"{run_id}: its cases file {path} is missing or has changed since it ran")
+    traffic_path = traffic_dir / f"day-{int(day):02d}.jsonl"
+    if not traffic_path.is_file() or file_sha256(traffic_path) != role.get("traffic_sha256"):
+        raise ValueError(
+            f"{run_id}: its traffic file {traffic_path} is missing or not the one it ran"
+        )
+    version = (info["manifest"].get("judge") or {}).get("version")
+    if version != ONLINE_JUDGE_VERSION:
+        raise ValueError(
+            f"{run_id} is not judged by the pinned judge {ONLINE_JUDGE_VERSION}: "
+            f"uv run evals judge {run_id}"
+        )
+    judge = store.grades_for(run_id, "judge")
+    unjudged = [
+        a["case_id"]
+        for a in store.answered_attempts(run_id)
+        if isinstance(a["output"].get("citations"), list)
+        and any(isinstance(c, dict) for c in a["output"]["citations"])
+        and "judge_supported" not in judge.get((a["case_id"], a["attempt"]), {})
+    ]
+    if unjudged:
+        raise ValueError(
+            f"{run_id}: {len(unjudged)} cited answer(s) have no judge verdict (first "
+            f"{unjudged[0]}); judge them before checking the day"
+        )
+    traffic = {q.id: q for q in load_traffic(traffic_path)}
     cases = {c.id: c for c in load_suite(path)}
-    return day_values(store, run_id, cases, traffic)
+    values = day_values(store, run_id, cases, traffic)
+    if not values.values["error"]:
+        raise ValueError(f"{run_id} has no attempts")
+    return values
+
+
+def archive_reference_files(stamp: str) -> list[Path]:
+    """Move everything made against the current reference into results/online/archive/STAMP/,
+    so no alert or judge check made against the old reference is read against a new one."""
+    moved = []
+    check = REFERENCE_PATH.with_name("reference-check.json")
+    for path in (REFERENCE_PATH, check, ALERTS_PATH, JUDGE_SAMPLE_PATH, JUDGE_CHECK_PATH):
+        if path.exists():
+            dest = REFERENCE_PATH.parent / "archive" / stamp / path.name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            path.replace(dest)
+            moved.append(dest)
+    return moved
 
 
 def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str, list[str]]:
     """Six judged answers per reference day, drawn with a seed per day, as case ids per run.
-    Drawn once and saved before any label exists."""
+    Drawn once and saved before any label exists. Refused unless every reference day has six."""
+    if sorted(runs) != list(REFERENCE_DAYS):
+        raise ValueError(f"the judge check samples the reference days {list(REFERENCE_DAYS)}")
     out: dict[str, list[str]] = {}
     for day, run in sorted(runs.items()):
         judged = sorted(
@@ -309,8 +409,12 @@ def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str
             for (case, attempt), grades in store.grades_for(run, "judge").items()
             if attempt == 1 and "judge_supported" in grades
         )
+        if len(judged) < JUDGE_CHECK_PER_DAY:
+            raise ValueError(
+                f"{run} has {len(judged)} judged answers; the check needs {JUDGE_CHECK_PER_DAY}"
+            )
         rng = random.Random(f"judge-check-{day}")
-        out[run] = sorted(rng.sample(judged, min(JUDGE_CHECK_PER_DAY, len(judged))))
+        out[run] = sorted(rng.sample(judged, JUDGE_CHECK_PER_DAY))
     return out
 
 
@@ -318,32 +422,44 @@ def judge_check_score(
     store: ResultsStore, sample: Mapping[str, Sequence[str]], labeler: str
 ) -> dict[str, Any]:
     """The judge's false passes on the sample: it found an answer fully supported and the labeler
-    did not. The judge may then alert only if the labels are complete and false passes are at
-    most JUDGE_CHECK_MAX_FALSE_PASSES."""
+    did not. The labels pass only if all 30 are in and false passes are at most
+    JUDGE_CHECK_MAX_FALSE_PASSES. A sampled answer without a judge verdict is refused, not read
+    as a judge fail, which could never be a false pass."""
+    if len(sample) != len(REFERENCE_DAYS) or any(
+        len(cases) != JUDGE_CHECK_PER_DAY for cases in sample.values()
+    ):
+        raise ValueError(
+            f"the sample must hold {JUDGE_CHECK_PER_DAY} answers from each of the "
+            f"{len(REFERENCE_DAYS)} reference runs"
+        )
     rows: list[dict[str, Any]] = []
     for run, cases in sample.items():
         labels = {x["case_id"]: x for x in store.labels(run, labeler) if x["attempt"] == 1}
         judge = store.grades_for(run, "judge")
         for case in cases:
+            verdict = judge.get((case, 1), {}).get("judge_supported")
+            if verdict is None:
+                raise ValueError(f"{run} {case}: the sampled answer has no judge verdict")
             label = labels.get(case)
             rows.append(
                 {
                     "run": run,
                     "case": case,
-                    "judge_supported": judge.get((case, 1), {}).get("judge_supported") == 1.0,
+                    "judge_supported": verdict == 1.0,
                     "labeled_supported": None if label is None else label["supported"],
                 }
             )
     labeled = [r for r in rows if r["labeled_supported"] is not None]
     false_passes = [r for r in labeled if r["judge_supported"] and not r["labeled_supported"]]
-    complete = bool(rows) and len(labeled) == len(rows)
+    complete = len(labeled) == len(rows)
     return {
         "labeler": labeler,
+        "reference_runs": sorted(sample),
         "answers": len(rows),
         "labeled": len(labeled),
         "complete": complete,
         "false_passes": len(false_passes),
         "max_false_passes": JUDGE_CHECK_MAX_FALSE_PASSES,
-        "passed": complete and len(false_passes) <= JUDGE_CHECK_MAX_FALSE_PASSES,
+        "labels_passed": complete and len(false_passes) <= JUDGE_CHECK_MAX_FALSE_PASSES,
         "rows": rows,
     }

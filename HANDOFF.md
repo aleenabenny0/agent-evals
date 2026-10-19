@@ -473,6 +473,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   with v2.1. The optional realism read (`evals pilot-review 0 --quick`) was not taken. Next: the
   online runs of days 1 to 5 (`uv run evals online-run N`, about $0.70 each), then part 3, the
   monitor.
+  **2026-10-19, later:** days 1 to 5 ran online (agent $0.96 in all, judge about $0.45 a day)
+  and were frozen as the reference: no day alerted against the other four. Parts 3 and 4 built
+  (`evals monitor`, `evals judge-check`, `evals dashboard`); a code review's findings fixed
+  (plan, "Code review of parts 3 and 4"). Next: Aleena's 30 blind labels
+  (`uv run evals judge-check label`, then `uv run evals judge-check score`); then part 5, day 6
+  first. Ask Aleena before spending past $25 (about $8 spent on phase 7 so far).
 
 ## Target: the three project briefs
 

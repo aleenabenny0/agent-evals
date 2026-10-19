@@ -319,7 +319,7 @@ def test_online_run_refuses_a_wrong_judge_before_paying_for_the_agent(
 def test_online_run_writes_the_day_runs_once_judges_and_records_its_role(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    _traffic(tmp_path, monkeypatch)
+    traffic = _traffic(tmp_path, monkeypatch)
     calls: dict[str, Any] = {}
 
     def fake_run(**kwargs: Any) -> str:
@@ -341,7 +341,13 @@ def test_online_run_writes_the_day_runs_once_judges_and_records_its_role(
         role = store.run_info("r-1")["manifest"]["online"]
     finally:
         store.close()
-    assert role == {"day": 1, "config": str(config), "champion": False}
+    assert role == {
+        "day": 1,
+        "config": config.as_posix(),
+        "champion": False,
+        "shadow": False,
+        "traffic_sha256": file_sha256(traffic / "day-01.jsonl"),  # what the monitor checks
+    }
 
 
 def test_the_label_screen_shows_no_reference_for_an_online_case(

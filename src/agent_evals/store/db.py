@@ -79,9 +79,16 @@ def _now() -> datetime:
 
 
 class ResultsStore:
-    def __init__(self, path: Path) -> None:
-        path.parent.mkdir(parents=True, exist_ok=True)
+    def __init__(self, path: Path, *, read_only: bool = False) -> None:
+        """Open (or create) the results database. Read-only, a missing file is an error, never
+        a new empty database: readers like the monitor must not mistake one for no data."""
         self.path = path
+        if read_only:
+            if not path.is_file():
+                raise FileNotFoundError(f"no results database at {path}")
+            self.con = duckdb.connect(str(path), read_only=True)
+            return
+        path.parent.mkdir(parents=True, exist_ok=True)
         self.con = duckdb.connect(str(path))
         self.con.execute(SCHEMA)
 

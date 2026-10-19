@@ -26,7 +26,14 @@ DEFAULT_CONFIG = Path("configs/default.yaml")
 
 
 def _config(path: Path) -> Config:
-    return load_config(path if path.exists() else None)
+    """The config file, which must exist: falling back to defaults from the wrong folder would
+    quietly open (and create) another results database."""
+    if not path.is_file():
+        console.print(
+            f"[red]No config file at {path}. Run from the project folder, or pass -c.[/red]"
+        )
+        raise typer.Exit(code=2)
+    return load_config(path)
 
 
 def _require_unchanged_cases(info: dict[str, Any], suite_path: Path) -> None:
@@ -1500,56 +1507,89 @@ def monitor(
             "freeze them as the reference.",
         ),
     ] = False,
+    refreeze: Annotated[
+        bool,
+        typer.Option(
+            "--refreeze",
+            help="With --freeze: replace a frozen reference. What was checked against the old "
+            "one (alerts, the judge check) is moved to results/online/archive/.",
+        ),
+    ] = False,
     run_id: Annotated[
         str | None,
-        typer.Option("--run", help="An online run to check; default the day's champion."),
+        typer.Option("--run", help="The online run to check; needed when the day has several."),
     ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Is a day worse than the reference days (phase 7 part 3)? Reads stored runs only, so it is
-    free. Exits 1 on an alert, or when the reference is too noisy to freeze."""
+    free. Exits 0 when the day is clear, 1 on an alert (or a reference too noisy to freeze), 3
+    when there is no alert but the day is not cleared (a family metric untested, or the judge
+    untrusted), and 2 when the day cannot be checked."""
     from datetime import UTC, datetime
 
     from agent_evals import monitor as mon
     from agent_evals.store.db import ResultsStore
 
     cfg = _config(config)
-    enabled = mon.judge_enabled(mon.JUDGE_CHECK_PATH)
-    store = ResultsStore(cfg.paths.db)
+    now = datetime.now(UTC).isoformat(timespec="seconds")
+    try:
+        store = ResultsStore(cfg.paths.db, read_only=True)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from None
     try:
         if freeze:
-            runs = {d: mon.champion_run(store, d) for d in mon.REFERENCE_DAYS}
-            if missing := [d for d, r in runs.items() if r is None]:
+            if mon.REFERENCE_PATH.exists() and not refreeze:
+                console.print(
+                    f"[red]The reference is already frozen ({mon.REFERENCE_PATH}). Pass "
+                    "--refreeze to replace it.[/red]"
+                )
+                raise typer.Exit(code=2)
+            try:
+                found = {d: mon.day_run(store, d, champion_only=True) for d in mon.REFERENCE_DAYS}
+            except ValueError as exc:
+                console.print(f"[red]{exc}. Which run counts is a decision: not frozen.[/red]")
+                raise typer.Exit(code=2) from None
+            if missing := [d for d, r in found.items() if r is None]:
                 console.print(
                     f"[red]No complete champion online run for day(s) {missing}: run "
                     "`uv run evals online-run N` first.[/red]"
                 )
                 raise typer.Exit(code=2)
-            days = [mon.load_day(store, str(runs[d]), TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
-            checks = mon.leave_one_day_out(days, judge_enabled=enabled)
+            runs = {d: str(r) for d, r in found.items()}
+            try:
+                days = [mon.load_day(store, runs[d], TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
+            except ValueError as exc:
+                console.print(f"[red]{exc}[/red]")
+                raise typer.Exit(code=2) from None
+            # The judge is never in the family here: it joins through `judge-check score`, which
+            # reruns this check with judge_supported in the family.
+            checks = mon.leave_one_day_out(days, judge_enabled=False)
             for d, report in zip(mon.REFERENCE_DAYS, checks, strict=True):
                 _print_monitor(report, f"day {d} against the other reference days")
             record = {
-                "checked_at": datetime.now(UTC).isoformat(timespec="seconds"),
+                "checked_at": now,
                 "days": {str(d): runs[d] for d in mon.REFERENCE_DAYS},
-                "judge_in_family": enabled,
+                "judge_in_family": False,
                 "leave_one_day_out": checks,
             }
-            if noisy := {
-                str(d): r["alerts"]
-                for d, r in zip(mon.REFERENCE_DAYS, checks, strict=True)
-                if r["alerts"]
-            }:
+            if noisy := mon.noisy_days(runs, checks):
                 path = mon.REFERENCE_PATH.with_name("reference-check.json")
                 path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+                path.write_text(json.dumps(record, indent=2, allow_nan=False) + "\n", "utf-8")
                 console.print(
                     f"[red]The reference is too noisy: {noisy}. By the plan the demo stops here; "
                     f"details in {path}.[/red]"
                 )
                 raise typer.Exit(code=1)
+            if refreeze:
+                stamp = now.replace(":", "").replace("+0000", "Z")
+                for moved in mon.archive_reference_files(stamp):
+                    console.print(f"archived {moved}")
             mon.REFERENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
-            mon.REFERENCE_PATH.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+            mon.REFERENCE_PATH.write_text(
+                json.dumps(record, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+            )
             console.print(
                 f"[green]No reference day alerts against the others: days 1 to 5 frozen as the "
                 f"reference ({mon.REFERENCE_PATH}).[/green]"
@@ -1558,6 +1598,12 @@ def monitor(
         if day is None:
             console.print("[red]Give a day to check, or --freeze to set up the reference.[/red]")
             raise typer.Exit(code=2)
+        if day in mon.REFERENCE_DAYS:
+            console.print(
+                f"[red]Day {day} is a reference day: `--freeze` checks days 1 to 5 against "
+                "each other.[/red]"
+            )
+            raise typer.Exit(code=2)
         if not mon.REFERENCE_PATH.exists():
             console.print(
                 "[red]No frozen reference yet: run `uv run evals monitor --freeze`.[/red]"
@@ -1565,30 +1611,59 @@ def monitor(
             raise typer.Exit(code=2)
         reference = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
         ref_runs = [str(r) for r in reference["days"].values()]
-        target = run_id or mon.champion_run(store, day)
+        if run_id is not None:
+            try:
+                role = store.run_info(run_id)["manifest"].get("online") or {}
+            except KeyError as exc:
+                console.print(f"[red]{exc.args[0]}[/red]")
+                raise typer.Exit(code=2) from None
+            if role.get("day") != day:
+                console.print(f"[red]{run_id} is a run of day {role.get('day')}, not {day}.[/red]")
+                raise typer.Exit(code=2)
+            if role.get("shadow"):
+                console.print(
+                    f"[red]{run_id} is a shadow run: the monitor checks the run that served "
+                    "the day.[/red]"
+                )
+                raise typer.Exit(code=2)
+            target: str | None = run_id
+        else:
+            try:
+                target = mon.day_run(store, day)
+            except ValueError as exc:
+                console.print(f"[red]{exc}: pass --run to choose.[/red]")
+                raise typer.Exit(code=2) from None
         if target is None:
-            console.print(f"[red]No complete champion online run for day {day}.[/red]")
+            console.print(f"[red]No complete online run for day {day}.[/red]")
             raise typer.Exit(code=2)
-        if target in ref_runs:
-            console.print(f"[red]{target} is a reference run; --freeze checks those.[/red]")
-            raise typer.Exit(code=2)
-        report = mon.check_day(
-            mon.load_day(store, target, TRAFFIC_DIR),
-            [mon.load_day(store, r, TRAFFIC_DIR) for r in ref_runs],
-            judge_enabled=enabled,
-        )
+        try:
+            report = mon.check_day(
+                mon.load_day(store, target, TRAFFIC_DIR),
+                [mon.load_day(store, r, TRAFFIC_DIR) for r in ref_runs],
+                judge_enabled=mon.judge_enabled(mon.JUDGE_CHECK_PATH, ref_runs),
+            )
+        except ValueError as exc:
+            console.print(f"[red]{exc}[/red]")
+            raise typer.Exit(code=2) from None
     finally:
         store.close()
     _print_monitor(report, f"day {day} ({target}) against the reference days")
     alerts = (
         json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
     )
-    alerts[str(day)] = {"checked_at": datetime.now(UTC).isoformat(timespec="seconds"), **report}
+    alerts[str(day)] = {"checked_at": now, **report}
     mon.ALERTS_PATH.parent.mkdir(parents=True, exist_ok=True)
-    mon.ALERTS_PATH.write_text(json.dumps(alerts, indent=2) + "\n", encoding="utf-8")
+    mon.ALERTS_PATH.write_text(
+        json.dumps(alerts, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+    )
     if report["alerts"]:
         console.print(f"[red]ALERT on day {day}: {', '.join(report['alerts'])}[/red]")
         raise typer.Exit(code=1)
+    if reasons := mon.not_cleared(report):
+        console.print(
+            f"[yellow]Day {day}: no alert, but not cleared: {'; '.join(reasons)}.[/yellow]"
+        )
+        raise typer.Exit(code=3)
     console.print(f"[green]Day {day}: no alert.[/green]")
 
 
@@ -1610,19 +1685,37 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
     checked = (
         json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
     )
-    store = ResultsStore(cfg.paths.db)
+    try:
+        store = ResultsStore(cfg.paths.db, read_only=True)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from None
     points: list[dash.DayPoint] = []
     try:
         if reference is not None:
             ref_runs = {int(d): str(r) for d, r in reference["days"].items()}
-        else:  # not frozen yet: show whichever reference days have run
-            found = {d: mon.champion_run(store, d) for d in mon.REFERENCE_DAYS}
-            ref_runs = {d: r for d, r in found.items() if r is not None}
+        else:  # not frozen yet: show whichever reference days have a checkable run
+            ref_runs = {}
+            for d in mon.REFERENCE_DAYS:
+                try:
+                    found = mon.day_run(store, d, champion_only=True)
+                    if found is not None:
+                        mon.load_day(store, found, TRAFFIC_DIR)
+                        ref_runs[d] = found
+                except ValueError as exc:
+                    console.print(f"[yellow]day {d} left out: {exc}[/yellow]")
         days = [(d, r, True, None) for d, r in sorted(ref_runs.items())]
-        days += [
-            (int(d), str(rep["run_id"]), False, rep)
-            for d, rep in sorted(checked.items(), key=lambda kv: int(kv[0]))
-        ]
+        for key, rep in sorted(checked.items(), key=lambda kv: int(kv[0])):
+            run = str(rep["run_id"])
+            if sorted(rep.get("reference_runs") or []) != sorted(ref_runs.values()):
+                console.print(
+                    f"[yellow]day {key} left out: checked against another reference[/yellow]"
+                )
+                continue
+            if (store.run_info(run)["manifest"].get("online") or {}).get("day") != int(key):
+                console.print(f"[yellow]day {key} left out: {run} is a run of another day[/yellow]")
+                continue
+            days.append((int(key), run, False, rep))
         for d, run, is_ref, report in days:
             traffic = {q.id: q for q in load_traffic(TRAFFIC_DIR / f"day-{d:02d}.jsonl")}
             points.append(
@@ -1635,9 +1728,13 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
                     worst=dash.least_supported(store, run, traffic),
                 )
             )
+    except (KeyError, ValueError) as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from None
     finally:
         store.close()
-    html = dash.render(points, reference, mon.judge_enabled(mon.JUDGE_CHECK_PATH))
+    judge_in = reference is not None and mon.judge_enabled(mon.JUDGE_CHECK_PATH, ref_runs.values())
+    html = dash.render(points, reference, judge_in)
     dash.DASHBOARD_PATH.parent.mkdir(parents=True, exist_ok=True)
     dash.DASHBOARD_PATH.write_text(html, encoding="utf-8")
     console.print(f"wrote {dash.DASHBOARD_PATH} ({len(points)} days)")
@@ -1655,12 +1752,17 @@ def judge_check(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """May judge_supported alert (phase 7 part 3)? Aleena labels 30 judged answers from the
-    reference days, blind; the judge may pass at most 2 of the ones she fails. `label` can be
-    stopped with q and run again to continue; `score` records the result for the monitor."""
+    reference days, blind; the judge may pass at most 2 of the ones she fails. If it does, the
+    leave-one-day-out check runs again with judge_supported in the family and must stay quiet.
+    `label` can be stopped with q and run again to continue; `score` records the result for the
+    monitor."""
     from agent_evals import monitor as mon
     from agent_evals.store.db import ResultsStore
 
     cfg = _config(config)
+    if action not in ("label", "score"):
+        console.print("[red]The action is label or score.[/red]")
+        raise typer.Exit(code=2)
     if not mon.REFERENCE_PATH.exists():
         console.print("[red]Freeze the reference first: uv run evals monitor --freeze[/red]")
         raise typer.Exit(code=2)
@@ -1668,16 +1770,42 @@ def judge_check(
         int(d): str(r)
         for d, r in json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))["days"].items()
     }
-    if mon.JUDGE_SAMPLE_PATH.exists():
-        sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
-    else:  # drawn once, before any label exists
-        store = ResultsStore(cfg.paths.db)
-        try:
-            sample = mon.judge_check_sample(store, runs)
-        finally:
-            store.close()
-        mon.JUDGE_SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
-        mon.JUDGE_SAMPLE_PATH.write_text(json.dumps(sample, indent=2) + "\n", encoding="utf-8")
+    try:
+        store = ResultsStore(cfg.paths.db, read_only=True)
+    except FileNotFoundError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from None
+    try:
+        if mon.JUDGE_SAMPLE_PATH.exists():
+            sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+            if sorted(sample) != sorted(runs.values()):
+                console.print(
+                    f"[red]{mon.JUDGE_SAMPLE_PATH} was drawn from another reference. A refreeze "
+                    "(`uv run evals monitor --freeze --refreeze`) archives it.[/red]"
+                )
+                raise typer.Exit(code=2)
+        else:  # drawn once, before any label exists
+            try:
+                sample = mon.judge_check_sample(store, runs)
+            except ValueError as exc:
+                console.print(f"[red]{exc}[/red]")
+                raise typer.Exit(code=2) from None
+            mon.JUDGE_SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            mon.JUDGE_SAMPLE_PATH.write_text(json.dumps(sample, indent=2) + "\n", encoding="utf-8")
+        if action == "score":
+            try:
+                result = mon.judge_check_score(store, sample, labeler)
+                days = (
+                    [mon.load_day(store, runs[d], TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
+                    if result["labels_passed"]
+                    else []
+                )
+            except ValueError as exc:
+                console.print(f"[red]{exc}[/red]")
+                raise typer.Exit(code=2) from None
+    finally:
+        store.close()
+    total = sum(len(cases) for cases in sample.values())
     if action == "label":
         for n, (run, cases) in enumerate(sample.items(), 1):
             console.print(f"[bold]Reference day {n} of {len(sample)}[/bold] ({run})")
@@ -1693,7 +1821,7 @@ def judge_check(
                 fresh=False,
                 config=config,
             )
-            store = ResultsStore(cfg.paths.db)
+            store = ResultsStore(cfg.paths.db, read_only=True)
             try:
                 done = {x["case_id"] for x in store.labels(run, labeler)}
             finally:
@@ -1701,32 +1829,50 @@ def judge_check(
             if not set(cases) <= done:  # stopped with q: stop here, resume next time
                 console.print("Stopped. Run the same command to continue where you left off.")
                 return
-        console.print("[green]All 30 labeled. Next: uv run evals judge-check score[/green]")
+        console.print(f"[green]All {total} labeled. Next: uv run evals judge-check score[/green]")
         return
-    if action != "score":
-        console.print("[red]The action is label or score.[/red]")
-        raise typer.Exit(code=2)
-    store = ResultsStore(cfg.paths.db)
-    try:
-        result = mon.judge_check_score(store, sample, labeler)
-    finally:
-        store.close()
     if not result["complete"]:
         console.print(
             f"[yellow]{result['labeled']} of {result['answers']} labeled; finish with "
             "uv run evals judge-check label[/yellow]"
         )
         raise typer.Exit(code=1)
-    mon.JUDGE_CHECK_PATH.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
-    verdict = (
-        "passes: judge_supported may now alert"
-        if result["passed"]
-        else "fails: judge_supported stays out of the alert family"
+    noisy: dict[str, Any] = {}
+    if result["labels_passed"]:  # the noise check again, now with judge_supported in the family
+        checks = mon.leave_one_day_out(days, judge_enabled=True)
+        noisy = mon.noisy_days(runs, checks)
+        result["leave_one_day_out"] = [
+            {
+                "run_id": c["run_id"],
+                "alerts": c["alerts"],
+                "untested": c["untested"],
+                "judge_supported": next(
+                    m for m in c["metrics"] if m["metric"] == "judge_supported"
+                ),
+            }
+            for c in checks
+        ]
+    result["noisy"] = noisy
+    result["passed"] = result["labels_passed"] and not noisy
+    mon.JUDGE_CHECK_PATH.write_text(
+        json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )
-    console.print(
+    counted = (
         f"The judge passed {result['false_passes']} answer(s) you failed, of {result['answers']} "
-        f"(at most {result['max_false_passes']} allowed): it {verdict}."
+        f"(at most {result['max_false_passes']} allowed)"
     )
+    if not result["labels_passed"]:
+        console.print(f"{counted}: it fails, so judge_supported stays out of the alert family.")
+    elif noisy:
+        console.print(
+            f"{counted}: the labels pass. But with judge_supported in the family the reference "
+            f"is too noisy ({noisy}), so judge_supported stays out of the alert family."
+        )
+    else:
+        console.print(
+            f"{counted}: it passes, and the reference stays quiet with judge_supported in the "
+            "family: judge_supported may now alert."
+        )
 
 
 @app.command("online-run")
@@ -1736,14 +1882,24 @@ def online_run(
         bool,
         typer.Option("--judge/--no-judge", help="Judge the answers with the pinned judge."),
     ] = True,
+    shadow: Annotated[
+        bool,
+        typer.Option(
+            "--shadow",
+            help="A shadow run: the champion on the questions of a day another config serves "
+            "(part 5). It is compared with the served run; the monitor never checks it.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Run the docs agent on one simulated day, grade what needs no reference answer, and judge it
     with the pinned judge (phase 7 part 2). Costs money. The run is never the latest run. Any
-    config may run (part 5's fault and shadow days need others); the run records which, and
-    whether it was the champion's (configs/default.yaml)."""
+    config may run (part 5's fault and shadow days need others); the run records which, whether
+    it was the champion's (configs/default.yaml), whether it is a shadow, and the hash of the
+    traffic file it ran."""
     from agent_evals.graders.judge import JudgeGrader
     from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.harness.manifest import file_sha256
     from agent_evals.online import (
         ONLINE_CASES_DIR,
         ONLINE_JUDGE_VERSION,
@@ -1770,6 +1926,7 @@ def online_run(
             f"first: uv run evals simulate {day}"
         )
         raise typer.Exit(code=2)
+    traffic_sha256 = file_sha256(traffic_path)
     cases_path = ONLINE_CASES_DIR / f"{online_suite_name(day)}.jsonl"
     write_suite(cases_path, [online_case(q) for q in load_traffic(traffic_path)])
     run_id = run(
@@ -1778,7 +1935,13 @@ def online_run(
     store = ResultsStore(cfg.paths.db)
     try:
         champion = config.resolve() == DEFAULT_CONFIG.resolve()
-        role = {"day": day, "config": str(config), "champion": champion}
+        role = {
+            "day": day,
+            "config": config.as_posix(),
+            "champion": champion,
+            "shadow": shadow,
+            "traffic_sha256": traffic_sha256,
+        }
         store.annotate_run(run_id, "online", role)
     finally:
         store.close()

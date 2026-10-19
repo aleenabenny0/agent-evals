@@ -91,7 +91,28 @@ run records its day, its config and whether that was the champion's.
 - **Kept apart.** Online runs never become `latest_run_id`, so `evals report` keeps showing suite
   runs.
 
-## 3. Monitor and alert (`evals monitor`), to agree first
+## 3. Monitor and alert (`evals monitor`, approved by Aleena 2026-10-19)
+
+**Built** (commit 96284ab, then the review's fixes; see "Code review of parts 3 and 4"):
+`evals monitor --freeze` runs the leave-one-day-out check on days 1 to 5 and, if no day alerts
+against the other four, freezes them in `results/online/reference.json`. A frozen reference is
+replaced only with `--refreeze`, which moves everything checked against the old one to
+`results/online/archive/`. `evals monitor DAY` checks a later day and records it in
+`results/online/alerts.json`. It exits 0 when the day is clear and 1 on an alert. It exits 3 when
+nothing alerts but the day is not cleared, because a family metric went untested or the judge is
+in the family and untrusted that day. It exits 2 when the day cannot be checked: its run is not
+complete, is not judged in full by the pinned judge, or its cases or traffic file has changed
+since it ran. Each reference day must have exactly one complete champion run; which of two runs
+counts is a decision, never a default. `evals judge-check label` walks Aleena through the 30
+blind labels (6 per reference day, drawn with a seed per day). `evals judge-check score` counts
+the judge's false passes. If the labels pass, it reruns the leave-one-day-out check with
+judge_supported in the family, and judge_supported may alert only if that stays quiet too.
+
+**Reference frozen 2026-10-19** on the real runs of days 1 to 5, before any later day ran. No
+reference day alerted against the other four, with the 6-metric family (judge_supported waits
+for the labels). The closest calls stayed under their floors: day 3's latency was +11% with p
+0.016, against a 25% floor, and day 1's in-scope declines were +4.0 points with p 0.071, against
+a 5-point floor. All five runs were complete, with every cited answer judged by `2cf75fa03e09`.
 
 - **Reference.** Days 1 to 5, frozen. Before any later day is judged, a leave-one-day-out check
   runs: each reference day is tested against the other four with the full rule. It must raise no
@@ -126,7 +147,18 @@ run records its day, its config and whether that was the champion's.
   the day's n against the reference n.
 - **Output.** A table, `results/online/alerts.json`, and a non-zero exit code on an alert.
 
-## 4. Dashboard (`evals dashboard`)
+## 4. Dashboard (`evals dashboard`, static HTML chosen by Aleena 2026-10-19)
+
+**Built:** `evals dashboard` writes `docs/dashboard/index.html`: one page with no scripts and no
+outside requests, rebuilt from the stored runs and the monitor's files. It has one small chart
+per alert metric plus fabricated citations. Each chart shows every day's value with its 95%
+interval and n over a band for the pooled reference days, in `src/agent_evals/chart.py`'s colours
+and font. Below the charts are the alert banner, the checked-days table with the judge-trust
+flag, and each day's five least-supported answers with the judge's reasons. Latency and tokens
+are drawn as geometric means in seconds and tokens. Rates start at zero; the other axes are
+labelled at the bottom. It was checked by screenshot at desktop width and at 390 px. A day
+checked against another reference, or recorded under another day's number, is left out with a
+warning.
 
 - **Recommended:** a static HTML page built into `docs/dashboard/index.html`, which can be
   published with GitHub Pages. It shows the alert family per day with 95% intervals and graded n,
@@ -155,9 +187,13 @@ run records its day, its config and whether that was the champion's.
 - **Money**, recomputed 2026-10-19. The first figure, "about $25 in all", did not match its
   own unit costs, which came to about $34. Measured since: the generator and its checker cost
   $0.62 to $0.64 per 100 questions (days 0 and 1, from the recorded tokens at the published
-  prices). Estimated until day 1's online run measures them: the agent about $0.20 and the
-  judge about $0.50 per 100 questions, with prompt caching, and with one judge call per answer
-  online, since the responsive check is skipped. So about $1.35 per 100 questions. Day sizes,
+  prices). Measured on the online runs of days 1 to 5: the agent cost $0.18 to $0.20 per 100
+  questions ($0.96 for the five days, with 71% to 73% of its input read from the prompt cache).
+  The judge cost $0.45 for day 1's 83 answers, at one call per answer online since the
+  responsive check is skipped; days 2 to 5 judged 84 to 89 answers each, so about the same. So
+  about $1.30 per 100 questions, against the $1.35 estimated before. Spent on phase 7 so far:
+  about $8 (day 0 generated twice, about $1.50; days 1 to 5 generated, about $3.15; their online
+  runs, about $3.30), plus a few one-off checks. Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
@@ -314,4 +350,28 @@ Generator v2.1 changes only retries and the outside services' assignment: a look
 is still kept only when the checker finds its section answers every part of it. Day 0, the pilot
 day, stays the v2 day it was checked on (its meta records v2); days 1 to 5, the reference, are
 v2.1.
+
+## Code review of parts 3 and 4 (2026-10-19)
+
+Two isolated reviewers read the monitor, the judge check and the dashboard at commit 96284ab, one
+for the code and one for the statistics. Each worked on its own copy of the results database and
+reproduced every finding there. The code review's ten findings:
+
+| Finding | Done |
+|---|---|
+| A run with no judge grades, or no attempts, read as "no alert" (exit 0); an unjudged reference day could be frozen | Refused: a run must be complete, have attempts, and have every cited answer judged by `2cf75fa03e09`. A family metric with no test leaves the day not cleared (exit 3) |
+| The judge check read a lost judge grade as a judge fail, which can never be a false pass, and passed on fewer than 30 answers | Refused: every sampled answer needs a verdict, and the sample must be 6 from each of the 5 days |
+| `--freeze` silently replaced the frozen reference, and alerts and the judge check made against the old one stayed in use | Refused without `--refreeze`, which archives them. The judge counts only for the reference it was checked on, and the dashboard leaves out days checked against another |
+| A reference day could be checked as a new day, and `--run` could name another day's run | Both refused; the dashboard takes the day from the run |
+| On days 7 and 8 the default run would be the champion's shadow, not the deployed run | Runs record whether they are shadows (`online-run --shadow`). The default is the day's one complete served run, and with two, `--run` is required |
+| The traffic file was never hash-checked, so a regenerated day changed the trust flags and the dashboard's questions | Recorded with each run and checked. Days 1 to 5 were backfilled: each file matches the hash written when it was generated, and predates its run |
+| From the wrong folder, the commands opened a new, empty database and exited 0 | A config file must exist. The monitor and dashboard open the database read-only, so a missing one is an error |
+| The leave-one-day-out check never ran with judge_supported in the family | `judge-check score` reruns it with the judge in, once the labels pass. The judge joins only if it stays quiet |
+| A NaN latency was Holm-rejected yet showed "ok", and alerts.json got NaN | Latencies that are not finite and positive are skipped; the JSON files refuse NaN |
+| The published detectable rise was about 0 when the reference rate is 0 | In `stats/`, so put to Aleena first (below) |
+
+The frozen reference stands. On the real data, with the fixed code, all five runs pass the new
+checks and each is its day's only complete champion run. With judge_supported in the family the
+leave-one-day-out check is quiet too: the closest call is day 5's judge_supported, +6.1 points
+with p 0.15. The judge still joins the family only through `judge-check score`, after the labels.
 

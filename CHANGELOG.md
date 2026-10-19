@@ -170,6 +170,19 @@ Format:
 
 ## Unreleased
 
+- 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved by Aleena (plan,
+  parts 3 and 4). `evals monitor --freeze` checks days 1 to 5 against each other, leaving one
+  day out at a time, and freezes them as the reference. `evals monitor DAY` tests a later day
+  against them: one-sided Fisher and permutation tests, Holm-corrected, each with a practical
+  floor. Fabricated citations get their own rule at p < 0.01. It exits 1 on an alert and 3 when
+  a quiet day is still not cleared. `evals judge-check label` and `score` let judge_supported
+  alert only after Aleena's 30 blind labels pass (at most 2 false passes) and the reference
+  stays quiet with it. `evals dashboard` writes the static page `docs/dashboard/index.html`.
+  The real days 1 to 5 were frozen as the reference; no day alerted against the other four
+  (plan, part 3). A code review found ten problems, nine fixed and one, in `stats/`, put to
+  Aleena first (plan, "Code review of parts 3 and 4"). Most important: an unjudged or empty run
+  no longer reads as a quiet day, the frozen reference cannot be replaced by accident, and each
+  run records the hash of the traffic it ran.
 - 2026-10-19: prompt caching on every API call, at Aleena's request. The client asks for the
   API's prompt cache only as it sends a call: a breakpoint on the system prompt (the tools come
   before it), shared by every call of a run, and for a conversation of more than one message

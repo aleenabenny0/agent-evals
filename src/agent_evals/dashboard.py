@@ -26,6 +26,14 @@ from agent_evals.store.db import ResultsStore
 DASHBOARD_PATH = Path("docs/dashboard/index.html")
 REFERENCE_COLOR, CHECKED_COLOR, ALERT_COLOR, BAND = "#0969da", INK, "#cf222e", "#ddf4ff"
 EXTRA = Spec("fabricated_citation", "rate", 0.0, "cited answers with a fabricated citation")
+SHOWN_LABELS = {  # the monitor's labels say "log"; the charts show these in their own units
+    "latency": "latency of uncached attempts (geometric mean)",
+    "tokens": "tokens per answer (geometric mean)",
+}
+
+
+def _label(spec: Spec) -> str:
+    return SHOWN_LABELS.get(spec.name, spec.label)
 
 
 @dataclass
@@ -93,12 +101,13 @@ def metric_chart(spec: Spec, points: Sequence[DayPoint]) -> str:
         f'<line x1="{left}" y1="{y(y_min):.1f}" x2="{width - right}" '
         f'y2="{y(y_min):.1f}" stroke="{GRID}"/>'
     ]
-    for frac in (0.5, 1.0):
+    for frac in (0.0, 0.5, 1.0):  # the bottom is labelled too: only rates start at zero
         v = y_min + frac * (y_max - y_min)
-        parts.append(
-            f'<line x1="{left}" y1="{y(v):.1f}" x2="{width - right}" y2="{y(v):.1f}" '
-            f'stroke="{GRID}" stroke-dasharray="2 3"/>'
-        )
+        if frac:
+            parts.append(
+                f'<line x1="{left}" y1="{y(v):.1f}" x2="{width - right}" y2="{y(v):.1f}" '
+                f'stroke="{GRID}" stroke-dasharray="2 3"/>'
+            )
         parts.append(
             f'<text x="{left - 6}" y="{y(v) + 4:.1f}" text-anchor="end" font-size="11" '
             f'fill="{MUTED}">{escape(_fmt(spec, v))}</text>'
@@ -135,7 +144,7 @@ def metric_chart(spec: Spec, points: Sequence[DayPoint]) -> str:
         )
     body = "".join(parts)
     return (
-        f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="{escape(spec.label)}" '
+        f'<svg viewBox="0 0 {width} {height}" role="img" aria-label="{escape(_label(spec))}" '
         f'font-family="{FONT}" xmlns="http://www.w3.org/2000/svg">{body}</svg>'
     )
 
@@ -182,7 +191,8 @@ p.lede { color: var(--muted); margin: 0 0 16px; }
 .banner { border: 1px solid var(--line); border-radius: 8px; padding: 12px 16px;
   background: var(--soft); }
 .banner strong.alert { color: var(--alert); } .banner strong.ok { color: var(--ok); }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 16px; }
 figure { margin: 0; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
 figcaption { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
 figcaption span { font-weight: 400; color: var(--muted); }
@@ -191,7 +201,8 @@ th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line
   vertical-align: top; }
 .scroll { overflow-x: auto; }
 td.alert { color: var(--alert); font-weight: 600; } .muted { color: var(--muted); }
-details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0; }
+details { border: 1px solid var(--line); border-radius: 8px; padding: 8px 12px; margin: 8px 0;
+  overflow-wrap: break-word; }
 summary { cursor: pointer; font-weight: 600; }
 blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--line);
   color: var(--muted); }
@@ -218,13 +229,14 @@ def render(
         status = '<strong class="ok">No alert</strong> on any checked day.'
     frozen = (
         f"Reference: days {', '.join(reference['days'])}, frozen "
-        f"{escape(reference.get('checked_at', ''))}; "
+        f"{reference.get('checked_at', '')}; "
         "the leave-one-day-out check raised no alert."
         if reference
         else ""
     )
     judge = (
-        "judge_supported is in the alert family (the judge passed the 30 blind labels)."
+        "judge_supported is in the alert family: the judge passed the 30 blind labels, and the "
+        "reference stayed quiet with it in the family."
         if judge_in_family
         else "judge_supported is shown but cannot alert until the judge passes Aleena's 30 "
         "blind labels."
@@ -234,7 +246,7 @@ def render(
         floor = "" if spec.name == EXTRA.name else f"alert floor {_floor(spec)}; "
         rule = "own rule, p &lt; 0.01" if spec.name == EXTRA.name else "Holm-corrected family"
         figures.append(
-            f"<figure><figcaption>{escape(spec.label)} <span>({floor}{rule}; up is worse)</span>"
+            f"<figure><figcaption>{escape(_label(spec))} <span>({floor}{rule}; up is worse)</span>"
             f"</figcaption>{metric_chart(spec, points)}</figure>"
         )
     rows = []
@@ -277,8 +289,8 @@ def render(
 <title>Docs agent monitor</title><style>{CSS}</style></head>
 <body><main>
 <h1>Docs agent: online monitor</h1>
-<p class="lede">Simulated traffic, 100 questions a day, graded only by checks that need no
-answer key. Each dot is a day with its 95% interval and graded n. Rebuilt by
+<p class="lede">Simulated traffic, graded only by checks that need no answer key. Each dot is a
+day with its 95% interval and n, the number of answers that metric graded. Rebuilt by
 <code>evals dashboard</code>.</p>
 <div class="banner"><p>{status}</p><p class="muted">{escape(frozen)} {escape(judge)}</p></div>
 <h2>The alert family, day by day</h2>{key}
