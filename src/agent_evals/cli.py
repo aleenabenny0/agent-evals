@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
 
@@ -1435,6 +1436,160 @@ def _interactive() -> bool:
     import sys
 
     return sys.stdin.isatty()
+
+
+def _print_monitor(report: dict[str, Any], title: str) -> None:
+    """One day's monitor table: every metric with its change, p, floor and blind spot."""
+    from math import exp
+
+    table = Table(show_header=True, header_style="bold", title=title)
+    for col in ("metric", "day", "reference", "change", "p", "floor", "detectable", "status"):
+        table.add_column(col, justify="left" if col in ("metric", "status") else "right")
+
+    def fmt(row: dict[str, Any], key: str) -> str:
+        value = row.get(key)
+        if value is None:
+            return "-"
+        if key == "p":
+            return f"{value:.4f}"
+        if row["metric"] in ("latency", "tokens") and key in ("effect", "floor", "detectable"):
+            return f"{(exp(value) - 1) * 100:+.0f}%"  # a log difference, shown as a ratio
+        if row["kind"] == "rate" and key in ("day", "ref"):
+            return f"{value:.3f}"
+        if row["kind"] == "rate":
+            return f"{value * 100:+.1f} pts"
+        return f"{value:+.2f}" if key in ("effect", "floor", "detectable") else f"{value:.2f}"
+
+    for row in report["metrics"]:
+        colour = "red" if row["status"] == "alert" else ""
+        status = f"[{colour}]{row['status']}[/{colour}]" if colour else row["status"]
+        table.add_row(
+            row["metric"],
+            fmt(row, "day"),
+            fmt(row, "ref"),
+            fmt(row, "effect"),
+            fmt(row, "p"),
+            fmt(row, "floor"),
+            fmt(row, "detectable"),
+            status,
+        )
+    console.print(table)
+    fab = report["fabricated_citation"]
+    if fab["p"] is not None:
+        verdict = "[red]alert[/red]" if fab["alert"] else "ok"
+        console.print(
+            f"fabricated citations, own rule (p < 0.01): day {fab['day']:.3f}, reference "
+            f"{fab['ref']:.3f}, p {fab['p']:.4f}: {verdict}"
+        )
+    judge = report["judge"]
+    trust = "trusted" if judge["trusted"] else "[yellow]untrusted today[/yellow]"
+    console.print(f"judge: {'in' if judge['in_family'] else 'not yet in'} the family; {trust}")
+    console.print(f"reported only: {json.dumps(report['reported'])}")
+
+
+@app.command()
+def monitor(
+    day: Annotated[
+        int | None, typer.Argument(help="Day to check against the frozen reference days.")
+    ] = None,
+    freeze: Annotated[
+        bool,
+        typer.Option(
+            "--freeze",
+            help="Check days 1 to 5 against each other (leave one day out) and, if no alert, "
+            "freeze them as the reference.",
+        ),
+    ] = False,
+    run_id: Annotated[
+        str | None,
+        typer.Option("--run", help="An online run to check; default the day's champion."),
+    ] = None,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
+    """Is a day worse than the reference days (phase 7 part 3)? Reads stored runs only, so it is
+    free. Exits 1 on an alert, or when the reference is too noisy to freeze."""
+    from datetime import UTC, datetime
+
+    from agent_evals import monitor as mon
+    from agent_evals.store.db import ResultsStore
+
+    cfg = _config(config)
+    enabled = mon.judge_enabled(mon.JUDGE_CHECK_PATH)
+    store = ResultsStore(cfg.paths.db)
+    try:
+        if freeze:
+            runs = {d: mon.champion_run(store, d) for d in mon.REFERENCE_DAYS}
+            if missing := [d for d, r in runs.items() if r is None]:
+                console.print(
+                    f"[red]No complete champion online run for day(s) {missing}: run "
+                    "`uv run evals online-run N` first.[/red]"
+                )
+                raise typer.Exit(code=2)
+            days = [mon.load_day(store, str(runs[d]), TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
+            checks = mon.leave_one_day_out(days, judge_enabled=enabled)
+            for d, report in zip(mon.REFERENCE_DAYS, checks, strict=True):
+                _print_monitor(report, f"day {d} against the other reference days")
+            record = {
+                "checked_at": datetime.now(UTC).isoformat(timespec="seconds"),
+                "days": {str(d): runs[d] for d in mon.REFERENCE_DAYS},
+                "judge_in_family": enabled,
+                "leave_one_day_out": checks,
+            }
+            if noisy := {
+                str(d): r["alerts"]
+                for d, r in zip(mon.REFERENCE_DAYS, checks, strict=True)
+                if r["alerts"]
+            }:
+                path = mon.REFERENCE_PATH.with_name("reference-check.json")
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+                console.print(
+                    f"[red]The reference is too noisy: {noisy}. By the plan the demo stops here; "
+                    f"details in {path}.[/red]"
+                )
+                raise typer.Exit(code=1)
+            mon.REFERENCE_PATH.parent.mkdir(parents=True, exist_ok=True)
+            mon.REFERENCE_PATH.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+            console.print(
+                f"[green]No reference day alerts against the others: days 1 to 5 frozen as the "
+                f"reference ({mon.REFERENCE_PATH}).[/green]"
+            )
+            return
+        if day is None:
+            console.print("[red]Give a day to check, or --freeze to set up the reference.[/red]")
+            raise typer.Exit(code=2)
+        if not mon.REFERENCE_PATH.exists():
+            console.print(
+                "[red]No frozen reference yet: run `uv run evals monitor --freeze`.[/red]"
+            )
+            raise typer.Exit(code=2)
+        reference = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+        ref_runs = [str(r) for r in reference["days"].values()]
+        target = run_id or mon.champion_run(store, day)
+        if target is None:
+            console.print(f"[red]No complete champion online run for day {day}.[/red]")
+            raise typer.Exit(code=2)
+        if target in ref_runs:
+            console.print(f"[red]{target} is a reference run; --freeze checks those.[/red]")
+            raise typer.Exit(code=2)
+        report = mon.check_day(
+            mon.load_day(store, target, TRAFFIC_DIR),
+            [mon.load_day(store, r, TRAFFIC_DIR) for r in ref_runs],
+            judge_enabled=enabled,
+        )
+    finally:
+        store.close()
+    _print_monitor(report, f"day {day} ({target}) against the reference days")
+    alerts = (
+        json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
+    )
+    alerts[str(day)] = {"checked_at": datetime.now(UTC).isoformat(timespec="seconds"), **report}
+    mon.ALERTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    mon.ALERTS_PATH.write_text(json.dumps(alerts, indent=2) + "\n", encoding="utf-8")
+    if report["alerts"]:
+        console.print(f"[red]ALERT on day {day}: {', '.join(report['alerts'])}[/red]")
+        raise typer.Exit(code=1)
+    console.print(f"[green]Day {day}: no alert.[/green]")
 
 
 @app.command("online-run")

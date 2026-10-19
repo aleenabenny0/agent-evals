@@ -395,6 +395,36 @@ class ResultsStore:
             for c, a, o, t, e in rows
         ]
 
+    def attempt_usage(self, run_id: str) -> list[dict[str, Any]]:
+        """Each attempt's error, latency, tokens and local-cache hits, for the online monitor."""
+        rows = self.con.execute(
+            "SELECT case_id, attempt, error, latency_ms, cached_calls, model_calls, input_tokens, "
+            "output_tokens FROM attempts WHERE run_id = ? ORDER BY case_id, attempt",
+            [run_id],
+        ).fetchall()
+        keys = (
+            "case_id",
+            "attempt",
+            "error",
+            "latency_ms",
+            "cached_calls",
+            "model_calls",
+            "input_tokens",
+            "output_tokens",
+        )
+        return [dict(zip(keys, r, strict=True)) for r in rows]
+
+    def online_runs(self) -> list[dict[str, Any]]:
+        """Every run of online cases, oldest first, with its manifest."""
+        rows = self.con.execute(
+            "SELECT run_id, started_at, status, manifest FROM runs WHERE COALESCE(online, FALSE) "
+            "ORDER BY started_at"
+        ).fetchall()
+        return [
+            {"run_id": r, "started_at": t, "status": st, "manifest": json.loads(m)}
+            for r, t, st, m in rows
+        ]
+
     def attempt(self, run_id: str, case_id: str, attempt: int) -> dict[str, Any] | None:
         """One stored attempt: output, trajectory, usage, error, and its grades."""
         row = self.con.execute(
