@@ -145,6 +145,28 @@ def test_redo_asks_chosen_questions_again_and_the_newer_answer_wins(pilot_config
     assert result.exit_code == 2 and "Not in the pilot sample" in result.output
 
 
+def test_the_quick_read_asks_realism_only_for_one_lookup_and_one_comparison_each(
+    pilot_config: Path,
+) -> None:
+    args = ["pilot-review", "2", "--quick", "-c", str(pilot_config)]
+    result = CliRunner().invoke(cli.app, args, input="y\n\n" * 10)  # realistic, no note
+    output = " ".join(result.output.split())
+    assert result.exit_code == 0, output
+    assert "Realism read passed: 10 of 10" in output
+    assert "Could the snapshot" not in output and "search hits" not in output
+    quick = load_verdicts(cli.TRAFFIC_DIR.parent / "quick-day-02.jsonl")
+    assert len(quick) == 10 and {a["answerable"] for a in quick.values()} == {"skip"}
+    assert {a["intent"] for a in quick.values()} == {"lookup", "comparison"}
+    assert not _answers()  # the full pilot's file is untouched
+
+
+def test_the_quick_read_fails_below_seven_of_ten(pilot_config: Path) -> None:
+    args = ["pilot-review", "2", "--quick", "-c", str(pilot_config)]
+    result = CliRunner().invoke(cli.app, args, input="n\n\n" * 4 + "y\n\n" * 6)
+    output = " ".join(result.output.split())
+    assert result.exit_code == 1 and "Fewer than 7 of 10 are realistic" in output
+
+
 def test_pilot_review_refuses_without_a_terminal(
     pilot_config: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

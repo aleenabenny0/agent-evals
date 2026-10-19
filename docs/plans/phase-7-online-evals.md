@@ -244,3 +244,13 @@ nothing its sentence does not settle.
 
 If check 1 or 2 fails, the prompt is revised and the day regenerated, and every attempt is
 reported here.
+
+**Results, v2's day 0.** Check 1 passes: the snapshot fully answers all 20, and the auditor, told
+to refute every "full", changed none (43 of 43 quotes verified; `results/online/traffic/
+day-00.answerability.json`). The check's first run ended at a usage limit with no verdicts and was
+rerun unchanged. Check 2 passes: 2 of the 90 in-snapshot questions copy 6 or more consecutive
+words from their page (2%). While generating, the checker rejected 6 drafts that their section
+did not fully answer, and each was rewritten. One thing is left to the realism read: some
+questions follow the page's own example closely, such as its Ohio-to-Oregon transaction or its
+Auto Scaling group of 4, 6 and 12. Check 3 is Aleena's to take or skip:
+`uv run evals pilot-review 0 --quick` (10 questions, realism only, at least 7 to pass).

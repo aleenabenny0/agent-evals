@@ -1389,6 +1389,13 @@ def pilot_review(
     redo: Annotated[
         str, typer.Option(help="Comma-separated question ids to ask again, even if answered.")
     ] = "",
+    quick: Annotated[
+        bool,
+        typer.Option(
+            "--quick",
+            help="The 10-question realism read of a revised generator: realism only.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Review 30 simulated questions, 6 per persona across all four intents: would a real
@@ -1404,6 +1411,7 @@ def pilot_review(
 
     from agent_evals.corpus import Corpus
     from agent_evals.simulate import (
+        QUICK_PER_PERSONA,
         append_verdict,
         current_verdicts,
         load_traffic,
@@ -1411,6 +1419,7 @@ def pilot_review(
         pilot_sample,
         pilot_summary,
         question_sha,
+        quick_summary,
         source_passages,
     )
 
@@ -1433,12 +1442,17 @@ def pilot_review(
         )
         raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
-    picked = pilot_sample(load_traffic(traffic_path), day)
+    traffic = load_traffic(traffic_path)
+    if quick:
+        picked = pilot_sample(traffic, day, QUICK_PER_PERSONA, name="quick")
+    else:
+        picked = pilot_sample(traffic, day)
     again = {s.strip() for s in redo.split(",") if s.strip()}
     if unknown := sorted(again - {q.id for q in picked}):
         console.print(f"[red]Not in the pilot sample: {escape(', '.join(unknown))}[/red]")
         raise typer.Exit(code=2)
-    out_path = TRAFFIC_DIR.parent / f"pilot-day-{day:02d}.jsonl"
+    review = "quick" if quick else "pilot"
+    out_path = TRAFFIC_DIR.parent / f"{review}-day-{day:02d}.jsonl"
     verdicts = load_verdicts(out_path)
     for i, q in enumerate(picked, 1):
         earlier = current_verdicts([q], verdicts).get(q.id)
@@ -1454,7 +1468,9 @@ def pilot_review(
                 f"answerable {earlier['answerable']}, note: {earlier.get('note') or '(none)'}"
             )
             console.print(f"[dim]Your earlier answer ({escape(q.id)}): {escape(before)}[/dim]")
-        if q.intent == "outside_snapshot":
+        if quick:
+            pass  # realism only: the question alone, as a real reader would see it
+        elif q.intent == "outside_snapshot":
             console.print(
                 f"[dim]No snapshot page names {escape(q.service or '')}, so there is no page to "
                 "open. The search hits below are the closest the snapshot has: answer n unless "
@@ -1481,7 +1497,8 @@ def pilot_review(
         for hit in corpus.search(q.question, k=10):  # several hits can share a page
             pages.setdefault(hit.url, hit.title)
         hits = "; ".join(list(pages.values())[:3])
-        console.print(f"[dim]top snapshot search hits: {escape(hits)}[/dim]")
+        if not quick:
+            console.print(f"[dim]top snapshot search hits: {escape(hits)}[/dim]")
         answer_prompt = "Could the snapshot answer it? (y/n/u unsure, q quits)"
         if q.intent == "false_premise":
             answer_prompt = "Could the snapshot show the premise is wrong? (y/n/u unsure, q quits)"
@@ -1493,9 +1510,11 @@ def pilot_review(
             ).lower()
             if realistic == "q":
                 break
-            answerable = Prompt.ask(
-                answer_prompt, choices=["y", "n", "u", "q"], case_sensitive=False
-            ).lower()
+            answerable = "skip"  # the realism read asks one question
+            if not quick:
+                answerable = Prompt.ask(
+                    answer_prompt, choices=["y", "n", "u", "q"], case_sensitive=False
+                ).lower()
             if answerable == "q":
                 break
             note = Prompt.ask(
@@ -1518,6 +1537,25 @@ def pilot_review(
         append_verdict(out_path, record)
         if quit_after:
             break
+    if quick:
+        result = quick_summary(picked, verdicts)
+        console.print_json(json.dumps(result))
+        if not result["complete"]:
+            console.print(
+                f"Not finished: {result['reviewed']} of {result['sample']} reviewed. Run the "
+                "same command to continue."
+            )
+        elif not result["passes"]:
+            console.print(
+                f"[red]Fewer than {result['bar']} of {result['sample']} are realistic: the "
+                "generator prompt gets revised.[/red]"
+            )
+            raise typer.Exit(code=1)
+        else:
+            console.print(
+                f"[green]Realism read passed: {result['realistic']} of {result['sample']}.[/green]"
+            )
+        return
     summary = pilot_summary(picked, verdicts)
     console.print_json(json.dumps(summary))
     if not summary["complete"]:

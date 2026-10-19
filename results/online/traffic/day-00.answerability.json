@@ -1,0 +1,1046 @@
+{
+  "summary": {
+    "date": "2026-10-18",
+    "generator_version": "v2",
+    "traffic_sha256": "a28e138792b2313efadcae03ef5ca570dc66355c4de89012b6078b480a63c6c6",
+    "method": "Pre-registered check (plan, 'Pilot and generator v2'): workflow wf_4febcc2c-b23. Three agents searched the whole snapshot for the 20 lookups and comparisons of v2's pilot sample, without seeing the section each was written from; every quote passed Corpus.contains_quote. An auditor then tried to refute every 'full' verdict, choosing the stricter verdict when unsure.",
+    "tally_after_audit": {
+      "full": 20,
+      "partial": 0,
+      "none": 0,
+      "missing": 0
+    },
+    "audit_changed": 0,
+    "pass_rule": "at least 17 full and at most 1 none (v1: 6 full, 4 none)",
+    "passes": true
+  },
+  "rows": [
+    {
+      "id": "online-d00-022",
+      "intent": "lookup",
+      "question": "prod deploy keeps failing on some hosts, can codedeploy in-place deploys limit how many ec2 instances go offline at once during the rolling update",
+      "source_url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+      "first": {
+        "id": "online-d00-022",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Can CodeDeploy in-place deployments limit how many EC2 instances go offline at once during the rolling update?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+            "quote": "During an in-place deployment, CodeDeploy performs a rolling update across Amazon EC2 instances. You can specify the number of instances to be taken offline at a time for updates.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+            "quote": "Settings that determine the deployment speed and the minimum number of instances that must be healthy at any point during a deployment.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page says directly that in-place deployments do a rolling update and that you can set how many instances are taken offline at a time. It also says deployment configurations set a minimum number of healthy instances. The failing hosts are only background to the question, not a separate ask."
+      },
+      "audit": {
+        "id": "online-d00-022",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+            "quote": "During an in-place deployment, CodeDeploy performs a rolling update across Amazon EC2 instances. You can specify the number of instances to be taken offline at a time for updates.",
+            "verified": true
+          }
+        ],
+        "explanation": "There is one ask: can in-place deploys limit how many instances go offline at once. The source page answers it directly. The failing hosts are only background."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-073",
+      "intent": "lookup",
+      "question": "We're planning to add a lot of alarms across our accounts. Is there a cap on how many CloudWatch alarms we can create, or can we just keep adding them?",
+      "source_url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Alarms.html",
+      "first": {
+        "id": "online-d00-073",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Is there a cap on how many CloudWatch alarms can be created, or can we keep adding them?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Alarms.html",
+            "quote": "There is no limit to the number of alarms that you can create.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html",
+            "quote": "| Number of Metrics Insights alarms | Each supported Region: 200 | No |",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page says there is no limit on the number of alarms. The quotas page adds one exception: Metrics Insights alarms are capped at 200 per Region and that cap cannot be raised. The question is answered either way."
+      },
+      "audit": {
+        "id": "online-d00-073",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Alarms.html",
+            "quote": "There is no limit to the number of alarms that you can create.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_limits.html",
+            "quote": "| Number of Metrics Insights alarms | Each supported Region: 200 | No |",
+            "verified": true
+          }
+        ],
+        "explanation": "The 'Common features' section of the source page says plainly that there is no limit on the number of alarms. The quotas page adds one exception: Metrics Insights alarms are capped at 200 per Region."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-014",
+      "intent": "comparison",
+      "question": "I'm new to AWS and using a SageMaker notebook instance. Should I start with the SageMaker Python SDK, and what is its relationship to Boto3 and the SageMaker API operations?",
+      "source_url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+      "first": {
+        "id": "online-d00-014",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Should a new user on a SageMaker notebook instance start with the SageMaker Python SDK?",
+          "What is the SDK's relationship to Boto3 and the SageMaker API operations?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+            "quote": "If you're a first-time SageMaker AI user, we recommend you to use the SageMaker Python SDK, following the end-to-end ML tutorial.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+            "quote": "The SageMaker Python SDK abstracts AWS SDK for Python (Boto3) and SageMaker API operations.",
+            "verified": true
+          }
+        ],
+        "explanation": "Both parts are answered on the source page: first-time users are told to use the SageMaker Python SDK, and the SDK is described as a layer that abstracts Boto3 and the SageMaker API operations."
+      },
+      "audit": {
+        "id": "online-d00-014",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+            "quote": "If you're a first-time SageMaker AI user, we recommend you to use the SageMaker Python SDK, following the end-to-end ML tutorial.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/nbi.html",
+            "quote": "The SageMaker Python SDK abstracts AWS SDK for Python (Boto3) and SageMaker API operations.",
+            "verified": true
+          }
+        ],
+        "explanation": "Both parts are answered on the source page. First-time users are told to use the SDK, and the page says the SDK abstracts Boto3 and the SageMaker API operations."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-024",
+      "intent": "lookup",
+      "question": "our agent is built on LangGraph, not Strands, and someone said AgentCore won't work with it. is that true, or can AgentCore services run with other open-source frameworks and any model",
+      "source_url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html",
+      "first": {
+        "id": "online-d00-024",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Is it true that AgentCore won't work with a LangGraph-based agent?",
+          "Can AgentCore services run with other open-source frameworks and any model?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html",
+            "quote": "AgentCore services work together or independently with any open-source framework such as CrewAI, LangGraph, LlamaIndex, and Strands Agents and with any foundation model",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page names LangGraph as a supported framework and says AgentCore works with any open-source framework and any foundation model, so the claim is false. The page's service table also lists LangGraph support for Runtime, Memory and Evaluations."
+      },
+      "audit": {
+        "id": "online-d00-024",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/what-is-bedrock-agentcore.html",
+            "quote": "AgentCore services work together or independently with any open-source framework such as CrewAI, LangGraph, LlamaIndex, and Strands Agents and with any foundation model",
+            "verified": true
+          }
+        ],
+        "explanation": "The page names LangGraph explicitly and says AgentCore works with any open-source framework and any model. That refutes the claim and answers both parts."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-001",
+      "intent": "lookup",
+      "question": "I attached a new custom network ACL to a subnet, and now the older ACL I had on it seems to no longer apply. Did AWS remove the old association automatically, or can a subnet really only have one network ACL?",
+      "source_url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+      "first": {
+        "id": "online-d00-001",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Did AWS remove the old network ACL association automatically?",
+          "Can a subnet only have one network ACL?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+            "quote": "However, a subnet can be associated with only one network ACL at a time. When you associate a network ACL with a subnet, the previous association is removed.",
+            "verified": true
+          }
+        ],
+        "explanation": "One sentence answers both parts: a subnet can have only one network ACL at a time, and associating a new one removes the previous association."
+      },
+      "audit": {
+        "id": "online-d00-001",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/vpc/latest/userguide/vpc-network-acls.html",
+            "quote": "However, a subnet can be associated with only one network ACL at a time. When you associate a network ACL with a subnet, the previous association is removed.",
+            "verified": true
+          }
+        ],
+        "explanation": "One passage answers both parts: a subnet can have only one network ACL at a time, and associating a new one removes the previous association automatically."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-091",
+      "intent": "lookup",
+      "question": "In CloudTrail console, can I download file with management events from last 90 days, and do I need filter first or can I take complete file?",
+      "source_url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+      "first": {
+        "id": "online-d00-091",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Can I download a file of management events from the last 90 days in the CloudTrail console?",
+          "Do I need to filter first, or can I download the complete file?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+            "quote": "Downloading a filtered or complete file of the last 90 days of management events from **Event history**.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page lists this as a console task: you can download either a filtered or a complete file of the last 90 days of management events from Event history. That answers both parts, and no filtering is needed."
+      },
+      "audit": {
+        "id": "online-d00-091",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+            "quote": "Downloading a filtered or complete file of the last 90 days of management events from **Event history**.",
+            "verified": true
+          }
+        ],
+        "explanation": "In its list of CloudTrail console tasks, the page says you can download a filtered or a complete file of the last 90 days of management events. That answers both parts: you can download it, and filtering is not required."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-063",
+      "intent": "lookup",
+      "question": "Our Textract jobs started getting throttled and I want to raise the limit, but I'm told some limits can't be changed. Which kinds of Textract quotas can I actually adjust, and where do I go to do it?",
+      "source_url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+      "first": {
+        "id": "online-d00-063",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Which kinds of Textract quotas can be adjusted (versus not)?",
+          "Where do I go to adjust them?"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+            "quote": "*Set quotas*, which can be viewed in the section [Set Quotas in Amazon Textract](./limits-document.html), cannot be changed.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+            "quote": "can be viewed or changed via the [Service quotas console](https://console.aws.amazon.com/servicequotas)",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html",
+            "quote": "If the limit set for your account is frequently exceeded, you can request a limit increase. To change a limit, select the Amazon Textract option in the Service Quotas console.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+            "quote": "Set quotas",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page separates set quotas, which cannot be changed, from default quotas, which can be viewed or changed in the Service Quotas console. That answers both which quotas you can adjust and where. The what-is page adds that API rate quotas can be raised and that limits such as file size cannot be changed."
+      },
+      "audit": {
+        "id": "online-d00-063",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+            "quote": "*Set quotas*, which can be viewed in the section [Set Quotas in Amazon Textract](./limits-document.html), cannot be changed.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/limits.html",
+            "quote": "can be viewed or changed via the [Service quotas console](https://console.aws.amazon.com/servicequotas)",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/textract/latest/dg/what-is.html",
+            "quote": "If the limit set for your account is frequently exceeded, you can request a limit increase. To change a limit, select the Amazon Textract option in the Service Quotas console.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page names two kinds of quota. Set quotas cannot be changed. Default quotas can be viewed or changed in the Service Quotas console. In context, what-is.html adds that the adjustable ones are the API operation rate quotas, while file size and supported languages cannot be changed. Both which and where are answered."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-042",
+      "intent": "lookup",
+      "question": "Where can I find the default EKS service quota values, and how do I request an increase for a quota that's marked adjustable?",
+      "source_url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+      "first": {
+        "id": "online-d00-042",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Where to find the default EKS service quota values",
+          "How to request an increase for a quota marked adjustable"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+            "quote": "In the **Service quotas** list, you can see the service quota name, applied value (if it’s available), AWS default quota, and whether the quota value is adjustable.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+            "quote": "To view the default EKS service quotas, see [Amazon Elastic Kubernetes Service endpoints and quotas]",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+            "quote": "(Optional) To request a quota increase, select the quota that you want to increase, select **Request quota increase**, enter or select the required information, and select **Request**.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/general/latest/gr/eks.html",
+            "quote": "The default values are the initial quotas set by AWS.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page says default quotas appear in the Service Quotas console and links to the General Reference, which is in the snapshot and has the default-value tables. It also gives the console steps for a quota increase and names the CLI command request-service-quota-increase. Both parts are answered."
+      },
+      "audit": {
+        "id": "online-d00-042",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+            "quote": "In the **Service quotas** list, you can see the service quota name, applied value (if it’s available), AWS default quota, and whether the quota value is adjustable.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/eks/latest/userguide/service-quotas.html",
+            "quote": "(Optional) To request a quota increase, select the quota that you want to increase, select **Request quota increase**, enter or select the required information, and select **Request**.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/general/latest/gr/eks.html",
+            "quote": "The default values are the initial quotas set by AWS.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page says where the default values are shown: the Service Quotas console, the list-aws-default-service-quotas CLI command, and the General Reference page, which is in the snapshot. It also gives the console steps for requesting an increase."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-035",
+      "intent": "comparison",
+      "question": "asg is stuck at 6 instances, whats the difference between desired capacity and min size, which one stops it dropping below 4 when scaling policy kicks in",
+      "source_url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+      "first": {
+        "id": "online-d00-035",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Difference between desired capacity and minimum size",
+          "Which setting stops the group dropping below 4 when a scaling policy acts"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "You can specify the minimum number of instances in each Auto Scaling group, and Amazon EC2 Auto Scaling ensures that your group never goes below this size.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "If you specify the desired capacity, either when you create the group or at any time thereafter, Amazon EC2 Auto Scaling ensures that your group has this many instances.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "The scaling policies that you define adjust the number of instances, within your minimum and maximum number of instances, based on the criteria that you specify.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page explains that desired capacity is the instance count the group keeps, while minimum size is a floor the group never goes below. It also says scaling policies only adjust the count within the min and max. Its example group (min 4, desired 6, max 12) matches the question exactly. Deep troubleshooting of why the group is 'stuck' is not covered, but the desired-capacity definition explains holding at 6."
+      },
+      "audit": {
+        "id": "online-d00-035",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "You can specify the minimum number of instances in each Auto Scaling group, and Amazon EC2 Auto Scaling ensures that your group never goes below this size.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "If you specify the desired capacity, either when you create the group or at any time thereafter, Amazon EC2 Auto Scaling ensures that your group has this many instances.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+            "quote": "The scaling policies that you define adjust the number of instances, within your minimum and maximum number of instances, based on the criteria that you specify.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page defines desired capacity as the count the group maintains and minimum size as a floor it never goes below. It also says scaling policies stay within min and max, so the minimum is what stops the group dropping below 4. Its example (min 4, desired 6, max 12) matches the question. 'Stuck at 6' is context, and the desired-capacity definition explains it."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-095",
+      "intent": "comparison",
+      "question": "For Lambda timeout, what is difference between normal function and function on Managed Instances? I think normal max is 15 minutes, but with async invoke or event source mapping, what is the maximum there?",
+      "source_url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html",
+      "first": {
+        "id": "online-d00-095",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Normal Lambda function maximum timeout (15 minutes?)",
+          "Maximum timeout on Managed Instances for async invocations and event source mappings"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html",
+            "quote": "default value for this setting is 3 seconds, but you can adjust this in increments of 1 second up to a maximum value of 900 seconds (15 minutes).",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html",
+            "quote": "For functions using AWS Lambda Managed Instances, asynchronous invocations and event source mapping invocations (except Amazon MQ and Amazon DocumentDB) support a maximum allowed value of 5,400 seconds (90 minutes).",
+            "verified": true
+          }
+        ],
+        "explanation": "The page confirms 900 seconds (15 minutes) for normal functions. For Managed Instances, async and event source mapping invocations allow 5,400 seconds (90 minutes), except Amazon MQ and Amazon DocumentDB. The gettingstarted-limits page says the same."
+      },
+      "audit": {
+        "id": "online-d00-095",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html",
+            "quote": "default value for this setting is 3 seconds, but you can adjust this in increments of 1 second up to a maximum value of 900 seconds (15 minutes).",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-timeout.html",
+            "quote": "For functions using AWS Lambda Managed Instances, asynchronous invocations and event source mapping invocations (except Amazon MQ and Amazon DocumentDB) support a maximum allowed value of 5,400 seconds (90 minutes).",
+            "verified": true
+          }
+        ],
+        "explanation": "The page confirms the 15-minute normal maximum. It gives a 90-minute maximum for async and event source mapping invocations on Managed Instances, with Amazon MQ and Amazon DocumentDB as exceptions. That is the difference the question asks about."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-054",
+      "intent": "comparison",
+      "question": "In our compliance design, how does the retain-until-date differ between an object under variable retention with the event hold still on versus one whose hold was released, and can shortening the duration bring the date earlier in either case?",
+      "source_url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+      "first": {
+        "id": "online-d00-054",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "How the retain-until-date behaves while the event hold is still on",
+          "How the retain-until-date behaves after the hold is released",
+          "Can shortening the duration bring the date earlier in either case"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "While the event hold is on, Amazon S3 computes the retain-until-date as the current time plus the duration. The date moves forward as time passes.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "When you release the event hold, Amazon S3 fixes the retain-until-date at the release time plus the duration, and the date stops changing.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "If you decrease it, Amazon S3 does not set the retain-until-date to an earlier date than its current value.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "When an object is locked in compliance mode, its retention mode can't be changed, and its retention period can't be shortened.",
+            "verified": true
+          }
+        ],
+        "explanation": "The 'Retain-until-date behavior with variable retention' section covers both states. While the hold is on, the date keeps moving forward, and shortening the duration never moves it earlier. On release, the date is fixed at release time plus duration. The page only describes changing the duration while the hold is on, and compliance mode says the retention period can't be shortened, so the answer is 'no' in both cases. Neither case says this in one sentence, so a strict grader could call the released case slightly implicit."
+      },
+      "audit": {
+        "id": "online-d00-054",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "While the event hold is on, Amazon S3 computes the retain-until-date as the current time plus the duration. The date moves forward as time passes.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "If you decrease it, Amazon S3 does not set the retain-until-date to an earlier date than its current value.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "When you release the event hold, Amazon S3 fixes the retain-until-date at the release time plus the duration, and the date stops changing.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html",
+            "quote": "When an object is locked in compliance mode, its retention mode can't be changed, and its retention period can't be shortened.",
+            "verified": true
+          }
+        ],
+        "explanation": "The section 'Retain-until-date behavior with variable retention' covers both states. While the hold is on, the date moves forward and decreasing the duration never makes it earlier, with a worked example. On release, the date is fixed and stops changing. The Retention periods section also says the event hold duration can be changed only while the hold is on, and in compliance mode the retention period can't be shortened. So the answer for the released case is stated directly ('stops changing'), not inferred. This is the weakest of the 'full' items, but it holds."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-023",
+      "intent": "lookup",
+      "question": "data capture on our endpoint just stopped writing to S3 mid traffic, disk is nearly full. what disk usage level should i stay under so capture keeps going",
+      "source_url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+      "first": {
+        "id": "online-d00-023",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Why data capture stopped writing when disk was nearly full",
+          "What disk usage level to stay under so capture continues"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+            "quote": "To prevent impact to inference requests, Data Capture stops capturing requests at high levels of disk usage.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+            "quote": "We recommended that you keep your disk utilization below 75% to ensure data capture continues capturing requests.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page says Data Capture stops at high disk usage to protect inference requests, and it recommends keeping disk utilization below 75%."
+      },
+      "audit": {
+        "id": "online-d00-023",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+            "quote": "To prevent impact to inference requests, Data Capture stops capturing requests at high levels of disk usage.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+            "quote": "We recommended that you keep your disk utilization below 75% to ensure data capture continues capturing requests.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page gives both the why (capture stops at high disk usage to protect inference) and the threshold (stay below 75%)."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-065",
+      "intent": "lookup",
+      "question": "Can my team manage Macie through scripts and code instead of clicking around the console, and if so, which languages or tools does AWS offer for that?",
+      "source_url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+      "first": {
+        "id": "online-d00-065",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Can Macie be managed with scripts and code instead of the console",
+          "Which languages or tools AWS offers for that"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "To interact with Macie programmatically, you can send HTTPS requests directly to Macie or use a current version of an AWS command line tool or an AWS SDK.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "AWS provides two sets of command line tools: the AWS Command Line Interface (AWS CLI) and the AWS Tools for PowerShell.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "languages and platforms—for example, Java, Go, Python, C++, and .NET.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page confirms programmatic access through the Macie API. The tools it names are the AWS CLI and AWS Tools for PowerShell (useful for scripts), SDKs for Java, Go, Python, C++ and .NET, and the REST API over HTTPS."
+      },
+      "audit": {
+        "id": "online-d00-065",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "To interact with Macie programmatically, you can send HTTPS requests directly to Macie or use a current version of an AWS command line tool or an AWS SDK.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "AWS provides two sets of command line tools: the AWS Command Line Interface (AWS CLI) and the AWS Tools for PowerShell.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+            "quote": "languages and platforms—for example, Java, Go, Python, C++, and .NET.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page confirms programmatic access and names the tools: AWS CLI, AWS Tools for PowerShell, SDKs (Java, Go, Python, C++, .NET), and direct HTTPS requests."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-000",
+      "intent": "lookup",
+      "question": "Hello! I'm new to SQS and wondering about FIFO queues: is there a limit to how many message groups I can create inside a single FIFO queue?",
+      "source_url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+      "first": {
+        "id": "online-d00-000",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Is there a limit on the number of message groups in a single FIFO queue"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+            "quote": "There is no quota to the number of message groups within a FIFO queue.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page answers directly: there is no quota on the number of message groups in a FIFO queue."
+      },
+      "audit": {
+        "id": "online-d00-000",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+            "quote": "There is no quota to the number of message groups within a FIFO queue.",
+            "verified": true
+          }
+        ],
+        "explanation": "There is a single ask, and the page answers it directly: there is no quota on message groups."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-007",
+      "intent": "lookup",
+      "question": "I called AssumeRole and got back something called AssumedRoleUser, but I don't understand what it's for. Could you explain what the ARN and assumed role ID in it are used for, and whether they include my session name?",
+      "source_url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+      "first": {
+        "id": "online-d00-007",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "What AssumedRoleUser is for",
+          "What the ARN and assumed role ID are used for",
+          "Whether they include the session name"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers that you can use to refer to the resulting temporary security credentials.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "For example, you can reference these credentials as a principal in a resource-based policy by using the ARN or assumed role ID.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "The ARN and ID include the `RoleSessionName` that you specified when you called `AssumeRole`.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page's AssumedRoleUser response element answers every part. It says the field holds identifiers for the temporary credentials, that they can be used as a principal in a resource-based policy, and that both the ARN and the ID include the RoleSessionName. The sample response (assumed-role/demo/TestAR, ARO123EXAMPLE123:TestAR) shows this too."
+      },
+      "audit": {
+        "id": "online-d00-007",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "The Amazon Resource Name (ARN) and the assumed role ID, which are identifiers that you can use to refer to the resulting temporary security credentials.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "For example, you can reference these credentials as a principal in a resource-based policy by using the ARN or assumed role ID.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html",
+            "quote": "The ARN and ID include the `RoleSessionName` that you specified when you called `AssumeRole`.",
+            "verified": true
+          }
+        ],
+        "explanation": "All three parts are answered by the AssumedRoleUser response element: it holds identifiers for the temporary credentials, they can be used as a principal in a resource-based policy, and both include the RoleSessionName."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-088",
+      "intent": "lookup",
+      "question": "I want strict order and no duplicate messages from SNS FIFO topic. Which type of SQS queue I must use together with it for this integration?",
+      "source_url": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html",
+      "first": {
+        "id": "online-d00-088",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Which SQS queue type to use with an SNS FIFO topic for strict ordering and deduplication"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html",
+            "quote": "how they integrate with [Amazon SQS FIFO queues]",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html",
+            "quote": "You'll learn how to use these services together to ensure strict message ordering and deduplication",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "FIFO topic subscriptions use FIFO queues, and standard topic subscriptions use standard queues.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page is a short stub (about 1,400 characters). It still says that SNS FIFO topics integrate with Amazon SQS FIFO queues to give strict ordering and deduplication, which answers the single ask: use an SQS FIFO queue. The SNS dead-letter-queue page backs this up (FIFO topic subscriptions use FIFO queues), though that line is about dead-letter queues."
+      },
+      "audit": {
+        "id": "online-d00-088",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html",
+            "quote": "how they integrate with [Amazon SQS FIFO",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html",
+            "quote": "You'll learn how to use these services together to ensure strict message ordering and deduplication",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "FIFO topic subscriptions use FIFO queues, and standard topic subscriptions use standard queues.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source stub says SNS FIFO topics integrate with SQS FIFO queues, and that using the two together gives strict ordering and deduplication. That answers the single ask: an SQS FIFO queue. The DLQ page backs this up. No snapshot page says a standard queue would also meet the goal; I checked sns-sqs-as-subscriber and the search results. Only the word 'must' is weakly supported, but the user's stated goal is answered. I re-checked my quote of 'integrate with [Amazon SQS FIFO' against the page text; it spans a line break, and the checker's original quote had already passed contains_quote."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-044",
+      "intent": "lookup",
+      "question": "For our Polly design review, which Spanish (Spain) voices are offered in the Long Form engine, so I can check what that engine's voice list covers?",
+      "source_url": "https://docs.aws.amazon.com/polly/latest/dg/available-voices.html",
+      "first": {
+        "id": "online-d00-044",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Which Spanish (Spain) voices are offered in the Long Form engine"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/available-voices.html",
+            "quote": "| Generative voice | Long Form voice | Neural voice | Standard voice |",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/available-voices.html",
+            "quote": "| 37 | **Spanish (Spain)** | es-ES | Conchita  Lucia  Alba  Enrique  Sergio  Raúl | Female  Female  Female  Male  Male  Male | No  Yes  No  No  Yes  No | No  No  Yes  No  No  Yes |",
+            "verified": true
+          }
+        ],
+        "explanation": "In the voices table, the Long Form column for the es-ES row reads No, No, Yes, No, No, Yes for Conchita, Lucia, Alba, Enrique, Sergio and Raúl. So the Long Form Spanish (Spain) voices are Alba (female) and Raúl (male)."
+      },
+      "audit": {
+        "id": "online-d00-044",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/available-voices.html",
+            "quote": "| Generative voice | Long Form voice | Neural voice | Standard voice |",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/polly/latest/dg/available-voices.html",
+            "quote": "| 37 | **Spanish (Spain)** | es-ES | Conchita  Lucia  Alba  Enrique  Sergio  Raúl | Female  Female  Female  Male  Male  Male | No  Yes  No  No  Yes  No | No  No  Yes  No  No  Yes |",
+            "verified": true
+          }
+        ],
+        "explanation": "I checked the full table header: the columns run Generative, Long Form, Neural, Standard. So the second Yes/No column is Long Form, and it reads No No Yes No No Yes. The Long Form es-ES voices are Alba and Raúl."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-074",
+      "intent": "comparison",
+      "question": "I want an alarm that tells me when messages land in our SNS dead-letter queue. Would alarming on NumberOfMessagesSent or on ApproximateNumberOfMessagesVisible actually catch failed deliveries, and what's the difference between them?",
+      "source_url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+      "first": {
+        "id": "online-d00-074",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Would an alarm on NumberOfMessagesSent catch failed deliveries",
+          "Would an alarm on ApproximateNumberOfMessagesVisible catch failed deliveries",
+          "What the difference between the two metrics is"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "Setting up an alarm for the `NumberOfMessagesSent` metric is not suitable because this metric does not capture messages sent to a DLQ because of failed processing attempts.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "Instead, use the `ApproximateNumberOfMessagesVisible` metric, which captures all messages currently available in the DLQ, including those moved due to processing failures.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page answers both metric questions and the difference. NumberOfMessagesSent does not count messages that reach the DLQ after failed processing, so it would miss failed deliveries. ApproximateNumberOfMessagesVisible counts every message currently in the DLQ, including those moved after failures. The page also gives example alarm steps: alarm on ApproximateNumberOfMessagesVisible with a threshold of 1."
+      },
+      "audit": {
+        "id": "online-d00-074",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "Setting up an alarm for the `NumberOfMessagesSent` metric is not suitable because this metric does not capture messages sent to a DLQ because of failed processing attempts.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-dead-letter-queues.html",
+            "quote": "Instead, use the `ApproximateNumberOfMessagesVisible` metric, which captures all messages currently available in the DLQ, including those moved due to processing failures.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page covers both metrics and why they differ. NumberOfMessagesSent misses messages moved to the DLQ after failed processing. ApproximateNumberOfMessagesVisible counts every message currently in the DLQ."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-041",
+      "intent": "lookup",
+      "question": "When I create a function URL through the console, which version of my function does it attach to, the published one or the unpublished one?",
+      "source_url": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html",
+      "first": {
+        "id": "online-d00-041",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Which function version a console-created function URL attaches to (published or unpublished)"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html",
+            "quote": "This creates a function URL for the `$LATEST` unpublished version of your function.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html",
+            "quote": "You can apply function URLs to any function alias, or to the `$LATEST` unpublished function version.",
+            "verified": true
+          }
+        ],
+        "explanation": "The console steps say directly that the function URL is created for the $LATEST unpublished version, unless you create it from an alias. The page also says function URLs can't be added to any other (published) version."
+      },
+      "audit": {
+        "id": "online-d00-041",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html",
+            "quote": "This creates a function URL for the `$LATEST` unpublished version of your function.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/lambda/latest/dg/urls-configuration.html",
+            "quote": "You can apply function URLs to any function alias, or to the `$LATEST` unpublished function version.",
+            "verified": true
+          }
+        ],
+        "explanation": "The console steps say directly that the URL is created for the $LATEST unpublished version."
+      },
+      "verdict": "full"
+    },
+    {
+      "id": "online-d00-090",
+      "intent": "lookup",
+      "question": "I did TransactWriteItems in Ohio on my global table. In Oregon I see only some of the items, not all. Why is the transaction half done there? Is this expected?",
+      "source_url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html",
+      "first": {
+        "id": "online-d00-090",
+        "snapshot_verdict": "full",
+        "source_page_verdict": "full",
+        "parts": [
+          "Why only some of the transaction's items appear in Oregon",
+          "Whether this is expected"
+        ],
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html",
+            "quote": "Transactional operations provide ACID (Atomicity, Consistency, Isolation, and Durability) guarantees ONLY within the Region where the write is originally made. Transactions aren't supported across Regions in global tables.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html",
+            "quote": "you may observe partially completed transactions in US West (Oregon) Region as changes are replicated. Changes will only be replicated to other Regions once they have been committed in the source Region.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+            "quote": "Transactions aren't supported across Regions in global tables.",
+            "verified": true
+          }
+        ],
+        "explanation": "The source page answers both parts using the exact Ohio/Oregon TransactWriteItems scenario. The why: ACID guarantees hold only in the Region where the write was made, and transactions aren't supported across Regions. Whether it's expected: yes, the page says you may see partially completed transactions in Oregon while changes replicate after they commit in the source Region. The transaction-apis page says the same."
+      },
+      "audit": {
+        "id": "online-d00-090",
+        "final_verdict": "full",
+        "changed": false,
+        "missing": "",
+        "evidence": [
+          {
+            "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html",
+            "quote": "Transactional operations provide ACID (Atomicity, Consistency, Isolation, and Durability) guarantees ONLY within the Region where the write is originally made. Transactions aren't supported across Regions in global tables.",
+            "verified": true
+          },
+          {
+            "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/globaltables_HowItWorks.html",
+            "quote": "you may observe partially completed transactions in US West (Oregon) Region as changes are replicated. Changes will only be replicated to other Regions once they have been committed in the source Region.",
+            "verified": true
+          }
+        ],
+        "explanation": "The page uses the exact Ohio-to-Oregon TransactWriteItems scenario. It gives the why (ACID holds only in the source Region; transactions aren't supported across Regions) and says partial results in Oregon are expected during replication."
+      },
+      "verdict": "full"
+    }
+  ]
+}

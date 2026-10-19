@@ -726,6 +726,11 @@ PILOT_PER_PERSONA: dict[str, int] = {
     "outside_snapshot": 1,
 }
 TRAFFIC_SHARE = {intent: n / sum(QUOTA.values()) for intent, n in QUOTA.items()}
+# The realism read of a revised generator (plan, "Pilot and generator v2"): one lookup and one
+# comparison per persona, the two intents v2 changed, judged for realism only. Fixed before the
+# read: at least QUICK_BAR of the 10 realistic, or the prompt is revised.
+QUICK_PER_PERSONA: dict[str, int] = {"lookup": 1, "comparison": 1}
+QUICK_BAR = 7
 # The right answer to "could the snapshot answer it?" (for a false premise: show it wrong).
 EXPECTED_ANSWERABLE = {
     "lookup": "y",
@@ -739,12 +744,18 @@ def question_sha(q: TrafficQuestion) -> str:
     return sha256_text(q.question)[:16]
 
 
-def pilot_sample(questions: Sequence[TrafficQuestion], day: int) -> list[TrafficQuestion]:
-    """PILOT_PER_PERSONA questions from each persona, drawn reproducibly, in shuffled order."""
-    rng = random.Random(f"pilot-{day}")
+def pilot_sample(
+    questions: Sequence[TrafficQuestion],
+    day: int,
+    per_persona: Mapping[str, int] = PILOT_PER_PERSONA,
+    name: str = "pilot",
+) -> list[TrafficQuestion]:
+    """`per_persona` questions by intent from each persona, drawn reproducibly from a seed named
+    after the review, in shuffled order."""
+    rng = random.Random(f"{name}-{day}")
     picked: list[TrafficQuestion] = []
     for persona in PERSONAS:
-        for intent, n in PILOT_PER_PERSONA.items():
+        for intent, n in per_persona.items():
             cell = [q for q in questions if q.persona == persona and q.intent == intent]
             picked.extend(rng.sample(cell, min(n, len(cell))))
     rng.shuffle(picked)
@@ -825,6 +836,23 @@ def pilot_summary(
         # Decided on the unrounded share, and only on a finished pilot.
         "meets_two_thirds": weighted >= 2 / 3 - 1e-9 if complete and weighted is not None else None,
         "by_intent": by_intent,
+    }
+
+
+def quick_summary(
+    picked: Sequence[TrafficQuestion], verdicts: Mapping[str, Mapping[str, Any]]
+) -> dict[str, Any]:
+    """The realism read: realistic count against QUICK_BAR, decided once all are reviewed."""
+    current = current_verdicts(picked, verdicts)
+    realistic = sum(1 for v in current.values() if v["realistic"])
+    complete = bool(picked) and len(current) == len(picked)
+    return {
+        "reviewed": len(current),
+        "sample": len(picked),
+        "complete": complete,
+        "realistic": realistic,
+        "bar": QUICK_BAR,
+        "passes": realistic >= QUICK_BAR if complete else None,
     }
 
 
