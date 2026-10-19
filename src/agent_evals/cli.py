@@ -1592,6 +1592,57 @@ def monitor(
     console.print(f"[green]Day {day}: no alert.[/green]")
 
 
+@app.command()
+def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
+    """Build the online dashboard (phase 7 part 4): one static page, docs/dashboard/index.html,
+    from the stored runs and the monitor's files. Free."""
+    from agent_evals import dashboard as dash
+    from agent_evals import monitor as mon
+    from agent_evals.simulate import load_traffic
+    from agent_evals.store.db import ResultsStore
+
+    cfg = _config(config)
+    reference = (
+        json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+        if mon.REFERENCE_PATH.exists()
+        else None
+    )
+    checked = (
+        json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
+    )
+    store = ResultsStore(cfg.paths.db)
+    points: list[dash.DayPoint] = []
+    try:
+        if reference is not None:
+            ref_runs = {int(d): str(r) for d, r in reference["days"].items()}
+        else:  # not frozen yet: show whichever reference days have run
+            found = {d: mon.champion_run(store, d) for d in mon.REFERENCE_DAYS}
+            ref_runs = {d: r for d, r in found.items() if r is not None}
+        days = [(d, r, True, None) for d, r in sorted(ref_runs.items())]
+        days += [
+            (int(d), str(rep["run_id"]), False, rep)
+            for d, rep in sorted(checked.items(), key=lambda kv: int(kv[0]))
+        ]
+        for d, run, is_ref, report in days:
+            traffic = {q.id: q for q in load_traffic(TRAFFIC_DIR / f"day-{d:02d}.jsonl")}
+            points.append(
+                dash.DayPoint(
+                    day=d,
+                    run_id=run,
+                    reference=is_ref,
+                    values=mon.load_day(store, run, TRAFFIC_DIR),
+                    report=report,
+                    worst=dash.least_supported(store, run, traffic),
+                )
+            )
+    finally:
+        store.close()
+    html = dash.render(points, reference, mon.judge_enabled(mon.JUDGE_CHECK_PATH))
+    dash.DASHBOARD_PATH.parent.mkdir(parents=True, exist_ok=True)
+    dash.DASHBOARD_PATH.write_text(html, encoding="utf-8")
+    console.print(f"wrote {dash.DASHBOARD_PATH} ({len(points)} days)")
+
+
 @app.command("judge-check")
 def judge_check(
     action: Annotated[

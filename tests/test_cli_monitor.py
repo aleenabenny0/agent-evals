@@ -146,3 +146,19 @@ def test_a_noisy_reference_is_not_frozen(setup: Path, tmp_path: Path) -> None:
         store.close()
     code, output = _monitor(setup, "--freeze")
     assert code == 1 and "too noisy" in output and not mon.REFERENCE_PATH.exists()
+
+
+def test_the_dashboard_shows_every_metric_and_the_alert_day(
+    setup: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from agent_evals import dashboard as dash
+
+    monkeypatch.setattr(dash, "DASHBOARD_PATH", tmp_path / "dashboard" / "index.html")
+    assert _monitor(setup, "--freeze")[0] == 0
+    assert _monitor(setup, "6")[0] == 1
+    result = CliRunner().invoke(cli.app, ["dashboard", "-c", str(setup)])
+    assert result.exit_code == 0, result.output
+    page = dash.DASHBOARD_PATH.read_text(encoding="utf-8")
+    assert page.startswith("<!doctype html>") and page.count("<svg") == 8  # 7 metrics + fabricated
+    assert "Alert:" in page and "uncited_answer" in page and "day 6" in page
+    assert "<script" not in page and "http" not in page.split("<main>")[0]  # static, no fetches
