@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 from pathlib import Path
 
 import pytest
@@ -85,17 +86,25 @@ def _day(store: ResultsStore, tmp: Path, day: int, uncited: int, run: str = "") 
     store.finish_run(run, "complete")
 
 
-@pytest.fixture
-def setup(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
-    (tmp_path / "traffic").mkdir()
-    (tmp_path / "cases").mkdir()
-    store = ResultsStore(tmp_path / "evals.duckdb")
+@pytest.fixture(scope="module")
+def built(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Six online days in a store, built once: inserts row by row are slow."""
+    base = tmp_path_factory.mktemp("monitor")
+    (base / "traffic").mkdir()
+    (base / "cases").mkdir()
+    store = ResultsStore(base / "evals.duckdb")
     try:
         for day in (1, 2, 3, 4, 5):
-            _day(store, tmp_path, day, uncited=1)
-        _day(store, tmp_path, 6, uncited=10)  # most answers lose their citations
+            _day(store, base, day, uncited=1)
+        _day(store, base, 6, uncited=10)  # most answers lose their citations
     finally:
         store.close()
+    return base
+
+
+@pytest.fixture
+def setup(built: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
+    shutil.copytree(built, tmp_path, dirs_exist_ok=True)  # each test gets its own store
     monkeypatch.setattr(cli, "TRAFFIC_DIR", tmp_path / "traffic")
     monkeypatch.setattr(mon, "REFERENCE_PATH", tmp_path / "reference.json")
     monkeypatch.setattr(mon, "ALERTS_PATH", tmp_path / "alerts.json")

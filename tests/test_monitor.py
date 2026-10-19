@@ -37,9 +37,9 @@ def _day(run_id: str, **override: Any) -> DayValues:
         "uncited_answer": _ones(80, 8),
         "in_scope_abstention": _ones(80, 4),
         "error": _ones(100, 1),
-        "model_calls": [3.0, 4.0, 5.0, 4.0] * 25,
-        "latency": [8.9, 9.0, 9.1, 9.0] * 25,
-        "tokens": [9.4, 9.5, 9.6, 9.5] * 20,
+        "model_calls": [3.0, 4.0, 5.0, 4.0] * 10,  # small, to keep the 20,000 draws quick
+        "latency": [8.9, 9.0, 9.1, 9.0] * 10,
+        "tokens": [9.4, 9.5, 9.6, 9.5] * 10,
     }
     values.update(override.pop("values", {}))
     day = DayValues(
@@ -84,7 +84,7 @@ def test_a_real_rise_alerts_and_a_small_significant_one_stays_under_its_floor() 
 
 
 def test_means_alert_on_a_rise_past_the_floor_and_latency_needs_uncached_attempts() -> None:
-    slow = _day("d9", values={"latency": [x + log(1.6) for x in [8.9, 9.0, 9.1, 9.0] * 25]})
+    slow = _day("d9", values={"latency": [x + log(1.6) for x in [8.9, 9.0, 9.1, 9.0] * 10]})
     assert "latency" in check_day(slow, REFERENCE, judge_enabled=False)["alerts"]
     cached = _day("d9", values=slow.values, cache_hits=3)
     row = _row(check_day(cached, REFERENCE, judge_enabled=False), "latency")
