@@ -1,0 +1,79 @@
+{
+  "questions": 100,
+  "by_intent": {
+    "comparison": 10,
+    "false_premise": 10,
+    "lookup": 70,
+    "outside_snapshot": 10
+  },
+  "by_persona": {
+    "cost-manager": 20,
+    "new-developer": 20,
+    "non-native": 20,
+    "on-call": 20,
+    "security-reviewer": 20
+  },
+  "by_area": {
+    "ai_ml": 18,
+    "analytics": 4,
+    "compute": 9,
+    "databases": 10,
+    "devtools": 2,
+    "integration": 11,
+    "management": 7,
+    "networking": 9,
+    "security": 14,
+    "storage": 6
+  },
+  "outside_services": [
+    "Braket",
+    "Clean Rooms",
+    "Device Farm",
+    "HealthLake",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "MediaLive",
+    "RoboMaker",
+    "Snowball",
+    "Wickr"
+  ],
+  "source_pages": 79,
+  "most_questions_from_one_page": 2,
+  "symptom_phrased": 20,
+  "mean_title_overlap": 0.138,
+  "copied_6_or_more_words": 2,
+  "mean_copied_run": 3.03,
+  "regenerated": 6,
+  "day": 4,
+  "generator": "claude-sonnet-5-5",
+  "generator_version": "v2.1",
+  "traffic_sha256": "98b4dd8167c8466a4fe1992805d2c450bf7a0de1bf35b2e3a81f9deed74843da",
+  "inputs": {
+    "corpus": "b6343e2afd9cd7e8e5f5ef6a566477a4b0d77cb9ec321105e063f5fb238f6678",
+    "test_suite": "283fad51a7ec0b0c6ef260a8149ad6cb24f22a8ecc815889696cf01c72fe388c",
+    "area_map": "1a99a7837ed93d44f4a29ebfd38b0a4295de39217824b5703828894a48f6a9cc",
+    "plan": "162df88efc8f7bd3407ca5b1e641ed3841676fe86d922dcf508b47e466a5dca3"
+  },
+  "allowed_source_pages": 245,
+  "excluded_pages": {
+    "test_evidence": 72,
+    "test_support_sentence": 17
+  },
+  "outside_services_dropped": {
+    "GameLift": "named by a test question",
+    "Ground Station": "named by a test question",
+    "Chime": "named on a snapshot page",
+    "Greengrass": "named on a snapshot page",
+    "WorkSpaces": "named on a snapshot page",
+    "MediaConvert": "named on a snapshot page",
+    "Outposts": "named on a snapshot page"
+  },
+  "retries": {
+    "failed": 0,
+    "check_failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 0,
+    "unanswerable": 7,
+    "redrawn_page": 0
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "questions": 100,
+  "by_intent": {
+    "comparison": 10,
+    "false_premise": 10,
+    "lookup": 70,
+    "outside_snapshot": 10
+  },
+  "by_persona": {
+    "cost-manager": 20,
+    "new-developer": 20,
+    "non-native": 20,
+    "on-call": 20,
+    "security-reviewer": 20
+  },
+  "by_area": {
+    "ai_ml": 12,
+    "analytics": 4,
+    "compute": 20,
+    "databases": 5,
+    "devtools": 3,
+    "integration": 8,
+    "management": 5,
+    "migration": 1,
+    "networking": 9,
+    "security": 15,
+    "storage": 8
+  },
+  "outside_services": [
+    "Braket",
+    "Clean Rooms",
+    "HealthLake",
+    "IoT SiteWise",
+    "Location Service",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "RoboMaker",
+    "Snow Family",
+    "Wickr"
+  ],
+  "source_pages": 73,
+  "most_questions_from_one_page": 3,
+  "symptom_phrased": 20,
+  "mean_title_overlap": 0.14,
+  "copied_6_or_more_words": 6,
+  "mean_copied_run": 3.38,
+  "regenerated": 6,
+  "day": 5,
+  "generator": "claude-sonnet-5-5",
+  "generator_version": "v2.1",
+  "traffic_sha256": "a12879d62c9b2ddae3db90a92ecc75d067a4bf5441313d1622f725c068706c1b",
+  "inputs": {
+    "corpus": "b6343e2afd9cd7e8e5f5ef6a566477a4b0d77cb9ec321105e063f5fb238f6678",
+    "test_suite": "283fad51a7ec0b0c6ef260a8149ad6cb24f22a8ecc815889696cf01c72fe388c",
+    "area_map": "1a99a7837ed93d44f4a29ebfd38b0a4295de39217824b5703828894a48f6a9cc",
+    "plan": "36d32d7723e9bbbb33e4464ee236bd39d3a4755bd8ab50106644584cbcfdda96"
+  },
+  "allowed_source_pages": 245,
+  "excluded_pages": {
+    "test_evidence": 72,
+    "test_support_sentence": 17
+  },
+  "outside_services_dropped": {
+    "GameLift": "named by a test question",
+    "Ground Station": "named by a test question",
+    "Chime": "named on a snapshot page",
+    "Greengrass": "named on a snapshot page",
+    "WorkSpaces": "named on a snapshot page",
+    "MediaConvert": "named on a snapshot page",
+    "Outposts": "named on a snapshot page"
+  },
+  "retries": {
+    "failed": 0,
+    "check_failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 0,
+    "unanswerable": 6,
+    "redrawn_page": 0
+  }
+}
