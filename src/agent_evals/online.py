@@ -17,7 +17,7 @@ from agent_evals.simulate import TrafficQuestion
 from agent_evals.types import Case, Gold
 
 ONLINE_CASES_DIR = Path("results/online/cases")
-ONLINE_SUITE_PREFIX = "online-"  # an online run's suite name; never the latest run
+ONLINE_SUITE_PREFIX = "online-"  # names a day's cases file; online-ness comes from the cases
 # The judge validated against Aleena's labels (docs/judge-validation.md): claude-sonnet-5-5 with
 # rubric v2. Only it judges online runs, so a change of judge cannot pass for a change in the
 # agent.

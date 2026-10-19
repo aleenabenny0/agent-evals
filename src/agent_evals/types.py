@@ -119,8 +119,10 @@ class Case(BaseModel):
                     "an online case's gold may hold only `support`, never an answer, phrases "
                     "or evidence"
                 )
-            if not g.support:
+            if not g.support or not all(s.strip() for s in g.support):
                 raise ValueError("an online case with an empty gold is rejected; leave it out")
+            if self.type != "false_premise":
+                raise ValueError("only an online false premise has a gold: its minimal key")
         return self
 
     @property

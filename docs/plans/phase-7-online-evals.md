@@ -43,7 +43,9 @@ tested blind.
   mentioned in passing (Outposts on ten pages, as in "On Outposts, gp3 volumes support sizes up
   to 16 TiB"), and two more are named by test questions. So `simulate.py` adds eight candidates,
   every candidate is checked when a day is planned, and each dropped one is recorded with its
-  reason. 13 remain, and a day's 10 outside questions name 10 different services.
+  reason. 13 names remain. Snowball and Snow Family are one product family, so a day names each
+  family at most once (generator v2.1): a day's 10 outside questions name 10 different products,
+  from 12 families.
 - **Recorded per question:** source page, persona, intent, area, and the share of its content
   words (stopwords dropped) that appear in the page's title or headings.
 - **Storage.** `results/online/traffic/day-NN.jsonl`, outside `suites/`, so snapshot checks and
@@ -64,7 +66,17 @@ tested blind.
   decided only once all 30 are reviewed. Below two thirds, the generator prompts are revised
   before day 1. The rates are published, per intent.
 
-## 2. Online runs (grader guards, to agree first)
+## 2. Online runs (grader guards, approved by Aleena 2026-10-19)
+
+**Built** (commit 1e96ed6, then the review's 16 fixes): `evals online-run DAY [--no-judge]` turns
+the day's traffic into `results/online/cases/online-day-NN.jsonl`, runs the docs agent once per
+question and judges the answers. A run is online because its cases are, recorded with the run,
+never because of a file name; a file or run that mixes online and offline cases is refused.
+`evals judge` refuses an online run unless the judge is `2cf75fa03e09`, and online-run checks that
+before paying for the agent. Judge, regrade and label refuse an online run whose cases file has
+changed since it ran. The gate refuses online runs, which have no reference answers. Each online
+run records its day, its config and whether that was the champion's.
+
 
 - **Case model.** New values: suite "online", split "online" and provenance "simulated", which is
   not a draft. `gold` may be absent, but only on online cases. Every place that reads `case.gold`
@@ -126,7 +138,9 @@ tested blind.
 
 1. **Days 1 to 5** are normal, 100 questions each, and form the reference.
 2. **Day 6** is normal and must not alert, as the false-alarm check.
-3. **Day 7** is a bad deploy: a rollback to prompt v2, with 200 questions. The champion also runs
+3. **Day 7** is a bad deploy: a rollback to prompt v2, with 200 questions (generated as two halves
+   of 100 with separate seeds, each half naming 10 different products, so a product may appear in
+   both halves; to be built in part 5). The champion also runs
    on the same questions as a shadow, so the paired difference separates the agent from the
    traffic. The expected alert, judge_supported down, is stated with its power, computed from the
    reference's observed rate and graded n.
@@ -138,17 +152,32 @@ tested blind.
 
 ## Cost and Aleena's time
 
-- **Money:** about $25 in all. That covers 5 days of 100 questions and 6 days of 200 with
-  shadows. Each 100 questions costs about $1.65: about $0.50 for the generator and its checker,
-  $0.25 for the agent and $0.90 for the judge.
-- **Aleena's time:** about 40 minutes, in three short tasks: the pilot of 30 questions, 30 judge
-  labels from reference days, and sealing the blind configs.
+- **Money**, recomputed 2026-10-19. The first figure, "about $25 in all", did not match its
+  own unit costs, which came to about $34. Measured since: the generator and its checker cost
+  $0.62 to $0.64 per 100 questions (days 0 and 1, from the recorded tokens at the published
+  prices). Estimated until day 1's online run measures them: the agent about $0.20 and the
+  judge about $0.50 per 100 questions, with prompt caching, and with one judge call per answer
+  online, since the responsive check is skipped. So about $1.35 per 100 questions. Day sizes,
+  settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
+  against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
+  champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
+  day with its shadow, so about $28 in all, plus about $1.50 already spent generating day 0
+  twice. Aleena approved about $25; the work stops to ask before passing it, at day 7 at the
+  latest. Without shadow runs on the blind days 9 to 11 the total is about $24 (each such day
+  saves about $1.40: the champion's second agent run and its judging).
+- **Aleena's time:** about 40 minutes, in three short tasks: the pilot of 30 questions (done,
+  2026-10-18), 30 judge labels from reference days, and sealing the blind configs. Optional: the
+  10-question realism read of generator v2, about 3 minutes (`evals pilot-review 0 --quick`), not
+  taken so far.
 
-## Decisions for Aleena
+## Decisions for Aleena (answered 2026-10-19)
 
-1. Approve the online-case grader guards (part 2) and the alert rule (part 3).
-2. Dashboard: static HTML (recommended) or Streamlit.
-3. The budget and the three short tasks.
+1. The online-case grader guards (part 2) and the alert rule (part 3): **approved**.
+2. Dashboard: **static HTML**.
+3. The budget (about $25 as then estimated) and the three short tasks: **approved**. The
+   estimate has since been corrected (see "Cost"), so anything past $25 is asked first.
+4. The 10-question realism read of generator v2 (`evals pilot-review 0 --quick`): open, and
+   optional.
 
 ## How the review of v1 was taken in
 
@@ -195,9 +224,11 @@ given to her failed (the day was an option) and a markup crash turned up while f
 agent drove `evals pilot-review` on a copy of day 0, a second parsed every command in the docs,
 and an independent agent reproduced each failure. That confirmed 6 problems in the command, left
 4 more unverified, and found 3 outdated commands in old notes. All 10 command problems are fixed,
-each with an end-to-end test in `tests/test_cli_pilot.py`. Two of the old commands are
-corrected; the third is left as a superseded record (`docs/judge-validation.md`, section 2). No
-current instruction failed to parse.
+each with a test: a command-line test in `tests/test_cli_pilot.py` for each, except that the
+stratified sample, the passages and the search hits had unit tests only until the session audit
+of 2026-10-19 added command-line tests for them too. Two of the old commands are corrected; the
+third is left as a superseded record (`docs/judge-validation.md`, section 2). No current
+instruction failed to parse.
 
 | Problem | Fix |
 |---|---|
@@ -254,3 +285,33 @@ did not fully answer, and each was rewritten. One thing is left to the realism r
 questions follow the page's own example closely, such as its Ohio-to-Oregon transaction or its
 Auto Scaling group of 4, 6 and 12. Check 3 is Aleena's to take or skip:
 `uv run evals pilot-review 0 --quick` (10 questions, realism only, at least 7 to pass).
+
+## Session audit (2026-10-19)
+
+Aleena asked for a check that nothing was wrong or missing. A docs auditor checked every number
+and claim written in the last day against the result files and the code; a code auditor hunted
+for bugs in the pilot tool, generator v2 and prompt caching, replaying day 0 from the call cache
+with misses refused (it rebuilds byte for byte) and testing the store migration on a copy of the
+results database. Their verifier stopped at a usage limit, so each finding was checked by hand
+before it was fixed. Fourteen findings, all fixed or written down:
+
+| Finding | Done |
+|---|---|
+| The budget's total never matched its unit costs ($34 against "$25") | Recomputed from measured costs ("Cost"); asked before passing $25 |
+| Snowball and Snow Family counted as two of a day's 10 different services | One product family a day (generator v2.1); days 1 to 5 regenerated |
+| A retry quoted only the last rejected draft, so the generator went back to an earlier one | Every rejection on the page is quoted (v2.1) |
+| A failed checker call was counted as a generator failure | Counted apart, as `check_failed` (v2.1) |
+| 200-question days cannot be generated, and the plan disagreed on which days had 200 | Two halves of 100 (part 5); day sizes settled in the demo and "Cost" |
+| The prompt cache helper could mark an empty block, override a TTL or pass 4 breakpoints | It leaves those alone; tests |
+| The generator and checker were said to use the prompt cache; their prompts are too short | Corrected: only the agent and the judge cache |
+| Sonnet's 0.05x cache-read price was described but not applied | Set in the judge's pricing, with the published prices |
+| No CHANGELOG entries for generator v2 and part 2; part 2 of the plan named no command | Added (CHANGELOG; part 2's "Built" note) |
+| "Each with an end-to-end test" overstated the pilot's tests | Reworded; the missing command-line tests added |
+| The time budget left out the optional realism read | Added |
+| `evals simulate --help` said one call per question | Corrected |
+
+Generator v2.1 changes only retries and the outside services' assignment: a lookup or comparison
+is still kept only when the checker finds its section answers every part of it. Day 0, the pilot
+day, stays the v2 day it was checked on (its meta records v2); days 1 to 5, the reference, are
+v2.1.
+

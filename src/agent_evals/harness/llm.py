@@ -58,16 +58,45 @@ def with_prompt_cache(request: dict[str, Any]) -> dict[str, Any]:
     so each turn of a tool loop reuses the turns before it. A one-message request (a judge or
     generator call) gets no more than that: its message is used once, and writing it to the
     cache would only add the 1.25x write price. The caller's request is not changed."""
+    if "cache_control" in request:  # the caller manages the cache itself
+        return request
     marker = {"type": "ephemeral"}
     sent = dict(request)
+    used = _breakpoints(request)
     system = sent.get("system")
-    if isinstance(system, str) and system:
-        sent["system"] = [{"type": "text", "text": system, "cache_control": marker}]
-    elif isinstance(system, list) and system and isinstance(system[-1], dict):
-        sent["system"] = [*system[:-1], {**system[-1], "cache_control": marker}]
-    if len(sent.get("messages", [])) > 1 and "cache_control" not in sent:
+    if used < MAX_BREAKPOINTS:
+        if isinstance(system, str) and system.strip():
+            sent["system"] = [{"type": "text", "text": system, "cache_control": marker}]
+            used += 1
+        elif isinstance(system, list) and system and _markable(system[-1]):
+            sent["system"] = [*system[:-1], {**system[-1], "cache_control": marker}]
+            used += 1
+    if len(sent.get("messages", [])) > 1 and used < MAX_BREAKPOINTS:
         sent["cache_control"] = marker
     return sent
+
+
+MAX_BREAKPOINTS = 4  # the API's limit per request, automatic caching included
+
+
+def _markable(block: Any) -> bool:
+    """A system block that can take a breakpoint: not already marked (its TTL is kept), and not
+    an empty text block, which the API cannot cache."""
+    if not isinstance(block, dict) or "cache_control" in block:
+        return False
+    return block.get("type") != "text" or bool(str(block.get("text", "")).strip())
+
+
+def _breakpoints(request: dict[str, Any]) -> int:
+    """The cache_control markers a request already carries, in tools, system and messages."""
+    blocks: list[Any] = list(request.get("tools") or [])
+    if isinstance(request.get("system"), list):
+        blocks += request["system"]
+    for message in request.get("messages") or []:
+        content = message.get("content") if isinstance(message, dict) else None
+        if isinstance(content, list):
+            blocks += content
+    return sum(1 for b in blocks if isinstance(b, dict) and "cache_control" in b)
 
 
 class AnthropicClient:

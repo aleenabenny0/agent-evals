@@ -135,6 +135,45 @@ def test_plan_day_has_exact_quotas_distinct_outside_services_and_no_excluded_pag
     assert plan_day(1, pages, {OBJECTS_URL}, SERVICES) == slots  # a day can be rebuilt exactly
 
 
+def test_a_day_names_each_service_family_once(pages: Corpus) -> None:
+    services = ["Snowball", "Snow Family", *SERVICES[:10]]  # 12 names, 11 families
+    for day in range(12):
+        named = {s.service for s in plan_day(day, pages, set(), services) if s.service}
+        assert len(named) == OUTSIDE_PER_DAY and not {"Snowball", "Snow Family"} <= named
+    with pytest.raises(ValueError, match="distinct"):  # 10 names but 9 families
+        plan_day(1, pages, set(), ["Snowball", "Snow Family", *SERVICES[:8]])
+
+
+def test_retries_carry_every_rejected_draft_and_a_failed_check_is_counted_apart(
+    pages: Corpus,
+) -> None:
+    slots = [
+        Slot(6, 0, "cost-manager", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
+        Slot(6, 1, "cost-manager", "lookup", MEMORY_URL, None, None, False, MEMORY_SEC),
+    ]
+    taken = "What is the most memory a Lambda function can have?"
+    vague = "How much memory can a function use, and what does each MB cost?"
+    llm = ScriptedLLM(
+        [
+            ask(taken),
+            checked("full"),
+            ask(taken),  # slot 1, try 0: a duplicate
+            ask(vague),  # try 1
+            checked("partial", "the price per MB"),
+            ask("Does more memory also give a function more CPU?"),  # try 2
+            [text("no verdict")],  # the checker fails
+            ask("Does more memory also give a function more CPU?"),  # try 3
+            checked("full"),
+        ]
+    )
+    questions, redo = generate_day(llm, slots, pages, {}, "m")
+    assert questions[1].attempt == 3
+    assert (redo["duplicate"], redo["unanswerable"], redo["check_failed"]) == (1, 1, 1)
+    assert redo["failed"] == 0  # the generator never failed; the checker did
+    last = llm.requests[7]["messages"][0]["content"]  # slot 1, try 3
+    assert taken in last and vague in last and "the price per MB" in last  # both rejections
+
+
 def test_plan_day_refuses_without_pages_or_ten_distinct_services(corpus: Corpus) -> None:
     with pytest.raises(ValueError, match="source pages"):
         plan_day(1, corpus, excluded_urls={BUCKETS_URL, LAMBDA_URL}, outside=SERVICES)
@@ -259,6 +298,7 @@ def test_a_near_duplicate_is_retried_under_a_new_salt_with_the_clash_quoted(
     assert [q.attempt for q in questions] == [0, 1, 0]
     assert redo == {
         "failed": 0,
+        "check_failed": 0,
         "unnamed_service": 0,
         "duplicate": 1,
         "unanswerable": 0,
@@ -322,7 +362,7 @@ def test_failed_replies_and_unnamed_services_are_retried_not_fatal(corpus: Corpu
     assert questions[0].question == "How is an Amazon Braket quantum task billed?"
     assert questions[0].attempt == 2
     assert redo["failed"] == 1 and redo["unnamed_service"] == 1
-    assert 'Use the name "Braket"' in llm.requests[2]["messages"][0]["content"]
+    assert 'does not use the name "Braket"' in llm.requests[2]["messages"][0]["content"]
 
 
 def test_a_slot_that_never_yields_a_question_fails_loudly(corpus: Corpus) -> None:

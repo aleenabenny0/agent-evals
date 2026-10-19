@@ -174,17 +174,35 @@ Format:
   API's prompt cache only as it sends a call: a breakpoint on the system prompt (the tools come
   before it), shared by every call of a run, and for a conversation of more than one message
   automatic caching too, so each turn of the agent's tool loop reuses the turns before it. A
-  one-message call (judge, generator) caches only its system prompt, because writing its
-  one-time message to the cache would cost 1.25x for nothing. The API documents that the cache
-  never changes the response. The local call-cache key and the agent and judge fingerprints are
-  as before, so past runs still replay from the local cache and the judge is still
-  2cf75fa03e09. Token counts stay whole (input_tokens includes the cached part), and cost prices
-  cache writes at 1.25x and reads at 0.1x the input price (0.05x on Sonnet 5.5); the results
-  store gains two columns for the cached part. Measured live: on one smoke question the agent's
-  3 calls cost 19% less, and from the judge's second answer on, both its system prompts
-  (1,563 tokens) were read from the cache, about 68% less input cost per answer. Latency drops
-  too, so latency from before and after this change is not comparable; every online day runs
-  with it.
+  one-message call gets only the system breakpoint, because writing its one-time message to the
+  cache would cost 1.25x for nothing. Only the agent and the judge benefit: the generator's and
+  checker's prompts are below the API's 512-token minimum, so nothing of theirs is cached. The API
+  documents that the cache never changes the response. The local call-cache key and the agent
+  and judge fingerprints are as before, so past runs still replay from the local cache and the
+  judge is still 2cf75fa03e09. Token counts stay whole (input_tokens includes the cached part),
+  and cost prices cache writes at 1.25x and reads at 0.1x the input price; Sonnet 5.5 reads cost
+  0.05x, set in the judge's pricing with the published prices ($2 and $10 per million tokens).
+  The results store gains two columns for the cached part. Measured in a one-off live check
+  (not stored): on one smoke question the agent's 3 calls cost 19% less, and from the judge's
+  second answer on, both its system prompts (1,563 tokens) were read from the cache, about 68%
+  less input cost per answer. Every new run now stores its cache tokens. Latency drops too, so
+  latency from before and after this change is not comparable; every online day runs with it.
+- 2026-10-19: phase 7 part 2, online runs, approved by Aleena (plan, part 2). Online cases (suite,
+  split "online", provenance "simulated") have no gold, except a false premise's key. The keyword
+  grader records only `abstained` on them (`answer_keywords` version 3); the evidence metrics and
+  the judge's responsive check are skipped. `evals online-run DAY` writes the day's cases to
+  `results/online/cases/`, runs the docs agent and judges with the pinned judge `2cf75fa03e09`.
+  An adversarial review found 16 problems, all fixed: a run is online because its cases are
+  (recorded with the run), not because of its file name; mixed files and runs are refused; online
+  runs are never the latest, are refused by the gate, and cannot be judged, regraded or labeled
+  after their cases file changes; online-run checks the judge before paying for the agent.
+- 2026-10-18 and 19: generator v2, then v2.1. The pilot found the questions realistic but often
+  not answerable, so a lookup or comparison is now written from one section of its page and kept
+  only when a checker call finds the section answers every part of it. Pre-registered checks on
+  day 0: 20 of 20 piloted lookups and comparisons fully answered (v1: 6), copying 2%. Day 0 was
+  regenerated and the v1 pilot moved to `results/online/pilot-v1/`. v2.1, after a session audit:
+  one product family per day among the outside services, retries quote every rejected draft, and
+  checker failures are counted apart. Days 1 to 5 are v2.1.
 - 2026-10-18: phase 7 part 1, the simulated user. `evals simulate DAY` writes a day of 100
   questions (5 personas, each with 14 lookup, 2 comparison, 2 false-premise and 2
   outside-snapshot questions) to `results/online/traffic/`, and `evals pilot-review` records the
@@ -193,8 +211,9 @@ Format:
   questions. An isolated code review found 16 problems, all fixed (plan, "Code review of part 1").
   Day 0, the pilot day, is generated; nothing is graded yet. Then `evals pilot-review` was tested
   end to end on a copy of day 0, after the command as first given failed; all 10 problems found
-  are fixed, each with a command-line test. The pilot sample is now stratified by intent and its bar weighted by
-  traffic share, both fixed before any answer exists.
+  are fixed, each with a test (command-line tests for the sample, passages and search hits came
+  with the 2026-10-19 audit). The pilot sample is now stratified by intent and its bar weighted
+  by traffic share, both fixed before any answer exists.
 - 2026-10-18: the improvement chart and the cause breakdown for Brief 02 M6 (`docs/charts/`),
   rebuilt from the results store by `scripts/improvement_chart.py`, plotted numbers in
   `docs/charts/improvement.json`; reviewed for honesty by an isolated reviewer against this file

@@ -102,6 +102,9 @@ def run_suite(
     show_progress: bool = True,
 ) -> str:
     run_id = run_id or new_run_id(agent.name)
+    kinds = {c.is_online for c in cases}
+    if len(kinds) > 1:
+        raise ValueError("a run mixes online and offline cases; their metrics would pool")
     store.start_run(
         run_id,
         agent=agent.name,
@@ -109,6 +112,7 @@ def run_suite(
         suite=suite_name,
         attempts=attempts,
         manifest=manifest,
+        online=kinds == {True},
     )
 
     jobs = iter([(case, attempt) for case in cases for attempt in range(1, attempts + 1)])

@@ -15,7 +15,7 @@ from agent_evals.config import Config, load_config
 if TYPE_CHECKING:
     from agent_evals.stats.core import Estimate
     from agent_evals.store.db import ResultsStore
-    from agent_evals.types import Grade
+    from agent_evals.types import Case, Grade
 
 app = typer.Typer(add_completion=False, no_args_is_help=True, help=__doc__)
 console = Console()
@@ -26,6 +26,20 @@ DEFAULT_CONFIG = Path("configs/default.yaml")
 
 def _config(path: Path) -> Config:
     return load_config(path if path.exists() else None)
+
+
+def _require_unchanged_cases(info: dict[str, Any], suite_path: Path) -> None:
+    """An online run's cases file must be the one it ran: a day regenerated since would put
+    other questions under the same ids. (A suite file may change on purpose; see regrade.)"""
+    from agent_evals.harness.manifest import file_sha256
+
+    recorded = info["manifest"].get("suite", {}).get("sha256")
+    if info.get("online") and suite_path.exists() and file_sha256(suite_path) != recorded:
+        console.print(
+            f"[red]{suite_path} has changed since online run {info['run_id']}; its answers "
+            "belong to other questions now.[/red]"
+        )
+        raise typer.Exit(code=2)
 
 
 @app.command()
@@ -547,7 +561,7 @@ def judge(
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
-    from agent_evals.online import ONLINE_JUDGE_VERSION, ONLINE_SUITE_PREFIX
+    from agent_evals.online import ONLINE_JUDGE_VERSION
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
     from agent_evals.types import AgentResult
@@ -558,9 +572,7 @@ def judge(
     try:
         info = store.run_info(run_id)
         grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
-        if str(info["suite"]).startswith(ONLINE_SUITE_PREFIX) and (
-            grader.version != ONLINE_JUDGE_VERSION
-        ):
+        if info["online"] and grader.version != ONLINE_JUDGE_VERSION:
             console.print(
                 f"[red]An online run is judged only by the validated judge "
                 f"{ONLINE_JUDGE_VERSION}; this config's judge is {grader.version}.[/red]"
@@ -570,6 +582,7 @@ def judge(
         if not suite_path.exists():
             console.print(f"[red]The run's suite file {suite_path} is gone; cannot judge.[/red]")
             raise typer.Exit(code=2)
+        _require_unchanged_cases(info, suite_path)
         cases = {c.id: c for c in load_suite(suite_path)}
         todo = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
         if only_labeled is not None:
@@ -614,10 +627,13 @@ def judge(
             },
         )
         u = grader.usage
+        cost = u.cost_usd(cfg.judge.model.pricing)
+        uncached = (cost or 0.0) * (u.model_calls - u.cached_calls) / max(u.model_calls, 1)
+        spent = f"; about ${uncached:.2f} spent" if cost is not None else ""
         console.print(
             f"judged {judged} answers with {cfg.judge.model.name} (judge {grader.version}): "
             f"{u.model_calls} calls ({u.cached_calls} from cache), {u.input_tokens} in / "
-            f"{u.output_tokens} out tokens"
+            f"{u.output_tokens} out tokens{spent}"
         )
         _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
@@ -696,6 +712,7 @@ def label(
     try:
         info = store.run_info(run_id)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
+        _require_unchanged_cases(info, suite_path)
         cases = {c.id: c for c in load_suite(suite_path)} if suite_path.exists() else {}
         mine = store.labels(run_id, labeler)
         previous = {(x["case_id"], x["attempt"]): x for x in mine}
@@ -843,14 +860,7 @@ def label(
                 console.print(
                     "[dim]no citations: supported is not asked (uncited_answer covers it)[/dim]"
                 )
-            if c.gold is not None:
-                console.print(Panel(c.gold.answer, title="reference answer (gold)"))
-                console.print(f"must_include: {c.gold.must_include}")
-            else:
-                console.print(
-                    "[dim]online case: no reference answer, so judge responsive from the "
-                    "question alone[/dim]"
-                )
+            _show_reference(c)
             question = (
                 "responsive: does it answer the question as asked? (y)es, (n)o, (s)kip, (q)uit"
             )
@@ -1151,10 +1161,12 @@ def regrade(
     ]
     store = ResultsStore(cfg.paths.db)
     try:
-        suite_path = Path(str(store.run_info(run_id)["manifest"].get("suite", {}).get("path", "")))
+        info = store.run_info(run_id)
+        suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         if not suite_path.exists():
             console.print(f"[red]The run's suite file {suite_path} is gone.[/red]")
             raise typer.Exit(code=2)
+        _require_unchanged_cases(info, suite_path)
         n = regrade_run(store, run_id, load_suite(suite_path), graders)
         console.print(f"regraded {n} attempts of {run_id} against {suite_path}")
         _print_summary(store, run_id, cfg.judge.grader_name)
@@ -1179,6 +1191,12 @@ def gate_cmd(
     cfg = _config(config)
     store = ResultsStore(cfg.paths.db)
     try:
+        if store.run_info(champion)["online"] or store.run_info(challenger)["online"]:
+            console.print(
+                "[red]The gate compares suite runs, which have reference answers; online runs "
+                "have none and are watched by the monitor instead (phase 7 part 3).[/red]"
+            )
+            raise typer.Exit(code=2)
         manifest = store.run_info(champion)["manifest"]
         suite_path = Path(str(manifest.get("suite", {}).get("path", "")))
         if "test" in suite_path.name:
@@ -1321,7 +1339,8 @@ def simulate(
     ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Generate one simulated day of online traffic (phase 7). One call per question."""
+    """Generate one simulated day of online traffic (phase 7): a generator call per question, a
+    checker call per lookup and comparison, and any retries. Costs about $0.65 a day."""
     import dataclasses
     import json
 
@@ -1395,6 +1414,23 @@ def simulate(
     console.print_json(json.dumps(meta))
 
 
+def _show_reference(c: Case) -> None:
+    """The label screen's reference for the responsive question. An online case has none; a
+    false premise shows the page sentence it wrongly contradicts instead."""
+    from rich.panel import Panel
+
+    if c.is_online or c.gold is None:
+        console.print(
+            "[dim]online case: no reference answer, so judge responsive from the question "
+            "alone[/dim]"
+        )
+        if c.gold is not None and c.gold.support:
+            console.print(Panel(c.gold.support[0], title="the page sentence it contradicts"))
+        return
+    console.print(Panel(c.gold.answer, title="reference answer (gold)"))
+    console.print(f"must_include: {c.gold.must_include}")
+
+
 def _interactive() -> bool:
     import sys
 
@@ -1411,11 +1447,30 @@ def online_run(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Run the docs agent on one simulated day, grade what needs no reference answer, and judge it
-    with the pinned judge (phase 7 part 2). Costs money. The run is never the latest run."""
-    from agent_evals.online import ONLINE_CASES_DIR, online_case, online_suite_name
+    with the pinned judge (phase 7 part 2). Costs money. The run is never the latest run. Any
+    config may run (part 5's fault and shadow days need others); the run records which, and
+    whether it was the champion's (configs/default.yaml)."""
+    from agent_evals.graders.judge import JudgeGrader
+    from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.online import (
+        ONLINE_CASES_DIR,
+        ONLINE_JUDGE_VERSION,
+        online_case,
+        online_suite_name,
+    )
     from agent_evals.simulate import load_traffic
+    from agent_evals.store.db import ResultsStore
     from agent_evals.suites import write_suite
 
+    cfg = _config(config)
+    if judge_answers:  # refused before the agent is paid for, not after
+        version = JudgeGrader(AnthropicClient(), cfg.judge).version
+        if version != ONLINE_JUDGE_VERSION:
+            console.print(
+                f"[red]An online run is judged only by the validated judge "
+                f"{ONLINE_JUDGE_VERSION}; this config's judge is {version}. Nothing was run.[/red]"
+            )
+            raise typer.Exit(code=2)
     traffic_path = TRAFFIC_DIR / f"day-{day:02d}.jsonl"
     if not traffic_path.exists():
         console.print(
@@ -1428,6 +1483,13 @@ def online_run(
     run_id = run(
         suite=cases_path, agent="docs", attempts=1, limit=None, allow_drafts=False, config=config
     )
+    store = ResultsStore(cfg.paths.db)
+    try:
+        champion = config.resolve() == DEFAULT_CONFIG.resolve()
+        role = {"day": day, "config": str(config), "champion": champion}
+        store.annotate_run(run_id, "online", role)
+    finally:
+        store.close()
     if judge_answers:
         judge(
             run_id=run_id, limit=None, salt="judge", replace=False, only_labeled=None, config=config

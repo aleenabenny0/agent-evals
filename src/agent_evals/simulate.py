@@ -35,7 +35,7 @@ from pydantic import BaseModel, ConfigDict, ValidationError
 from agent_evals.corpus import Chunk, Corpus, Page, tokenize
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.llm import LLMClient
-from agent_evals.types import Area
+from agent_evals.types import Area, Case
 
 PERSONAS: dict[str, str] = {
     "new-developer": (
@@ -87,7 +87,10 @@ AREA_MAP_PATH = Path("configs/online-area-map.json")
 DUPLICATE_JACCARD = 0.6
 MAX_ATTEMPTS = 6  # per source page, each under its own sub-salt
 MAX_REDRAWS = 2  # then an in-snapshot slot's page is redrawn, at most this many times
-GENERATOR_VERSION = "v2"
+GENERATOR_VERSION = "v2.1"  # v2.1: one service per family a day; retries keep every rejection
+# Names that are one product family. A day names each family at most once, so "10 different
+# services" means ten different products, not Snowball twice under two names.
+SERVICE_FAMILIES: dict[str, str] = {"Snow Family": "Snowball"}
 MIN_SECTION_CHARS = 300  # shorter sections are mostly fragments and one-line callouts
 
 SYSTEM = """\
@@ -248,15 +251,16 @@ def page_areas(area_map: Mapping[str, Mapping[str, str]], urls: Iterable[str]) -
     return out
 
 
-def protected_pages(corpus: Corpus, test_cases: Iterable[Any]) -> dict[str, set[str]]:
+def protected_pages(corpus: Corpus, test_cases: Iterable[Case]) -> dict[str, set[str]]:
     """Pages no question may come from, by reason: the gold evidence pages of test cases, and the
-    other pages that hold a test case's support sentence word for word."""
-    cases = list(test_cases)
-    evidence = {u for c in cases for group in c.gold.evidence for u in group if u in corpus.pages}
+    other pages that hold a test case's support sentence word for word. A case without gold (an
+    online case) protects nothing."""
+    golds = [c.gold for c in test_cases if c.gold is not None]
+    evidence = {u for g in golds for group in g.evidence for u in group if u in corpus.pages}
     support = {
         url
-        for c in cases
-        for sentence in c.gold.support
+        for g in golds
+        for sentence in g.support
         for url in corpus.pages
         if url not in evidence and corpus.contains_quote(url, sentence)
     }
@@ -393,11 +397,19 @@ def plan_day(
     if not pool:
         raise ValueError("no allowed source pages to plan a day from")
     services = list(dict.fromkeys(outside))
-    if len(services) < OUTSIDE_PER_DAY:
+    if len({SERVICE_FAMILIES.get(s, s) for s in services}) < OUTSIDE_PER_DAY:
         raise ValueError(
             f"need {OUTSIDE_PER_DAY} distinct outside-snapshot services, got {len(services)}"
         )
     rng.shuffle(services)
+    # Then one service per family, in shuffled order; the shuffle is the same as without the
+    # rule, so the day's page draws do not move.
+    families: set[str] = set()
+    distinct: list[str] = []
+    for name in services:
+        if SERVICE_FAMILIES.get(name, name) not in families:
+            families.add(SERVICE_FAMILIES.get(name, name))
+            distinct.append(name)
     slots: list[Slot] = []
     n_outside = 0
     for persona in PERSONAS:
@@ -406,7 +418,7 @@ def plan_day(
             for k in range(n):
                 index = len(slots)
                 if intent == "outside_snapshot":
-                    service = services[n_outside]
+                    service = distinct[n_outside]
                     n_outside += 1
                     slots.append(Slot(day, index, persona, intent, None, service, None, False))
                     continue
@@ -566,6 +578,16 @@ def longest_shared_run(question: str, text: str) -> int:
     return best
 
 
+def _retry_hint(rejected: Sequence[str]) -> str | None:
+    """Every draft rejected on this page so far, with why, so a retry cannot return to one."""
+    if not rejected:
+        return None
+    lines = "\n".join(f"- {r}" for r in rejected)
+    return (
+        f"These drafts were rejected; write a different question that avoids each problem:\n{lines}"
+    )
+
+
 def _fill(
     llm: LLMClient,
     slot: Slot,
@@ -587,9 +609,9 @@ def _fill(
         base = f"online-day{slot.day:02d}-slot{slot.index:03d}"
         if redraw:
             base += f"-redo{redraw}"
-        hint: str | None = None
+        rejected: list[str] = []  # this page's rejected drafts; a redrawn page starts afresh
         for attempt in range(MAX_ATTEMPTS):
-            request = generation_request(slot, page, model, hint)
+            request = generation_request(slot, page, model, _retry_hint(rejected))
             try:
                 # sonnet-5-5 rejects a forced tool_choice (graders/judge.py), and a failed reply
                 # is cached like any other, so a failure moves on to the next sub-salt.
@@ -599,7 +621,7 @@ def _fill(
                 continue
             if slot.service and not mentions(question, slot.service):
                 redo["unnamed_service"] += 1
-                hint = f'Use the name "{slot.service}" in the question.'
+                rejected.append(f'"{question}": it does not use the name "{slot.service}"')
                 continue
             clash = next(
                 (q.question for q in earlier if jaccard(question, q.question) >= DUPLICATE_JACCARD),
@@ -607,7 +629,7 @@ def _fill(
             )
             if clash is not None:
                 redo["duplicate"] += 1
-                hint = f'Someone already asked this, so ask something different: "{clash}"'
+                rejected.append(f'"{question}": someone already asked "{clash}"')
                 continue
             if slot.section:
                 try:
@@ -616,15 +638,15 @@ def _fill(
                         check_request(question, slot.section, model),
                         f"{base}-try{attempt}-check",
                     )
-                except ValueError:
-                    redo["failed"] += 1
+                except ValueError:  # the checker failed, not the question: ask again
+                    redo["check_failed"] += 1
                     continue
                 if checked.verdict != "full":
                     redo["unanswerable"] += 1
                     gap = f" ({checked.missing})" if checked.missing.strip() else ""
-                    hint = (
-                        f'The section does not answer every part of "{question}"{gap}. Ask only '
-                        "what the section answers."
+                    rejected.append(
+                        f'"{question}": the section does not answer every part of it{gap}; ask '
+                        "only what the section answers"
                     )
                     continue
             return slot, question, attempt, redraw
@@ -643,13 +665,21 @@ def generate_day(
 ) -> tuple[list[TrafficQuestion], dict[str, int]]:
     """Generate every slot in order. A slot is retried under a new sub-salt when the generator
     gives no question, when an outside-snapshot question leaves out its service, when the
-    question is a near-duplicate of an earlier one that day (with the clash quoted back), or when
-    the checker finds its section does not answer every part of it (with the gap named). After
+    question is a near-duplicate of an earlier one that day, or when the checker finds its
+    section does not answer every part of it; each retry lists every draft rejected on that page
+    so far, with why. A checker that fails to answer is retried too, and counted apart. After
     MAX_ATTEMPTS on one page an in-snapshot slot's page is redrawn from `pool`, keeping persona
     and intent. A day so gets its full quota or fails loudly. `areas` maps page URL to area.
     Returns the questions and the retry counts by reason."""
     out: list[TrafficQuestion] = []
-    redo = {"failed": 0, "unnamed_service": 0, "duplicate": 0, "unanswerable": 0, "redrawn_page": 0}
+    redo = {
+        "failed": 0,
+        "check_failed": 0,
+        "unnamed_service": 0,
+        "duplicate": 0,
+        "unanswerable": 0,
+        "redrawn_page": 0,
+    }
     for planned in slots:
         slot, question, attempt, redraw = _fill(llm, planned, corpus, model, out, pool, redo)
         page = corpus.pages.get(slot.source_url) if slot.source_url else None

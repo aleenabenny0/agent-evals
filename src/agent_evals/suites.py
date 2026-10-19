@@ -37,6 +37,8 @@ def load_suite(path: Path) -> list[Case]:
             errors.append(f"line {lineno}: answerable case {case.id!r} has no must_include")
         seen.add(case.id)
         cases.append(case)
+    if len({c.is_online for c in cases}) > 1:
+        errors.append("the file mixes online and offline cases; their metrics would pool")
     if errors:
         raise SuiteError(f"{path} has {len(errors)} problem(s):\n" + "\n".join(errors))
     return cases
@@ -90,7 +92,9 @@ def check_against_corpus(cases: Iterable[Case], corpus: Corpus) -> tuple[list[st
     warnings: list[str] = []
     for c in cases:
         gold = c.gold
-        if gold is None:  # an online case: no reference answer to check against the snapshot
+        # An online case has no reference answer, and a false premise's key was checked to be
+        # on its page when it was generated.
+        if c.is_online or gold is None:
             continue
         present = [u for u in gold.evidence_urls if u in corpus.pages]
         for url in gold.evidence_urls:

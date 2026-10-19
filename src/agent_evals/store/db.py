@@ -64,6 +64,9 @@ CREATE TABLE IF NOT EXISTS labels (
 );
 -- Added 2026-10-12 with the two-question support rubric; NULL on labels made before it.
 ALTER TABLE labels ADD COLUMN IF NOT EXISTS core_supported BOOLEAN;
+-- Added 2026-10-19 with phase 7 part 2: a run of online cases (simulated traffic). NULL on
+-- runs made before it, which were all suite runs.
+ALTER TABLE runs ADD COLUMN IF NOT EXISTS online BOOLEAN;
 -- Added 2026-10-19 with the API's prompt cache: the part of input_tokens it wrote and read.
 -- NULL on attempts recorded before it.
 ALTER TABLE attempts ADD COLUMN IF NOT EXISTS prompt_cache_write_tokens BIGINT;
@@ -96,10 +99,12 @@ class ResultsStore:
         suite: str,
         attempts: int,
         manifest: dict[str, Any],
+        online: bool = False,
     ) -> None:
         self.con.execute(
-            "INSERT INTO runs VALUES (?, ?, NULL, 'running', ?, ?, ?, ?, ?)",
-            [run_id, _now(), agent, agent_version, suite, attempts, json.dumps(manifest)],
+            "INSERT INTO runs (run_id, started_at, finished_at, status, agent, agent_version, "
+            "suite, attempts, manifest, online) VALUES (?, ?, NULL, 'running', ?, ?, ?, ?, ?, ?)",
+            [run_id, _now(), agent, agent_version, suite, attempts, json.dumps(manifest), online],
         )
 
     def finish_run(self, run_id: str, status: str) -> None:
@@ -284,10 +289,10 @@ class ResultsStore:
         return [dict(zip(keys, r, strict=True)) for r in rows]
 
     def latest_run_id(self) -> str | None:
-        """The newest suite run. An online run (phase 7, suite "online-day-NN") is never the
-        latest, so `evals report` keeps showing suite runs."""
+        """The newest suite run. A run of online cases (phase 7) is never the latest, so
+        `evals report` keeps showing suite runs; what decides it is the cases, not a name."""
         row = self.con.execute(
-            "SELECT run_id FROM runs WHERE suite NOT LIKE 'online-%' "
+            "SELECT run_id FROM runs WHERE NOT COALESCE(online, FALSE) "
             "ORDER BY started_at DESC LIMIT 1"
         ).fetchone()
         return str(row[0]) if row else None
@@ -295,7 +300,7 @@ class ResultsStore:
     def run_info(self, run_id: str) -> dict[str, Any]:
         row = self.con.execute(
             "SELECT run_id, started_at, finished_at, status, agent, agent_version, suite, "
-            "attempts, manifest FROM runs WHERE run_id = ?",
+            "attempts, manifest, COALESCE(online, FALSE) FROM runs WHERE run_id = ?",
             [run_id],
         ).fetchone()
         if row is None:
@@ -310,6 +315,7 @@ class ResultsStore:
             "suite",
             "attempts",
             "manifest",
+            "online",
         ]
         info = dict(zip(keys, row, strict=True))
         info["manifest"] = json.loads(info["manifest"])

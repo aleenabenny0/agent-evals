@@ -96,6 +96,31 @@ def test_a_conversation_also_gets_automatic_caching_for_its_earlier_turns() -> N
     assert "cache_control" not in turn_two["system"][-1] and "cache_control" not in turn_two
 
 
+def test_the_prompt_cache_helper_never_builds_a_request_the_api_rejects() -> None:
+    mine = {**REQUEST, "cache_control": {"type": "ephemeral", "ttl": "1h"}}
+    assert with_prompt_cache(mine) is mine  # the caller manages the cache: left alone
+    kept = {**REQUEST, "system": [{"type": "text", "text": "a", "cache_control": {"ttl": "1h"}}]}
+    assert with_prompt_cache(kept)["system"] == kept["system"]  # an existing TTL is kept
+    empty = {**REQUEST, "system": [{"type": "text", "text": "a"}, {"type": "text", "text": " "}]}
+    assert "cache_control" not in with_prompt_cache(empty)["system"][-1]  # cannot be cached
+    four = {
+        **REQUEST,
+        "system": "s",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": str(n), "cache_control": {"type": "ephemeral"}}
+                    for n in range(4)
+                ],
+            },
+            {"role": "assistant", "content": "x"},
+        ],
+    }
+    sent = with_prompt_cache(four)
+    assert sent["system"] == "s" and "cache_control" not in sent  # the four slots are taken
+
+
 def test_prompt_cache_tokens_are_billed_at_their_own_multiples() -> None:
     pricing = Pricing(input_per_mtok=1.0, output_per_mtok=5.0)
     usage = Usage(

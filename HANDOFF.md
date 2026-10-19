@@ -466,9 +466,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   once she approves them.
   **2026-10-19:** Aleena's decisions: grader guards and alert rule yes, static dashboard, budget ok.
   Generator v2 (lookups written from one page section, checked) passes its pre-registered checks
-  (20 of 20 fully answered against v1's 6). Part 2 built (`evals online-run DAY`, commit 1e96ed6),
-  under adversarial review. Prompt caching on every API call (CHANGELOG). Next: days 1 to 5 and
-  their online runs, then part 3, the monitor.
+  (20 of 20 fully answered against v1's 6). Part 2 built (`evals online-run DAY`), and the
+  adversarial review's 16 findings fixed. Prompt caching on every API call (CHANGELOG). A session
+  audit found 14 more problems (plan, "Session audit"), all fixed: notably the budget, which was
+  about $28, not $25 (ask Aleena before passing $25), and generator v2.1. Days 1 to 5 generated
+  with v2.1. The optional realism read (`evals pilot-review 0 --quick`) was not taken. Next: the
+  online runs of days 1 to 5 (`uv run evals online-run N`, about $0.70 each), then part 3, the
+  monitor.
 
 ## Target: the three project briefs
 

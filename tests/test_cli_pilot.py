@@ -167,6 +167,34 @@ def test_the_quick_read_fails_below_seven_of_ten(pilot_config: Path) -> None:
     assert result.exit_code == 1 and "Fewer than 7 of 10 are realistic" in output
 
 
+def test_each_question_shows_two_passages_its_page_link_and_distinct_search_hits(
+    pilot_config: Path,
+) -> None:
+    code, output = _review(pilot_config, "q\n")
+    assert code == 0
+    assert "best-matching passages on its page" in output and LAMBDA_URL in output
+    assert "another page may have it" in output
+    hits = output.split("top snapshot search hits:")[1].split("Would a real person")[0]
+    titles = [t.strip() for t in hits.split(";")]
+    assert len(titles) == len(set(titles))  # one title per page, however many chunks matched
+
+
+def test_the_sample_is_drawn_from_a_larger_day_by_persona_and_intent(
+    pilot_config: Path,
+) -> None:
+    day = cli.TRAFFIC_DIR / "day-02.jsonl"
+    doubled = [*_questions(), *(q.model_copy(update={"id": q.id + "b"}) for q in _questions())]
+    day.write_text("".join(q.model_dump_json() + "\n" for q in doubled), encoding="utf-8")
+    code, _ = _review(pilot_config, ANSWER_ONE * 30)
+    answers = _answers()
+    assert code == 0 and len(answers) == 30  # 30 of the 60, stratified
+    by_cell: dict[tuple[str, str], int] = {}
+    for a in answers.values():
+        key = (str(a["persona"]), str(a["intent"]))
+        by_cell[key] = by_cell.get(key, 0) + 1
+    assert by_cell == {(p, i): n for p in PERSONAS for i, n in PILOT_PER_PERSONA.items()}
+
+
 def test_pilot_review_refuses_without_a_terminal(
     pilot_config: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

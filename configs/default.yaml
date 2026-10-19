@@ -34,15 +34,18 @@ graders:
 
 judge:
   # LLM judge for "supported" and "responsive" (docs/plans/llm-judge.md). Only `evals judge RUN`
-  # calls it; a normal run never does. Pricing left empty until checked on the pricing page, so
-  # `evals judge` reports tokens, not dollars.
+  # calls it; a normal run never does. Pricing is not part of the judge's version.
   model:
     name: claude-sonnet-5-5
     max_tokens: 2048       # the model thinks before the tool call; 400 truncated verdicts
     temperature: null
     pricing:
-      input_per_mtok: null
-      output_per_mtok: null
+      # USD per million tokens for claude-sonnet-5-5, first-party, from
+      # https://platform.claude.com/docs/en/about-claude/pricing on 2026-10-19. Prompt-cache
+      # reads on Sonnet 5.5 cost 0.05x the input price, not the default 0.1x.
+      input_per_mtok: 2.00
+      output_per_mtok: 10.00
+      cache_read_multiplier: 0.05
   strict_tools: true
 
 suites:
