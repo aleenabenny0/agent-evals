@@ -1716,11 +1716,13 @@ def monitor(
         if target is None:
             console.print(f"[red]No complete online run for day {day}.[/red]")
             raise typer.Exit(code=2)
+        enabled, standing = mon.judge_standing(store, ref_runs)
         try:
             report = mon.check_day(
                 mon.load_day(store, target, TRAFFIC_DIR),
                 [mon.load_day(store, r, TRAFFIC_DIR) for r in ref_runs],
-                judge_enabled=mon.judge_enabled(store, ref_runs),
+                judge_enabled=enabled,
+                judge_note=None if enabled else standing,
             )
         except ValueError as exc:
             console.print(f"[red]{exc}[/red]")
@@ -1786,7 +1788,9 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
                     console.print(f"[yellow]day {d} left out: {exc}[/yellow]")
         drawn = mon.recorded_sample(store, ref_runs.values()) if ref_runs else None
         blind = (drawn or {}).get("runs") or {}  # the judge check's: never shown with a verdict
-        judge_in = reference is not None and mon.judge_enabled(store, ref_runs.values())
+        judge_in, standing = (
+            mon.judge_standing(store, ref_runs.values()) if reference is not None else (False, None)
+        )
         days = [(d, r, True, None) for d, r in sorted(ref_runs.items())]
         for key, rep in sorted(checked.items(), key=lambda kv: int(kv[0])):
             run = str(rep["run_id"])
@@ -1816,7 +1820,7 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
         raise typer.Exit(code=2) from None
     finally:
         store.close()
-    html = dash.render(points, reference, judge_in)
+    html = dash.render(points, reference, judge_in, standing)
     dash.DASHBOARD_PATH.parent.mkdir(parents=True, exist_ok=True)
     dash.DASHBOARD_PATH.write_text(html, encoding="utf-8")
     console.print(f"wrote {dash.DASHBOARD_PATH} ({len(points)} days)")
@@ -1876,6 +1880,37 @@ def judge_check(
         raise typer.Exit(code=2) from None
     new_draw = False
     try:
+        if sorted(runs) != list(mon.REFERENCE_DAYS):
+            console.print(f"[red]{mon.REFERENCE_PATH} does not name days 1 to 5.[/red]")
+            raise typer.Exit(code=2)
+        for d, run in sorted(runs.items()):  # the frozen champion runs, never a hand-edited list
+            try:
+                champion = mon.day_run(store, d, champion_only=True)
+            except ValueError:
+                champion = None
+            if champion != run:
+                console.print(
+                    f"[red]{mon.REFERENCE_PATH} names {run} for day {d}, which is not that day's "
+                    "one complete champion online run. The judge check runs only on the frozen "
+                    "reference.[/red]"
+                )
+                raise typer.Exit(code=2)
+        for key in (mon.JUDGE_SAMPLE_RECORD, mon.JUDGE_CHECK_RECORD):  # records are written once
+            if (taken := mon.foreign_record(store, runs.values(), key)) is not None:
+                console.print(
+                    f"[red]{taken} already belongs to the judge check of another reference "
+                    "(its sample and score stay with it), so it cannot join this one.[/red]"
+                )
+                raise typer.Exit(code=2)
+        if mon.JUDGE_CHECK_PATH.exists() and mon.recorded_judge_check(store, runs.values()) is None:
+            stamp = now.replace(":", "").replace("+0000", "Z")
+            dest = mon.REFERENCE_PATH.parent / "archive" / stamp / mon.JUDGE_CHECK_PATH.name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            mon.JUDGE_CHECK_PATH.replace(dest)
+            console.print(
+                f"[yellow]{mon.JUDGE_CHECK_PATH} matched no score in the results database, so it "
+                f"counted for nothing; moved to {dest}.[/yellow]"
+            )
         if action == "score":  # the first complete score is final
             first = mon.recorded_judge_check(store, runs.values())
             if first is not None:
@@ -1895,10 +1930,10 @@ def judge_check(
                     "[/red]"
                 )
                 raise typer.Exit(code=2)
-            if any(store.labels(run, labeler) for run in runs.values()):
+            if any(store.labels(run) for run in runs.values()):  # anyone's, under any name
                 console.print(
-                    f"[red]{labeler} already has labels on the reference runs, so a sample drawn "
-                    "now would not be blind to them. Nothing was drawn.[/red]"
+                    "[red]The reference runs already have labels, so a sample drawn now would "
+                    "not be blind to them. Nothing was drawn.[/red]"
                 )
                 raise typer.Exit(code=2)
             from agent_evals import dashboard as dash

@@ -183,7 +183,8 @@ Format:
   check before the draw"). The results database is the check's only record, with the files as
   its published copies. The first complete judge-check score is final: no file written, edited
   or deleted, and no re-record of the same runs, can make, change or reopen it, and a re-judge
-  afterwards takes the judge out of the family. Until it is scored, every command that would show the
+  afterwards takes the judge out of the family. The check runs only on the frozen champion
+  runs, and its records are written once (plan, "Final check before the draw"). Until it is scored, every command that would show the
   judge's verdicts on the sampled answers holds them back (`label --show-judge`,
   `judge-validate`, `trace`). The sample leaves out the answers the dashboard publishes with
   the judge's verdict, only `label` draws it, never after labels exist, and a digest of the

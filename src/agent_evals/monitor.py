@@ -51,6 +51,7 @@ JUDGE_CHECK_LABELER = "aleena"  # the plan: Aleena's 30 blind labels, nobody els
 JUDGE_CHECK_RECORD = "judge_check"  # the first complete score, kept on each reference run
 JUDGE_SAMPLE_RECORD = "judge_check_sample"  # the drawn sample and its digests, likewise
 CANNOT_ALERT = "no day of this n can alert"  # a blind spot with no number: the worst kind
+PENDING = "pending: the judge has not yet passed Aleena's 30 blind labels"
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
 
@@ -193,9 +194,15 @@ def _shift(day: float | None, ref: float | None) -> float | None:
 
 
 def check_day(
-    day: DayValues, reference: Sequence[DayValues], *, judge_enabled: bool, seed: int = 0
+    day: DayValues,
+    reference: Sequence[DayValues],
+    *,
+    judge_enabled: bool,
+    seed: int = 0,
+    judge_note: str | None = None,
 ) -> dict[str, Any]:
-    """The full rule for one day against the pooled reference days."""
+    """The full rule for one day against the pooled reference days. judge_note says why the
+    judge is out of the family, when it is (judge_standing)."""
     family = [s for s in ALERT_FAMILY if judge_enabled or s.name != "judge_supported"]
     rows: dict[str, dict[str, Any]] = {}
     pvalues: dict[str, float] = {}
@@ -218,7 +225,7 @@ def check_day(
         if spec.name == "latency" and day.cache_hits:
             row["status"] = f"refused: {day.cache_hits} attempts hit the local call cache"
         elif spec.name == "judge_supported" and not judge_enabled:
-            row["status"] = "pending: the judge has not yet passed Aleena's 30 blind labels"
+            row["status"] = judge_note or PENDING
         elif not d or not r:
             row["status"] = "no data"
         else:
@@ -335,20 +342,47 @@ def noisy_days(days: Mapping[int, str], checks: Sequence[Mapping[str, Any]]) -> 
     return out
 
 
-def judge_enabled(store: ResultsStore, reference_runs: Iterable[str]) -> bool:
-    """Whether judge_supported is in the alert family: the judge passed Aleena's 30 blind labels
-    (at most 2 false passes) on these reference runs, and the leave-one-day-out check with it in
-    the family raised no alert. Read from the results database, never from judge-check.json,
-    which is only its published copy. A check on another reference or with anyone else's labels
-    does not count, nor does one whose sampled answers were re-judged since."""
+def judge_standing(store: ResultsStore, reference_runs: Iterable[str]) -> tuple[bool, str]:
+    """Whether judge_supported is in the alert family, and why or why not: the judge passed
+    Aleena's 30 blind labels (at most 2 false passes) on these reference runs, and the
+    leave-one-day-out check with it in the family raised no alert. Read from the results
+    database, never from judge-check.json, which is only its published copy. A check on another
+    reference or with anyone else's labels does not count, nor does one whose sampled answers
+    were re-judged since."""
     runs = list(reference_runs)
     kept = recorded_judge_check(store, runs)
-    if kept is None or not kept.get("passed") or kept.get("labeler") != JUDGE_CHECK_LABELER:
-        return False
+    if kept is None:
+        return False, PENDING
+    if kept.get("labeler") != JUDGE_CHECK_LABELER:
+        return False, "out of the family: the recorded judge check is not Aleena's"
+    if not kept.get("passed"):
+        if kept.get("labels_passed"):
+            return False, "out of the family: the reference is too noisy with the judge in it"
+        return False, "out of the family: the judge failed Aleena's 30 blind labels"
     drawn = recorded_sample(store, runs)
-    return drawn is not None and verdict_digests(store, drawn["runs"]) == drawn.get(
-        "verdict_digests"
-    )
+    if drawn is None or verdict_digests(store, drawn["runs"]) != drawn.get("verdict_digests"):
+        return False, "out of the family: the sampled answers were re-judged after its check"
+    return True, "in the family: the judge passed Aleena's 30 blind labels"
+
+
+def judge_enabled(store: ResultsStore, reference_runs: Iterable[str]) -> bool:
+    """Whether judge_supported is in the alert family (judge_standing, without the reason)."""
+    return judge_standing(store, reference_runs)[0]
+
+
+def foreign_record(store: ResultsStore, reference_runs: Iterable[str], key: str) -> str | None:
+    """A reference run that already carries a judge-check record of this kind made for another
+    set of runs, or None. Records are written once: a run belongs to one judge check, so no
+    check on another (or hand-edited) reference can overwrite the real one's record."""
+    runs = sorted(reference_runs)
+    for run in runs:
+        try:
+            kept = store.run_info(run)["manifest"].get(key)
+        except KeyError:
+            continue
+        if kept and sorted(kept.get("reference_runs") or []) != runs:
+            return run
+    return None
 
 
 def day_runs(store: ResultsStore, day: int, *, champion_only: bool = False) -> list[str]:

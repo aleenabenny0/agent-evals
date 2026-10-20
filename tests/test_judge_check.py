@@ -34,7 +34,7 @@ def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[
     store = ResultsStore(tmp_path / "evals.duckdb")
     runs = {d: f"r{d}" for d in range(1, 6)}
     try:
-        for run in runs.values():
+        for day, run in runs.items():  # each its day's one complete champion run, as frozen
             store.start_run(
                 run,
                 agent="docs",
@@ -44,6 +44,8 @@ def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[
                 manifest={},
                 online=True,
             )
+            store.annotate_run(run, "online", {"day": day, "champion": True})
+            store.finish_run(run, "complete")
             for i in range(16):
                 answer = AgentResult(output={"answer": "a", "citations": [], "abstained": False})
                 passed = float(i % 2 == 0)
@@ -432,6 +434,112 @@ def test_answers_already_shown_with_a_verdict_are_never_sampled(tmp_path: Path) 
     assert all(len(cases) == 6 for cases in sample.values())  # still 3 and 3 from the rest
     assert all(len(published[run]) == 5 for run in drawn)  # the dashboard's 5 a day
     assert all(not set(published[run]) & set(cases) for run, cases in drawn.items())
+
+
+def test_the_check_runs_only_on_the_frozen_reference_and_its_records_are_written_once(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    frozen = mon.REFERENCE_PATH.read_text(encoding="utf-8")
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # another complete online run, not day 5's champion
+        store.start_run(
+            "x5", agent="docs", agent_version="v", suite="x", attempts=1, manifest={}, online=True
+        )
+        store.annotate_run("x5", "online", {"day": 5, "champion": False})
+        store.finish_run("x5", "complete")
+    finally:
+        store.close()
+    edited = {"days": {str(d): r for d, r in runs.items()} | {"5": "x5"}}
+    mon.REFERENCE_PATH.write_text(json.dumps(edited), encoding="utf-8")
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    assert result.exit_code == 2 and "not that day's one complete champion" in " ".join(
+        result.output.split()
+    )
+    mon.REFERENCE_PATH.write_text(frozen, encoding="utf-8")
+    _cli_draw(config, monkeypatch)  # the real draw, recorded on r1 to r5
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # day 5 rerun: a new reference that shares r1 to r4 with the drawn one
+        store.finish_run("r5", "failed")
+        store.annotate_run("x5", "online", {"day": 5, "champion": True})
+    finally:
+        store.close()
+    mon.REFERENCE_PATH.write_text(json.dumps(edited), encoding="utf-8")
+    result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    output = " ".join(result.output.split())
+    assert result.exit_code == 2 and "already belongs to the judge check of another" in output
+    store = ResultsStore(tmp_path / "evals.duckdb", read_only=True)
+    try:  # the real draw's record is untouched on every run
+        assert mon.recorded_sample(store, runs.values()) is not None
+    finally:
+        store.close()
+
+
+def test_a_forged_result_file_is_moved_aside_and_any_label_blocks_a_draw(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    _label_sample(tmp_path, {"r2": ["c1"]}, supported=True)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # the same label again under another spelling of her name
+        for label in store.labels("r2"):
+            store.record_label(
+                "r2",
+                label["case_id"],
+                1,
+                "Aleena",
+                supported=True,
+                responsive=True,
+                note="",
+                label_split="judge-dev",
+            )
+        store.con.execute("DELETE FROM labels WHERE labeler = 'aleena'")
+    finally:
+        store.close()
+    forged = {"complete": True, "passed": True, "labeler": "aleena"}
+    mon.JUDGE_CHECK_PATH.write_text(json.dumps(forged), encoding="utf-8")
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    output = " ".join(result.output.split())
+    assert (
+        "matched no score in the results database" in output and not mon.JUDGE_CHECK_PATH.exists()
+    )
+    assert list((mon.REFERENCE_PATH.parent / "archive").glob(f"*/{mon.JUDGE_CHECK_PATH.name}"))
+    assert result.exit_code == 2 and "already have labels" in output  # anyone's, any name
+    assert not mon.JUDGE_SAMPLE_PATH.exists()
+
+
+def test_the_reason_the_judge_is_out_is_said(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    sample = _cli_draw(config, monkeypatch)
+
+    def standing() -> str:
+        store = ResultsStore(tmp_path / "evals.duckdb", read_only=True)
+        try:
+            return mon.judge_standing(store, runs.values())[1]
+        finally:
+            store.close()
+
+    assert standing() == mon.PENDING
+    _label_sample(tmp_path, sample, supported=True)
+    _reference_days(monkeypatch, REFERENCE)
+    assert _cli_score(config)[0] == 0 and standing().startswith("in the family")
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # a re-judge of one sampled answer after the pass
+        case = sample["r2"][0]
+        store.delete_grades("r2", "judge", [(case, 1)])
+        store.add_grades("r2", case, 1, [("judge", Grade(metric="judge_supported", value=0.5))])
+    finally:
+        store.close()
+    assert "re-judged after its check" in standing()
+    html = dash.render([], {"days": {}}, False, standing())
+    assert "re-judged after its check" in html and "until the judge passes" not in html
 
 
 def test_a_null_stdin_is_not_a_person_at_a_terminal(monkeypatch: pytest.MonkeyPatch) -> None:

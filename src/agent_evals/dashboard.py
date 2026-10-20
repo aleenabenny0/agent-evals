@@ -251,9 +251,12 @@ blockquote { margin: 6px 0; padding: 4px 10px; border-left: 3px solid var(--line
 
 
 def render(
-    points: Sequence[DayPoint], reference: dict[str, Any] | None, judge_in_family: bool
+    points: Sequence[DayPoint],
+    reference: dict[str, Any] | None,
+    judge_in_family: bool,
+    judge_note: str | None = None,
 ) -> str:
-    """The whole page."""
+    """The whole page. judge_note says why the judge is out of the family, when it is."""
     checked = [p for p in points if not p.reference]
     alerting = [p for p in checked if p.report and p.report["alerts"]]
     if reference is None:
@@ -274,13 +277,18 @@ def render(
             f"Reference: days {', '.join(reference['days'])}, frozen {frozen_at}{redone}; "
             "the leave-one-day-out check raised no alert."
         )
-    judge = (
-        "judge_supported is in the alert family: the judge passed the 30 blind labels, and the "
-        "reference stayed quiet with it in the family."
-        if judge_in_family
-        else "judge_supported is shown but cannot alert until the judge passes Aleena's 30 "
-        "blind labels."
-    )
+    if judge_in_family:
+        judge = (
+            "judge_supported is in the alert family: the judge passed the 30 blind labels, and "
+            "the reference stayed quiet with it in the family."
+        )
+    elif judge_note and not judge_note.startswith("pending"):
+        judge = f"judge_supported is shown but cannot alert, being {judge_note}."
+    else:
+        judge = (
+            "judge_supported is shown but cannot alert until the judge passes Aleena's 30 "
+            "blind labels."
+        )
     figures = []
     for i, spec in enumerate((*ALERT_FAMILY, EXTRA)):
         floor = "" if spec.name == EXTRA.name else f"alert floor {_floor(spec)}; "

@@ -164,8 +164,8 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   database, never the files:
   - The sample leaves out the answers the dashboard publishes with the judge's verdict (each
     day's five least supported), and the dashboard never shows a sampled answer.
-  - Only `judge-check label` draws the sample, and never once Aleena has labels on the
-    reference runs.
+  - Only `judge-check label` draws the sample, and never once the reference runs carry
+    anyone's labels.
   - The sample carries a digest of the judge's grades on it, reasons included. Labeling and
     scoring are refused if they changed, which catches any re-judging after the draw.
   - Until the first complete score, the judge's verdicts on the sampled answers are held back
@@ -177,7 +177,10 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
     deleted can make, change or reopen it, and nor can a re-record of the same runs.
   - judge_supported is in the alert family only while the recorded score passed and the
     judge's grades on the sample are still the ones it was scored on: a re-judge afterwards
-    takes it out.
+    takes it out. The monitor and dashboard say which reason keeps it out.
+  - The check runs only on the frozen reference: each day's one complete champion run. Its
+    records are written once, so no check on another or a hand-edited reference can overwrite
+    them. A run belongs to one judge check.
   - No test can touch the real `results/online/`: each test's monitor files go to a temporary
     folder, and the test run fails if a real file changed.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
@@ -543,4 +546,15 @@ after labels and scores, swapped cases and one-character edits to a judge reason
 labeler names, `--show-judge` in every form, and judge-validate. The next real steps also ran
 on a copy: a NUL stdin draws and then refuses, the 3-and-3 sample is disjoint from the
 dashboard, and the dashboard rebuilds byte-identical. The worktree's 294 tests passed.
+
+A further isolated reviewer then attacked the database record itself, at commit 355752f.
+Every attempt through files was stopped, but it found 4 more problems, all confirmed and
+fixed:
+
+| Finding | Done |
+|---|---|
+| Each run had one slot per record, which a draw or score overwrote, and `judge-check` took its runs from reference.json, a plain file. Drawing and scoring on hand-edited references that shared runs could erase the real score, which could then be made again with changed labels | The check runs only on each day's one complete champion run, and its records are written once |
+| After a re-judge of a passed check, the monitor and dashboard said the judge "has not yet passed" | They give the actual reason |
+| A hand-written judge-check.json was ignored but left in place, where a commit could publish it | `judge-check` moves a result file with no score in the database to the archive, and says so |
+| The no-labels-before-the-draw rule matched the labeler's name exactly | Labels under any name block a draw |
 
