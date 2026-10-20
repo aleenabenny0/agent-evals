@@ -12,6 +12,7 @@ import pytest
 from typer.testing import CliRunner
 
 from agent_evals import cli
+from agent_evals import dashboard as dash
 from agent_evals import monitor as mon
 from agent_evals.store.db import ResultsStore
 from agent_evals.types import AgentResult, Grade
@@ -20,9 +21,15 @@ from test_monitor import _day as synthetic_day
 from test_monitor import _ones as ones
 
 
+def _draw(store: ResultsStore, runs: dict[int, str]) -> dict[str, list[str]]:
+    """The sample exactly as `judge-check` draws it: the dashboard's answers left out."""
+    return mon.judge_check_sample(store, runs, dash.shown_with_verdicts(store, runs.values()))
+
+
 def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[int, str]:
-    """Five reference runs with 10 judged answers each (the judge passes every other one),
-    plus optional labels: per run, the labeler's verdict on each sampled answer in order."""
+    """Five reference runs with 16 judged answers each (the judge passes every other one, so 8
+    fails remain 3 after the dashboard's 5 least supported are left out), plus optional
+    labels: per run, the labeler's verdict on each sampled answer in order."""
     store = ResultsStore(tmp_path / "evals.duckdb")
     runs = {d: f"r{d}" for d in range(1, 6)}
     try:
@@ -36,7 +43,7 @@ def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[
                 manifest={},
                 online=True,
             )
-            for i in range(10):
+            for i in range(16):
                 answer = AgentResult(output={"answer": "a", "citations": [], "abstained": False})
                 passed = float(i % 2 == 0)
                 store.record_attempt(
@@ -48,7 +55,7 @@ def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[
                     [("judge", Grade(metric="judge_supported", value=passed))],
                 )
         if labels is not None:
-            sample = mon.judge_check_sample(store, runs)
+            sample = _draw(store, runs)
             for run, verdicts in labels.items():
                 for case, supported in zip(sample[run], verdicts, strict=True):
                     store.record_label(
@@ -72,8 +79,8 @@ def test_the_sample_is_three_passed_and_three_failed_a_day_drawn_reproducibly(
     runs = _store(tmp_path)
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:
-        sample = mon.judge_check_sample(store, runs)
-        assert sample == mon.judge_check_sample(store, runs)
+        sample = _draw(store, runs)
+        assert sample == _draw(store, runs)
         passed = {
             run: sum(store.grades_for(run, "judge")[(c, 1)]["judge_supported"] for c in cases)
             for run, cases in sample.items()
@@ -89,7 +96,7 @@ def _score(tmp_path: Path, labels: dict[str, list[bool]]) -> dict[str, Any]:
     runs = _store(tmp_path, labels)
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:
-        return mon.judge_check_score(store, mon.judge_check_sample(store, runs), "aleena")
+        return mon.judge_check_score(store, _draw(store, runs), "aleena")
     finally:
         store.close()
 
@@ -112,7 +119,7 @@ def test_a_lost_verdict_or_a_thin_day_is_refused_not_counted(tmp_path: Path) -> 
     runs = _store(tmp_path)
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:
-        sample = mon.judge_check_sample(store, runs)
+        sample = _draw(store, runs)
         store.delete_grades("r2", "judge", [(sample["r2"][0], 1)])  # e.g. a --replace cut short
         with pytest.raises(ValueError, match="no judge verdict"):
             mon.judge_check_score(store, sample, "aleena")  # never read as a judge fail
@@ -295,6 +302,23 @@ def test_the_judges_verdicts_stay_hidden_on_the_checks_runs(
     args = ["label", "r1", "--labeler", "aleena", "--revisit", "all", "--split", "judge-dev"]
     result = CliRunner().invoke(cli.app, [*args, "--show-judge", "-c", str(config)])
     assert result.exit_code == 2 and "labeled blind" in " ".join(result.output.split())
+
+
+def test_answers_already_shown_with_a_verdict_are_never_sampled(tmp_path: Path) -> None:
+    runs = _store(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        free = mon.judge_check_sample(store, runs)
+        shown = {run: cases[:2] for run, cases in free.items()}  # e.g. on the dashboard
+        sample = mon.judge_check_sample(store, runs, shown)
+        drawn = _draw(store, runs)  # as the command draws it
+        published = dash.shown_with_verdicts(store, runs.values())
+    finally:
+        store.close()
+    assert all(not set(shown[run]) & set(cases) for run, cases in sample.items())
+    assert all(len(cases) == 6 for cases in sample.values())  # still 3 and 3 from the rest
+    assert all(len(published[run]) == 5 for run in drawn)  # the dashboard's 5 a day
+    assert all(not set(published[run]) & set(cases) for run, cases in drawn.items())
 
 
 def test_a_null_stdin_is_not_a_person_at_a_terminal(monkeypatch: pytest.MonkeyPatch) -> None:

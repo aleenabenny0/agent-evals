@@ -153,7 +153,9 @@ a 5-point floor. All five runs were complete, with every cited answer judged by 
   random 30 would hold only about 7 or 8 judge passes (10 in the draw of 2026-10-19), since the
   judge passes about a quarter of online answers, and a false pass can happen only on those.
   The judge must pass at most 2 she fails, of its 15 passes: the bar of iteration 4's spot
-  check. Its false fails are reported too. Four rules keep the check honest:
+  check. Its false fails are reported too. Five rules keep the check honest:
+  - The sample leaves out the answers the dashboard publishes with the judge's verdict (each
+    day's five least supported), and the dashboard never shows a sampled answer.
   - The sample is saved with a digest of the judge's grades on it, reasons included. Labeling
     and scoring are refused if they changed, which catches any re-judging after the draw.
   - The judge's view (`label --show-judge`) is refused on the check's runs.
@@ -465,6 +467,7 @@ all are fixed:
 | The blind spot's wiring in check_day (Holm level, pending and refused metrics, the fabricated rule) had no test: setting the level to 0.5 passed every test | Tested |
 | "A random 30 would hold about 10 judge passes": the expectation is 7 or 8; 10 was one draw | Corrected in the plan, the docstring and the CHANGELOG |
 | alert_count scanned one exact Fisher test per count, minutes at n of 10,000 | Bisection, about log2(n) tests; the project's days are 80 to 200 |
+| Found by the author afterwards: the published dashboard lists each reference day's five least-supported answers with the judge's reasons. These are judge fails, and a sampled one would not be blind | The sample leaves them out, and the dashboard never shows a sampled answer |
 
 Rejected by the verifier: that no test would catch a wrong mean formula (the closed-form tests
 fail on a wrong standard error or sign), and that HANDOFF's next step skipped day 6 (part 5

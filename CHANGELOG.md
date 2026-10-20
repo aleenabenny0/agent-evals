@@ -180,7 +180,8 @@ Format:
   passes applies to 15 judge passes, not about 7 or 8. False fails are reported too. An
   independent check of both found 13 problems (11 confirmed), all fixed (plan, "Check of
   decisions 5 and 6"). The first complete judge-check score is final. The judge's view is
-  refused on the check's runs. A re-judged sample is caught by a digest of the judge's grades.
+  refused on the check's runs, and the sample leaves out the answers the dashboard publishes
+  with the judge's verdict. A re-judged sample is caught by a digest of the judge's grades.
   Only Aleena's labels count. Interactive screens need a real console on Windows. A refreeze of
   the same runs keeps the freeze date.
 - 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved by Aleena (plan,

@@ -10,7 +10,7 @@ in their own units (geometric means), not logs.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Collection, Iterable, Sequence
 from dataclasses import dataclass
 from html import escape
 from math import exp
@@ -178,16 +178,20 @@ def metric_chart(spec: Spec, points: Sequence[DayPoint], index: int = 0) -> str:
 
 
 def least_supported(
-    store: ResultsStore, run_id: str, traffic: dict[str, TrafficQuestion], k: int = 5
+    store: ResultsStore,
+    run_id: str,
+    traffic: dict[str, TrafficQuestion],
+    k: int = 5,
+    hidden: Collection[str] = (),
 ) -> list[dict[str, str]]:
     """The day's k answers the judge found least supported (core claims unsupported first),
-    with the judge's reason."""
+    with the judge's reason. `hidden` answers (the blind judge check's) are never shown."""
     reasons = store.grade_reasons(run_id, "judge")
     outputs = {a["case_id"]: a["output"] for a in store.answered_attempts(run_id)}
     worst = []
     for (case, attempt), grades in sorted(reasons.items()):
         full = grades.get("judge_supported")
-        if attempt != 1 or full is None or full[0] == 1.0:
+        if attempt != 1 or full is None or full[0] == 1.0 or case in hidden:
             continue
         core = grades.get("judge_core_supported", (1.0, ""))[0]
         worst.append((core, case, full[1]))
@@ -205,6 +209,12 @@ def least_supported(
             }
         )
     return out
+
+
+def shown_with_verdicts(store: ResultsStore, runs: Iterable[str]) -> dict[str, list[str]]:
+    """The answers the dashboard publishes with the judge's verdict (each run's least-supported
+    list), which the blind judge check must never sample."""
+    return {run: [a["case"] for a in least_supported(store, run, {})] for run in runs}
 
 
 CSS = (

@@ -443,20 +443,27 @@ def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:
     }
 
 
-def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str, list[str]]:
+def judge_check_sample(
+    store: ResultsStore,
+    runs: Mapping[int, str],
+    shown: Mapping[str, Iterable[str]] | None = None,
+) -> dict[str, list[str]]:
     """Six judged answers per reference day, three the judge passed and three it failed, drawn
     with a seed per day, as case ids per run, sorted so their order shows no verdict. A plain
     random draw would hold only about 7 or 8 judge passes in 30 (10 in the draw of 2026-10-19),
     since the judge passes about a quarter of online answers, and a false pass can happen only
-    on those (decision 6). Drawn once and saved, with its verdict digests, before any label
-    exists. Refused unless every reference day has three of each."""
+    on those (decision 6). Answers already shown with the judge's verdict (`shown`, run -> case
+    ids: the dashboard's least-supported lists) are left out, or the labeler could know them.
+    Drawn once and saved, with its verdict digests, before any label exists. Refused unless
+    every reference day has three of each."""
     if sorted(runs) != list(REFERENCE_DAYS):
         raise ValueError(f"the judge check samples the reference days {list(REFERENCE_DAYS)}")
     need_passed = JUDGE_CHECK_PASSED_PER_DAY
     need_failed = JUDGE_CHECK_PER_DAY - JUDGE_CHECK_PASSED_PER_DAY
     out: dict[str, list[str]] = {}
     for day, run in sorted(runs.items()):
-        verdicts = _verdicts(store, run)
+        seen = set((shown or {}).get(run, ()))
+        verdicts = {case: ok for case, ok in _verdicts(store, run).items() if case not in seen}
         passed = sorted(case for case, ok in verdicts.items() if ok)
         failed = sorted(case for case, ok in verdicts.items() if not ok)
         if len(passed) < need_passed or len(failed) < need_failed:

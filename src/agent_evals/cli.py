@@ -1753,6 +1753,11 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=2) from None
     points: list[dash.DayPoint] = []
+    blind: dict[str, list[str]] = (  # the judge check's answers: never shown with a verdict
+        json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8")).get("runs") or {}
+        if mon.JUDGE_SAMPLE_PATH.exists()
+        else {}
+    )
     try:
         if reference is not None:
             ref_runs = {int(d): str(r) for d, r in reference["days"].items()}
@@ -1787,7 +1792,7 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
                     reference=is_ref,
                     values=mon.load_day(store, run, TRAFFIC_DIR),
                     report=report,
-                    worst=dash.least_supported(store, run, traffic),
+                    worst=dash.least_supported(store, run, traffic, hidden=blind.get(run, ())),
                 )
             )
     except (KeyError, ValueError) as exc:
@@ -1871,8 +1876,12 @@ def judge_check(
                 )
                 raise typer.Exit(code=2)
         else:  # drawn once, before any label exists, with digests of the judge's grades
+            from agent_evals import dashboard as dash
+
+            # the dashboard has published these with the judge's verdicts: never sample them
+            shown = dash.shown_with_verdicts(store, runs.values())
             try:
-                sample = mon.judge_check_sample(store, runs)
+                sample = mon.judge_check_sample(store, runs, shown)
             except ValueError as exc:
                 console.print(f"[red]{exc}[/red]")
                 raise typer.Exit(code=2) from None
