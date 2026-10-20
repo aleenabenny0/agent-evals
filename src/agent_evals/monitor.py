@@ -48,6 +48,7 @@ JUDGE_CHECK_PER_DAY = 6  # 30 answers over the five reference days
 JUDGE_CHECK_PASSED_PER_DAY = 3  # of each day's 6: 3 the judge passed, 3 it failed (decision 6)
 JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check, over the 15 passes
 JUDGE_CHECK_LABELER = "aleena"  # the plan: Aleena's 30 blind labels, nobody else's
+JUDGE_CHECK_RECORD = "judge_check"  # the first complete score, kept on each reference run
 CANNOT_ALERT = "no day of this n can alert"  # a blind spot with no number: the worst kind
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
@@ -420,18 +421,54 @@ def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
     return values
 
 
-def archive_reference_files(stamp: str) -> list[Path]:
+def archive_reference_files(stamp: str, *, keep_judge_check: bool = False) -> list[Path]:
     """Move everything made against the current reference into results/online/archive/STAMP/,
-    so no alert or judge check made against the old reference is read against a new one."""
+    so no alert or judge check made against the old reference is read against a new one. With
+    keep_judge_check (a re-record of the same runs), the judge check's sample and result stay:
+    they belong to the runs, not to the code, and moving them would reopen a final score."""
     moved = []
     check = REFERENCE_PATH.with_name("reference-check.json")
-    for path in (REFERENCE_PATH, check, ALERTS_PATH, JUDGE_SAMPLE_PATH, JUDGE_CHECK_PATH):
+    paths = [REFERENCE_PATH, check, ALERTS_PATH]
+    if not keep_judge_check:
+        paths += [JUDGE_SAMPLE_PATH, JUDGE_CHECK_PATH]
+    for path in paths:
         if path.exists():
             dest = REFERENCE_PATH.parent / "archive" / stamp / path.name
             dest.parent.mkdir(parents=True, exist_ok=True)
             path.replace(dest)
             moved.append(dest)
     return moved
+
+
+def recorded_judge_check(
+    store: ResultsStore, reference_runs: Iterable[str]
+) -> dict[str, Any] | None:
+    """The first complete judge-check result for these reference runs, as kept in the results
+    database (every reference run carries it once scored), or None. It outlives
+    judge-check.json, so deleting or editing that file cannot reopen a final score."""
+    runs = sorted(reference_runs)
+    for run in runs:
+        kept = store.run_info(run)["manifest"].get(JUDGE_CHECK_RECORD)
+        if kept and kept.get("complete") and sorted(kept.get("reference_runs") or []) == runs:
+            return dict(kept)
+    return None
+
+
+def blind_cases(run_id: str) -> set[str]:
+    """The judge check's sampled answers in this run while the check awaits its first complete
+    score. Their judge verdicts and reasons must not reach the labeler: `label --show-judge`,
+    `judge-validate` and `trace` hold them back. Empty once the check is scored, or for a run
+    the check did not sample."""
+    if not JUDGE_SAMPLE_PATH.exists():
+        return set()
+    sample = json.loads(JUDGE_SAMPLE_PATH.read_text(encoding="utf-8")).get("runs") or {}
+    if run_id not in sample:
+        return set()
+    if JUDGE_CHECK_PATH.exists():
+        done = json.loads(JUDGE_CHECK_PATH.read_text(encoding="utf-8"))
+        if done.get("complete") and sorted(done.get("reference_runs") or []) == sorted(sample):
+            return set()
+    return set(sample[run_id])
 
 
 def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:

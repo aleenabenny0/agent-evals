@@ -488,7 +488,9 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   same reference, re-recorded with the new numbers), `uv run evals monitor 6` (day 6, the
   false-alarm check), `uv run evals dashboard`, and drawing and committing the judge-check
   sample. Then Aleena's 30 blind labels (`uv run evals judge-check label`, then
-  `uv run evals judge-check score`), then part 5.
+  `uv run evals judge-check score`), then part 5. A re-check of the fixes found 8 more, all
+  fixed (plan, "Re-check of the fixes"). Never run the tests while a real online run or monitor
+  command is writing to `results/online/`: a guard fails the test run on any change there.
 
 ## Target: the three project briefs
 

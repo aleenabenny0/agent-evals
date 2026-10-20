@@ -173,18 +173,42 @@ def test_a_frozen_reference_is_replaced_only_on_purpose(setup: Path) -> None:
     first["frozen_at"] = "2026-10-19T16:47:55+00:00"  # as if frozen a day earlier
     mon.REFERENCE_PATH.write_text(json.dumps(first), encoding="utf-8")
     assert _monitor(setup, "6")[0] == 1  # writes alerts.json against this reference
+    for path in (mon.JUDGE_SAMPLE_PATH, mon.JUDGE_CHECK_PATH):  # a judge check on these runs
+        path.write_text('{"runs": {}}', encoding="utf-8")
     code, output = _monitor(setup, "--freeze")
     assert code == 2 and "already frozen" in output
     code, output = _monitor(setup, "--freeze", "--refreeze")
     assert code == 0 and "archived" in output and not mon.ALERTS_PATH.exists()
     archived = list((mon.REFERENCE_PATH.parent / "archive").glob("*/alerts.json"))
     assert len(archived) == 1 and mon.REFERENCE_PATH.exists()
+    # the same runs: the judge check belongs to them and stays, or a final score would reopen
+    assert "kept the judge check" in output
+    assert mon.JUDGE_SAMPLE_PATH.exists() and mon.JUDGE_CHECK_PATH.exists()
     again = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
     # the same runs re-recorded: the freeze date stands, and the first record is archived
     assert again["days"] == first["days"] and again["frozen_at"] == "2026-10-19T16:47:55+00:00"
     assert again["checked_at"] != again["frozen_at"]
     assert Path(again["previous_record"]).name == "reference.json"
     assert Path(again["previous_record"]).exists()
+
+
+def test_a_refreeze_on_other_runs_archives_the_judge_check(setup: Path, tmp_path: Path) -> None:
+    assert _monitor(setup, "--freeze")[0] == 0
+    for path in (mon.JUDGE_SAMPLE_PATH, mon.JUDGE_CHECK_PATH):
+        path.write_text('{"runs": {}}', encoding="utf-8")
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # day 5's run replaced by another quiet one
+        store.finish_run("r5", "failed")
+        _day(store, tmp_path, 5, uncited=1, run="r5-again")
+    finally:
+        store.close()
+    code, output = _monitor(setup, "--freeze", "--refreeze")
+    assert code == 0 and "kept the judge check" not in output
+    assert not mon.JUDGE_SAMPLE_PATH.exists() and not mon.JUDGE_CHECK_PATH.exists()
+    archive = mon.REFERENCE_PATH.parent / "archive"
+    assert len(list(archive.glob("*/judge-check.json"))) == 1  # moved, never deleted
+    frozen = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+    assert frozen["days"]["5"] == "r5-again" and frozen["frozen_at"] == frozen["checked_at"]
 
 
 def test_a_day_that_cannot_be_checked_is_refused_and_one_not_cleared_says_so(

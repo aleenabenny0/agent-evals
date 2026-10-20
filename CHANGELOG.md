@@ -177,13 +177,17 @@ Format:
   answers went from +0 points to about +8, errors from +2.7 to +6, latency from +17% to +30%.
   This changes what is reported, never when an alert fires. The judge check's 30 answers are
   now 3 the judge passed and 3 it failed from each reference day, so its bar of at most 2 false
-  passes applies to 15 judge passes, not about 7 or 8. False fails are reported too. An
-  independent check of both found 13 problems (11 confirmed), all fixed (plan, "Check of
-  decisions 5 and 6"). The first complete judge-check score is final. The judge's view is
-  refused on the check's runs, and the sample leaves out the answers the dashboard publishes
-  with the judge's verdict. A re-judged sample is caught by a digest of the judge's grades.
-  Only Aleena's labels count. Interactive screens need a real console on Windows. A refreeze of
-  the same runs keeps the freeze date.
+  passes applies to 15 judge passes, not about 7 or 8. False fails are reported too. Two
+  independent checks raised 22 findings, 19 of which held (some the same problem seen twice),
+  and all are fixed (plan, "Check of decisions 5 and 6" and "Re-check of the fixes"). The first complete judge-check
+  score is final: it is kept in the results database, and neither deleting its file nor a
+  re-record of the same runs reopens it. Until it is scored, every command that would show the
+  judge's verdicts on the sampled answers holds them back (`label --show-judge`,
+  `judge-validate`, `trace`). The sample leaves out the answers the dashboard publishes with
+  the judge's verdict, only `label` draws it, never after labels exist, and a digest of the
+  judge's grades catches any re-judging. Only Aleena's labels count. Interactive screens need a
+  real console on Windows. A refreeze of the same runs keeps the freeze date. No test can touch
+  the real `results/online/`.
 - 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved by Aleena (plan,
   parts 3 and 4). `evals monitor --freeze` checks days 1 to 5 against each other, leaving one
   day out at a time, and freezes them as the reference. `evals monitor DAY` tests a later day

@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Callable
+import hashlib
+from collections.abc import Callable, Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -108,3 +110,42 @@ class ScriptedLLM:
 @pytest.fixture
 def scripted() -> Callable[..., ScriptedLLM]:
     return ScriptedLLM
+
+
+REAL_ONLINE_RESULTS = Path(__file__).resolve().parents[1] / "results" / "online"
+
+
+def _snapshot(root: Path) -> dict[str, str]:
+    if not root.exists():
+        return {}
+    return {
+        p.relative_to(root).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
+        for p in sorted(root.rglob("*"))
+        if p.is_file()
+    }
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _real_online_results_untouched() -> Iterator[None]:
+    """Fails the run if any test wrote, moved or archived a real results/online/ file. (A
+    refreeze test once could have moved the real judge-check sample.) So never run the tests
+    while a real online run or monitor command is writing there."""
+    before = _snapshot(REAL_ONLINE_RESULTS)
+    yield
+    after = _snapshot(REAL_ONLINE_RESULTS)
+    changed = sorted(k for k in before.keys() | after.keys() if before.get(k) != after.get(k))
+    assert not changed, f"a test changed the real results/online/: {changed}"
+
+
+@pytest.fixture(autouse=True)
+def _monitor_files_in_tmp(
+    tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Every monitor and dashboard file of every test goes to its own temporary folder; a test
+    may still point them elsewhere."""
+    from agent_evals import dashboard, monitor
+
+    base = tmp_path_factory.mktemp("online-results")
+    for name in ("REFERENCE_PATH", "ALERTS_PATH", "JUDGE_CHECK_PATH", "JUDGE_SAMPLE_PATH"):
+        monkeypatch.setattr(monitor, name, base / getattr(monitor, name).name)
+    monkeypatch.setattr(dashboard, "DASHBOARD_PATH", base / "dashboard" / "index.html")

@@ -97,8 +97,10 @@ run records its day, its config and whether that was the champion's.
 `evals monitor --freeze` runs the leave-one-day-out check on days 1 to 5 and, if no day alerts
 against the other four, freezes them in `results/online/reference.json`. A frozen reference is
 replaced only with `--refreeze`, which moves everything checked against the old one to
-`results/online/archive/`. If the runs are the same, it only re-records the reference, so
-the freeze date stands and the new record points to the archived first one. `evals monitor DAY` checks a later day and records it in
+`results/online/archive/`. If the runs are the same, it re-records the reference: the freeze
+date stands, the new record points to the one it replaced (a chain back to the first), and the
+judge check's sample and result stay in place, since they belong to the runs; alerts are
+archived either way. `evals monitor DAY` checks a later day and records it in
 `results/online/alerts.json`. It exits 0 when the day is clear and 1 on an alert. It exits 3 when
 nothing alerts but the day is not cleared, because a family metric went untested or the judge is
 in the family and untrusted that day. It exits 2 when the day cannot be checked: its run is not
@@ -153,15 +155,24 @@ a 5-point floor. All five runs were complete, with every cited answer judged by 
   random 30 would hold only about 7 or 8 judge passes (10 in the draw of 2026-10-19), since the
   judge passes about a quarter of online answers, and a false pass can happen only on those.
   The judge must pass at most 2 she fails, of its 15 passes: the bar of iteration 4's spot
-  check. Its false fails are reported too. Five rules keep the check honest:
+  check. Its false fails are reported too. Seven rules keep the check honest:
   - The sample leaves out the answers the dashboard publishes with the judge's verdict (each
     day's five least supported), and the dashboard never shows a sampled answer.
+  - Only `judge-check label` draws the sample, and never once Aleena has labels on the
+    reference runs.
   - The sample is saved with a digest of the judge's grades on it, reasons included. Labeling
     and scoring are refused if they changed, which catches any re-judging after the draw.
-  - The judge's view (`label --show-judge`) is refused on the check's runs.
+  - Until the first complete score, the judge's verdicts on the sampled answers are held back
+    by every command that would show them: `label --show-judge`, `judge-validate` and `trace`.
+    Only a deliberate query of the database itself could still reach them.
   - Only Aleena's labels count.
-  - The first complete score is final. Its result shows the judge's verdicts, so a later
-    relabel and rescore would no longer be blind.
+  - The first complete score is final, because its result shows the judge's verdicts and a
+    later relabel and rescore would no longer be blind. It is kept in
+    `results/online/judge-check.json` and in the results database on every reference run.
+    Deleting or editing the file cannot reopen it (the next score restores it), and nor can a
+    re-record of the same runs.
+  - No test can touch the real `results/online/`: each test's monitor files go to a temporary
+    folder, and the test run fails if a real file changed.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
   leaves the Holm family, the report gives the number tested, and the day is not cleared.
@@ -473,4 +484,28 @@ Rejected by the verifier: that no test would catch a wrong mean formula (the clo
 fail on a wrong standard error or sign), and that HANDOFF's next step skipped day 6 (part 5
 starts with it). The reviewers' simulations put the mean blind spots at 0.76 to 0.82 of days
 alerting, as did the author's (see "Blind spots").
+
+## Re-check of the fixes (2026-10-20)
+
+Two more isolated reviewers then tried to defeat the fixed judge check at commit a3f8b84, and
+ran the next real steps on copies. They drove the real labeling screens through 30 labels, with
+a quit and a resume, and a verifier reproduced each finding. Of 9 findings, 8 held, some of
+them the same problem seen twice, and all are fixed:
+
+| Finding | Done |
+|---|---|
+| A re-record of the same runs (`--freeze --refreeze`) archived the judge check's sample and result. The next score then redrew the same 30 and rescored edited labels, so a failed check could be passed | A re-record of the same runs keeps both in place; only a refreeze on other runs archives them |
+| `judge-check score` drew a sample when none was saved, even with Aleena's labels already in | Only `label` draws, and never once her labels exist on the reference runs |
+| Running the test suite would have moved the real judge-check sample: one test's refreeze used the real path for it (no sample had been drawn yet, so nothing was lost) | Every test's monitor and dashboard files go to a temporary folder. The run fails if a real `results/online/` file changed, which a probe test confirmed |
+| `judge-validate` on a reference run gave the judge's verdicts on her sampled labels before the score (its false negatives are the false passes), so labels could be tuned blind until the check passed | Refused on the check's runs until the check is scored |
+| `trace` printed the judge's verdict and reason on a sampled answer | Held back until the check is scored |
+| Deleting or editing judge-check.json reopened a final score | The first complete result is also kept in the results database on every reference run; the next score restores the file from it |
+| The CHANGELOG claimed the judge's view was refused, while only `label --show-judge` was | Now true of every command that shows it, and worded as such |
+| "Points to the archived first one" held only for the first re-record | Corrected: each record points to the one it replaced |
+
+Rejected by the verifier: that the old scan's "minutes at n of 10,000" did not reproduce (it
+took over 500 s with a large reference and no floor). The reviewers also confirmed the parts
+found sound: the next real steps on copies (frozen_at kept, day 6 clear, a 3-and-3 sample
+disjoint from the dashboard, which stays byte-identical), the digest guard, the labeler pin, and
+that a real console passes the interactive check while NUL and pipes do not.
 

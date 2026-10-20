@@ -158,30 +158,106 @@ def _reference_days(monkeypatch: pytest.MonkeyPatch, days: list[mon.DayValues]) 
     monkeypatch.setattr(mon, "load_day", lambda store, run, traffic_dir: by_run[run])
 
 
+def _cli_draw(config: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, list[str]]:
+    """Draw and save the sample as `judge-check label` does (she quits at once); return it."""
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    drew = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    assert drew.exit_code == 0 and "Stopped" in drew.output, drew.output
+    return dict(json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))["runs"])
+
+
+def _label_sample(tmp_path: Path, sample: dict[str, list[str]], supported: bool) -> None:
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        for run, cases in sample.items():
+            for case in cases:
+                store.record_label(
+                    run,
+                    case,
+                    1,
+                    "aleena",
+                    supported=supported,
+                    responsive=True,
+                    note="",
+                    label_split="judge-dev",
+                )
+    finally:
+        store.close()
+
+
+def _cli_score(config: Path) -> tuple[int, str]:
+    result = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
+    return result.exit_code, " ".join(result.output.split())
+
+
 def test_score_records_the_result_the_monitor_reads(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
+    runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
+    _label_sample(tmp_path, _cli_draw(config, monkeypatch), supported=True)
     _reference_days(monkeypatch, REFERENCE)
-    result = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
-    assert result.exit_code == 0 and "may now alert" in " ".join(result.output.split())
+    code, output = _cli_score(config)
+    assert code == 0 and "may now alert" in output
     assert mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
     assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, ["r1", "r2", "r3", "r4", "other"])
-    assert json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))  # the sample was saved
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # the first complete result is kept in the database as well
+        kept = mon.recorded_judge_check(store, runs.values())
+    finally:
+        store.close()
+    assert kept == json.loads(mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8"))
 
 
 def test_the_judge_stays_out_if_the_reference_is_noisy_with_it(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
+    runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
+    _label_sample(tmp_path, _cli_draw(config, monkeypatch), supported=True)
     odd = synthetic_day("odd", values={"judge_supported": ones(80, 60)})
     _reference_days(monkeypatch, [*REFERENCE[:4], odd])
-    result = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
-    output = " ".join(result.output.split())
-    assert result.exit_code == 0 and "the labels pass" in output and "too noisy" in output
+    code, output = _cli_score(config)
+    assert code == 0 and "the labels pass" in output and "too noisy" in output
     assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
+
+
+def test_score_never_draws_and_no_draw_follows_her_labels(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    code, output = _cli_score(config)
+    assert code == 2 and "No judge-check sample yet" in output
+    assert not mon.JUDGE_SAMPLE_PATH.exists()
+    _label_sample(tmp_path, {"r1": ["c1"]}, supported=True)  # a label, but the sample is gone
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    assert result.exit_code == 2 and "would not be blind" in " ".join(result.output.split())
+    assert not mon.JUDGE_SAMPLE_PATH.exists()
+
+
+def test_the_judges_verdicts_stay_hidden_until_the_check_is_scored(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    sample = _cli_draw(config, monkeypatch)
+    case = sample["r1"][0]
+    validate = ["judge-validate", "r1", "--split", "all", "-c", str(config)]
+    refused = CliRunner().invoke(cli.app, validate)
+    assert refused.exit_code == 2 and "labeled blind" in " ".join(refused.output.split())
+    trace = CliRunner().invoke(cli.app, ["trace", "r1", case, "-c", str(config)])
+    assert trace.exit_code == 0 and "judge_supported" not in trace.output
+    assert "held back" in " ".join(trace.output.split())
+    other = CliRunner().invoke(cli.app, ["trace", "r1", "c15", "-c", str(config)])
+    assert "c15" not in sample["r1"] and "judge_supported" in other.output  # not sampled
+    _label_sample(tmp_path, sample, supported=True)
+    _reference_days(monkeypatch, REFERENCE)
+    assert _cli_score(config)[0] == 0
+    assert CliRunner().invoke(cli.app, validate).exit_code == 0  # scored: nothing left to hide
+    shown = CliRunner().invoke(cli.app, ["trace", "r1", case, "-c", str(config)])
+    assert "judge_supported" in shown.output
 
 
 def test_label_walks_the_reference_runs_and_stops_when_she_quits(
@@ -233,34 +309,25 @@ def test_the_monitor_keeps_the_judge_out_until_the_check_passes(tmp_path: Path) 
 
 
 def test_the_first_complete_score_is_final(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
+    runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
+    sample = _cli_draw(config, monkeypatch)
+    _label_sample(tmp_path, sample, supported=False)  # she fails all 15 judge passes
     _reference_days(monkeypatch, REFERENCE)
-    first = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
-    assert first.exit_code == 0 and "may now alert" in " ".join(first.output.split())
+    code, output = _cli_score(config)
+    assert code == 0 and "it fails" in output
     recorded = mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8")
-    assert json.loads(recorded)["scored_at"]
-    # the result shows the judge's verdicts; a label changed after reading them must not count
-    sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))["runs"]
-    store = ResultsStore(tmp_path / "evals.duckdb")
-    try:
-        store.record_label(
-            "r1",
-            sample["r1"][0],
-            1,
-            "aleena",
-            supported=False,
-            responsive=True,
-            note="",
-            label_split="judge-dev",
-        )
-    finally:
-        store.close()
-    second = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
-    assert second.exit_code == 0 and "first complete result is final" in " ".join(
-        second.output.split()
-    )
+    assert json.loads(recorded)["scored_at"] and not json.loads(recorded)["passed"]
+    # the result shows the judge's verdicts; labels changed after reading them must not count
+    _label_sample(tmp_path, sample, supported=True)
+    code, output = _cli_score(config)
+    assert code == 0 and "first complete result is final" in output
     assert mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8") == recorded  # untouched
+    mon.JUDGE_CHECK_PATH.unlink()  # nor can deleting (or editing) the file reopen it
+    code, output = _cli_score(config)
+    assert code == 0 and "did not pass" in output and "restored from the results database" in output
+    assert json.loads(mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8")) == json.loads(recorded)
+    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
 
 
 def test_a_re_judged_sample_is_refused_before_labeling_and_scoring(
