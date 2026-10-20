@@ -1493,9 +1493,11 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
     fab = report["fabricated_citation"]
     if fab["p"] is not None:
         verdict = "[red]alert[/red]" if fab["alert"] else "ok"
+        blind = fab.get("detectable")
+        seen = f", detectable +{blind * 100:.1f} pts" if blind is not None else ""
         console.print(
             f"fabricated citations, own rule (p < 0.01): day {fab['day']:.3f}, reference "
-            f"{fab['ref']:.3f}, p {fab['p']:.4f}: {verdict}"
+            f"{fab['ref']:.3f}, p {fab['p']:.4f}{seen}: {verdict}"
         )
     judge = report["judge"]
     trust = "trusted" if judge["trusted"] else "[yellow]untrusted today[/yellow]"
@@ -1766,7 +1768,8 @@ def judge_check(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """May judge_supported alert (phase 7 part 3)? Aleena labels 30 judged answers from the
-    reference days, blind; the judge may pass at most 2 of the ones she fails. If it does, the
+    reference days, blind: 3 the judge passed and 3 it failed from each day, in an order that
+    shows neither. The judge may pass at most 2 of the ones she fails. If so, the
     leave-one-day-out check runs again with judge_supported in the family and must stay quiet.
     `label` can be stopped with q and run again to continue; `score` records the result for the
     monitor."""
@@ -1871,9 +1874,13 @@ def judge_check(
     mon.JUDGE_CHECK_PATH.write_text(
         json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )
+    console.print(
+        f"It failed {result['false_fails']} answer(s) you passed, of the "
+        f"{result['answers'] - result['judge_passed']} it failed (reported, no bar)."
+    )
     counted = (
-        f"The judge passed {result['false_passes']} answer(s) you failed, of {result['answers']} "
-        f"(at most {result['max_false_passes']} allowed)"
+        f"The judge passed {result['false_passes']} answer(s) you failed, of the "
+        f"{result['judge_passed']} it passed (at most {result['max_false_passes']} allowed)"
     )
     if not result["labels_passed"]:
         console.print(f"{counted}: it fails, so judge_supported stays out of the alert family.")

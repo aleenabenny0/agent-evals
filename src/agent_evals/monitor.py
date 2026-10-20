@@ -44,7 +44,8 @@ ALERTS_PATH = Path("results/online/alerts.json")
 JUDGE_CHECK_PATH = Path("results/online/judge-check.json")
 JUDGE_SAMPLE_PATH = Path("results/online/judge-check-sample.json")
 JUDGE_CHECK_PER_DAY = 6  # 30 answers over the five reference days
-JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check
+JUDGE_CHECK_PASSED_PER_DAY = 3  # of each day's 6: 3 the judge passed, 3 it failed (decision 6)
+JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check, over the 15 passes
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
 
@@ -217,17 +218,27 @@ def check_day(
             row["status"] = "no data"
         else:
             if spec.kind == "rate":
-                row["p"] = fisher_greater(int(sum(d)), len(d), int(sum(r)), len(r))
-                row["detectable"] = detectable_rate_rise(
-                    fmean(r), len(d), len(r), alpha=ALPHA / len(family)
-                )
+                row["p"] = fisher_greater(round(sum(d)), len(d), round(sum(r)), len(r))
             else:
                 row["p"] = permutation_greater(d, r, seed=seed)
-                row["detectable"] = detectable_mean_rise(
-                    pstdev(r), len(d), len(r), alpha=ALPHA / len(family)
-                )
             pvalues[spec.name] = row["p"]
         rows[spec.name] = row
+    for spec in ALERT_FAMILY:  # every metric's blind spot, whether tested today or not
+        d = day.values[spec.name]
+        r = [x for ref in reference for x in ref.values[spec.name]]
+        if not d or not r:
+            continue
+        # Holm's first step, which a lone rise must pass: alpha over the metrics tested, one
+        # more for a metric that would join them (a pending judge, a refused latency)
+        level = ALPHA / (len(pvalues) + (spec.name not in pvalues))
+        rows[spec.name]["detectable_alpha"] = level
+        rows[spec.name]["detectable"] = (
+            detectable_rate_rise(
+                bad_ref=round(sum(r)), n_ref=len(r), n_day=len(d), alpha=level, floor=spec.floor
+            )
+            if spec.kind == "rate"
+            else detectable_mean_rise(pstdev(r), len(d), len(r), alpha=level, floor=spec.floor)
+        )
     rejected = holm(pvalues, alpha=ALPHA)
     for name in pvalues:
         row = rows[name]
@@ -239,9 +250,17 @@ def check_day(
     fab: dict[str, Any] = {"n_day": len(day.fabricated), "n_ref": len(rf), "p": None}
     fab["day"] = fmean(day.fabricated) if day.fabricated else None
     fab["ref"] = fmean(rf) if rf else None
+    fab["detectable"] = None
     if day.fabricated and rf:
         fab["p"] = fisher_greater(
-            int(sum(day.fabricated)), len(day.fabricated), int(sum(rf)), len(rf)
+            round(sum(day.fabricated)), len(day.fabricated), round(sum(rf)), len(rf)
+        )
+        fab["detectable"] = detectable_rate_rise(  # its own rule: p below 0.01, no floor
+            bad_ref=round(sum(rf)),
+            n_ref=len(rf),
+            n_day=len(day.fabricated),
+            alpha=FABRICATION_P,
+            strict=True,
         )
     fab["alert"] = fab["p"] is not None and fab["p"] < FABRICATION_P
 
@@ -407,34 +426,51 @@ def archive_reference_files(stamp: str) -> list[Path]:
     return moved
 
 
+def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:
+    """case id -> did the judge find the answer fully supported, for the run's judged answers."""
+    return {
+        case: grades["judge_supported"] == 1.0
+        for (case, attempt), grades in store.grades_for(run, "judge").items()
+        if attempt == 1 and "judge_supported" in grades
+    }
+
+
 def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str, list[str]]:
-    """Six judged answers per reference day, drawn with a seed per day, as case ids per run.
-    Drawn once and saved before any label exists. Refused unless every reference day has six."""
+    """Six judged answers per reference day, three the judge passed and three it failed, drawn
+    with a seed per day, as case ids per run, sorted so their order shows no verdict. A plain
+    random draw would hold only about 10 judge passes in 30, since the judge passes about a
+    quarter of online answers, and a false pass can happen only on those (decision 6). Drawn
+    once and saved before any label exists. Refused unless every reference day has three of
+    each."""
     if sorted(runs) != list(REFERENCE_DAYS):
         raise ValueError(f"the judge check samples the reference days {list(REFERENCE_DAYS)}")
+    need_passed = JUDGE_CHECK_PASSED_PER_DAY
+    need_failed = JUDGE_CHECK_PER_DAY - JUDGE_CHECK_PASSED_PER_DAY
     out: dict[str, list[str]] = {}
     for day, run in sorted(runs.items()):
-        judged = sorted(
-            case
-            for (case, attempt), grades in store.grades_for(run, "judge").items()
-            if attempt == 1 and "judge_supported" in grades
-        )
-        if len(judged) < JUDGE_CHECK_PER_DAY:
+        verdicts = _verdicts(store, run)
+        passed = sorted(case for case, ok in verdicts.items() if ok)
+        failed = sorted(case for case, ok in verdicts.items() if not ok)
+        if len(passed) < need_passed or len(failed) < need_failed:
             raise ValueError(
-                f"{run} has {len(judged)} judged answers; the check needs {JUDGE_CHECK_PER_DAY}"
+                f"{run} has {len(passed)} judge-passed and {len(failed)} judge-failed answers; "
+                f"the check needs {need_passed} and {need_failed}"
             )
         rng = random.Random(f"judge-check-{day}")
-        out[run] = sorted(rng.sample(judged, JUDGE_CHECK_PER_DAY))
+        out[run] = sorted(rng.sample(passed, need_passed) + rng.sample(failed, need_failed))
     return out
 
 
 def judge_check_score(
     store: ResultsStore, sample: Mapping[str, Sequence[str]], labeler: str
 ) -> dict[str, Any]:
-    """The judge's false passes on the sample: it found an answer fully supported and the labeler
-    did not. The labels pass only if all 30 are in and false passes are at most
-    JUDGE_CHECK_MAX_FALSE_PASSES. A sampled answer without a judge verdict is refused, not read
-    as a judge fail, which could never be a false pass."""
+    """The judge's errors on the sample. A false pass: it found an answer fully supported and
+    the labeler did not. The labels pass only if all 30 are in and false passes, out of the 15
+    answers the judge passed, are at most JUDGE_CHECK_MAX_FALSE_PASSES. False fails (it failed
+    an answer the labeler passed) are counted too and reported, without a bar: they inflate
+    "not supported", the alert direction. A sampled answer without a judge verdict is refused,
+    not read as a judge fail, which could never be a false pass; so is a day whose verdicts no
+    longer split 3 and 3, since the judge was then re-run after the draw."""
     if len(sample) != len(REFERENCE_DAYS) or any(
         len(cases) != JUDGE_CHECK_PER_DAY for cases in sample.values()
     ):
@@ -446,10 +482,12 @@ def judge_check_score(
     for run, cases in sample.items():
         labels = {x["case_id"]: x for x in store.labels(run, labeler) if x["attempt"] == 1}
         judge = store.grades_for(run, "judge")
+        passes = 0
         for case in cases:
             verdict = judge.get((case, 1), {}).get("judge_supported")
             if verdict is None:
                 raise ValueError(f"{run} {case}: the sampled answer has no judge verdict")
+            passes += verdict == 1.0
             label = labels.get(case)
             rows.append(
                 {
@@ -459,17 +497,25 @@ def judge_check_score(
                     "labeled_supported": None if label is None else label["supported"],
                 }
             )
+        if passes != JUDGE_CHECK_PASSED_PER_DAY:
+            raise ValueError(
+                f"{run}: {passes} of its sampled answers are judge passes, not "
+                f"{JUDGE_CHECK_PASSED_PER_DAY}; its verdicts changed after the sample was drawn"
+            )
     labeled = [r for r in rows if r["labeled_supported"] is not None]
     false_passes = [r for r in labeled if r["judge_supported"] and not r["labeled_supported"]]
+    false_fails = [r for r in labeled if not r["judge_supported"] and r["labeled_supported"]]
     complete = len(labeled) == len(rows)
     return {
         "labeler": labeler,
         "reference_runs": sorted(sample),
         "answers": len(rows),
+        "judge_passed": sum(r["judge_supported"] for r in rows),
         "labeled": len(labeled),
         "complete": complete,
         "false_passes": len(false_passes),
         "max_false_passes": JUDGE_CHECK_MAX_FALSE_PASSES,
+        "false_fails": len(false_fails),
         "labels_passed": complete and len(false_passes) <= JUDGE_CHECK_MAX_FALSE_PASSES,
         "rows": rows,
     }

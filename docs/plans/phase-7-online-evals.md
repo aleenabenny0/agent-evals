@@ -104,9 +104,11 @@ in the family and untrusted that day. It exits 2 when the day cannot be checked:
 complete, is not judged in full by the pinned judge, or its cases or traffic file has changed
 since it ran. Each reference day must have exactly one complete champion run; which of two runs
 counts is a decision, never a default. `evals judge-check label` walks Aleena through the 30
-blind labels (6 per reference day, drawn with a seed per day). `evals judge-check score` counts
-the judge's false passes. If the labels pass, it reruns the leave-one-day-out check with
-judge_supported in the family, and judge_supported may alert only if that stays quiet too.
+blind labels: from each reference day, 3 answers the judge passed and 3 it failed, drawn with a
+seed per day and shown in an order that reveals neither. `evals judge-check score` counts the
+judge's false passes, and reports its false fails. If the labels pass, it reruns the
+leave-one-day-out check with judge_supported in the family, and judge_supported may alert only
+if that stays quiet too.
 
 **Reference frozen 2026-10-19** on the real runs of days 1 to 5, before any later day ran. No
 reference day alerted against the other four, with the 6-metric family (judge_supported waits
@@ -143,15 +145,25 @@ a 5-point floor. All five runs were complete, with every cited answer judged by 
   share of answers naming their source page.
 - **Judge trust.** If median answer length or the source-naming share moves more than 25% from
   the reference, that day's judge_supported is marked untrusted. The 25% is relative to the
-  reference value, in either direction. With source naming near 96%, only a fall below about 72%
-  can trip it. An alert still stands, but a
-  non-alert does not clear the day. Before judge_supported may alert at all, Aleena labels 30
-  answers from reference days blind. The judge must pass at most 2 she fails, the same bar as
-  iteration 4's spot check.
+  reference value, in either direction; with source naming near 96%, only a fall below about
+  72% can trip it. An alert still stands, but a non-alert does not clear the day.
+- **Judge check.** Before judge_supported may alert at all, Aleena labels 30 answers from
+  reference days blind: from each day, 3 the judge passed and 3 it failed (decision 6). A plain
+  random 30 would hold only about 10 judge passes, since the judge passes about a quarter of
+  online answers, and a false pass can happen only on those. The judge must pass at most 2 she
+  fails, of its 15 passes: the bar of iteration 4's spot check. Its false fails are reported
+  too.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
-  leaves the Holm family, the report gives the number tested, and the day is not cleared. The minimum detectable effect is published for every metric, at
-  the day's n against the reference n.
+  leaves the Holm family, the report gives the number tested, and the day is not cleared.
+- **Blind spots** (decision 5). Every metric, the fabricated-citation rule included, publishes
+  its detectable rise: the smallest true rise that would alert on 8 days in 10, its floor
+  included, at the day's n against the reference. For rates it is exact: the fewest bad
+  outcomes that pass Fisher's test and the floor, and the binomial chance of reaching them. For
+  means it uses the normal approximation, which the statistics review checked against the exact
+  permutation test. The level is Holm's first step, which a lone rise must pass: 0.05 over the
+  number of metrics tested that day, counting one more for a metric not tested (a pending judge,
+  a refused latency).
 - **Output.** A table, `results/online/alerts.json`, and a non-zero exit code on an alert.
 
 ## 4. Dashboard (`evals dashboard`, static HTML chosen by Aleena 2026-10-19)
@@ -377,20 +389,25 @@ reproduced every finding there. The code review's ten findings:
 | From the wrong folder, the commands opened a new, empty database and exited 0 | A config file must exist. The monitor and dashboard open the database read-only, so a missing one is an error |
 | The leave-one-day-out check never ran with judge_supported in the family | `judge-check score` reruns it with the judge in, once the labels pass. The judge joins only if it stays quiet |
 | A NaN latency was Holm-rejected yet showed "ok", and alerts.json got NaN | Latencies that are not finite and positive are skipped; the JSON files refuse NaN |
-| The published detectable rise was about 0 when the reference rate is 0 | In `stats/`, so put to Aleena first (decision 5 below) |
+| The published detectable rise was about 0 when the reference rate is 0 | In `stats/`, so put to Aleena first; approved 2026-10-20 and built (decision 5) |
+
+The frozen reference stands. On the real data, with the fixed code, all five runs pass the new
+checks and each is its day's only complete champion run. With judge_supported in the family the
+leave-one-day-out check is quiet too: the closest call is day 5's judge_supported, +6.1 points
+with p 0.15. The judge still joins the family only through `judge-check score`, after the labels.
 
 The statistics review's eleven findings. It replayed the rule on a copy of the real days and
 simulated reference days drawn from one distribution:
 
 | Finding | Done |
 |---|---|
-| The detectable rise was badly understated for rare rates: uncited answers showed +0.04 points against +7.7 exact. It also ignored the floors: latency showed +17%, though nothing under +25% can alert | Put to Aleena, being in `stats/` (decision 5) |
-| No detectable rise was given for fabricated citations, for judge_supported while pending, or for refused latency | Part of decision 5 |
+| The detectable rise was badly understated for rare rates: uncited answers showed +0.04 points against +7.7 exact. It also ignored the floors: latency showed +17%, though nothing under +25% can alert | Put to Aleena, being in `stats/`; approved 2026-10-20 and built (decision 5) |
+| No detectable rise was given for fabricated citations, for judge_supported while pending, or for refused latency | Built with decision 5 |
 | The leave-one-day-out check never ran with judge_supported in the family | Fixed with the code review's finding |
 | Five days from one distribution still stop the demo at that check about 10% of the time (up to 17% with day-to-day variation), and the plan did not say so | Stated in part 3. Days 1 to 5 passed, so the rule stays as approved |
 | A failed reference check could be re-rolled | Refused, after a stop as well; `--refreeze` archives everything first |
 | With a metric refused, Holm ran over fewer metrics, but the report still said 6 or 7 | The report gives the number tested; part 3 says how a refused metric is handled |
-| Only about 10 of the judge check's 30 answers are ones the judge passed (10 in today's draw), and a false pass can happen only on those, so the bar of 2 is weaker than it looks | Put to Aleena before any label exists (decision 6) |
+| Only about 10 of the judge check's 30 answers are ones the judge passed (10 in today's draw), and a false pass can happen only on those, so the bar of 2 is weaker than it looks | Put to Aleena before any label existed; approved 2026-10-20 and built (decision 6) |
 | The reported in-scope support also counted false premises | Lookups and comparisons only, as everywhere else |
 | The dashboard's band was the pooled mean's interval, which normal days often fall outside (13 of 40 dots) | Each day sits over the range a normal day of its n shows |
 | The monitor table showed judge_supported as the unsupported share, and latency and tokens as logs | Rows show their labels; latency and tokens are in seconds and tokens |
@@ -399,22 +416,19 @@ simulated reference days drawn from one distribution:
 An independent verifier then checked every finding against the code at 96284ab and a copy of the
 database: 20 of the 21 held, and only the last statistics finding was rejected.
 
-## Decisions for Aleena (open, 2026-10-19)
+## Decisions for Aleena (asked 2026-10-19, both approved 2026-10-20)
 
-5. **The "detectable" column** (`stats/`). It should be the smallest real rise the monitor
+5. **The "detectable" column** (`stats/`). **Approved and built** ("Blind spots" in part 3).
+   It should be the smallest real rise the monitor
    would catch on 8 days in 10. The formula behind it is a normal shortcut that breaks near 0%,
    and it leaves out the floor an alert also needs. Proposed: compute rates exactly (the
    binomial count the Fisher test needs), count the floor, and give it for every metric,
    including fabricated citations. On today's reference, uncited answers would go from +0
    points to +7.7, errors from +2.7 to +6.0, latency from +17% to about +30%, and fabricated
    citations from none to +8.9. It changes what is reported, never when an alert fires.
-6. **The judge check's sample**, before any label exists. Proposed: draw 15 answers the judge
+6. **The judge check's sample**, before any label exists. **Approved and built** ("Judge check"
+   in part 3). Proposed: draw 15 answers the judge
    passed and 15 it failed (3 and 3 a day) in place of 30 at random. Keep the bar (at most 2
    false passes), now applied to 15 judge passes, and also report the answers the judge failed
    that Aleena passes. Same 30 labels, same time.
-
-The frozen reference stands. On the real data, with the fixed code, all five runs pass the new
-checks and each is its day's only complete champion run. With judge_supported in the family the
-leave-one-day-out check is quiet too: the closest call is day 5's judge_supported, +6.1 points
-with p 0.15. The judge still joins the family only through `judge-check score`, after the labels.
 

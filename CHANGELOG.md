@@ -170,6 +170,14 @@ Format:
 
 ## Unreleased
 
+- 2026-10-20: Aleena's decisions 5 and 6 (plan), both approved. Every monitored metric, the
+  fabricated-citation rule included, now publishes its blind spot as the smallest true rise
+  that alerts on 8 days in 10, floor included. It is exact for rates (`stats/monitor.py`
+  `detectable_rate_rise`) and by the normal approximation for means. On the reference, uncited
+  answers went from +0 points to about +8, errors from +2.7 to +6, latency from +17% to +30%.
+  This changes what is reported, never when an alert fires. The judge check's 30 answers are
+  now 3 the judge passed and 3 it failed from each reference day, so its bar of at most 2 false
+  passes applies to 15 judge passes, not about 10. False fails are reported too.
 - 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved by Aleena (plan,
   parts 3 and 4). `evals monitor --freeze` checks days 1 to 5 against each other, leaving one
   day out at a time, and freezes them as the reference. `evals monitor DAY` tests a later day

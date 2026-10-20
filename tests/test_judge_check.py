@@ -64,15 +64,23 @@ def _store(tmp_path: Path, labels: dict[str, list[bool]] | None = None) -> dict[
     return runs
 
 
-def test_the_sample_is_six_judged_answers_a_day_drawn_reproducibly(tmp_path: Path) -> None:
+def test_the_sample_is_three_passed_and_three_failed_a_day_drawn_reproducibly(
+    tmp_path: Path,
+) -> None:
     runs = _store(tmp_path)
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:
         sample = mon.judge_check_sample(store, runs)
         assert sample == mon.judge_check_sample(store, runs)
+        passed = {
+            run: sum(store.grades_for(run, "judge")[(c, 1)]["judge_supported"] for c in cases)
+            for run, cases in sample.items()
+        }
     finally:
         store.close()
     assert set(sample) == set(runs.values()) and all(len(c) == 6 for c in sample.values())
+    assert set(passed.values()) == {3}  # 15 judge passes in all, where false passes can occur
+    assert all(cases == sorted(cases) for cases in sample.values())  # order shows no verdict
 
 
 def _score(tmp_path: Path, labels: dict[str, list[bool]]) -> dict[str, Any]:
@@ -88,10 +96,11 @@ def test_the_score_counts_false_passes_and_needs_every_label(tmp_path: Path) -> 
     agree = {f"r{d}": [True] * 6 for d in range(1, 6)}  # she passes everything: no false pass
     result = _score(tmp_path / "a", agree)
     assert result["complete"] and result["false_passes"] == 0 and result["labels_passed"]
+    assert result["judge_passed"] == 15 and result["false_fails"] == 15  # reported, no bar
     harsh = {f"r{d}": [False] * 6 for d in range(1, 6)}  # she fails everything the judge passed
     result = _score(tmp_path / "b", harsh)
-    assert result["false_passes"] == sum(r["judge_supported"] for r in result["rows"]) > 2
-    assert not result["labels_passed"]
+    assert result["false_passes"] == sum(r["judge_supported"] for r in result["rows"]) == 15
+    assert not result["labels_passed"] and result["false_fails"] == 0
     partial = {"r1": [True] * 6}
     result = _score(tmp_path / "c", partial)
     assert not result["complete"] and not result["labels_passed"] and result["labeled"] == 6
@@ -105,8 +114,14 @@ def test_a_lost_verdict_or_a_thin_day_is_refused_not_counted(tmp_path: Path) -> 
         store.delete_grades("r2", "judge", [(sample["r2"][0], 1)])  # e.g. a --replace cut short
         with pytest.raises(ValueError, match="no judge verdict"):
             mon.judge_check_score(store, sample, "aleena")  # never read as a judge fail
+        # the judge re-run after the draw turns one of day 1's sampled passes into a fail
+        flipped = next(c for c in sample["r1"] if mon._verdicts(store, "r1")[c])
+        store.delete_grades("r1", "judge", [(flipped, 1)])
+        store.add_grades("r1", flipped, 1, [("judge", Grade(metric="judge_supported", value=0.0))])
+        with pytest.raises(ValueError, match="verdicts changed after the sample was drawn"):
+            mon.judge_check_score(store, sample, "aleena")
         store.delete_grades("r3", "judge")
-        with pytest.raises(ValueError, match="r3 has 0 judged answers"):
+        with pytest.raises(ValueError, match="r3 has 0 judge-passed and 0 judge-failed"):
             mon.judge_check_sample(store, runs)  # 24 answers would pass as the check
         with pytest.raises(ValueError, match="6 answers from each"):
             mon.judge_check_score(store, {"r1": sample["r1"]}, "aleena")

@@ -8,11 +8,14 @@ import numpy as np
 import pytest
 
 from agent_evals.stats.monitor import (
+    alert_count,
+    binomial_tail,
     detectable_mean_rise,
     detectable_rate_rise,
     fisher_greater,
     holm,
     permutation_greater,
+    rate_alert_power,
 )
 
 
@@ -57,9 +60,57 @@ def test_holm_steps_down_and_stops_at_the_first_failure() -> None:
 
 
 def test_detectable_effects_shrink_with_n_and_vanish_without_data() -> None:
-    small = detectable_rate_rise(0.3, 100, 500, alpha=0.05 / 7)
-    big = detectable_rate_rise(0.3, 200, 500, alpha=0.05 / 7)
+    small = detectable_rate_rise(bad_ref=150, n_ref=500, n_day=100, alpha=0.05 / 7)
+    big = detectable_rate_rise(bad_ref=150, n_ref=500, n_day=200, alpha=0.05 / 7)
     assert small is not None and big is not None and big < small
-    assert detectable_rate_rise(0.3, 0, 500, alpha=0.05) is None
+    assert detectable_rate_rise(bad_ref=150, n_ref=500, n_day=0, alpha=0.05) is None
+    assert detectable_rate_rise(bad_ref=0, n_ref=10, n_day=3, alpha=1e-9) is None  # never alerts
     mean = detectable_mean_rise(1.0, 100, 400, alpha=0.05)
-    assert mean is not None and 0.2 < mean < 0.4  # 2.49 x sqrt(1/100 + 1/400) = 0.28
+    assert mean is not None and 0.2 < mean < 0.4  # 1.64 x sqrt(1/100 + 1/400) + 0.84 x 0.1
+    assert detectable_mean_rise(1.0, 100, 400, alpha=0.05, floor=0.5) == pytest.approx(
+        0.5 + 0.8416 * 0.1, abs=1e-3
+    )  # the floor binds: the observed rise must reach 0.5, then 80% power on top
+
+
+def test_a_zero_reference_rate_still_needs_real_failures() -> None:
+    # The real uncited case: 0 of 431 on the reference days, a day of 86. The old normal
+    # approximation said a 0.04-point rise was detectable; an alert needs 5 uncited (the 5-point
+    # floor), which a day reaches 80% of the time only at a true rate near 7.7%.
+    assert alert_count(0, 431, 86, alpha=0.05 / 6, floor=0.05) == 5
+    mde = detectable_rate_rise(bad_ref=0, n_ref=431, n_day=86, alpha=0.05 / 6, floor=0.05)
+    assert mde == pytest.approx(0.077, abs=0.002)
+    assert binomial_tail(5, 86, mde) == pytest.approx(0.8, abs=1e-6)
+
+
+def test_the_detectable_rise_alerts_8_days_in_10_by_simulating_the_rule() -> None:
+    rng = np.random.default_rng(7)
+    for bad_ref, n_ref, n_day, floor in (
+        (12, 398, 80, 0.05),
+        (3, 500, 100, 0.02),
+        (322, 431, 86, 0.05),
+    ):
+        alpha = 0.05 / 6
+        mde = detectable_rate_rise(
+            bad_ref=bad_ref, n_ref=n_ref, n_day=n_day, alpha=alpha, floor=floor
+        )
+        assert mde is not None
+        rate = bad_ref / n_ref + mde
+        days = rng.binomial(n_day, rate, 4_000)
+        alerts = [  # the monitor's rule, applied directly to each simulated day
+            fisher_greater(int(k), n_day, bad_ref, n_ref) <= alpha
+            and k / n_day - bad_ref / n_ref >= floor - 1e-12
+            for k in days
+        ]
+        assert np.mean(alerts) == pytest.approx(0.8, abs=0.025)
+        assert rate_alert_power(rate, bad_ref, n_ref, n_day, alpha=alpha, floor=floor) == (
+            pytest.approx(0.8, abs=1e-6)
+        )
+
+
+def test_the_fabrication_rule_is_strict_and_has_no_floor() -> None:
+    # 12 of 431 on the reference days, a day of 86, p below 0.01: the real fabricated rule
+    k = alert_count(12, 431, 86, alpha=0.01, strict=True)
+    assert k is not None and fisher_greater(k, 86, 12, 431) < 0.01
+    assert fisher_greater(k - 1, 86, 12, 431) >= 0.01
+    mde = detectable_rate_rise(bad_ref=12, n_ref=431, n_day=86, alpha=0.01, strict=True)
+    assert mde == pytest.approx(0.089, abs=0.003)

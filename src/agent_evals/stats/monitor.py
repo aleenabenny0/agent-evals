@@ -3,14 +3,16 @@
 Each metric compares one day with the frozen reference days, one-sided in its bad direction: a
 rate by Fisher's exact test, a mean by a permutation test. The alert family is Holm-corrected,
 and an alert also needs the effect to reach the metric's practical floor, so a tiny but
-significant shift on a big day does not page anyone. Every test reports the smallest effect it
-could detect at the day's n, so a quiet day is read with its blind spots in view.
+significant shift on a big day does not page anyone. Every metric reports the smallest true
+rise that would alert on 8 days in 10, floor included, so a quiet day is read with its blind
+spots in view: exactly for rates, by the normal approximation for means (decision 5, approved
+by Aleena 2026-10-20).
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from math import comb, sqrt
+from math import comb, exp, lgamma, log, log1p, sqrt
 from statistics import NormalDist
 
 import numpy as np
@@ -67,23 +69,99 @@ def holm(pvalues: Mapping[str, float], *, alpha: float = 0.05) -> dict[str, bool
     return rejected
 
 
-def detectable_rate_rise(
-    rate_ref: float, n_day: int, n_ref: int, *, alpha: float, power: float = 0.8
-) -> float | None:
-    """The smallest rise in a rate that a one-sided test at `alpha` detects with `power`, by the
-    normal approximation at the reference rate. None when a side has no observations."""
+def binomial_tail(k: int, n: int, p: float) -> float:
+    """P(X >= k) for X ~ Binomial(n, p), summed in log space so large n cannot overflow."""
+    if k <= 0 or p >= 1.0:
+        return 1.0
+    if k > n or p <= 0.0:
+        return 0.0
+    lp, lq, ln = log(p), log1p(-p), lgamma(n + 1)
+    tail = sum(
+        exp(ln - lgamma(j + 1) - lgamma(n - j + 1) + j * lp + (n - j) * lq) for j in range(k, n + 1)
+    )
+    return min(1.0, tail)
+
+
+def alert_count(
+    bad_ref: int, n_ref: int, n_day: int, *, alpha: float, floor: float = 0.0, strict: bool = False
+) -> int | None:
+    """The fewest bad outcomes among the day's n_day that raise the alert against the frozen
+    reference: Fisher's p at most alpha (below it, if strict) and the rise at least the floor.
+    Every larger count alerts too, since Fisher's p only falls as the count grows. None when no
+    count can."""
     if n_day == 0 or n_ref == 0:
         return None
-    z = _NORMAL.inv_cdf(1 - alpha) + _NORMAL.inv_cdf(power)
-    p = min(max(rate_ref, 1e-6), 1 - 1e-6)
-    return z * sqrt(p * (1 - p) * (1 / n_day + 1 / n_ref))
+    rate_ref = bad_ref / n_ref
+    start = max(0, int(n_day * (rate_ref + floor)) - 1)  # below this the floor is out of reach
+    for k in range(start, n_day + 1):
+        p = fisher_greater(k, n_day, bad_ref, n_ref)
+        significant = p < alpha if strict else p <= alpha
+        if significant and k / n_day - rate_ref >= floor - 1e-12:
+            return k
+    return None
+
+
+def rate_alert_power(
+    rate_true: float,
+    bad_ref: int,
+    n_ref: int,
+    n_day: int,
+    *,
+    alpha: float,
+    floor: float = 0.0,
+    strict: bool = False,
+) -> float:
+    """The chance that a day of n_day whose true bad rate is rate_true raises the alert, the
+    reference frozen as it is: the binomial chance of reaching the alert count. Exact."""
+    k = alert_count(bad_ref, n_ref, n_day, alpha=alpha, floor=floor, strict=strict)
+    return 0.0 if k is None else binomial_tail(k, n_day, rate_true)
+
+
+def detectable_rate_rise(
+    *,
+    bad_ref: int,
+    n_ref: int,
+    n_day: int,
+    alpha: float,
+    floor: float = 0.0,
+    power: float = 0.8,
+    strict: bool = False,
+) -> float | None:
+    """The smallest rise in the day's true bad rate that raises the alert with `power`, the
+    reference frozen as it is. Exact: the true rate at which the day reaches the alert count
+    (Fisher's test at alpha and the floor) with that chance. None when a side has no
+    observations or no count can alert. (It replaced a normal approximation at the reference
+    rate, which read about 0 at a reference rate of 0 and left out the floor.)"""
+    k = alert_count(bad_ref, n_ref, n_day, alpha=alpha, floor=floor, strict=strict)
+    if k is None:
+        return None
+    rate_ref = bad_ref / n_ref
+    if binomial_tail(k, n_day, rate_ref) >= power:
+        return 0.0
+    lo, hi = rate_ref, 1.0
+    for _ in range(60):  # the tail rises with the true rate: bisect for the power
+        mid = (lo + hi) / 2
+        if binomial_tail(k, n_day, mid) >= power:
+            hi = mid
+        else:
+            lo = mid
+    return hi - rate_ref
 
 
 def detectable_mean_rise(
-    sd_ref: float, n_day: int, n_ref: int, *, alpha: float, power: float = 0.8
+    sd_ref: float,
+    n_day: int,
+    n_ref: int,
+    *,
+    alpha: float,
+    floor: float = 0.0,
+    power: float = 0.8,
 ) -> float | None:
-    """The smallest rise in a mean that a one-sided test at `alpha` detects with `power`."""
+    """The smallest rise in a mean that raises the alert with `power`, the reference frozen as it
+    is, by the normal approximation (the statistics review checked it against the exact
+    permutation test): the day's observed rise must clear both the test's critical value and the
+    floor, and it varies around the true rise with the day's own standard error."""
     if n_day == 0 or n_ref == 0:
         return None
-    z = _NORMAL.inv_cdf(1 - alpha) + _NORMAL.inv_cdf(power)
-    return z * sd_ref * sqrt(1 / n_day + 1 / n_ref)
+    critical = max(_NORMAL.inv_cdf(1 - alpha) * sd_ref * sqrt(1 / n_day + 1 / n_ref), floor)
+    return critical + _NORMAL.inv_cdf(power) * sd_ref / sqrt(n_day)
