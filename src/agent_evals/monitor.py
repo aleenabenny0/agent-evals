@@ -49,6 +49,7 @@ JUDGE_CHECK_PASSED_PER_DAY = 3  # of each day's 6: 3 the judge passed, 3 it fail
 JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check, over the 15 passes
 JUDGE_CHECK_LABELER = "aleena"  # the plan: Aleena's 30 blind labels, nobody else's
 JUDGE_CHECK_RECORD = "judge_check"  # the first complete score, kept on each reference run
+JUDGE_SAMPLE_RECORD = "judge_check_sample"  # the drawn sample and its digests, likewise
 CANNOT_ALERT = "no day of this n can alert"  # a blind spot with no number: the worst kind
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
@@ -334,16 +335,20 @@ def noisy_days(days: Mapping[int, str], checks: Sequence[Mapping[str, Any]]) -> 
     return out
 
 
-def judge_enabled(path: Path, reference_runs: Iterable[str]) -> bool:
+def judge_enabled(store: ResultsStore, reference_runs: Iterable[str]) -> bool:
     """Whether judge_supported is in the alert family: the judge passed Aleena's 30 blind labels
     (at most 2 false passes) on these reference runs, and the leave-one-day-out check with it in
-    the family raised no alert. A check made on another reference, or with anyone else's labels,
-    does not count."""
-    if not path.exists():
+    the family raised no alert. Read from the results database, never from judge-check.json,
+    which is only its published copy. A check on another reference or with anyone else's labels
+    does not count, nor does one whose sampled answers were re-judged since."""
+    runs = list(reference_runs)
+    kept = recorded_judge_check(store, runs)
+    if kept is None or not kept.get("passed") or kept.get("labeler") != JUDGE_CHECK_LABELER:
         return False
-    result = json.loads(path.read_text(encoding="utf-8"))
-    same = sorted(result.get("reference_runs") or []) == sorted(reference_runs)
-    return bool(result.get("passed")) and same and result.get("labeler") == JUDGE_CHECK_LABELER
+    drawn = recorded_sample(store, runs)
+    return drawn is not None and verdict_digests(store, drawn["runs"]) == drawn.get(
+        "verdict_digests"
+    )
 
 
 def day_runs(store: ResultsStore, day: int, *, champion_only: bool = False) -> list[str]:
@@ -444,31 +449,53 @@ def recorded_judge_check(
     store: ResultsStore, reference_runs: Iterable[str]
 ) -> dict[str, Any] | None:
     """The first complete judge-check result for these reference runs, as kept in the results
-    database (every reference run carries it once scored), or None. It outlives
-    judge-check.json, so deleting or editing that file cannot reopen a final score."""
+    database (every reference run carries it once scored), or None. The database is the record;
+    judge-check.json is only its published copy, so no file written, edited or deleted by hand
+    can make, change or reopen a final score."""
+    kept = _kept(store, reference_runs, JUDGE_CHECK_RECORD)
+    return kept if kept is not None and kept.get("complete") else None
+
+
+def recorded_sample(store: ResultsStore, reference_runs: Iterable[str]) -> dict[str, Any] | None:
+    """The judge-check sample drawn for these reference runs, as kept in the results database
+    (every reference run carries it from the draw): drawn_at, reference_runs, runs (run -> case
+    ids) and verdict_digests. judge-check-sample.json is only its published copy."""
+    return _kept(store, reference_runs, JUDGE_SAMPLE_RECORD)
+
+
+def _kept(store: ResultsStore, reference_runs: Iterable[str], key: str) -> dict[str, Any] | None:
     runs = sorted(reference_runs)
     for run in runs:
-        kept = store.run_info(run)["manifest"].get(JUDGE_CHECK_RECORD)
-        if kept and kept.get("complete") and sorted(kept.get("reference_runs") or []) == runs:
+        try:
+            kept = store.run_info(run)["manifest"].get(key)
+        except KeyError:  # a run the database does not know holds no record
+            continue
+        if kept and sorted(kept.get("reference_runs") or []) == runs:
             return dict(kept)
     return None
 
 
-def blind_cases(run_id: str) -> set[str]:
+def blind_cases(store: ResultsStore, run_id: str) -> set[str]:
     """The judge check's sampled answers in this run while the check awaits its first complete
     score. Their judge verdicts and reasons must not reach the labeler: `label --show-judge`,
-    `judge-validate` and `trace` hold them back. Empty once the check is scored, or for a run
-    the check did not sample."""
-    if not JUDGE_SAMPLE_PATH.exists():
+    `judge-validate` and `trace` hold them back. Read from the results database, so moving or
+    deleting a file lifts nothing. Empty once the check is scored, or for a run the check did
+    not sample."""
+    try:
+        manifest = store.run_info(run_id)["manifest"]
+    except KeyError:
         return set()
-    sample = json.loads(JUDGE_SAMPLE_PATH.read_text(encoding="utf-8")).get("runs") or {}
-    if run_id not in sample:
+    drawn = manifest.get(JUDGE_SAMPLE_RECORD)
+    if not drawn:
         return set()
-    if JUDGE_CHECK_PATH.exists():
-        done = json.loads(JUDGE_CHECK_PATH.read_text(encoding="utf-8"))
-        if done.get("complete") and sorted(done.get("reference_runs") or []) == sorted(sample):
-            return set()
-    return set(sample[run_id])
+    scored = manifest.get(JUDGE_CHECK_RECORD)
+    if (
+        scored
+        and scored.get("complete")
+        and sorted(scored.get("reference_runs") or []) == sorted(drawn.get("reference_runs") or [])
+    ):
+        return set()
+    return set((drawn.get("runs") or {}).get(run_id, []))
 
 
 def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:

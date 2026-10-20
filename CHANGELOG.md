@@ -177,11 +177,13 @@ Format:
   answers went from +0 points to about +8, errors from +2.7 to +6, latency from +17% to +30%.
   This changes what is reported, never when an alert fires. The judge check's 30 answers are
   now 3 the judge passed and 3 it failed from each reference day, so its bar of at most 2 false
-  passes applies to 15 judge passes, not about 7 or 8. False fails are reported too. Two
-  independent checks raised 22 findings, 19 of which held (some the same problem seen twice),
-  and all are fixed (plan, "Check of decisions 5 and 6" and "Re-check of the fixes"). The first complete judge-check
-  score is final: it is kept in the results database, and neither deleting its file nor a
-  re-record of the same runs reopens it. Until it is scored, every command that would show the
+  passes applies to 15 judge passes, not about 7 or 8. False fails are reported too. Three
+  independent checks raised 27 findings, 24 of which held (some the same problem seen twice),
+  and all are fixed (plan, "Check of decisions 5 and 6", "Re-check of the fixes" and "Final
+  check before the draw"). The results database is the check's only record, with the files as
+  its published copies. The first complete judge-check score is final: no file written, edited
+  or deleted, and no re-record of the same runs, can make, change or reopen it, and a re-judge
+  afterwards takes the judge out of the family. Until it is scored, every command that would show the
   judge's verdicts on the sampled answers holds them back (`label --show-judge`,
   `judge-validate`, `trace`). The sample leaves out the answers the dashboard publishes with
   the judge's verdict, only `label` draws it, never after labels exist, and a digest of the

@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
 
@@ -90,6 +91,14 @@ def test_the_sample_is_three_passed_and_three_failed_a_day_drawn_reproducibly(
     assert set(sample) == set(runs.values()) and all(len(c) == 6 for c in sample.values())
     assert set(passed.values()) == {3}  # 15 judge passes in all, where false passes can occur
     assert all(cases == sorted(cases) for cases in sample.values())  # order shows no verdict
+
+
+def _enabled(tmp_path: Path, runs: Iterable[str]) -> bool:
+    store = ResultsStore(tmp_path / "evals.duckdb", read_only=True)
+    try:
+        return mon.judge_enabled(store, runs)
+    finally:
+        store.close()
 
 
 def _score(tmp_path: Path, labels: dict[str, list[bool]]) -> dict[str, Any]:
@@ -199,8 +208,7 @@ def test_score_records_the_result_the_monitor_reads(
     _reference_days(monkeypatch, REFERENCE)
     code, output = _cli_score(config)
     assert code == 0 and "may now alert" in output
-    assert mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
-    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, ["r1", "r2", "r3", "r4", "other"])
+    assert _enabled(tmp_path, runs.values())
     store = ResultsStore(tmp_path / "evals.duckdb")
     try:  # the first complete result is kept in the database as well
         kept = mon.recorded_judge_check(store, runs.values())
@@ -219,7 +227,7 @@ def test_the_judge_stays_out_if_the_reference_is_noisy_with_it(
     _reference_days(monkeypatch, [*REFERENCE[:4], odd])
     code, output = _cli_score(config)
     assert code == 0 and "the labels pass" in output and "too noisy" in output
-    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
+    assert not _enabled(tmp_path, runs.values())
 
 
 def test_score_never_draws_and_no_draw_follows_her_labels(
@@ -294,16 +302,42 @@ def test_label_walks_the_reference_runs_and_stops_when_she_quits(
     assert all(len(cases) == 6 for _, cases in seen)
 
 
-def test_the_monitor_keeps_the_judge_out_until_the_check_passes(tmp_path: Path) -> None:
-    path, runs = tmp_path / "judge-check.json", ["r1", "r2"]
-    assert not mon.judge_enabled(path, runs)
-    result: dict[str, Any] = {"passed": False, "reference_runs": runs, "labeler": "aleena"}
-    path.write_text(json.dumps(result), encoding="utf-8")
-    assert not mon.judge_enabled(path, runs)
-    path.write_text(json.dumps(result | {"passed": True}), encoding="utf-8")
-    assert mon.judge_enabled(path, runs) and not mon.judge_enabled(path, ["r1", "r3"])
-    path.write_text(json.dumps(result | {"passed": True, "labeler": "bob"}), encoding="utf-8")
-    assert not mon.judge_enabled(path, runs)  # the plan: Aleena's labels, nobody else's
+def test_only_a_recorded_pass_on_unchanged_grades_puts_the_judge_in(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    sample = _cli_draw(config, monkeypatch)
+    assert not _enabled(tmp_path, runs.values())  # drawn, not scored
+    forged = {"complete": True, "passed": True, "labeler": "aleena"}
+    forged["reference_runs"] = sorted(runs.values())
+    mon.JUDGE_CHECK_PATH.write_text(json.dumps(forged), encoding="utf-8")
+    assert not _enabled(tmp_path, runs.values())  # a file counts for nothing
+    code, output = _cli_score(config)
+    assert code == 1 and "0 of 30 labeled" in output  # nor does it make a final score
+    _label_sample(tmp_path, sample, supported=True)
+    _reference_days(monkeypatch, REFERENCE)
+    assert _cli_score(config)[0] == 0 and _enabled(tmp_path, runs.values())
+    assert not _enabled(tmp_path, ["r1", "r2", "r3", "r4", "other"])  # another reference
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # a record under another labeler's name puts nothing in
+        kept = mon.recorded_judge_check(store, runs.values())
+        assert kept is not None
+        for run in runs.values():
+            store.annotate_run(run, mon.JUDGE_CHECK_RECORD, kept | {"labeler": "bob"})
+    finally:
+        store.close()
+    assert not _enabled(tmp_path, runs.values())
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # back to her record, then the sampled answers re-judged after the pass
+        for run in runs.values():
+            store.annotate_run(run, mon.JUDGE_CHECK_RECORD, kept)
+        case = sample["r1"][0]
+        store.delete_grades("r1", "judge", [(case, 1)])
+        store.add_grades("r1", case, 1, [("judge", Grade(metric="judge_supported", value=0.5))])
+    finally:
+        store.close()
+    assert not _enabled(tmp_path, runs.values())  # its grades are not the ones it was checked on
     no_option = CliRunner().invoke(cli.app, ["judge-check", "score", "--labeler", "bob"])
     assert no_option.exit_code == 2  # the command has no --labeler at all
 
@@ -327,7 +361,7 @@ def test_the_first_complete_score_is_final(tmp_path: Path, monkeypatch: pytest.M
     code, output = _cli_score(config)
     assert code == 0 and "did not pass" in output and "restored from the results database" in output
     assert json.loads(mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8")) == json.loads(recorded)
-    assert not mon.judge_enabled(mon.JUDGE_CHECK_PATH, runs.values())
+    assert not _enabled(tmp_path, runs.values())
 
 
 def test_a_re_judged_sample_is_refused_before_labeling_and_scoring(
@@ -359,16 +393,28 @@ def test_a_re_judged_sample_is_refused_before_labeling_and_scoring(
         assert result.exit_code == 2 and "changed since the sample was drawn" in output
 
 
-def test_the_judges_verdicts_stay_hidden_on_the_checks_runs(
+def test_the_judges_view_is_refused_and_a_moved_sample_file_lifts_nothing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
-    mon.JUDGE_SAMPLE_PATH.write_text(json.dumps({"runs": {"r1": ["c0"]}}), encoding="utf-8")
+    sample = _cli_draw(config, monkeypatch)
+    published = mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8")
+    mon.JUDGE_SAMPLE_PATH.unlink()  # the blind is kept in the results database, not the file
     monkeypatch.setattr(cli, "_interactive", lambda: True)
     args = ["label", "r1", "--labeler", "aleena", "--revisit", "all", "--split", "judge-dev"]
     result = CliRunner().invoke(cli.app, [*args, "--show-judge", "-c", str(config)])
     assert result.exit_code == 2 and "labeled blind" in " ".join(result.output.split())
+    other = tmp_path / "other-judge.yaml"  # a config naming its judge otherwise
+    other.write_text(config.read_text(encoding="utf-8") + "judge:\n  grader_name: judge-v4\n")
+    trace = CliRunner().invoke(cli.app, ["trace", "r1", sample["r1"][0], "-c", str(other)])
+    assert trace.exit_code == 0 and "judge_supported" not in trace.output
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    again = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    assert again.exit_code == 0 and "restored from the results database" in " ".join(
+        again.output.split()
+    )
+    assert mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8") == published  # the same sample
 
 
 def test_answers_already_shown_with_a_verdict_are_never_sampled(tmp_path: Path) -> None:

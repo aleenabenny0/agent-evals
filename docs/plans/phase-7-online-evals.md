@@ -157,22 +157,27 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   random 30 would hold only about 7 or 8 judge passes (10 in the draw of 2026-10-19), since the
   judge passes about a quarter of online answers, and a false pass can happen only on those.
   The judge must pass at most 2 she fails, of its 15 passes: the bar of iteration 4's spot
-  check. Its false fails are reported too. Seven rules keep the check honest:
+  check. Its false fails are reported too. The record of the check is the results database:
+  the sample, when drawn, and the first complete score, when made, are kept on every reference
+  run. `results/online/judge-check-sample.json` and `judge-check.json` are only their published
+  copies, restored from the database if they go missing or are edited. Every rule reads the
+  database, never the files:
   - The sample leaves out the answers the dashboard publishes with the judge's verdict (each
     day's five least supported), and the dashboard never shows a sampled answer.
   - Only `judge-check label` draws the sample, and never once Aleena has labels on the
     reference runs.
-  - The sample is saved with a digest of the judge's grades on it, reasons included. Labeling
-    and scoring are refused if they changed, which catches any re-judging after the draw.
+  - The sample carries a digest of the judge's grades on it, reasons included. Labeling and
+    scoring are refused if they changed, which catches any re-judging after the draw.
   - Until the first complete score, the judge's verdicts on the sampled answers are held back
-    by every command that would show them: `label --show-judge`, `judge-validate` and `trace`.
-    Only a deliberate query of the database itself could still reach them.
+    by every command that would show them: `label --show-judge`, `judge-validate` and `trace`
+    (with any config). Only a deliberate query of the database itself could still reach them.
   - Only Aleena's labels count.
   - The first complete score is final, because its result shows the judge's verdicts and a
-    later relabel and rescore would no longer be blind. It is kept in
-    `results/online/judge-check.json` and in the results database on every reference run.
-    Deleting or editing the file cannot reopen it (the next score restores it), and nor can a
-    re-record of the same runs.
+    later relabel and rescore would no longer be blind. No file written, edited, moved or
+    deleted can make, change or reopen it, and nor can a re-record of the same runs.
+  - judge_supported is in the alert family only while the recorded score passed and the
+    judge's grades on the sample are still the ones it was scored on: a re-judge afterwards
+    takes it out.
   - No test can touch the real `results/online/`: each test's monitor files go to a temporary
     folder, and the test run fails if a real file changed.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
@@ -516,4 +521,26 @@ took over 500 s with a large reference and no floor). The reviewers also confirm
 found sound: the next real steps on copies (frozen_at kept, day 6 clear, a 3-and-3 sample
 disjoint from the dashboard, which stays byte-identical), the digest guard, the labeler pin, and
 that a real console passes the interactive check while NUL and pipes do not.
+
+## Final check before the draw (2026-10-20)
+
+A last isolated reviewer attacked the judge check at commit 2b0f40d on copies, and a verifier
+reproduced each finding. All 5 held. They had one root cause: the check trusted files that
+anyone could write, edit or move. So the results database became the only record of the
+sample and the score, with the files as its published copies:
+
+| Finding | Done |
+|---|---|
+| A hand-written judge-check.json counted as a final score before any real one: it lifted the blind, skipped the scoring and put the judge in the family | Only the database's record counts, for every rule |
+| The monitor and dashboard trusted an edited judge-check.json over the score in the database | `judge_enabled` reads the database |
+| `trace -c configs/judge-v4.yaml` (or judge-v3, judge-v2.1) printed the verdicts it said it held back, since it hid only the config's judge name | It hides every judge's grades on a sampled answer |
+| Moving judge-check-sample.json aside lifted the blind, and putting it back resumed the check as if nothing had happened | The sample is kept in the database at the draw, the blind reads it there, and the file is restored from it |
+| After a passed check, a re-judge of the sampled answers left the judge in the family | The judge is in the family only while those grades are unchanged |
+
+Everything else tried was stopped. That includes relabeling or `--fresh` after a score,
+deleting the result (restored byte for byte), refreezes of the same and other runs before and
+after labels and scores, swapped cases and one-character edits to a judge reason, other
+labeler names, `--show-judge` in every form, and judge-validate. The next real steps also ran
+on a copy: a NUL stdin draws and then refuses, the 3-and-3 sample is disjoint from the
+dashboard, and the dashboard rebuilds byte-identical. The worktree's 294 tests passed.
 
