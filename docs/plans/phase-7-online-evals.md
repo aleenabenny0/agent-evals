@@ -97,7 +97,8 @@ run records its day, its config and whether that was the champion's.
 `evals monitor --freeze` runs the leave-one-day-out check on days 1 to 5 and, if no day alerts
 against the other four, freezes them in `results/online/reference.json`. A frozen reference is
 replaced only with `--refreeze`, which moves everything checked against the old one to
-`results/online/archive/`. `evals monitor DAY` checks a later day and records it in
+`results/online/archive/`. If the runs are the same, it only re-records the reference, so
+the freeze date stands and the new record points to the archived first one. `evals monitor DAY` checks a later day and records it in
 `results/online/alerts.json`. It exits 0 when the day is clear and 1 on an alert. It exits 3 when
 nothing alerts but the day is not cleared, because a family metric went untested or the judge is
 in the family and untrusted that day. It exits 2 when the day cannot be checked: its run is not
@@ -149,10 +150,16 @@ a 5-point floor. All five runs were complete, with every cited answer judged by 
   72% can trip it. An alert still stands, but a non-alert does not clear the day.
 - **Judge check.** Before judge_supported may alert at all, Aleena labels 30 answers from
   reference days blind: from each day, 3 the judge passed and 3 it failed (decision 6). A plain
-  random 30 would hold only about 10 judge passes, since the judge passes about a quarter of
-  online answers, and a false pass can happen only on those. The judge must pass at most 2 she
-  fails, of its 15 passes: the bar of iteration 4's spot check. Its false fails are reported
-  too.
+  random 30 would hold only about 7 or 8 judge passes (10 in the draw of 2026-10-19), since the
+  judge passes about a quarter of online answers, and a false pass can happen only on those.
+  The judge must pass at most 2 she fails, of its 15 passes: the bar of iteration 4's spot
+  check. Its false fails are reported too. Four rules keep the check honest:
+  - The sample is saved with a digest of the judge's grades on it, reasons included. Labeling
+    and scoring are refused if they changed, which catches any re-judging after the draw.
+  - The judge's view (`label --show-judge`) is refused on the check's runs.
+  - Only Aleena's labels count.
+  - The first complete score is final. Its result shows the judge's verdicts, so a later
+    relabel and rescore would no longer be blind.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
   leaves the Holm family, the report gives the number tested, and the day is not cleared.
@@ -160,10 +167,13 @@ a 5-point floor. All five runs were complete, with every cited answer judged by 
   its detectable rise: the smallest true rise that would alert on 8 days in 10, its floor
   included, at the day's n against the reference. For rates it is exact: the fewest bad
   outcomes that pass Fisher's test and the floor, and the binomial chance of reaching them. For
-  means it uses the normal approximation, which the statistics review checked against the exact
-  permutation test. The level is Holm's first step, which a lone rise must pass: 0.05 over the
-  number of metrics tested that day, counting one more for a metric not tested (a pending judge,
-  a refused latency).
+  means it uses the normal approximation. Simulated on the real reference days, under the real
+  rule (the permutation test plus the floor), days whose true rise equals the blind spot alert
+  81% of the time for model calls, 77% for latency and 80% for tokens, each about +/- 6 points
+  on 200 days. The level is Holm's first step, which a lone rise must pass: 0.05 over the
+  number of metrics tested that day, counting one more for a metric not tested (a pending
+  judge, a refused latency). Where no day of that n can alert at all, the report says "cannot
+  alert" instead of a number.
 - **Output.** A table, `results/online/alerts.json`, and a non-zero exit code on an alert.
 
 ## 4. Dashboard (`evals dashboard`, static HTML chosen by Aleena 2026-10-19)
@@ -431,4 +441,33 @@ database: 20 of the 21 held, and only the last statistics finding was rejected.
    passed and 15 it failed (3 and 3 a day) in place of 30 at random. Keep the bar (at most 2
    false passes), now applied to 15 judge passes, and also report the answers the judge failed
    that Aleena passes. Same 30 labels, same time.
+
+## Check of decisions 5 and 6 (2026-10-20)
+
+Three isolated reviewers checked commit 8f7e9f5, each on copies of the database and
+`results/online/` in a throwaway worktree, and an independent verifier reproduced each finding.
+The first rebuilt the blind spots with its own exact arithmetic and matched every real one to
+within 6e-15. It found Fisher's p non-increasing in the day's count on 295,200 settings, which
+alert_count relies on. The second drove the real labeling screens with scripted answers. The
+third checked the docs and ran the next real steps. No finding changes when an alert fires or
+any alert decision, on days 1 to 6. Of 13 findings, 11 were confirmed (2 of them duplicates);
+all are fixed:
+
+| Finding | Done |
+|---|---|
+| After a complete score, its result shows the judge's verdicts; a failed check could then be relabeled and rescored, and the first result was overwritten without a trace | The first complete score is final, and a later score only reports it |
+| 16 of the 30 sampled answers sit on judge-dev, where `label --show-judge` shows the judge's verdicts before scoring | `--show-judge` is refused on the check's runs |
+| A re-judge after the draw that swaps one pass and one fail on a day kept the 3-and-3 count and was scored silently | The sample is saved with a digest of the judge's grades, reasons included (only 20 splits are possible, so a digest of the values alone could be reversed). Labeling and scoring are refused if it changed |
+| Any labeler name could switch the judge on; the plan says Aleena's labels | Only her labels count; `judge-check` has no `--labeler` |
+| On Windows, a stdin of NUL (a shell with no terminal) reports isatty(), so the labeling screens started and aborted at the first prompt | Interactive screens also require a real console (`label`, `review`, `pilot-review`) |
+| A re-recorded reference would carry today's date, after day 6 ran, against the plan's "frozen before any later day ran" | A refreeze of the same runs keeps the freeze date and points to the archived first record |
+| A blind spot of "no count can ever alert" showed as "-", like a number not computed | Shown as "cannot alert" |
+| The blind spot's wiring in check_day (Holm level, pending and refused metrics, the fabricated rule) had no test: setting the level to 0.5 passed every test | Tested |
+| "A random 30 would hold about 10 judge passes": the expectation is 7 or 8; 10 was one draw | Corrected in the plan, the docstring and the CHANGELOG |
+| alert_count scanned one exact Fisher test per count, minutes at n of 10,000 | Bisection, about log2(n) tests; the project's days are 80 to 200 |
+
+Rejected by the verifier: that no test would catch a wrong mean formula (the closed-form tests
+fail on a wrong standard error or sign), and that HANDOFF's next step skipped day 6 (part 5
+starts with it). The reviewers' simulations put the mean blind spots at 0.76 to 0.82 of days
+alerting, as did the author's (see "Blind spots").
 

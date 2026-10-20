@@ -179,7 +179,6 @@ def review(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Walk through unverified drafts one by one, with the support quote shown in its page."""
-    import sys
 
     from rich.panel import Panel
     from rich.prompt import Prompt
@@ -221,7 +220,7 @@ def review(
         console.print(f"[green]{restore_id} restored to {suite} as an unverified draft.[/green]")
         return
 
-    if not sys.stdin.isatty():
+    if not _interactive():
         console.print("[red]evals review needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
     cfg = _config(config)
@@ -690,7 +689,6 @@ def label(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Hand-label stored answers for judge validation: supported by its quotes? responsive?"""
-    import sys
 
     from rich.panel import Panel
     from rich.prompt import Prompt
@@ -703,7 +701,7 @@ def label(
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
 
-    if not sys.stdin.isatty():
+    if not _interactive():
         console.print("[red]evals label needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
     if show_judge and split != "judge-dev":
@@ -712,6 +710,20 @@ def label(
             "labels are the judge's exam and must be made without seeing it.[/red]"
         )
         raise typer.Exit(code=2)
+    if show_judge:
+        from agent_evals import monitor as mon
+
+        drawn = (
+            json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+            if mon.JUDGE_SAMPLE_PATH.exists()
+            else {}
+        )
+        if run_id in (drawn.get("runs") or {}):
+            console.print(
+                f"[red]{run_id} holds answers of the online judge check, which are labeled "
+                "blind: --show-judge is refused on it.[/red]"
+            )
+            raise typer.Exit(code=2)
     cfg = _config(config)
     corpus = None
     if (cfg.paths.corpus_dir / "pages.jsonl").exists():
@@ -1440,9 +1452,25 @@ def _show_reference(c: Case) -> None:
 
 
 def _interactive() -> bool:
+    """Whether a person at a terminal types into stdin. On Windows the NUL device, which a shell
+    with no terminal often hands a child process, also reports isatty(), so a console is
+    required there too: otherwise a screen meant for a person runs until its first prompt reads
+    the end of input."""
     import sys
 
-    return sys.stdin.isatty()
+    if not sys.stdin.isatty():
+        return False
+    if sys.platform != "win32":
+        return True
+    import ctypes
+    import msvcrt
+
+    try:
+        handle = msvcrt.get_osfhandle(sys.stdin.fileno())
+    except (OSError, ValueError):
+        return False
+    mode = ctypes.c_ulong()
+    return bool(ctypes.windll.kernel32.GetConsoleMode(handle, ctypes.byref(mode)))
 
 
 def _print_monitor(report: dict[str, Any], title: str) -> None:
@@ -1460,8 +1488,8 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
 
     def fmt(row: dict[str, Any], key: str) -> str:
         value = row.get(key)
-        if value is None:
-            return "-"
+        if value is None:  # a blind spot with no number means no day of this n can alert
+            return "cannot alert" if key == "detectable" and row.get("detectable_note") else "-"
         if key == "p":
             return f"{value:.4f}"
         if row["metric"] in ("latency", "tokens") and key in ("effect", "floor", "detectable"):
@@ -1494,7 +1522,11 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
     if fab["p"] is not None:
         verdict = "[red]alert[/red]" if fab["alert"] else "ok"
         blind = fab.get("detectable")
-        seen = f", detectable +{blind * 100:.1f} pts" if blind is not None else ""
+        seen = (
+            f", detectable +{blind * 100:.1f} pts"
+            if blind is not None
+            else (", cannot alert at this n" if fab.get("detectable_note") else "")
+        )
         console.print(
             f"fabricated citations, own rule (p < 0.01): day {fab['day']:.3f}, reference "
             f"{fab['ref']:.3f}, p {fab['p']:.4f}{seen}: {verdict}"
@@ -1582,16 +1614,30 @@ def monitor(
             checks = mon.leave_one_day_out(days, judge_enabled=False)
             for d, report in zip(mon.REFERENCE_DAYS, checks, strict=True):
                 _print_monitor(report, f"day {d} against the other reference days")
-            record = {
+            record: dict[str, Any] = {
+                "frozen_at": now,
                 "checked_at": now,
                 "days": {str(d): runs[d] for d in mon.REFERENCE_DAYS},
                 "judge_in_family": False,
                 "leave_one_day_out": checks,
             }
+            previous = (
+                json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+                if mon.REFERENCE_PATH.exists()
+                else None
+            )
+            if previous is not None and previous.get("days") == record["days"]:
+                # The same runs: the reference stays frozen from when it first was, and this
+                # check only re-records it with today's code.
+                record["frozen_at"] = previous.get("frozen_at") or previous.get("checked_at", now)
             if refreeze:  # everything from before goes to the archive, whatever this check finds
                 stamp = now.replace(":", "").replace("+0000", "Z")
-                for moved in mon.archive_reference_files(stamp):
-                    console.print(f"archived {moved}")
+                moved = mon.archive_reference_files(stamp)
+                for path in moved:
+                    console.print(f"archived {path}")
+                record["previous_record"] = next(
+                    (p.as_posix() for p in moved if p.name == mon.REFERENCE_PATH.name), None
+                )
             if noisy := mon.noisy_days(runs, checks):
                 check_path.parent.mkdir(parents=True, exist_ok=True)
                 check_path.write_text(
@@ -1764,19 +1810,23 @@ def judge_check(
             help="label: label the 30 sampled answers, blind; score: count the judge's false passes"
         ),
     ],
-    labeler: Annotated[str, typer.Option(help="Your name; stored with each label.")] = "aleena",
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """May judge_supported alert (phase 7 part 3)? Aleena labels 30 judged answers from the
     reference days, blind: 3 the judge passed and 3 it failed from each day, in an order that
     shows neither. The judge may pass at most 2 of the ones she fails. If so, the
     leave-one-day-out check runs again with judge_supported in the family and must stay quiet.
-    `label` can be stopped with q and run again to continue; `score` records the result for the
-    monitor."""
+    `label` can be stopped with q and run again to continue. `score` records the result for the
+    monitor, and its first complete result is final: the result shows the judge's verdicts, so a
+    second score after relabeling would no longer be blind."""
+    from datetime import UTC, datetime
+
     from agent_evals import monitor as mon
     from agent_evals.store.db import ResultsStore
 
     cfg = _config(config)
+    labeler = mon.JUDGE_CHECK_LABELER
+    now = datetime.now(UTC).isoformat(timespec="seconds")
     if action not in ("label", "score"):
         console.print("[red]The action is label or score.[/red]")
         raise typer.Exit(code=2)
@@ -1787,6 +1837,17 @@ def judge_check(
         int(d): str(r)
         for d, r in json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))["days"].items()
     }
+    if action == "score" and mon.JUDGE_CHECK_PATH.exists():
+        done = json.loads(mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8"))
+        if done.get("complete") and sorted(done.get("reference_runs") or []) == sorted(
+            runs.values()
+        ):
+            verdict = "passed" if done.get("passed") else "did not pass"
+            console.print(
+                f"The judge check was scored at {done.get('scored_at', 'an earlier run')} and "
+                f"{verdict}. Its first complete result is final ({mon.JUDGE_CHECK_PATH})."
+            )
+            return
     try:
         store = ResultsStore(cfg.paths.db, read_only=True)
     except FileNotFoundError as exc:
@@ -1794,21 +1855,34 @@ def judge_check(
         raise typer.Exit(code=2) from None
     try:
         if mon.JUDGE_SAMPLE_PATH.exists():
-            sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+            saved = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+            sample: dict[str, list[str]] = saved.get("runs") or {}
             if sorted(sample) != sorted(runs.values()):
                 console.print(
                     f"[red]{mon.JUDGE_SAMPLE_PATH} was drawn from another reference. A refreeze "
                     "(`uv run evals monitor --freeze --refreeze`) archives it.[/red]"
                 )
                 raise typer.Exit(code=2)
-        else:  # drawn once, before any label exists
+            if mon.verdict_digests(store, sample) != saved.get("verdict_digests"):
+                console.print(
+                    "[red]The judge's grades on the sampled answers have changed since the sample "
+                    f"was drawn ({saved.get('drawn_at', '?')}), so this would no longer be the "
+                    "check that was drawn. Nothing was labeled or scored.[/red]"
+                )
+                raise typer.Exit(code=2)
+        else:  # drawn once, before any label exists, with digests of the judge's grades
             try:
                 sample = mon.judge_check_sample(store, runs)
             except ValueError as exc:
                 console.print(f"[red]{exc}[/red]")
                 raise typer.Exit(code=2) from None
+            drawn = {
+                "drawn_at": now,
+                "runs": sample,
+                "verdict_digests": mon.verdict_digests(store, sample),
+            }
             mon.JUDGE_SAMPLE_PATH.parent.mkdir(parents=True, exist_ok=True)
-            mon.JUDGE_SAMPLE_PATH.write_text(json.dumps(sample, indent=2) + "\n", encoding="utf-8")
+            mon.JUDGE_SAMPLE_PATH.write_text(json.dumps(drawn, indent=2) + "\n", encoding="utf-8")
         if action == "score":
             try:
                 result = mon.judge_check_score(store, sample, labeler)
@@ -1840,10 +1914,10 @@ def judge_check(
             )
             store = ResultsStore(cfg.paths.db, read_only=True)
             try:
-                done = {x["case_id"] for x in store.labels(run, labeler)}
+                done_cases = {x["case_id"] for x in store.labels(run, labeler)}
             finally:
                 store.close()
-            if not set(cases) <= done:  # stopped with q: stop here, resume next time
+            if not set(cases) <= done_cases:  # stopped with q: stop here, resume next time
                 console.print("Stopped. Run the same command to continue where you left off.")
                 return
         console.print(f"[green]All {total} labeled. Next: uv run evals judge-check score[/green]")
@@ -1871,6 +1945,7 @@ def judge_check(
         ]
     result["noisy"] = noisy
     result["passed"] = result["labels_passed"] and not noisy
+    result["scored_at"] = now
     mon.JUDGE_CHECK_PATH.write_text(
         json.dumps(result, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )

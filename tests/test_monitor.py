@@ -11,6 +11,7 @@ import pytest
 from agent_evals.harness.manifest import file_sha256
 from agent_evals.monitor import (
     ALERT_FAMILY,
+    CANNOT_ALERT,
     DayValues,
     check_day,
     day_run,
@@ -22,6 +23,7 @@ from agent_evals.monitor import (
 )
 from agent_evals.online import ONLINE_JUDGE_VERSION, online_case
 from agent_evals.simulate import TrafficQuestion
+from agent_evals.stats.monitor import detectable_rate_rise
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import write_suite
 from agent_evals.types import AgentResult, Grade, Usage
@@ -340,6 +342,28 @@ def test_in_scope_support_counts_lookups_and_comparisons_not_false_premises(
         store.close()
     # the lookup supported, the comparison not; the false premise and outside question left out
     assert v.reported["judge_supported_over_all_in_scope"] == 0.5
+
+
+def test_every_metric_publishes_its_blind_spot_at_holms_first_step() -> None:
+    report = check_day(_day("d12"), REFERENCE, judge_enabled=False)
+    levels = {m["metric"]: m["detectable_alpha"] for m in report["metrics"]}
+    assert levels.pop("judge_supported") == pytest.approx(0.05 / 7)  # pending: would join 6
+    assert all(level == pytest.approx(0.05 / 6) for level in levels.values())
+    assert all(m["detectable"] is not None for m in report["metrics"])
+    cached = check_day(_day("d13", cache_hits=2), REFERENCE, judge_enabled=False)
+    assert _row(cached, "latency")["detectable_alpha"] == pytest.approx(0.05 / 6)  # 5 + it
+    assert _row(cached, "uncited_answer")["detectable_alpha"] == pytest.approx(0.05 / 5)
+    assert _row(cached, "latency")["detectable"] is not None  # refused, yet its blind spot shown
+    rf = [x for r in REFERENCE for x in r.fabricated]
+    assert report["fabricated_citation"]["detectable"] == detectable_rate_rise(
+        bad_ref=round(sum(rf)), n_ref=len(rf), n_day=80, alpha=0.01, strict=True
+    )
+    # a judge row of 4 answers: even 4 of 4 unsupported cannot pass Fisher at 0.05/7
+    tiny = check_day(
+        _day("d14", values={"judge_supported": [1.0] * 4}), REFERENCE, judge_enabled=True
+    )
+    row = _row(tiny, "judge_supported")
+    assert row["detectable"] is None and row["detectable_note"] == CANNOT_ALERT
 
 
 def test_an_untested_metric_or_an_untrusted_judge_does_not_clear_a_quiet_day() -> None:

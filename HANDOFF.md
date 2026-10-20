@@ -483,7 +483,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   then her 30 blind labels (`uv run evals judge-check label`, then
   `uv run evals judge-check score`). About $9.30 spent on phase 7; ask before passing $25.
   **2026-10-20:** Aleena approved decisions 5 and 6; both built (exact blind spots, the 3 and 3
-  judge-check sample). Next: her 30 blind labels, then part 5.
+  judge-check sample), then independently checked: 11 confirmed findings, all fixed (plan,
+  "Check of decisions 5 and 6"). Next, in order: `uv run evals monitor --freeze --refreeze` (the
+  same reference, re-recorded with the new numbers), `uv run evals monitor 6` (day 6, the
+  false-alarm check), `uv run evals dashboard`, and drawing and committing the judge-check
+  sample. Then Aleena's 30 blind labels (`uv run evals judge-check label`, then
+  `uv run evals judge-check score`), then part 5.
 
 ## Target: the three project briefs
 

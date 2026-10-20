@@ -255,13 +255,15 @@ def render(
         status = f'<strong class="alert">Alert:</strong> {escape(days)}.'
     else:
         status = '<strong class="ok">No alert</strong> on any checked day.'
-    frozen = (
-        f"Reference: days {', '.join(reference['days'])}, frozen "
-        f"{reference.get('checked_at', '')}; "
-        "the leave-one-day-out check raised no alert."
-        if reference
-        else ""
-    )
+    frozen = ""
+    if reference:
+        frozen_at = reference.get("frozen_at") or reference.get("checked_at", "")
+        again = reference.get("checked_at")
+        redone = f" (re-recorded {again})" if again and again != frozen_at else ""
+        frozen = (
+            f"Reference: days {', '.join(reference['days'])}, frozen {frozen_at}{redone}; "
+            "the leave-one-day-out check raised no alert."
+        )
     judge = (
         "judge_supported is in the alert family: the judge passed the 30 blind labels, and the "
         "reference stayed quiet with it in the family."

@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import json
+import os
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -212,7 +214,90 @@ def test_label_walks_the_reference_runs_and_stops_when_she_quits(
 def test_the_monitor_keeps_the_judge_out_until_the_check_passes(tmp_path: Path) -> None:
     path, runs = tmp_path / "judge-check.json", ["r1", "r2"]
     assert not mon.judge_enabled(path, runs)
-    path.write_text(json.dumps({"passed": False, "reference_runs": runs}), encoding="utf-8")
+    result: dict[str, Any] = {"passed": False, "reference_runs": runs, "labeler": "aleena"}
+    path.write_text(json.dumps(result), encoding="utf-8")
     assert not mon.judge_enabled(path, runs)
-    path.write_text(json.dumps({"passed": True, "reference_runs": runs}), encoding="utf-8")
+    path.write_text(json.dumps(result | {"passed": True}), encoding="utf-8")
     assert mon.judge_enabled(path, runs) and not mon.judge_enabled(path, ["r1", "r3"])
+    path.write_text(json.dumps(result | {"passed": True, "labeler": "bob"}), encoding="utf-8")
+    assert not mon.judge_enabled(path, runs)  # the plan: Aleena's labels, nobody else's
+    no_option = CliRunner().invoke(cli.app, ["judge-check", "score", "--labeler", "bob"])
+    assert no_option.exit_code == 2  # the command has no --labeler at all
+
+
+def test_the_first_complete_score_is_final(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    runs = _store(tmp_path, {f"r{d}": [True] * 6 for d in range(1, 6)})
+    config = _config(tmp_path, monkeypatch, runs)
+    _reference_days(monkeypatch, REFERENCE)
+    first = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
+    assert first.exit_code == 0 and "may now alert" in " ".join(first.output.split())
+    recorded = mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8")
+    assert json.loads(recorded)["scored_at"]
+    # the result shows the judge's verdicts; a label changed after reading them must not count
+    sample = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))["runs"]
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.record_label(
+            "r1",
+            sample["r1"][0],
+            1,
+            "aleena",
+            supported=False,
+            responsive=True,
+            note="",
+            label_split="judge-dev",
+        )
+    finally:
+        store.close()
+    second = CliRunner().invoke(cli.app, ["judge-check", "score", "-c", str(config)])
+    assert second.exit_code == 0 and "first complete result is final" in " ".join(
+        second.output.split()
+    )
+    assert mon.JUDGE_CHECK_PATH.read_text(encoding="utf-8") == recorded  # untouched
+
+
+def test_a_re_judged_sample_is_refused_before_labeling_and_scoring(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)  # she quits at once
+    drew = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    assert drew.exit_code == 0 and "Stopped" in drew.output  # the sample is drawn and saved
+    saved = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
+    assert saved["drawn_at"] and set(saved["verdict_digests"]) == set(runs.values())
+    sample = saved["runs"]
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # swap one pass and one fail on day 3: still 3 and 3, so only the digest sees it
+        verdicts = mon._verdicts(store, "r3")
+        passed = next(c for c in sample["r3"] if verdicts[c])
+        failed = next(c for c in sample["r3"] if not verdicts[c])
+        for case, value in ((passed, 0.0), (failed, 1.0)):
+            store.delete_grades("r3", "judge", [(case, 1)])
+            store.add_grades(
+                "r3", case, 1, [("judge", Grade(metric="judge_supported", value=value))]
+            )
+    finally:
+        store.close()
+    for action in ("label", "score"):
+        result = CliRunner().invoke(cli.app, ["judge-check", action, "-c", str(config)])
+        output = " ".join(result.output.split())
+        assert result.exit_code == 2 and "changed since the sample was drawn" in output
+
+
+def test_the_judges_verdicts_stay_hidden_on_the_checks_runs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    mon.JUDGE_SAMPLE_PATH.write_text(json.dumps({"runs": {"r1": ["c0"]}}), encoding="utf-8")
+    monkeypatch.setattr(cli, "_interactive", lambda: True)
+    args = ["label", "r1", "--labeler", "aleena", "--revisit", "all", "--split", "judge-dev"]
+    result = CliRunner().invoke(cli.app, [*args, "--show-judge", "-c", str(config)])
+    assert result.exit_code == 2 and "labeled blind" in " ".join(result.output.split())
+
+
+def test_a_null_stdin_is_not_a_person_at_a_terminal(monkeypatch: pytest.MonkeyPatch) -> None:
+    with open(os.devnull) as null:  # on Windows the NUL device reports isatty() as well
+        monkeypatch.setattr(sys, "stdin", null)
+        assert not cli._interactive()

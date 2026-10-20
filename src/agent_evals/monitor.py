@@ -21,6 +21,7 @@ from pathlib import Path
 from statistics import fmean, median, pstdev
 from typing import Any, Literal
 
+from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.manifest import file_sha256
 from agent_evals.online import ONLINE_JUDGE_VERSION
 from agent_evals.simulate import TrafficQuestion, load_traffic
@@ -46,6 +47,8 @@ JUDGE_SAMPLE_PATH = Path("results/online/judge-check-sample.json")
 JUDGE_CHECK_PER_DAY = 6  # 30 answers over the five reference days
 JUDGE_CHECK_PASSED_PER_DAY = 3  # of each day's 6: 3 the judge passed, 3 it failed (decision 6)
 JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check, over the 15 passes
+JUDGE_CHECK_LABELER = "aleena"  # the plan: Aleena's 30 blind labels, nobody else's
+CANNOT_ALERT = "no day of this n can alert"  # a blind spot with no number: the worst kind
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
 
 
@@ -239,6 +242,8 @@ def check_day(
             if spec.kind == "rate"
             else detectable_mean_rise(pstdev(r), len(d), len(r), alpha=level, floor=spec.floor)
         )
+        if rows[spec.name]["detectable"] is None:  # the worst blind spot, not a missing number
+            rows[spec.name]["detectable_note"] = CANNOT_ALERT
     rejected = holm(pvalues, alpha=ALPHA)
     for name in pvalues:
         row = rows[name]
@@ -262,6 +267,8 @@ def check_day(
             alpha=FABRICATION_P,
             strict=True,
         )
+        if fab["detectable"] is None:
+            fab["detectable_note"] = CANNOT_ALERT
     fab["alert"] = fab["p"] is not None and fab["p"] < FABRICATION_P
 
     ref_words = [w for ref in reference for w in ref.answer_words]
@@ -329,12 +336,13 @@ def noisy_days(days: Mapping[int, str], checks: Sequence[Mapping[str, Any]]) -> 
 def judge_enabled(path: Path, reference_runs: Iterable[str]) -> bool:
     """Whether judge_supported is in the alert family: the judge passed Aleena's 30 blind labels
     (at most 2 false passes) on these reference runs, and the leave-one-day-out check with it in
-    the family raised no alert. A check made on another reference does not count."""
+    the family raised no alert. A check made on another reference, or with anyone else's labels,
+    does not count."""
     if not path.exists():
         return False
     result = json.loads(path.read_text(encoding="utf-8"))
     same = sorted(result.get("reference_runs") or []) == sorted(reference_runs)
-    return bool(result.get("passed")) and same
+    return bool(result.get("passed")) and same and result.get("labeler") == JUDGE_CHECK_LABELER
 
 
 def day_runs(store: ResultsStore, day: int, *, champion_only: bool = False) -> list[str]:
@@ -438,10 +446,10 @@ def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:
 def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str, list[str]]:
     """Six judged answers per reference day, three the judge passed and three it failed, drawn
     with a seed per day, as case ids per run, sorted so their order shows no verdict. A plain
-    random draw would hold only about 10 judge passes in 30, since the judge passes about a
-    quarter of online answers, and a false pass can happen only on those (decision 6). Drawn
-    once and saved before any label exists. Refused unless every reference day has three of
-    each."""
+    random draw would hold only about 7 or 8 judge passes in 30 (10 in the draw of 2026-10-19),
+    since the judge passes about a quarter of online answers, and a false pass can happen only
+    on those (decision 6). Drawn once and saved, with its verdict digests, before any label
+    exists. Refused unless every reference day has three of each."""
     if sorted(runs) != list(REFERENCE_DAYS):
         raise ValueError(f"the judge check samples the reference days {list(REFERENCE_DAYS)}")
     need_passed = JUDGE_CHECK_PASSED_PER_DAY
@@ -458,6 +466,23 @@ def judge_check_sample(store: ResultsStore, runs: Mapping[int, str]) -> dict[str
             )
         rng = random.Random(f"judge-check-{day}")
         out[run] = sorted(rng.sample(passed, need_passed) + rng.sample(failed, need_failed))
+    return out
+
+
+def verdict_digests(store: ResultsStore, sample: Mapping[str, Sequence[str]]) -> dict[str, str]:
+    """Per run, a digest of the judge's grades on the sampled answers, values and reasons both.
+    Saved with the sample when it is drawn and compared before labeling and scoring, so any
+    re-judging after the draw is caught, even a swap of one pass and one fail that keeps a day
+    at 3 and 3. The reasons, which the labeler never sees, keep the digest from being worked
+    back to the verdicts: a day's 6 answers have only 20 possible 3-and-3 splits."""
+    out: dict[str, str] = {}
+    for run, cases in sample.items():
+        grades = store.grade_reasons(run, "judge")
+        rows = [
+            [case, sorted([m, v, why] for m, (v, why) in grades.get((case, 1), {}).items())]
+            for case in sorted(cases)
+        ]
+        out[run] = sha256_text(json.dumps(rows))
     return out
 
 

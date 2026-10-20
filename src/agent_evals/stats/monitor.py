@@ -87,18 +87,35 @@ def alert_count(
 ) -> int | None:
     """The fewest bad outcomes among the day's n_day that raise the alert against the frozen
     reference: Fisher's p at most alpha (below it, if strict) and the rise at least the floor.
-    Every larger count alerts too, since Fisher's p only falls as the count grows. None when no
-    count can."""
+    Fisher's p never rises as the count grows (checked exhaustively on small tables by the
+    review), so the significant counts are a run up to n_day: the smallest is found by bisection,
+    in about log2(n_day) tests. Every larger count alerts too. None when no count can."""
     if n_day == 0 or n_ref == 0:
         return None
     rate_ref = bad_ref / n_ref
-    start = max(0, int(n_day * (rate_ref + floor)) - 1)  # below this the floor is out of reach
-    for k in range(start, n_day + 1):
+
+    def significant(k: int) -> bool:
         p = fisher_greater(k, n_day, bad_ref, n_ref)
-        significant = p < alpha if strict else p <= alpha
-        if significant and k / n_day - rate_ref >= floor - 1e-12:
-            return k
-    return None
+        return p < alpha if strict else p <= alpha
+
+    if not significant(n_day):
+        return None
+    lo, hi = 0, n_day  # significant(hi) holds; find the smallest significant count
+    while lo < hi:
+        mid = (lo + hi) // 2
+        if significant(mid):
+            hi = mid
+        else:
+            lo = mid + 1
+    reach = next(  # the fewest the floor allows; below int(...) - 1 it is out of reach
+        (
+            k
+            for k in range(max(0, int(n_day * (rate_ref + floor)) - 1), n_day + 1)
+            if k / n_day - rate_ref >= floor - 1e-12
+        ),
+        None,
+    )
+    return None if reach is None else max(lo, reach)
 
 
 def rate_alert_power(
@@ -158,9 +175,10 @@ def detectable_mean_rise(
     power: float = 0.8,
 ) -> float | None:
     """The smallest rise in a mean that raises the alert with `power`, the reference frozen as it
-    is, by the normal approximation (the statistics review checked it against the exact
-    permutation test): the day's observed rise must clear both the test's critical value and the
-    floor, and it varies around the true rise with the day's own standard error."""
+    is, by the normal approximation: the day's observed rise must clear both the test's critical
+    value and the floor, and it varies around the true rise with the day's own standard error.
+    Checked by simulating the real rule (the permutation test plus the floor) on days resampled
+    from the real reference days and shifted by it (plan, "Blind spots")."""
     if n_day == 0 or n_ref == 0:
         return None
     critical = max(_NORMAL.inv_cdf(1 - alpha) * sd_ref * sqrt(1 / n_day + 1 / n_ref), floor)

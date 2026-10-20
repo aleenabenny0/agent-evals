@@ -169,6 +169,9 @@ def test_a_noisy_reference_is_not_frozen(setup: Path, tmp_path: Path) -> None:
 
 def test_a_frozen_reference_is_replaced_only_on_purpose(setup: Path) -> None:
     assert _monitor(setup, "--freeze")[0] == 0
+    first = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+    first["frozen_at"] = "2026-10-19T16:47:55+00:00"  # as if frozen a day earlier
+    mon.REFERENCE_PATH.write_text(json.dumps(first), encoding="utf-8")
     assert _monitor(setup, "6")[0] == 1  # writes alerts.json against this reference
     code, output = _monitor(setup, "--freeze")
     assert code == 2 and "already frozen" in output
@@ -176,6 +179,12 @@ def test_a_frozen_reference_is_replaced_only_on_purpose(setup: Path) -> None:
     assert code == 0 and "archived" in output and not mon.ALERTS_PATH.exists()
     archived = list((mon.REFERENCE_PATH.parent / "archive").glob("*/alerts.json"))
     assert len(archived) == 1 and mon.REFERENCE_PATH.exists()
+    again = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
+    # the same runs re-recorded: the freeze date stands, and the first record is archived
+    assert again["days"] == first["days"] and again["frozen_at"] == "2026-10-19T16:47:55+00:00"
+    assert again["checked_at"] != again["frozen_at"]
+    assert Path(again["previous_record"]).name == "reference.json"
+    assert Path(again["previous_record"]).exists()
 
 
 def test_a_day_that_cannot_be_checked_is_refused_and_one_not_cleared_says_so(
