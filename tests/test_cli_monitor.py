@@ -182,7 +182,7 @@ def test_a_frozen_reference_is_replaced_only_on_purpose(setup: Path) -> None:
     archived = list((mon.REFERENCE_PATH.parent / "archive").glob("*/alerts.json"))
     assert len(archived) == 1 and mon.REFERENCE_PATH.exists()
     # the same runs: the judge check belongs to them and stays, or a final score would reopen
-    assert "kept the judge check" in output
+    assert "kept judge-check-sample.json, judge-check.json" in output
     assert mon.JUDGE_SAMPLE_PATH.exists() and mon.JUDGE_CHECK_PATH.exists()
     again = json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8"))
     # the same runs re-recorded: the freeze date stands, and the first record is archived
@@ -203,7 +203,7 @@ def test_a_refreeze_on_other_runs_archives_the_judge_check(setup: Path, tmp_path
     finally:
         store.close()
     code, output = _monitor(setup, "--freeze", "--refreeze")
-    assert code == 0 and "kept the judge check" not in output
+    assert code == 0 and "kept" not in output
     assert not mon.JUDGE_SAMPLE_PATH.exists() and not mon.JUDGE_CHECK_PATH.exists()
     archive = mon.REFERENCE_PATH.parent / "archive"
     assert len(list(archive.glob("*/judge-check.json"))) == 1  # moved, never deleted

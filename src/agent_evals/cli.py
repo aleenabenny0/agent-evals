@@ -1649,8 +1649,11 @@ def monitor(
                 moved = mon.archive_reference_files(stamp, keep_judge_check=same_runs)
                 for path in moved:
                     console.print(f"archived {path}")
-                if same_runs:
-                    console.print("kept the judge check's sample and result: the same runs")
+                kept = [p for p in (mon.JUDGE_SAMPLE_PATH, mon.JUDGE_CHECK_PATH) if p.exists()]
+                if same_runs and kept:
+                    console.print(
+                        f"kept {', '.join(p.name for p in kept)}: they belong to the same runs"
+                    )
                 record["previous_record"] = next(
                     (p.as_posix() for p in moved if p.name == mon.REFERENCE_PATH.name), None
                 )

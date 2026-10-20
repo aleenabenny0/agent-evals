@@ -1,5 +1,6 @@
 {
-  "checked_at": "2026-10-19T16:47:55+00:00",
+  "frozen_at": "2026-10-19T16:47:55+00:00",
+  "checked_at": "2026-10-20T17:24:59+00:00",
   "days": {
     "1": "docs-20261019-161300-f4f40b",
     "2": "docs-20261019-162038-dd2eba",
@@ -30,8 +31,9 @@
           "ref": 0.7586206896551724,
           "effect": -0.05982550893228078,
           "p": null,
-          "detectable": null,
-          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+          "detectable": 0.15260938509493194,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+          "detectable_alpha": 0.0071428571428571435
         },
         {
           "metric": "uncited_answer",
@@ -44,7 +46,8 @@
           "ref": 0.0,
           "effect": 0.0,
           "p": 1.0,
-          "detectable": 0.00039524348068246235,
+          "detectable": 0.07965057756890048,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -59,7 +62,8 @@
           "ref": 0.0220125786163522,
           "effect": 0.040487421383647804,
           "p": 0.07083783648684601,
-          "detectable": 0.05937997939170654,
+          "detectable": 0.10329861692361705,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -74,7 +78,8 @@
           "ref": 0.005,
           "effect": 0.005,
           "p": 0.48877031170775287,
-          "detectable": 0.02551564284542822,
+          "detectable": 0.06129670413482811,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -89,7 +94,8 @@
           "ref": 4.755,
           "effect": 0.29499999999999993,
           "p": 0.0840457977101145,
-          "detectable": 0.6670337888078951,
+          "detectable": 0.6551867170399961,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -104,7 +110,8 @@
           "ref": 9.191735963605694,
           "effect": -0.032385787194145976,
           "p": 0.7376131193440328,
-          "detectable": 0.15961991962996683,
+          "detectable": 0.26027943815711235,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -119,7 +126,8 @@
           "ref": 10.000665690775138,
           "effect": 0.05829642160241555,
           "p": 0.23893805309734514,
-          "detectable": 0.2591712342466568,
+          "detectable": 0.28371939928601686,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         }
@@ -130,6 +138,7 @@
         "p": 1.0,
         "day": 0.0,
         "ref": 0.034482758620689655,
+        "detectable": 0.09981353428542432,
         "alert": false
       },
       "judge": {
@@ -141,14 +150,15 @@
         }
       },
       "reported": {
-        "judge_supported_over_all_in_scope": 0.2778,
+        "judge_supported_over_all_in_scope": 0.275,
         "outside_snapshot_answered": 0.0,
         "false_premise_declined": 0.2,
         "judge_core_supported": 0.8554,
         "median_answer_words": 78.0,
         "source_named_share": 0.9639
       },
-      "alerts": []
+      "alerts": [],
+      "untested": []
     },
     {
       "run_id": "docs-20261019-162038-dd2eba",
@@ -171,8 +181,9 @@
           "ref": 0.7521613832853026,
           "effect": -0.025970907094826412,
           "p": null,
-          "detectable": null,
-          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+          "detectable": 0.1496113798966351,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+          "detectable_alpha": 0.0071428571428571435
         },
         {
           "metric": "uncited_answer",
@@ -185,7 +196,8 @@
           "ref": 0.0,
           "effect": 0.0,
           "p": 1.0,
-          "detectable": 0.0003934495047258414,
+          "detectable": 0.07871791955073061,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -200,7 +212,8 @@
           "ref": 0.025078369905956112,
           "effect": 0.02555454148644895,
           "p": 0.198666968998237,
-          "detectable": 0.06358023360630453,
+          "detectable": 0.10178560567929451,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -215,7 +228,8 @@
           "ref": 0.005,
           "effect": 0.005,
           "p": 0.48877031170775287,
-          "detectable": 0.02551564284542822,
+          "detectable": 0.06129670413482811,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -230,7 +244,8 @@
           "ref": 4.8225,
           "effect": -0.04249999999999954,
           "p": 0.5845707714614269,
-          "detectable": 0.6577501958224431,
+          "detectable": 0.6530268709543539,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -245,7 +260,8 @@
           "ref": 9.192705776759142,
           "effect": -0.0372348529613884,
           "p": 0.7726113694315284,
-          "detectable": 0.16332778459531416,
+          "detectable": 0.26114208020142055,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -260,7 +276,8 @@
           "ref": 10.026892212599956,
           "effect": -0.07696461801780607,
           "p": 0.8324583770811459,
-          "detectable": 0.2621768763942468,
+          "detectable": 0.28433379823576593,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         }
@@ -271,6 +288,7 @@
         "p": 0.9285834349673635,
         "day": 0.011904761904761904,
         "ref": 0.03170028818443804,
+        "detectable": 0.10103051700958662,
         "alert": false
       },
       "judge": {
@@ -282,14 +300,15 @@
         }
       },
       "reported": {
-        "judge_supported_over_all_in_scope": 0.2556,
+        "judge_supported_over_all_in_scope": 0.2375,
         "outside_snapshot_answered": 0.0,
         "false_premise_declined": 0.1,
         "judge_core_supported": 0.9286,
         "median_answer_words": 82.0,
         "source_named_share": 0.9881
       },
-      "alerts": []
+      "alerts": [],
+      "untested": []
     },
     {
       "run_id": "docs-20261019-162659-a169f2",
@@ -312,8 +331,9 @@
           "ref": 0.7412790697674418,
           "effect": 0.028835872761293735,
           "p": null,
-          "detectable": null,
-          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+          "detectable": 0.15367977819071743,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+          "detectable_alpha": 0.0071428571428571435
         },
         {
           "metric": "uncited_answer",
@@ -326,7 +346,8 @@
           "ref": 0.0,
           "effect": 0.0,
           "p": 1.0,
-          "detectable": 0.0003882885068106201,
+          "detectable": 0.07604651812046993,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -341,7 +362,8 @@
           "ref": 0.031446540880503145,
           "effect": -0.006446540880503143,
           "p": 0.7323013778030704,
-          "detectable": 0.07062950885646903,
+          "detectable": 0.10777575482461257,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -356,7 +378,8 @@
           "ref": 0.0075,
           "effect": -0.0075,
           "p": 1.0,
-          "detectable": 0.031210869038178775,
+          "detectable": 0.07041107495026364,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -371,7 +394,8 @@
           "ref": 4.785,
           "effect": 0.14499999999999957,
           "p": 0.24913754312284386,
-          "detectable": 0.6737488504569633,
+          "detectable": 0.6567489892809608,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -386,7 +410,8 @@
           "ref": 9.164111919160701,
           "effect": 0.10573443503081847,
           "p": 0.016049197540122993,
-          "detectable": 0.1598083677444308,
+          "detectable": 0.26032328097992996,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -401,7 +426,8 @@
           "ref": 9.992842609550594,
           "effect": 0.09437185058366282,
           "p": 0.11869406529673517,
-          "detectable": 0.25623564299808127,
+          "detectable": 0.28268807776178784,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         }
@@ -412,6 +438,7 @@
         "p": 0.20790454350975776,
         "day": 0.04597701149425287,
         "ref": 0.023255813953488372,
+        "detectable": 0.09216576999107404,
         "alert": false
       },
       "judge": {
@@ -423,14 +450,15 @@
         }
       },
       "reported": {
-        "judge_supported_over_all_in_scope": 0.2222,
+        "judge_supported_over_all_in_scope": 0.225,
         "outside_snapshot_answered": 0.0,
         "false_premise_declined": 0.1,
         "judge_core_supported": 0.9655,
         "median_answer_words": 85.0,
         "source_named_share": 0.9655
       },
-      "alerts": []
+      "alerts": [],
+      "untested": []
     },
     {
       "run_id": "docs-20261019-163359-1bb93d",
@@ -453,8 +481,9 @@
           "ref": 0.7485380116959064,
           "effect": -0.006964977988041188,
           "p": null,
-          "detectable": null,
-          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+          "detectable": 0.1488099525626535,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+          "detectable_alpha": 0.0071428571428571435
         },
         {
           "metric": "uncited_answer",
@@ -467,7 +496,8 @@
           "ref": 0.0,
           "effect": 0.0,
           "p": 1.0,
-          "detectable": 0.00038502180620590925,
+          "detectable": 0.0743640637377751,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -482,7 +512,8 @@
           "ref": 0.03761755485893417,
           "effect": -0.03761755485893417,
           "p": 1.0,
-          "detectable": 0.07736717549592474,
+          "detectable": 0.11728614947542904,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -497,7 +528,8 @@
           "ref": 0.005,
           "effect": 0.005,
           "p": 0.48877031170775287,
-          "detectable": 0.02551564284542822,
+          "detectable": 0.06129670413482811,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -512,7 +544,8 @@
           "ref": 4.81,
           "effect": 0.020000000000000462,
           "p": 0.46342682865856705,
-          "detectable": 0.6693765717674778,
+          "detectable": 0.6557317700827882,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -527,7 +560,8 @@
           "ref": 9.172885616708944,
           "effect": 0.06186594728960415,
           "p": 0.10429478526073696,
-          "detectable": 0.1512166591588631,
+          "detectable": 0.25832440315465294,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -542,7 +576,8 @@
           "ref": 10.003193004033683,
           "effect": 0.04212731436592598,
           "p": 0.29793510324483774,
-          "detectable": 0.24602062579644005,
+          "detectable": 0.2801478563395877,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         }
@@ -553,6 +588,7 @@
         "p": 0.22059746372442113,
         "day": 0.0449438202247191,
         "ref": 0.023391812865497075,
+        "detectable": 0.08948442850060435,
         "alert": false
       },
       "judge": {
@@ -564,14 +600,15 @@
         }
       },
       "reported": {
-        "judge_supported_over_all_in_scope": 0.2556,
+        "judge_supported_over_all_in_scope": 0.25,
         "outside_snapshot_answered": 0.0,
         "false_premise_declined": 0.0,
         "judge_core_supported": 0.9326,
         "median_answer_words": 91.0,
         "source_named_share": 0.9551
       },
-      "alerts": []
+      "alerts": [],
+      "untested": []
     },
     {
       "run_id": "docs-20261019-164105-82a046",
@@ -594,8 +631,9 @@
           "ref": 0.7346938775510204,
           "effect": 0.06076066790352497,
           "p": null,
-          "detectable": null,
-          "status": "pending: the judge has not yet passed Aleena's 30 blind labels"
+          "detectable": 0.15127768367268013,
+          "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+          "detectable_alpha": 0.0071428571428571435
         },
         {
           "metric": "uncited_answer",
@@ -608,7 +646,8 @@
           "ref": 0.0,
           "effect": 0.0,
           "p": 1.0,
-          "detectable": 0.0003866384021045341,
+          "detectable": 0.07519588335386675,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -623,7 +662,8 @@
           "ref": 0.03459119496855346,
           "effect": -0.022091194968553458,
           "p": 0.935135377257729,
-          "detectable": 0.07395650142967616,
+          "detectable": 0.11842061397370929,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -638,7 +678,8 @@
           "ref": 0.0075,
           "effect": -0.0075,
           "p": 1.0,
-          "detectable": 0.031210869038178775,
+          "detectable": 0.07041107495026364,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -653,7 +694,8 @@
           "ref": 4.8975,
           "effect": -0.41749999999999954,
           "p": 0.9803509824508775,
-          "detectable": 0.677450344415192,
+          "detectable": 0.6588469898496909,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -668,7 +710,8 @@
           "ref": 9.204854754599843,
           "effect": -0.09797974216489003,
           "p": 0.9787010649467527,
-          "detectable": 0.15734833458113603,
+          "detectable": 0.2597509494476645,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         },
@@ -683,7 +726,8 @@
           "ref": 10.03588612140374,
           "effect": -0.11751593872644506,
           "p": 0.9346532673366331,
-          "detectable": 0.25129152256238957,
+          "detectable": 0.2814542145412403,
+          "detectable_alpha": 0.008333333333333333,
           "holm_rejected": false,
           "status": "ok"
         }
@@ -694,6 +738,7 @@
         "p": 0.4574271050422618,
         "day": 0.03409090909090909,
         "ref": 0.026239067055393587,
+        "detectable": 0.10057830820466229,
         "alert": false
       },
       "judge": {
@@ -712,7 +757,9 @@
         "median_answer_words": 86.5,
         "source_named_share": 0.9432
       },
-      "alerts": []
+      "alerts": [],
+      "untested": []
     }
-  ]
+  ],
+  "previous_record": "results/online/archive/2026-10-20T172459Z/reference.json"
 }

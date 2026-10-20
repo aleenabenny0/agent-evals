@@ -108,8 +108,8 @@ def metric_chart(spec: Spec, points: Sequence[DayPoint], index: int = 0) -> str:
     ]
     highs = [_shown(spec, e)[2] for e in estimates] + [b[1] for b in bands if b]
     lows = [_shown(spec, e)[1] for e in estimates] + [b[0] for b in bands if b]
-    if spec.kind == "rate":
-        y_min, y_max = 0.0, max(0.1, max(highs, default=0.1) * 1.15)
+    if spec.kind == "rate":  # from zero, and never past 100%
+        y_min, y_max = 0.0, min(1.0, max(0.1, max(highs, default=0.1) * 1.15))
     else:
         y_min, y_max = min(lows, default=0.0) * 0.9, max(highs, default=1.0) * 1.1
     days = [p.day for p in points] or [1]

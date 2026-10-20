@@ -1,0 +1,154 @@
+{
+  "6": {
+    "checked_at": "2026-10-20T17:25:04+00:00",
+    "run_id": "docs-20261019-172814-0cbb95",
+    "reference_runs": [
+      "docs-20261019-161300-f4f40b",
+      "docs-20261019-162038-dd2eba",
+      "docs-20261019-162659-a169f2",
+      "docs-20261019-163359-1bb93d",
+      "docs-20261019-164105-82a046"
+    ],
+    "family_size": 6,
+    "metrics": [
+      {
+        "metric": "judge_supported",
+        "label": "answers the judge found not fully supported",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 82,
+        "n_ref": 431,
+        "day": 0.8292682926829268,
+        "ref": 0.7470997679814385,
+        "effect": 0.08216852470148828,
+        "p": null,
+        "detectable": 0.15224772912389828,
+        "status": "pending: the judge has not yet passed Aleena's 30 blind labels",
+        "detectable_alpha": 0.0071428571428571435
+      },
+      {
+        "metric": "uncited_answer",
+        "label": "answers with no citation",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 82,
+        "n_ref": 431,
+        "day": 0.0,
+        "ref": 0.0,
+        "effect": 0.0,
+        "p": 1.0,
+        "detectable": 0.08060559504169752,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "in_scope_abstention",
+        "label": "lookups and comparisons declined",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 80,
+        "n_ref": 398,
+        "day": 0.0875,
+        "ref": 0.03015075376884422,
+        "effect": 0.057349246231155775,
+        "p": 0.025982170803310663,
+        "detectable": 0.1090715419362715,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "error",
+        "label": "attempts that errored",
+        "kind": "rate",
+        "floor": 0.02,
+        "n_day": 100,
+        "n_ref": 500,
+        "day": 0.0,
+        "ref": 0.006,
+        "effect": -0.006,
+        "p": 1.0,
+        "detectable": 0.06029670413482804,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "model_calls",
+        "label": "model calls per attempt",
+        "kind": "mean",
+        "floor": 0.5,
+        "n_day": 100,
+        "n_ref": 500,
+        "day": 4.86,
+        "ref": 4.814,
+        "effect": 0.04600000000000026,
+        "p": 0.41882905854707264,
+        "detectable": 0.6557204897072522,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "latency",
+        "label": "latency of uncached attempts (log ms)",
+        "kind": "mean",
+        "floor": 0.22314355131420976,
+        "n_day": 100,
+        "n_ref": 500,
+        "day": 9.134263175324591,
+        "ref": 9.185258806166864,
+        "effect": -0.05099563084227299,
+        "p": 0.8607569621518925,
+        "detectable": 0.2599966393218792,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "tokens",
+        "label": "tokens per answer (log)",
+        "kind": "mean",
+        "floor": 0.22314355131420976,
+        "n_day": 82,
+        "n_ref": 431,
+        "day": 9.95562515738111,
+        "ref": 10.011892147835464,
+        "effect": -0.056266990454354016,
+        "p": 0.7581120943952803,
+        "detectable": 0.28397382039908164,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      }
+    ],
+    "fabricated_citation": {
+      "n_day": 82,
+      "n_ref": 431,
+      "p": 0.8991008379529324,
+      "day": 0.012195121951219513,
+      "ref": 0.027842227378190254,
+      "detectable": 0.09447465636778851,
+      "alert": false
+    },
+    "judge": {
+      "in_family": false,
+      "trusted": true,
+      "shifts": {
+        "median_answer_words": 0.0118,
+        "source_named_share": 0.0005
+      }
+    },
+    "reported": {
+      "judge_supported_over_all_in_scope": 0.1625,
+      "outside_snapshot_answered": 0.0,
+      "false_premise_declined": 0.1,
+      "judge_core_supported": 0.939,
+      "median_answer_words": 86.0,
+      "source_named_share": 0.9634
+    },
+    "alerts": [],
+    "untested": []
+  }
+}

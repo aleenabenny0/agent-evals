@@ -118,6 +118,8 @@ reference day alerted against the other four, with the 6-metric family (judge_su
 for the labels). The closest calls stayed under their floors: day 3's latency was +11% with p
 0.016, against a 25% floor, and day 1's in-scope declines were +4.0 points with p 0.071, against
 a 5-point floor. All five runs were complete, with every cited answer judged by `2cf75fa03e09`.
+Re-recorded 2026-10-20 with decision 5's blind spots: the same runs, the same p-values and the
+same decisions. The first record is in `results/online/archive/2026-10-20T172459Z/`.
 
 - **Reference.** Days 1 to 5, frozen. Before any later day is judged, a leave-one-day-out check
   runs: each reference day is tested against the other four with the full rule. It must raise no
@@ -212,7 +214,13 @@ warning.
 ## 5. The demo, every step pre-registered before its day runs
 
 1. **Days 1 to 5** are normal, 100 questions each, and form the reference.
-2. **Day 6** is normal and must not alert, as the false-alarm check.
+2. **Day 6** is normal and must not alert, as the false-alarm check. **Done 2026-10-20: no
+   alert**, with all six family metrics tested (run `docs-20261019-172814-0cbb95`, judged by
+   `2cf75fa03e09`). The closest call was lookups and comparisons declined, +5.7 points with p
+   0.026, against a level of 0.0083. judge_supported, still pending, was +8.2 points not
+   supported. A reviewer's check with the judge in the family gave p 0.07 against 0.0071, so
+   it would have stayed quiet too. Its blind spots: uncited +8.1 points, declines +10.9, errors
+   +6.0, model calls +0.66, latency +30%, tokens +33%, fabricated +9.4.
 3. **Day 7** is a bad deploy: a rollback to prompt v2, with 200 questions (generated as two halves
    of 100 with separate seeds, each half naming 10 different products, so a product may appear in
    both halves; to be built in part 5). The champion also runs
