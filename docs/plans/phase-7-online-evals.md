@@ -323,9 +323,21 @@ warning.
    shadow as on day 7. A day on which neither model calls nor errors alerts is a miss, reported
    as such. The two faults become the blind days' "subtle" (`retrieval-k1.yaml`) and "larger"
    (`retrieval-k1-short.yaml`) configs, with `default.yaml` as "unchanged" (item 5).
-5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged, a subtle fault, or
-   a larger one. She commits only a hash of her choices. The monitor's call is made before the
-   choices are revealed and checked against the hash.
+5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged
+   (`configs/default.yaml`), a subtle fault (`configs/retrieval-k1.yaml`, one search result) or
+   a larger one (`configs/retrieval-k1-short.yaml`, one result and a quarter of each page). She
+   commits only a hash of her choices. The monitor's call is made before the choices are
+   revealed and checked against the hash. **Built 2026-10-21:** `evals blind seal` takes the
+   three choices and a passphrase, typed hidden, and keeps only the hash
+   (`results/online/blind.json`). `evals blind run DAY` takes the day's choice hidden and runs
+   the day under it; the run's record names its config, as every run's must, and nobody reads
+   it until `evals monitor DAY` has given its verdict. `evals blind reveal` takes the choices and
+   the passphrase again, refuses unless the hash matches and every blind day has its verdict,
+   checks each run's recorded config against the revealed choice, and writes the outcome
+   (`results/online/blind-reveal.json`). Pre-registered expectations, from the dev predictions
+   in items 3 and 4: unchanged, no alert (a normal day alerts about 6% of the time); subtle,
+   model calls alerts about 4 times in 10, so a miss is likely; larger, model calls and errors
+   alert almost surely. Shadows on the blind days are optional, by cost.
 
 ## Cost and Aleena's time
 

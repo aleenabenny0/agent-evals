@@ -2196,6 +2196,194 @@ def online_run(
         )
 
 
+BLIND_DAYS = (9, 10, 11)  # part 5, item 5: the days Aleena's sealed choices decide
+BLIND_CHOICES: dict[str, Path] = {  # what each choice runs
+    "unchanged": DEFAULT_CONFIG,
+    "subtle": Path("configs/retrieval-k1.yaml"),
+    "larger": Path("configs/retrieval-k1-short.yaml"),
+}
+BLIND_EXPECTED: dict[str, list[str]] = {  # the family alerts pre-registered for each choice
+    "unchanged": [],
+    "subtle": ["model_calls"],  # about 4 times in 10
+    "larger": ["model_calls", "error"],  # almost surely
+}
+BLIND_PATH = Path("results/online/blind.json")
+BLIND_REVEAL_PATH = Path("results/online/blind-reveal.json")
+blind_app = typer.Typer(
+    no_args_is_help=True,
+    help="The blind days 9 to 11 (phase 7 part 5): seal the choices, run a day under its sealed "
+    "choice, and reveal once every verdict is in.",
+)
+app.add_typer(blind_app, name="blind")
+
+
+def _commitment(choices: dict[int, str], passphrase: str) -> str:
+    """The sealed hash: the three choices and the passphrase, which only Aleena knows."""
+    from agent_evals.harness.cache import sha256_text
+
+    text = ";".join(f"{d}={choices[d]}" for d in sorted(choices)) + f";pass={passphrase}"
+    return sha256_text(text)
+
+
+def _ask_choice(prompt: str, *, hidden: bool) -> str:
+    from rich.prompt import Prompt
+
+    return str(Prompt.ask(prompt, choices=list(BLIND_CHOICES), password=hidden))
+
+
+@blind_app.command("seal")
+def blind_seal() -> None:
+    """Seal the choices for days 9 to 11: unchanged, subtle or larger for each, typed hidden,
+    with a passphrase to repeat at the reveal. Only the hash is kept, so the choices cannot
+    change once the verdicts are in, and nobody can read them before."""
+    from datetime import UTC, datetime
+
+    from rich.prompt import Prompt
+
+    if not _interactive():
+        console.print("[red]evals blind seal needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    if BLIND_PATH.exists():
+        console.print(f"[red]Already sealed ({BLIND_PATH}): a seal stands.[/red]")
+        raise typer.Exit(code=2)
+    choices = {
+        d: _ask_choice(f"day {d}: unchanged, subtle or larger (hidden)", hidden=True)
+        for d in BLIND_DAYS
+    }
+    passphrase = Prompt.ask("a passphrase, to repeat at the reveal (hidden)", password=True)
+    if not passphrase.strip():
+        console.print("[red]An empty passphrase seals nothing.[/red]")
+        raise typer.Exit(code=2)
+    if Prompt.ask("the passphrase again (hidden)", password=True) != passphrase:
+        console.print("[red]The passphrases differ; nothing was sealed.[/red]")
+        raise typer.Exit(code=2)
+    record = {
+        "sealed_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "days": list(BLIND_DAYS),
+        "options": {k: v.as_posix() for k, v in BLIND_CHOICES.items()},
+        "expected_alerts": BLIND_EXPECTED,
+        "commitment": _commitment(choices, passphrase),
+    }
+    BLIND_PATH.parent.mkdir(parents=True, exist_ok=True)
+    BLIND_PATH.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    console.print(
+        f"[green]Sealed: {record['commitment']} ({BLIND_PATH}). Nothing else was kept. Next: "
+        "uv run evals blind run 9[/green]"
+    )
+
+
+@blind_app.command("run")
+def blind_run(
+    day: Annotated[int, typer.Argument(help="A blind day, 9 to 11.")],
+    judge_answers: Annotated[
+        bool, typer.Option("--judge/--no-judge", help="Judge the answers with the pinned judge.")
+    ] = True,
+) -> None:
+    """Run one blind day under its sealed choice, typed hidden. The run's record names its
+    config, as every run's must; it is not read until `evals monitor DAY` has given its verdict."""
+    if day not in BLIND_DAYS:
+        console.print(f"[red]The blind days are {list(BLIND_DAYS)}.[/red]")
+        raise typer.Exit(code=2)
+    if not BLIND_PATH.exists():
+        console.print("[red]Seal the choices first: uv run evals blind seal[/red]")
+        raise typer.Exit(code=2)
+    if not _interactive():
+        console.print("[red]evals blind run needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    choice = _ask_choice(f"day {day}'s sealed choice (hidden)", hidden=True)
+    online_run(day=day, judge_answers=judge_answers, shadow=False, config=BLIND_CHOICES[choice])
+    console.print(
+        f"[green]Day {day} ran under its sealed choice. Next, before anyone reads the run's "
+        f"config: uv run evals monitor {day}[/green]"
+    )
+
+
+@blind_app.command("reveal")
+def blind_reveal(config: ConfigOpt = DEFAULT_CONFIG) -> None:
+    """After the monitor has given every blind day its verdict: repeat the choices and the
+    passphrase. The hash must match the seal; each run's recorded config is checked against the
+    revealed choice; and each verdict is set against the truth."""
+    from datetime import UTC, datetime
+
+    from rich.prompt import Prompt
+
+    from agent_evals import monitor as mon
+    from agent_evals.store.db import ResultsStore
+
+    if not BLIND_PATH.exists():
+        console.print("[red]Nothing is sealed: uv run evals blind seal[/red]")
+        raise typer.Exit(code=2)
+    sealed = json.loads(BLIND_PATH.read_text(encoding="utf-8"))
+    alerts = (
+        json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
+    )
+    if missing := [d for d in BLIND_DAYS if str(d) not in alerts]:
+        console.print(
+            f"[red]Days {missing} have no verdict yet. The verdict comes before the reveal: "
+            "uv run evals monitor DAY[/red]"
+        )
+        raise typer.Exit(code=2)
+    if not _interactive():
+        console.print("[red]evals blind reveal needs an interactive terminal.[/red]")
+        raise typer.Exit(code=2)
+    choices = {d: _ask_choice(f"day {d}'s choice", hidden=False) for d in BLIND_DAYS}
+    passphrase = Prompt.ask("the passphrase (hidden)", password=True)
+    if _commitment(choices, passphrase) != sealed["commitment"]:
+        console.print("[red]These choices and passphrase do not match the seal.[/red]")
+        raise typer.Exit(code=2)
+    cfg = _config(config)
+    store = ResultsStore(cfg.paths.db, read_only=True)
+    rows: list[dict[str, Any]] = []
+    try:
+        for d in BLIND_DAYS:
+            run = str(alerts[str(d)]["run_id"])
+            recorded = (store.run_info(run)["manifest"].get("online") or {}).get("config")
+            expected_cfg = BLIND_CHOICES[choices[d]].as_posix()
+            raised = list(alerts[str(d)]["alerts"])
+            if choices[d] == "unchanged":
+                outcome = "false alarm" if raised else "quiet, as expected"
+            else:
+                outcome = "caught" if raised else "missed"
+            rows.append(
+                {
+                    "day": d,
+                    "choice": choices[d],
+                    "run_id": run,
+                    "config_recorded": recorded,
+                    "config_matches": Path(str(recorded)).as_posix() == expected_cfg,
+                    "alerts": raised,
+                    "expected_alerts": BLIND_EXPECTED[choices[d]],
+                    "outcome": outcome,
+                }
+            )
+    finally:
+        store.close()
+    table = Table(show_header=True, header_style="bold", title="the blind days revealed")
+    for col in ("day", "choice", "alerts raised", "expected", "outcome", "config as sealed"):
+        table.add_column(col)
+    for row in rows:
+        table.add_row(
+            str(row["day"]),
+            row["choice"],
+            ", ".join(row["alerts"]) or "none",
+            ", ".join(row["expected_alerts"]) or "none",
+            row["outcome"],
+            "yes" if row["config_matches"] else "NO",
+        )
+    console.print(table)
+    record = {
+        "revealed_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "commitment": sealed["commitment"],
+        "choices": {str(d): c for d, c in choices.items()},
+        "days": rows,
+    }
+    BLIND_REVEAL_PATH.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
+    if not all(row["config_matches"] for row in rows):
+        console.print("[red]A day did not run under its sealed choice; the reveal is void.[/red]")
+        raise typer.Exit(code=1)
+    console.print(f"[green]Recorded in {BLIND_REVEAL_PATH}.[/green]")
+
+
 @app.command("pilot-review")
 def pilot_review(
     day: Annotated[int, typer.Argument(help="Simulated day to review.")] = 0,

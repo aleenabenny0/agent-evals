@@ -505,8 +505,11 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   Day 8's traffic is generated; its served and shadow runs are next, then `uv run evals
   monitor 8`, `uv run python scripts/predict_day.py served=RUN shadow=RUN --cases
   results/online/cases/online-day-08.jsonl`, `uv run evals dashboard`, and the record. Then the
-  blind days 9 to 11 (plan, part 5, item 5): Aleena seals her three choices first. About
-  $13.75 spent after day 7; ask before day 10. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
+  blind days 9 to 11 (plan, part 5, item 5), built as `evals blind seal`, `evals blind run DAY`
+  and `evals blind reveal`: Aleena seals her three choices first, generates and runs each day
+  (`uv run evals simulate DAY --halves 2`, then `uv run evals blind run DAY` in her own
+  terminal), the agent checks it (`uv run evals monitor DAY`) without reading the run's config,
+  and she reveals at the end. About $13.75 spent after day 7; ask before day 10. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
   day 10 (the plan's Cost section).
 
 ## Target: the three project briefs

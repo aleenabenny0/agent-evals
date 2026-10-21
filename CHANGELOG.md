@@ -170,6 +170,13 @@ Format:
 
 ## Unreleased
 
+- 2026-10-21: the blind days' protocol (phase 7 part 5, item 5). `evals blind seal` takes
+  Aleena's choice for each of days 9 to 11 (unchanged, subtle or larger) and a passphrase, typed
+  hidden, and keeps only a hash. `evals blind run DAY` runs a day under its sealed choice.
+  `evals blind reveal` refuses until every blind day has its monitor verdict and the repeated
+  choices and passphrase match the hash, then checks each run's recorded config against the
+  revealed choice and writes each day's outcome: caught, missed, quiet as expected, or false
+  alarm. The expectations per choice are pre-registered in the plan.
 - 2026-10-21: day 7 of the online demo, the pre-registered honest miss: a rollback to prompt
   v2 on 200 questions raised no family alert (every p above 0.39), and the champion shadow on
   the same questions matched it on every family metric. The judge's reported line rose 14
