@@ -302,6 +302,14 @@ warning.
    chance 0.97: the agent runs out of steps); declines, tokens and fabricated citations do not
    rise. Latency is not predicted from dev for either: every dev attempt's first call came from
    the cache, and the monitor drops cached attempts. Day 8's run itself has no cache hits.
+   **Decided 2026-10-21 (decision 8): the stronger fault.** Day 8 serves
+   `configs/retrieval-k1-short.yaml`, with the champion as shadow. **Pre-registered before day 8
+   was generated:** the expected alerts are model calls (chance 1.00) and errors (0.97). Declines,
+   tokens, uncited answers and fabricated citations are not expected to alert. Latency is
+   unpredicted; a rise is plausible with more calls, and a latency alert is read against the
+   shadow as on day 7. A day on which neither model calls nor errors alerts is a miss, reported
+   as such. The two faults become the blind days' "subtle" (`retrieval-k1.yaml`) and "larger"
+   (`retrieval-k1-short.yaml`) configs, with `default.yaml` as "unchanged" (item 5).
 5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged, a subtle fault, or
    a larger one. She commits only a hash of her choices. The monitor's call is made before the
    choices are revealed and checked against the hash.
@@ -554,9 +562,9 @@ the rollback as a reported-only day (an honest miss: a fault the family is blind
 judge_supported drawn as advisory) and make day 8's retrieval fault the demo's first caught
 alert. Either way, the choice is written down before day 7 runs.
 
-## Decision 8 for Aleena (open, 2026-10-21): day 8's fault
+## Decision 8 (approved by Aleena 2026-10-21): day 8 gets the stronger retrieval fault
 
-Part 5, item 4 has the numbers. Keep the planned fault, one search result, which the family
+Part 5, item 4 has the numbers and the pre-registration. The proposal as put: Keep the planned fault, one search result, which the family
 would catch about 4 times in 10 through model calls; or strengthen it to one search result and
 a quarter of each page, which it would catch almost surely through model calls and errors.
 Both are retrieval faults a bad deploy could plausibly cause. Proposed: the stronger one for
