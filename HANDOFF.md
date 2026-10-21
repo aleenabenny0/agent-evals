@@ -502,9 +502,8 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   `evals simulate DAY --halves 2` makes the 200-question days. **Decision 8 approved:** day 8
   serves `configs/retrieval-k1-short.yaml` (expected alerts: model calls and errors). **Day 7
   done: no alert, the honest miss as pre-registered** (plan, part 5, item 3; about $4.05).
-  Day 8's traffic is generated; its served and shadow runs are next, then `uv run evals
-  monitor 8`, `uv run python scripts/predict_day.py served=RUN shadow=RUN --cases
-  results/online/cases/online-day-08.jsonl`, `uv run evals dashboard`, and the record. Then the
+  **Day 8 done: alert on model calls and errors, the two pre-registered; the shadow stayed
+  normal** (item 4; about $3.86; about $17.60 spent). Next: the
   blind days 9 to 11 (plan, part 5, item 5), built as `evals blind seal`, `evals blind run DAY`
   and `evals blind reveal`: Aleena seals her three choices first, generates and runs each day
   (`uv run evals simulate DAY --halves 2`, then `uv run evals blind run DAY` in her own

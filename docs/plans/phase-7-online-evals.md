@@ -323,6 +323,19 @@ warning.
    shadow as on day 7. A day on which neither model calls nor errors alerts is a miss, reported
    as such. The two faults become the blind days' "subtle" (`retrieval-k1.yaml`) and "larger"
    (`retrieval-k1-short.yaml`) configs, with `default.yaml` as "unchanged" (item 5).
+
+   **Done 2026-10-21: alert on model calls and errors, the two pre-registered.** Served run
+   `docs-20261021-042652-35398c`: model calls 6.67 per attempt against the reference's 4.81
+   (+1.85, p < 0.0001), errors 3.5% against 0.6% (+2.9 points, p 0.0075, floor 2). Latency rose
+   17% (p < 0.0001) but stayed under its 25% floor; declines, uncited, tokens and fabricated
+   citations did not move. The champion shadow `docs-20261021-044041-f5b454` on the same
+   questions stayed normal (4.67 calls, 0.5% errors), so served minus shadow is +1.99 calls (CI
+   +1.74 to +2.25) and +3.0 points of errors (CI +0.5 to +6.0): the fault, not the traffic
+   (`results/online/shadow-day-08.txt`). The shadow's latency is not comparable: its first call
+   per question was the same request as the served run's (both use prompt v3) and came from the
+   cache. Reported only: the judge's line was 0.698 not fully supported against 0.747, and the
+   shadow's 0.739. Cost about $3.86: generation about $1.30, the agent runs $0.30 and $0.36,
+   their judging $0.92 and $0.98.
 5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged
    (`configs/default.yaml`), a subtle fault (`configs/retrieval-k1.yaml`, one search result) or
    a larger one (`configs/retrieval-k1-short.yaml`, one result and a quarter of each page). She
@@ -354,9 +367,10 @@ warning.
   answers). A few one-off checks come on top. Day 8's two prediction runs on the dev split cost
   $0.18 and $0.19, and day 7's was free (a cache replay of the 2026-10-11 v2 run): about $9.70
   in all on 2026-10-21. Day 7 cost about $4.05 measured (generation about $1.30, two agent runs
-  of 200 at $0.38 each, their judging $1.07 and $0.97), so about $13.75 after day 7 and about
-  $17.80 after day 8; day 9 with a shadow brings it to about $21.85, and day 10 would pass $25,
-  so the ask comes before day 10, unless days 9 to 11 run without shadows (about $2.65 each). Day sizes,
+  of 200 at $0.38 each, their judging $1.07 and $0.97), so about $13.75 after day 7, and day 8
+  about $3.86 measured, so about $17.60 after day 8. The blind days without shadows cost about
+  $2.65 each (generation, one run, its judging), so about $25.55 for all three, and about
+  $29.20 with shadows; either passes $25, so Aleena is asked before day 9. Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question

@@ -170,6 +170,10 @@ Format:
 
 ## Unreleased
 
+- 2026-10-21: day 8 of the online demo, the first caught fault: retrieval cut to one search
+  result and a quarter of each page raised the two pre-registered alerts, model calls (+1.85
+  per attempt, p < 0.0001) and errors (+2.9 points, p 0.0075), while the champion shadow on the
+  same questions stayed normal (plan, part 5, item 4; `results/online/shadow-day-08.txt`).
 - 2026-10-21: the blind days' protocol (phase 7 part 5, item 5). `evals blind seal` takes
   Aleena's choice for each of days 9 to 11 (unchanged, subtle or larger) and a passphrase, typed
   hidden, and keeps only a hash. `evals blind run DAY` runs a day under its sealed choice.
