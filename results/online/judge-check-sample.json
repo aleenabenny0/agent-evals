@@ -1,0 +1,59 @@
+{
+  "drawn_at": "2026-10-21T00:06:59+00:00",
+  "reference_runs": [
+    "docs-20261019-161300-f4f40b",
+    "docs-20261019-162038-dd2eba",
+    "docs-20261019-162659-a169f2",
+    "docs-20261019-163359-1bb93d",
+    "docs-20261019-164105-82a046"
+  ],
+  "runs": {
+    "docs-20261019-161300-f4f40b": [
+      "online-d01-020",
+      "online-d01-021",
+      "online-d01-026",
+      "online-d01-034",
+      "online-d01-085",
+      "online-d01-096"
+    ],
+    "docs-20261019-162038-dd2eba": [
+      "online-d02-004",
+      "online-d02-022",
+      "online-d02-044",
+      "online-d02-045",
+      "online-d02-071",
+      "online-d02-083"
+    ],
+    "docs-20261019-162659-a169f2": [
+      "online-d03-009",
+      "online-d03-011",
+      "online-d03-029",
+      "online-d03-030",
+      "online-d03-068",
+      "online-d03-085"
+    ],
+    "docs-20261019-163359-1bb93d": [
+      "online-d04-004",
+      "online-d04-030",
+      "online-d04-032",
+      "online-d04-037",
+      "online-d04-072",
+      "online-d04-086"
+    ],
+    "docs-20261019-164105-82a046": [
+      "online-d05-003",
+      "online-d05-016",
+      "online-d05-026",
+      "online-d05-042",
+      "online-d05-045",
+      "online-d05-062"
+    ]
+  },
+  "verdict_digests": {
+    "docs-20261019-161300-f4f40b": "efb8f8d39f5c9b7519451e98aea7f53c053c2fb69c3b6f717f944374fcaf0e2c",
+    "docs-20261019-162038-dd2eba": "3b7fb38517f180ec0190f73895b8bc9e0d9b5001fa998b3ab1afd7fac58e293e",
+    "docs-20261019-162659-a169f2": "8bf810ed3b6477477f9d5719ed09ceb8357bebdd8fd5ad62a129784a8dc1b206",
+    "docs-20261019-163359-1bb93d": "4f931644f31c260c19f32fe9fe14a70aa99cb532c4a1ad0407ddef5f0d59eea6",
+    "docs-20261019-164105-82a046": "abcff81731fe5bfeea6ceb379298edf96dae47fbba2b680c72cfbe9368355c45"
+  }
+}
