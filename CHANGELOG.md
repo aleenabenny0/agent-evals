@@ -170,6 +170,13 @@ Format:
 
 ## Unreleased
 
+- 2026-10-21: the online judge check scored, and the judge failed. Aleena labeled 30
+  reference-day answers blind (3 the judge passed and 3 it failed from each of days 1 to 5).
+  Of the 15 the judge passed, she failed 4, against a bar of 2; of the 15 it failed, she passed
+  2. judge_supported stays out of the alert family for the whole demo, reported but never
+  alerting; the family is the six code-graded metrics. The result is final and recorded in the
+  results database and `results/online/judge-check.json` (plan, part 3 "Judge check"). Day 7's
+  expected alert is now decision 7 for Aleena.
 - 2026-10-20: Aleena's decisions 5 and 6 (plan), both approved. Every monitored metric, the
   fabricated-citation rule included, now publishes its blind spot as the smallest true rise
   that alerts on 8 days in 10, floor included. It is exact for rates (`stats/monitor.py`

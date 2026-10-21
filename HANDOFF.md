@@ -494,9 +494,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   Later on 2026-10-20: three more checks hardened the judge check. Its only record is now the
   results database, written once, and the blind covers replays (plan, "Final check before the
   draw"). The reference was re-recorded, day 6 checked (no alert), and the judge-check sample
-  drawn (2026-10-21T00:06:59Z, commit a6c3a71). Next: Aleena runs
-  `uv run evals judge-check label` (30 blind labels), then `uv run evals judge-check score`.
-  Then commit `results/online/judge-check.json` and record the result in the plan.
+  drawn (2026-10-21T00:06:59Z, commit a6c3a71).
+  **2026-10-21: the judge check failed** (4 false passes of 15, bar 2; final). judge_supported
+  is out of the alert family for the demo; the family is the six code-graded metrics. Next:
+  Aleena's decision 7 (plan): what day 7's expected alert is, now that the judge cannot raise
+  one. Then part 5: days 7 and 8 at 200 questions with shadows, then the blind days 9 to 11.
+  About $9.30 spent on phase 7; ask before passing $25.
 
 ## Target: the three project briefs
 

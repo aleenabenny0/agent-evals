@@ -194,6 +194,16 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   end to end on a copy of the real data, with scripted labels, scoring refused until all 30
   were in. It then reran the leave-one-day-out check with the judge in the family on the real
   days, which stayed quiet, and a second score only reported the first.
+
+  **Scored 2026-10-21T02:45:11Z: the judge failed.** Of the 15 answers it passed, Aleena failed
+  4, against a bar of 2. Of the 15 it failed, she passed 2. They agreed on 24 of 30. The false
+  passes fell one on each of days 1 to 4; both false fails were on day 4. The result is final
+  and recorded (`results/online/judge-check.json`, and on every reference run in the results
+  database). **judge_supported stays out of the alert family for the whole demo:** it is
+  reported and drawn, never alerting, and the monitor's family is the six code-graded
+  metrics. This agrees with iteration 4's finding that the judge is lenient on the champion's
+  answers (its spot check then failed by one, and the judge passed 9 of 90 v5 answers she
+  failed): here it passes answers she finds not fully supported about a quarter of the time.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
   leaves the Holm family, the report gives the number tested, and the day is not cleared.
@@ -245,7 +255,9 @@ warning.
    both halves; to be built in part 5). The champion also runs
    on the same questions as a shadow, so the paired difference separates the agent from the
    traffic. The expected alert, judge_supported down, is stated with its power, computed from the
-   reference's observed rate and graded n.
+   reference's observed rate and graded n. **Open since the judge check failed (decision 7):**
+   judge_supported cannot alert, so day 7's expected alert must be one the six code-graded
+   metrics can raise, or the fault must change.
 4. **Day 8** degrades retrieval to one search result, with 200 questions and a shadow. Its
    expected alerts are predicted first, by running that config on the dev split offline.
 5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged, a subtle fault, or
@@ -481,6 +493,18 @@ database: 20 of the 21 held, and only the last statistics finding was rejected.
    passed and 15 it failed (3 and 3 a day) in place of 30 at random. Keep the bar (at most 2
    false passes), now applied to 15 judge passes, and also report the answers the judge failed
    that Aleena passes. Same 30 labels, same time.
+
+## Decision 7 for Aleena (open, 2026-10-21)
+
+The judge check failed, so judge_supported cannot alert. Day 7's bad deploy, a rollback to
+prompt v2, was expected to show up as judge_supported down: iteration 1 (v2 to v3) moved that
+metric most, and the six code-graded metrics may not move at all. Proposed: before day 7 is
+generated, run the v2 config on the dev split offline with no judge (about $0.20, the agent
+only) and compare its six family metrics with v3's dev run, paired. If one would alert at
+day 7's n, pre-register that as the expected alert and keep the rollback. If none would, keep
+the rollback as a reported-only day (an honest miss: a fault the family is blind to, with
+judge_supported drawn as advisory) and make day 8's retrieval fault the demo's first caught
+alert. Either way, the choice is written down before day 7 runs.
 
 ## Check of decisions 5 and 6 (2026-10-20)
 
