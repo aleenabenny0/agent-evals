@@ -491,6 +491,12 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   `uv run evals judge-check score`), then part 5. A re-check of the fixes found 8 more, all
   fixed (plan, "Re-check of the fixes"). Never run the tests while a real online run or monitor
   command is writing to `results/online/`: a guard fails the test run on any change there.
+  Later on 2026-10-20: three more checks hardened the judge check. Its only record is now the
+  results database, written once, and the blind covers replays (plan, "Final check before the
+  draw"). The reference was re-recorded, day 6 checked (no alert), and the judge-check sample
+  drawn (2026-10-21T00:06:59Z, commit a6c3a71). Next: Aleena runs
+  `uv run evals judge-check label` (30 blind labels), then `uv run evals judge-check score`.
+  Then commit `results/online/judge-check.json` and record the result in the plan.
 
 ## Target: the three project briefs
 

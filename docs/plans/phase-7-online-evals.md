@@ -187,6 +187,13 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
     belongs to one judge check.
   - No test can touch the real `results/online/`: each test's monitor files go to a temporary
     folder, and the test run fails if a real file changed.
+
+  **Drawn 2026-10-21T00:06:59Z**, before any label existed on the reference runs (commit
+  a6c3a71, `results/online/judge-check-sample.json`). It has 6 answers a day, 3 the judge
+  passed and 3 it failed, none of them on the dashboard, and is recorded on all five runs. Run
+  end to end on a copy of the real data, with scripted labels, scoring refused until all 30
+  were in. It then reran the leave-one-day-out check with the judge in the family on the real
+  days, which stayed quiet, and a second score only reported the first.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
   leaves the Holm family, the report gives the number tested, and the day is not cleared.
