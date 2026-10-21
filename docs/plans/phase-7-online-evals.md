@@ -342,7 +342,8 @@ warning.
    commits only a hash of her choices. The monitor's call is made before the choices are
    revealed and checked against the hash. **Built 2026-10-21:** `evals blind seal` takes the
    three choices and a passphrase, typed hidden, and keeps only the hash
-   (`results/online/blind.json`). `evals blind run DAY` takes the day's choice hidden and runs
+   (`results/online/blind.json`); a seal can be replaced (`--again`, the old one archived) only
+   while no blind day has run under it. `evals blind run DAY` takes the day's choice hidden and runs
    the day under it; the run's record names its config, as every run's must, and nobody reads
    it until `evals monitor DAY` has given its verdict. `evals blind reveal` takes the choices and
    the passphrase again, refuses unless the hash matches and every blind day has its verdict,

@@ -56,6 +56,20 @@ def test_seal_keeps_only_the_hash_and_stands(blind: Path, monkeypatch: pytest.Mo
     # the options and their expectations are public; the per-day choices are not kept
     assert set(sealed) == {"sealed_at", "days", "options", "expected_alerts", "commitment"}
     assert CliRunner().invoke(cli.app, ["blind", "seal"]).exit_code == 2  # a seal stands
+    # forgotten: --again replaces a seal no blind day has run under, archiving the old one
+    _answers(monkeypatch, ["larger", "larger", "unchanged", "new", "new"])
+    again = CliRunner().invoke(cli.app, ["blind", "seal", "--again", "-c", str(blind)])
+    assert again.exit_code == 0, again.output
+    assert len(list((cli.BLIND_PATH.parent / "archive").glob("*/blind.json"))) == 1
+    resealed = json.loads(cli.BLIND_PATH.read_text(encoding="utf-8"))
+    assert resealed["commitment"] == cli._commitment(
+        {9: "larger", 10: "larger", 11: "unchanged"}, "new"
+    )
+    _verdicts(cli.BLIND_PATH.parent, {9: "configs/default.yaml"}, {9: []})  # day 9 ran
+    _answers(monkeypatch, ["larger", "larger", "unchanged", "new", "new"])
+    again = CliRunner().invoke(cli.app, ["blind", "seal", "--again", "-c", str(blind)])
+    assert again.exit_code == 2 and "already ran under the seal" in " ".join(again.output.split())
+    assert json.loads(cli.BLIND_PATH.read_text(encoding="utf-8")) == resealed  # untouched
     cli.BLIND_PATH.unlink()
     _answers(monkeypatch, ["subtle", "unchanged", "larger", "pw", "other"])
     result = CliRunner().invoke(cli.app, ["blind", "seal"])

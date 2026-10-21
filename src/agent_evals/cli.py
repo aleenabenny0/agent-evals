@@ -2232,7 +2232,17 @@ def _ask_choice(prompt: str, *, hidden: bool) -> str:
 
 
 @blind_app.command("seal")
-def blind_seal() -> None:
+def blind_seal(
+    again: Annotated[
+        bool,
+        typer.Option(
+            "--again",
+            help="Replace a seal that no blind day has run under yet, for a forgotten choice or "
+            "passphrase. The old seal is archived, never deleted.",
+        ),
+    ] = False,
+    config: ConfigOpt = DEFAULT_CONFIG,
+) -> None:
     """Seal the choices for days 9 to 11: unchanged, subtle or larger for each, typed hidden,
     with a passphrase to repeat at the reveal. Only the hash is kept, so the choices cannot
     change once the verdicts are in, and nobody can read them before."""
@@ -2240,12 +2250,37 @@ def blind_seal() -> None:
 
     from rich.prompt import Prompt
 
+    from agent_evals.store.db import ResultsStore
+
     if not _interactive():
         console.print("[red]evals blind seal needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
+    now = datetime.now(UTC).isoformat(timespec="seconds")
     if BLIND_PATH.exists():
-        console.print(f"[red]Already sealed ({BLIND_PATH}): a seal stands.[/red]")
-        raise typer.Exit(code=2)
+        if not again:
+            console.print(
+                f"[red]Already sealed ({BLIND_PATH}): a seal stands. If you forgot a choice or "
+                "the passphrase and no blind day has run yet, pass --again.[/red]"
+            )
+            raise typer.Exit(code=2)
+        try:  # a seal that a day ran under locks that day's choice: it cannot be replaced
+            store = ResultsStore(_config(config).paths.db, read_only=True)
+        except FileNotFoundError:
+            ran: list[int] = []
+        else:
+            try:
+                days = {(r["manifest"].get("online") or {}).get("day") for r in store.online_runs()}
+            finally:
+                store.close()
+            ran = sorted(d for d in BLIND_DAYS if d in days)
+        if ran:
+            console.print(f"[red]Days {ran} already ran under the seal: it stands.[/red]")
+            raise typer.Exit(code=2)
+        stamp = now.replace(":", "").replace("+0000", "Z")
+        dest = BLIND_PATH.parent / "archive" / stamp / BLIND_PATH.name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        BLIND_PATH.replace(dest)
+        console.print(f"The earlier seal, which no day ran under, is archived at {dest}.")
     choices = {
         d: _ask_choice(f"day {d}: unchanged, subtle or larger (hidden)", hidden=True)
         for d in BLIND_DAYS
@@ -2258,7 +2293,7 @@ def blind_seal() -> None:
         console.print("[red]The passphrases differ; nothing was sealed.[/red]")
         raise typer.Exit(code=2)
     record = {
-        "sealed_at": datetime.now(UTC).isoformat(timespec="seconds"),
+        "sealed_at": now,
         "days": list(BLIND_DAYS),
         "options": {k: v.as_posix() for k, v in BLIND_CHOICES.items()},
         "expected_alerts": BLIND_EXPECTED,
