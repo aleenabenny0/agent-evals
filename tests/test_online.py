@@ -349,6 +349,22 @@ def test_online_run_writes_the_day_runs_once_judges_and_records_its_role(
         "traffic_sha256": file_sha256(traffic / "day-01.jsonl"),  # what the monitor checks
     }
 
+    def fake_shadow(**kwargs: Any) -> str:  # the champion on the same day, as part 5's shadow
+        _start(tmp_path, "r-2", online=True)
+        return "r-2"
+
+    monkeypatch.setattr(cli, "run", fake_shadow)
+    shadow = CliRunner().invoke(
+        cli.app, ["online-run", "1", "--shadow", "--no-judge", "-c", str(config)]
+    )
+    assert shadow.exit_code == 0, shadow.output
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        role = store.run_info("r-2")["manifest"]["online"]
+    finally:
+        store.close()
+    assert role["shadow"] is True and role["day"] == 1  # what keeps it out of `monitor 1`
+
 
 def test_the_label_screen_shows_no_reference_for_an_online_case(
     capsys: pytest.CaptureFixture[str],

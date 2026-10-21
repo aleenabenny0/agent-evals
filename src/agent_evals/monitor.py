@@ -302,7 +302,12 @@ def check_day(
         "family_size": len(pvalues),  # what Holm ran over: a metric with no test leaves it
         "metrics": list(rows.values()),
         "fabricated_citation": fab,
-        "judge": {"in_family": judge_enabled, "trusted": trusted, "shifts": shifts},
+        "judge": {
+            "in_family": judge_enabled,
+            "standing": "in the family" if judge_enabled else (judge_note or PENDING),
+            "trusted": trusted,
+            "shifts": shifts,
+        },
         "reported": day.reported,
         "alerts": alerts,
         # family metrics with no test today (no data, or latency refused): a quiet day with

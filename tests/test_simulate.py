@@ -135,6 +135,21 @@ def test_plan_day_has_exact_quotas_distinct_outside_services_and_no_excluded_pag
     assert plan_day(1, pages, {OBJECTS_URL}, SERVICES) == slots  # a day can be rebuilt exactly
 
 
+def test_a_second_half_has_its_own_seed_and_ids_past_the_first(pages: Corpus) -> None:
+    first = plan_day(7, pages, set(), SERVICES)
+    second = plan_day(7, pages, set(), SERVICES, half=2)
+    assert first == plan_day(7, pages, set(), SERVICES, half=1)  # a 100-question day is half 1
+    assert [s.index for s in second] == list(range(100, 200))  # ids and cache salts cannot clash
+    assert Counter((s.persona, s.intent) for s in second) == Counter(
+        (s.persona, s.intent) for s in first
+    )
+    outside = [s.service for s in second if s.intent == "outside_snapshot"]
+    assert len(set(outside)) == OUTSIDE_PER_DAY  # one service per family within the half
+    assert outside != [s.service for s in first if s.intent == "outside_snapshot"]  # own seed
+    with pytest.raises(ValueError, match="half counts from 1"):
+        plan_day(7, pages, set(), SERVICES, half=0)
+
+
 def test_a_day_names_each_service_family_once(pages: Corpus) -> None:
     services = ["Snowball", "Snow Family", *SERVICES[:10]]  # 12 names, 11 families
     for day in range(12):

@@ -63,6 +63,7 @@ PERSONAS: dict[str, str] = {
 QUOTA: dict[str, int] = {"lookup": 14, "comparison": 2, "false_premise": 2, "outside_snapshot": 2}
 SYMPTOM_PER_PERSONA = 4  # of the lookup questions, phrased as a problem the person hit
 OUTSIDE_PER_DAY = QUOTA["outside_snapshot"] * len(PERSONAS)  # each names a different service
+QUESTIONS_PER_HALF = sum(QUOTA.values()) * len(PERSONAS)  # 100: a day, or one half of a big one
 CASE_TYPE = {
     "lookup": "lookup",
     "comparison": "multi_step",
@@ -389,10 +390,17 @@ def plan_day(
     corpus: Corpus,
     excluded_urls: set[str],
     outside: Sequence[str],
+    half: int = 1,
 ) -> list[Slot]:
     """Fixed quotas per persona. Source pages are drawn uniformly from the pages not excluded; the
-    outside-snapshot slots take distinct services, in an order shuffled per day."""
-    rng = random.Random(f"online-day-{day}")
+    outside-snapshot slots take distinct services, in an order shuffled per day. A 200-question
+    day (part 5) is two halves: half 1 is planned exactly as a 100-question day, and half 2 from
+    its own seed, with slot indices (so ids and cache salts) offset by 100. Each half names one
+    service per family; a service may appear in both halves."""
+    if half < 1:
+        raise ValueError("half counts from 1")
+    rng = random.Random(f"online-day-{day}" if half == 1 else f"online-day-{day}-half-{half}")
+    offset = (half - 1) * QUESTIONS_PER_HALF
     pool = sorted(url for url in corpus.pages if url not in excluded_urls)
     if not pool:
         raise ValueError("no allowed source pages to plan a day from")
@@ -416,7 +424,7 @@ def plan_day(
         symptoms = set(rng.sample(range(QUOTA["lookup"]), SYMPTOM_PER_PERSONA))
         for intent, n in QUOTA.items():
             for k in range(n):
-                index = len(slots)
+                index = offset + len(slots)
                 if intent == "outside_snapshot":
                     service = distinct[n_outside]
                     n_outside += 1

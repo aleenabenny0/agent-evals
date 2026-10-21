@@ -1,0 +1,67 @@
+# Day 8 of the online demo (phase 7 part 5): configs/default.yaml with retrieval degraded to one search result.
+
+paths:
+  corpus_dir: data/snapshots/aws-docs
+  docs_lock: configs/docs_pages.lock.json   # page hashes, committed; see evals snapshot --check
+  suites_dir: suites
+  cache_dir: .cache/llm
+  db: results/evals.duckdb
+
+run:
+  workers: 4         # parallel cases; lower this if you hit rate limits
+  budget_usd: 5.0    # stop a run once uncached spend passes this (needs pricing below)
+
+docs_agent:
+  model:
+    name: claude-haiku-5-5
+    max_tokens: 2048
+    temperature: null      # leave null: anthropic SDK 1.x messages.create has no temperature
+    pricing:
+      # USD per million tokens for claude-haiku-5-5, Anthropic first-party rates as of 2026-10-06,
+      # for prompts up to 100K tokens (every request here is far below that). Re-check at
+      # https://platform.claude.com/docs/en/about-claude/pricing when the model changes.
+      input_per_mtok: 0.10
+      output_per_mtok: 0.50
+  max_steps: 12
+  search_k: 1              # part 5 day 8: the fault, retrieval cut to one search result
+  page_chars: 8000
+  strict_tools: true       # set false if the API rejects strict tool schemas for this model
+  max_submission_rejections: 3   # then the attempt fails as malformed_submission
+  prompt_version: v3             # champion since iteration 1 (2026-10-16); v2 is the previous champion
+
+graders:
+  min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated
+
+judge:
+  # LLM judge for "supported" and "responsive" (docs/plans/llm-judge.md). Only `evals judge RUN`
+  # calls it; a normal run never does. Pricing is not part of the judge's version.
+  model:
+    name: claude-sonnet-5-5
+    max_tokens: 2048       # the model thinks before the tool call; 400 truncated verdicts
+    temperature: null
+    pricing:
+      # USD per million tokens for claude-sonnet-5-5, first-party, from
+      # https://platform.claude.com/docs/en/about-claude/pricing on 2026-10-19. Prompt-cache
+      # reads on Sonnet 5.5 cost 0.05x the input price, not the default 0.1x.
+      input_per_mtok: 2.00
+      output_per_mtok: 10.00
+      cache_read_multiplier: 0.05
+  strict_tools: true
+
+suites:
+  # Kept out of the snapshot on purpose so unanswerable cases have real material; `evals
+  # validate` fails if a page about one of these is ever added. Matched case-insensitively
+  # against page titles and URLs, and against unanswerable questions.
+  held_out_services:
+    - GameLift
+    - Ground Station
+    - Braket
+    - RoboMaker
+    - Snowball
+    - Snow Family
+    - Chime
+    - Greengrass
+    - WorkSpaces
+    - MediaConvert
+    - Managed Blockchain
+    - Outposts

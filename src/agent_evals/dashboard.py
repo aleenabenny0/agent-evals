@@ -301,12 +301,10 @@ def render(
     for p in checked:
         r = p.report or {}
         alerts = ", ".join(r.get("alerts", [])) or "none"
-        trust = (r.get("judge") or {}).get("trusted")
         rows.append(
             f'<tr><td>{p.day}</td><td class="muted">{escape(p.run_id)}</td>'
             f'<td class="{"alert" if r.get("alerts") else ""}">{escape(alerts)}</td>'
-            f"<td>{'yes' if trust else 'no: a quiet judge_supported does not clear the day'}"
-            "</td></tr>"
+            f"<td>{_trust_cell(r)}</td></tr>"
         )
     table = (
         '<div class="scroll"><table><thead><tr><th>day</th><th>run</th><th>alerts</th>'
@@ -348,6 +346,14 @@ day with its 95% interval and n, the number of answers that metric graded. Rebui
 <h2>What the judge disliked most</h2>{"".join(answers)}
 </main></body></html>
 """
+
+
+def _trust_cell(report: dict[str, Any]) -> str:
+    """The checked-days table's 'judge trusted' cell: trust matters only with the judge in."""
+    judge = report.get("judge") or {}
+    if not judge.get("in_family"):
+        return "n/a: the judge is out of the family"
+    return "yes" if judge.get("trusted") else "no: a quiet judge_supported does not clear the day"
 
 
 def _floor(spec: Spec) -> str:

@@ -496,10 +496,16 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   draw"). The reference was re-recorded, day 6 checked (no alert), and the judge-check sample
   drawn (2026-10-21T00:06:59Z, commit a6c3a71).
   **2026-10-21: the judge check failed** (4 false passes of 15, bar 2; final). judge_supported
-  is out of the alert family for the demo; the family is the six code-graded metrics. Next:
-  Aleena's decision 7 (plan): what day 7's expected alert is, now that the judge cannot raise
-  one. Then part 5: days 7 and 8 at 200 questions with shadows, then the blind days 9 to 11.
-  About $9.30 spent on phase 7; ask before passing $25.
+  is out of the alert family for the demo; the family is the six code-graded metrics.
+  **Decision 7 approved and done:** day 7 (a rollback to prompt v2) is pre-registered as an
+  honest miss, no family alert expected (plan, part 5, item 3; `scripts/predict_day.py`).
+  `evals simulate DAY --halves 2` makes the 200-question days. Next: Aleena's decision 8 (day
+  8's fault: one search result, caught about 4 times in 10, or one result plus a quarter of
+  each page, caught almost surely); then `uv run evals simulate 7 --halves 2`,
+  `uv run evals online-run 7 -c configs/rollback-v2.yaml`, `uv run evals online-run 7 --shadow`,
+  `uv run evals monitor 7`, the shadow comparison, `uv run evals dashboard`, and the day 8 steps
+  the same way. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
+  day 10 (the plan's Cost section).
 
 ## Target: the three project briefs
 

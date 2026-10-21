@@ -250,16 +250,58 @@ warning.
    supported. A reviewer's check with the judge in the family gave p 0.07 against 0.0071, so
    it would have stayed quiet too. Its blind spots: uncited +8.1 points, declines +10.9, errors
    +6.0, model calls +0.66, latency +30%, tokens +33%, fabricated +9.4.
-3. **Day 7** is a bad deploy: a rollback to prompt v2, with 200 questions (generated as two halves
-   of 100 with separate seeds, each half naming 10 different products, so a product may appear in
-   both halves; to be built in part 5). The champion also runs
-   on the same questions as a shadow, so the paired difference separates the agent from the
-   traffic. The expected alert, judge_supported down, is stated with its power, computed from the
-   reference's observed rate and graded n. **Open since the judge check failed (decision 7):**
-   judge_supported cannot alert, so day 7's expected alert must be one the six code-graded
-   metrics can raise, or the fault must change.
-4. **Day 8** degrades retrieval to one search result, with 200 questions and a shadow. Its
-   expected alerts are predicted first, by running that config on the dev split offline.
+3. **Day 7** is a bad deploy: a rollback to prompt v2 (`configs/rollback-v2.yaml`), with 200
+   questions generated as two halves of 100 with separate seeds (`evals simulate 7 --halves 2`;
+   each half names 10 different products, so a product may appear in both halves). The champion
+   also runs on the same questions as a shadow (`evals online-run 7 --shadow`), so the paired
+   difference separates the agent from the traffic. **Pre-registered 2026-10-21, before day 7
+   was generated (decision 7): no family alert is expected.** The judge's score, the one metric
+   the rollback moves, cannot alert, so day 7 is an honest miss: a fault the family is blind to.
+   Predicted from the dev split with `scripts/predict_day.py`: the regraded v2 champion run
+   `docs-20261011-223111-702e87` (made from an uncommitted tree at cb2b4a4) against the v3 run
+   `docs-20261016-214710-02abb7`, same graders. Today's code differs from the v3 run's only by
+   prompt caching and an off-by-default number check, and a fresh v2 run today replayed the old
+   one call for call from the cache (`docs-20261021-030556-6fae1e`, 130 of 130 identical).
+
+   | Metric | v3 dev | v2 dev | v2 minus v3 (95% CI) | Reference | Floor | Alert chance at 200 |
+   |---|---|---|---|---|---|---|
+   | uncited_answer | 0.0% | 0.0% | +0.0 pts | 0.0% | +5 pts | 0.00 |
+   | in-scope declined | 1.2% | 2.7% | +1.6 pts (+0.0 to +3.5) | 3.0% | +5 pts | 0.015 |
+   | error | 0.5% | 0.0% | -0.5 pts (-1.3 to +0.0) | 0.6% | +2 pts | 0.00 |
+   | model calls | 4.00 | 4.02 | +0.02 (-0.07 to +0.12) | 4.81 | +0.50 | 0.00 |
+   | latency | 7.3 s | 8.1 s | +11% (+6% to +17%) | 9.8 s | +25% | 0.00 |
+   | tokens | 15.6k | 15.0k | -3% (-6% to +0%) | 22.3k | +25% | 0.00 |
+   | fabricated (own rule) | 1.1% | 1.4% | +0.3 pts (-1.2 to +2.0) | 2.8% | none | 0.003 |
+
+   An independent re-derivation matched every number. Reported only: the judge's "not fully
+   supported" share is expected to rise by about 20 points (v2 minus v3 on dev +19.9, CI +14.5
+   to +25.1; the reference is 0.747, so the rise is capped near +25), far above its normal-day
+   band on the dashboard. Two caveats, written down before the day: (1) latency drifts between
+   days (the six online days span 0.16 on the log scale, sd 0.06), and the dev +11% is confounded
+   with the five days between the two runs, so a latency alert has a few percent chance from the
+   API rather than the prompt; (2) if v2's extra declines carry over as a ratio (2.3 times) rather
+   than as points, the decline alert chance is about 0.2, and the dev excess rests mostly on one
+   paraphrase cluster. **Reading day 7:** no alert confirms the miss. An alert on latency or
+   declines is read against the shadow, with `scripts/predict_day.py served=RUN shadow=RUN
+   --cases results/online/cases/online-day-07.jsonl`: if the champion shadow moves the same way
+   against the reference (a served-minus-shadow difference near zero), it is the day or the
+   traffic, a false alarm for the demo; if the served run moves alone, it is an unpredicted
+   catch, reported as such. v2 answers are also about 20% longer than v3's on dev, just under the
+   25% judge-trust shift, so day 7's judge may be flagged untrusted; the reported judge line is
+   read from the served run and the shadow comparison either way. Cost about $3.90: two halves
+   generated, two runs of 200, both judged for the advisory line.
+4. **Day 8** degrades retrieval, with 200 questions and a shadow. Its expected alerts are
+   predicted first, by running that config on the dev split offline. **Predicted 2026-10-21,
+   open for Aleena (decision 8).** The planned fault, one search result
+   (`configs/retrieval-k1.yaml`; dev run `docs-20261021-031002-e724f3`, $0.18, one attempt, no
+   judge), moves model calls +0.47 per attempt (CI +0.27 to +0.70; floor +0.50; alert chance
+   0.42) and in-scope declines +2.7 points (chance 0.08); errors +0.3 points; tokens fall 19%.
+   A stronger retrieval fault, one search result and 2,000 characters of each page instead of
+   8,000 (`configs/retrieval-k1-short.yaml`; dev run `docs-20261021-031621-45b504`, $0.19), moves
+   model calls +1.75 (CI +1.44 to +2.08; chance 1.00) and errors +5.6 points (CI +2.1 to +10.0;
+   chance 0.97: the agent runs out of steps); declines, tokens and fabricated citations do not
+   rise. Latency is not predicted from dev for either: every dev attempt's first call came from
+   the cache, and the monitor drops cached attempts. Day 8's run itself has no cache hits.
 5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged, a subtle fault, or
    a larger one. She commits only a hash of her choices. The monitor's call is made before the
    choices are revealed and checked against the hash.
@@ -276,7 +318,11 @@ warning.
   about $1.30 per 100 questions, against the $1.35 estimated before. Spent on phase 7 so far:
   about $9.30. That is day 0 generated twice, about $1.50; days 1 to 5 generated, about $3.15;
   their online runs, about $3.30; and day 6, about $1.30 (agent $0.19, judge $0.47 for 82
-  answers). A few one-off checks come on top. Day sizes,
+  answers). A few one-off checks come on top. Day 8's two prediction runs on the dev split cost
+  $0.18 and $0.19, and day 7's was free (a cache replay of the 2026-10-11 v2 run): about $9.70
+  in all on 2026-10-21. Days 7 and 8 cost about $3.90 each with their shadows, so about $17.50
+  after day 8 and $21.40 after day 9; day 10 would pass $25, so the ask comes before it, unless
+  days 9 to 11 run without shadows (about $2.50 each, $25.00 in all). Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
@@ -494,9 +540,11 @@ database: 20 of the 21 held, and only the last statistics finding was rejected.
    false passes), now applied to 15 judge passes, and also report the answers the judge failed
    that Aleena passes. Same 30 labels, same time.
 
-## Decision 7 for Aleena (open, 2026-10-21)
+## Decision 7 (approved by Aleena 2026-10-21): day 7 stays the rollback, as an honest miss
 
-The judge check failed, so judge_supported cannot alert. Day 7's bad deploy, a rollback to
+The prediction and its reading are in part 5, item 3. The dev run of v2 budgeted below turned
+out free: it replayed the 2026-10-11 run from the call cache, call for call. The proposal as put:
+the judge check failed, so judge_supported cannot alert. Day 7's bad deploy, a rollback to
 prompt v2, was expected to show up as judge_supported down: iteration 1 (v2 to v3) moved that
 metric most, and the six code-graded metrics may not move at all. Proposed: before day 7 is
 generated, run the v2 config on the dev split offline with no judge (about $0.20, the agent
@@ -505,6 +553,16 @@ day 7's n, pre-register that as the expected alert and keep the rollback. If non
 the rollback as a reported-only day (an honest miss: a fault the family is blind to, with
 judge_supported drawn as advisory) and make day 8's retrieval fault the demo's first caught
 alert. Either way, the choice is written down before day 7 runs.
+
+## Decision 8 for Aleena (open, 2026-10-21): day 8's fault
+
+Part 5, item 4 has the numbers. Keep the planned fault, one search result, which the family
+would catch about 4 times in 10 through model calls; or strengthen it to one search result and
+a quarter of each page, which it would catch almost surely through model calls and errors.
+Both are retrieval faults a bad deploy could plausibly cause. Proposed: the stronger one for
+day 8, so the demo has one caught fault before the blind days, and the two faults as the blind
+days' "subtle" and "larger" configs (part 5, item 5), with `configs/default.yaml` as
+"unchanged".
 
 ## Check of decisions 5 and 6 (2026-10-20)
 

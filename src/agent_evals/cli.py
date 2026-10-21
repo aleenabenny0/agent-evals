@@ -1393,13 +1393,23 @@ TRAFFIC_DIR = Path("results/online/traffic")
 def simulate(
     day: int,
     model: Annotated[str, typer.Option(help="Generator model.")] = "claude-sonnet-5-5",
+    halves: Annotated[
+        int,
+        typer.Option(
+            "--halves",
+            min=1,
+            help="Halves of 100 questions, each planned from its own seed; part 5's 200-question "
+            "days take 2. The duplicate check runs across halves.",
+        ),
+    ] = 1,
     force: Annotated[
         bool, typer.Option("--force", help="Replace an existing day whose questions differ.")
     ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Generate one simulated day of online traffic (phase 7): a generator call per question, a
-    checker call per lookup and comparison, and any retries. Costs about $0.65 a day."""
+    checker call per lookup and comparison, and any retries. Costs about $0.65 per 100
+    questions."""
     import dataclasses
     import json
 
@@ -1431,12 +1441,15 @@ def simulate(
     areas = page_areas(load_area_map(AREA_MAP_PATH), pool)
     candidates = [*cfg.suites.held_out_services, *EXTRA_OUTSIDE_SERVICES]
     services, dropped = outside_services(candidates, corpus, [c.question for c in test_cases])
-    slots = plan_day(day, corpus, excluded, services)
+    slots = [
+        s for h in range(1, halves + 1) for s in plan_day(day, corpus, excluded, services, half=h)
+    ]
     llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
     questions, redo = generate_day(llm, slots, corpus, areas, model, pool)
     traffic = "".join(q.model_dump_json() + "\n" for q in questions)
     meta = day_summary(questions) | {
         "day": day,
+        "halves": halves,
         "generator": model,
         "generator_version": GENERATOR_VERSION,
         "traffic_sha256": sha256_text(traffic),
@@ -1572,7 +1585,8 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
         )
     judge = report["judge"]
     trust = "trusted" if judge["trusted"] else "[yellow]untrusted today[/yellow]"
-    console.print(f"judge: {'in' if judge['in_family'] else 'not yet in'} the family; {trust}")
+    standing = judge.get("standing") or ("in the family" if judge["in_family"] else "pending")
+    console.print(f"judge: {standing}; {trust}")
     console.print(f"reported only: {json.dumps(report['reported'])}")
 
 

@@ -170,6 +170,15 @@ Format:
 
 ## Unreleased
 
+- 2026-10-21: phase 7 part 5 groundwork. `evals simulate DAY --halves 2` generates a
+  200-question day as two halves of 100, the second from its own seed with ids 100 to 199, the
+  duplicate check running across both; a 100-question day is half 1, so days 0 to 6 are
+  unchanged. `scripts/predict_day.py` compares two runs on the same cases under the monitor's own
+  metric definitions and gives each metric's alert chance at a day's size: before a day, from
+  dev runs of the two configs; after it, the served run against its shadow. Day 7 is
+  pre-registered as an honest miss (plan, part 5): a rollback to prompt v2 moves no family
+  metric, only the judge's reported line. Day 8's fault is decision 8. The monitor and the
+  dashboard now say why the judge is out of the family, and a test covers `online-run --shadow`.
 - 2026-10-21: the online judge check scored, and the judge failed. Aleena labeled 30
   reference-day answers blind (3 the judge passed and 3 it failed from each of days 1 to 5).
   Of the 15 the judge passed, she failed 4, against a bar of 2; of the 15 it failed, she passed
