@@ -1,0 +1,82 @@
+{
+  "questions": 200,
+  "by_intent": {
+    "comparison": 20,
+    "false_premise": 20,
+    "lookup": 140,
+    "outside_snapshot": 20
+  },
+  "by_persona": {
+    "cost-manager": 40,
+    "new-developer": 40,
+    "non-native": 40,
+    "on-call": 40,
+    "security-reviewer": 40
+  },
+  "by_area": {
+    "ai_ml": 28,
+    "analytics": 21,
+    "compute": 14,
+    "databases": 18,
+    "devtools": 5,
+    "integration": 18,
+    "management": 14,
+    "migration": 3,
+    "networking": 10,
+    "security": 22,
+    "storage": 27
+  },
+  "outside_services": [
+    "Clean Rooms",
+    "Device Farm",
+    "HealthLake",
+    "IoT SiteWise",
+    "Location Service",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "MediaLive",
+    "RoboMaker",
+    "Snowball",
+    "Wickr"
+  ],
+  "source_pages": 125,
+  "most_questions_from_one_page": 4,
+  "symptom_phrased": 40,
+  "mean_title_overlap": 0.139,
+  "copied_6_or_more_words": 7,
+  "mean_copied_run": 3.21,
+  "regenerated": 17,
+  "day": 8,
+  "halves": 2,
+  "generator": "claude-sonnet-5-5",
+  "generator_version": "v2.1",
+  "traffic_sha256": "32f5e12f51bff9f2afde1b99c5aa5b2967c026acba2e62d79c660d1e67e1d16d",
+  "inputs": {
+    "corpus": "b6343e2afd9cd7e8e5f5ef6a566477a4b0d77cb9ec321105e063f5fb238f6678",
+    "test_suite": "283fad51a7ec0b0c6ef260a8149ad6cb24f22a8ecc815889696cf01c72fe388c",
+    "area_map": "1a99a7837ed93d44f4a29ebfd38b0a4295de39217824b5703828894a48f6a9cc",
+    "plan": "17f2ec9427b49a603974aecda94549cac239d1310a051ffb02c140a0e2dde4ee"
+  },
+  "allowed_source_pages": 245,
+  "excluded_pages": {
+    "test_evidence": 72,
+    "test_support_sentence": 17
+  },
+  "outside_services_dropped": {
+    "GameLift": "named by a test question",
+    "Ground Station": "named by a test question",
+    "Chime": "named on a snapshot page",
+    "Greengrass": "named on a snapshot page",
+    "WorkSpaces": "named on a snapshot page",
+    "MediaConvert": "named on a snapshot page",
+    "Outposts": "named on a snapshot page"
+  },
+  "retries": {
+    "failed": 0,
+    "check_failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 1,
+    "unanswerable": 18,
+    "redrawn_page": 0
+  }
+}
