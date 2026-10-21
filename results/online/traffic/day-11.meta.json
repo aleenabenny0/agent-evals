@@ -1,0 +1,84 @@
+{
+  "questions": 200,
+  "by_intent": {
+    "comparison": 20,
+    "false_premise": 20,
+    "lookup": 140,
+    "outside_snapshot": 20
+  },
+  "by_persona": {
+    "cost-manager": 40,
+    "new-developer": 40,
+    "non-native": 40,
+    "on-call": 40,
+    "security-reviewer": 40
+  },
+  "by_area": {
+    "ai_ml": 40,
+    "analytics": 10,
+    "compute": 26,
+    "databases": 19,
+    "devtools": 5,
+    "integration": 12,
+    "management": 14,
+    "migration": 6,
+    "networking": 8,
+    "security": 19,
+    "storage": 21
+  },
+  "outside_services": [
+    "Braket",
+    "Clean Rooms",
+    "Device Farm",
+    "HealthLake",
+    "IoT SiteWise",
+    "Location Service",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "MediaLive",
+    "RoboMaker",
+    "Snow Family",
+    "Snowball",
+    "Wickr"
+  ],
+  "source_pages": 124,
+  "most_questions_from_one_page": 3,
+  "symptom_phrased": 40,
+  "mean_title_overlap": 0.137,
+  "copied_6_or_more_words": 7,
+  "mean_copied_run": 3.03,
+  "regenerated": 17,
+  "day": 11,
+  "halves": 2,
+  "generator": "claude-sonnet-5-5",
+  "generator_version": "v2.1",
+  "traffic_sha256": "310b39b80b31545b96036527e33bd4b49223d6ea617fc6ad9e211f51ee9e5119",
+  "inputs": {
+    "corpus": "b6343e2afd9cd7e8e5f5ef6a566477a4b0d77cb9ec321105e063f5fb238f6678",
+    "test_suite": "283fad51a7ec0b0c6ef260a8149ad6cb24f22a8ecc815889696cf01c72fe388c",
+    "area_map": "1a99a7837ed93d44f4a29ebfd38b0a4295de39217824b5703828894a48f6a9cc",
+    "plan": "1147ec92dc8568acb0d1f3a2efeab1012198f209ae81bf1f7c2a14fabd25d946"
+  },
+  "allowed_source_pages": 245,
+  "excluded_pages": {
+    "test_evidence": 72,
+    "test_support_sentence": 17
+  },
+  "outside_services_dropped": {
+    "GameLift": "named by a test question",
+    "Ground Station": "named by a test question",
+    "Chime": "named on a snapshot page",
+    "Greengrass": "named on a snapshot page",
+    "WorkSpaces": "named on a snapshot page",
+    "MediaConvert": "named on a snapshot page",
+    "Outposts": "named on a snapshot page"
+  },
+  "retries": {
+    "failed": 0,
+    "check_failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 0,
+    "unanswerable": 18,
+    "redrawn_page": 0
+  }
+}
