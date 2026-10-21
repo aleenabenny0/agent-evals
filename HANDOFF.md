@@ -508,7 +508,10 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   and `evals blind reveal`: Aleena seals her three choices first, generates and runs each day
   (`uv run evals simulate DAY --halves 2`, then `uv run evals blind run DAY` in her own
   terminal), the agent checks it (`uv run evals monitor DAY`) without reading the run's config,
-  and she reveals at the end. About $13.75 spent after day 7; ask before day 10. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
+  and she reveals at the end. Aleena approved about $29.20 in all, with a champion shadow on
+  each blind day (`uv run evals online-run DAY --shadow`, run by the agent after her served run
+  and before `monitor DAY`; one writer at a time on the database). Days 9 to 11's questions are
+  generated and committed; about $21.50 spent before any blind day ran. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
   day 10 (the plan's Cost section).
 
 ## Target: the three project briefs

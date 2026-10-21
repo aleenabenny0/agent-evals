@@ -370,7 +370,10 @@ warning.
   of 200 at $0.38 each, their judging $1.07 and $0.97), so about $13.75 after day 7, and day 8
   about $3.86 measured, so about $17.60 after day 8. The blind days without shadows cost about
   $2.65 each (generation, one run, its judging), so about $25.55 for all three, and about
-  $29.20 with shadows; either passes $25, so Aleena is asked before day 9. Day sizes,
+  $29.20 with shadows; either passes $25, so Aleena was asked before day 9. **Approved
+  2026-10-21: with shadows, about $29.20 in all.** The three days' questions were generated
+  first (about $3.90; day 9's first attempt died on a DNS failure and was regenerated from the
+  cache), so about $21.50 was spent before any blind day ran. Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
