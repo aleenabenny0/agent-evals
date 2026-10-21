@@ -581,7 +581,7 @@ def judge(
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
     from agent_evals.online import ONLINE_JUDGE_VERSION
-    from agent_evals.store.db import ResultsStore
+    from agent_evals.store.db import WRITE_ONCE, ResultsStore
     from agent_evals.suites import load_suite
     from agent_evals.types import AgentResult
 
@@ -590,6 +590,15 @@ def judge(
     store = ResultsStore(cfg.paths.db)
     try:
         info = store.run_info(run_id)
+        name = cfg.judge.grader_name  # its notes go in the manifest under this name
+        held = info["manifest"].get(name)
+        is_judge_note = isinstance(held, dict) and {"version", "rubric"} <= held.keys()
+        if name in WRITE_ONCE or (held is not None and not is_judge_note):
+            console.print(
+                f"[red]The judge's name {name!r} is the name of another record of {run_id}, "
+                "which its notes would overwrite. Nothing was judged.[/red]"
+            )
+            raise typer.Exit(code=2)
         grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
         if info["online"] and grader.version != ONLINE_JUDGE_VERSION:
             console.print(
@@ -1054,6 +1063,14 @@ def judge_probe(
     cfg = _config(config)
     store = ResultsStore(cfg.paths.db)
     try:
+        from agent_evals import monitor as mon
+
+        if mon.blind_cases(store, run_id):  # its misses would list the judge's verdicts
+            console.print(
+                f"[red]{run_id} holds answers of the online judge check, which are labeled "
+                "blind until it is scored: judge-probe is refused on it until then.[/red]"
+            )
+            raise typer.Exit(code=2)
         info = store.run_info(run_id)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         cases = {c.id: c for c in load_suite(suite_path)}
@@ -1299,12 +1316,22 @@ def compare_cmd(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Paired comparison of two runs on their shared cases."""
+    from agent_evals import monitor as mon
     from agent_evals.report import compare
     from agent_evals.store.db import ResultsStore
 
     cfg = _config(config)
     store = ResultsStore(cfg.paths.db)
     try:
+        if metric.startswith("judge_") and any(
+            mon.blind_cases(store, run) for run in (baseline, candidate)
+        ):  # its newly passing and failing lists would show the judge's verdicts
+            console.print(
+                "[red]These runs hold answers of the online judge check, which are labeled "
+                "blind until it is scored: comparing them on a judge metric is refused until "
+                "then.[/red]"
+            )
+            raise typer.Exit(code=2)
         c = compare(store, baseline, candidate, metric, cfg.judge.grader_name)
     except ValueError as exc:
         console.print(f"[red]{exc}[/red]")
@@ -1883,18 +1910,6 @@ def judge_check(
         if sorted(runs) != list(mon.REFERENCE_DAYS):
             console.print(f"[red]{mon.REFERENCE_PATH} does not name days 1 to 5.[/red]")
             raise typer.Exit(code=2)
-        for d, run in sorted(runs.items()):  # the frozen champion runs, never a hand-edited list
-            try:
-                champion = mon.day_run(store, d, champion_only=True)
-            except ValueError:
-                champion = None
-            if champion != run:
-                console.print(
-                    f"[red]{mon.REFERENCE_PATH} names {run} for day {d}, which is not that day's "
-                    "one complete champion online run. The judge check runs only on the frozen "
-                    "reference.[/red]"
-                )
-                raise typer.Exit(code=2)
         for key in (mon.JUDGE_SAMPLE_RECORD, mon.JUDGE_CHECK_RECORD):  # records are written once
             if (taken := mon.foreign_record(store, runs.values(), key)) is not None:
                 console.print(
@@ -1902,27 +1917,43 @@ def judge_check(
                     "(its sample and score stay with it), so it cannot join this one.[/red]"
                 )
                 raise typer.Exit(code=2)
-        if mon.JUDGE_CHECK_PATH.exists() and mon.recorded_judge_check(store, runs.values()) is None:
-            stamp = now.replace(":", "").replace("+0000", "Z")
-            dest = mon.REFERENCE_PATH.parent / "archive" / stamp / mon.JUDGE_CHECK_PATH.name
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            mon.JUDGE_CHECK_PATH.replace(dest)
-            console.print(
-                f"[yellow]{mon.JUDGE_CHECK_PATH} matched no score in the results database, so it "
-                f"counted for nothing; moved to {dest}.[/yellow]"
-            )
-        if action == "score":  # the first complete score is final
-            first = mon.recorded_judge_check(store, runs.values())
-            if first is not None:
-                restored = publish(mon.JUDGE_CHECK_PATH, first)
-                verdict = "passed" if first.get("passed") else "did not pass"
-                console.print(
-                    f"The judge check was scored at {first.get('scored_at', '?')} and {verdict}. "
-                    f"Its first complete result is final ({mon.JUDGE_CHECK_PATH})."
-                    + (" That file was restored from the results database." if restored else "")
-                )
-                return
         drawn = mon.recorded_sample(store, runs.values())
+        first = mon.recorded_judge_check(store, runs.values())
+        for d, run in sorted(runs.items()):  # the frozen champion runs, never a hand-edited list
+            if drawn is None:  # the draw: each day's one complete champion run
+                try:
+                    ok = mon.day_run(store, d, champion_only=True) == run
+                except ValueError:
+                    ok = False
+            else:  # drawn: the runs it was drawn on, each still a complete champion run
+                ok = run in mon.day_runs(store, d, champion_only=True)
+            if not ok:
+                console.print(
+                    f"[red]{mon.REFERENCE_PATH} names {run} for day {d}, which is not that day's "
+                    "complete champion online run the judge check belongs to. It runs only on "
+                    "the frozen reference.[/red]"
+                )
+                raise typer.Exit(code=2)
+        stamp = now.replace(":", "").replace("+0000", "Z")
+        for path, record in ((mon.JUDGE_SAMPLE_PATH, drawn), (mon.JUDGE_CHECK_PATH, first)):
+            if record is not None:  # the published copy always matches the database
+                if publish(path, record):
+                    console.print(f"{path} was restored from the results database.")
+            elif path.exists():  # a copy of nothing: it counts for nothing, so move it aside
+                dest = mon.REFERENCE_PATH.parent / "archive" / stamp / path.name
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                path.replace(dest)
+                console.print(
+                    f"[yellow]{path} matched no record in the results database, so it counted "
+                    f"for nothing; moved to {dest}.[/yellow]"
+                )
+        if action == "score" and first is not None:  # the first complete score is final
+            verdict = "passed" if first.get("passed") else "did not pass"
+            console.print(
+                f"The judge check was scored at {first.get('scored_at', '?')} and {verdict}. "
+                f"Its first complete result is final ({mon.JUDGE_CHECK_PATH})."
+            )
+            return
         if drawn is None:
             if action == "score":  # only `label` draws the sample
                 console.print(
@@ -1952,6 +1983,11 @@ def judge_check(
                 "verdict_digests": mon.verdict_digests(store, sample),
             }
             new_draw = True
+        missing = [  # a draw cut short by a crash: its record is copied to the rest
+            run
+            for run in runs.values()
+            if mon.JUDGE_SAMPLE_RECORD not in store.run_info(run)["manifest"]
+        ]
         sample = {str(r): list(c) for r, c in drawn["runs"].items()}
         if mon.verdict_digests(store, sample) != drawn.get("verdict_digests"):
             console.print(
@@ -1961,27 +1997,23 @@ def judge_check(
             )
             raise typer.Exit(code=2)
         if action == "score":
-            try:
+            try:  # the days first, whatever the labels say: a refusal must not hint at them
+                days = [mon.load_day(store, runs[d], TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
                 result = mon.judge_check_score(store, sample, labeler)
-                days = (
-                    [mon.load_day(store, runs[d], TRAFFIC_DIR) for d in mon.REFERENCE_DAYS]
-                    if result["labels_passed"]
-                    else []
-                )
             except ValueError as exc:
                 console.print(f"[red]{exc}[/red]")
                 raise typer.Exit(code=2) from None
     finally:
         store.close()
-    if new_draw:  # first in the database, which no file can outlive or overrule
+    if missing:  # first in the database, which no file can outlive or overrule; all or none
         writer = ResultsStore(cfg.paths.db)
         try:
-            for run in runs.values():
-                writer.annotate_run(run, mon.JUDGE_SAMPLE_RECORD, drawn)
+            writer.annotate_runs(missing, mon.JUDGE_SAMPLE_RECORD, drawn)
         finally:
             writer.close()
-    if publish(mon.JUDGE_SAMPLE_PATH, drawn) and not new_draw:
-        console.print(f"{mon.JUDGE_SAMPLE_PATH} was restored from the results database.")
+        if not new_draw:
+            console.print(f"the sample's record was copied to {', '.join(missing)}")
+    publish(mon.JUDGE_SAMPLE_PATH, drawn)
     total = sum(len(cases) for cases in sample.values())
     if action == "label":
         for n, (run, cases) in enumerate(sample.items(), 1):
@@ -2034,8 +2066,7 @@ def judge_check(
     result["scored_at"] = now
     writer = ResultsStore(cfg.paths.db)  # first in the database, which a file cannot outlive
     try:
-        for run in runs.values():
-            writer.annotate_run(run, mon.JUDGE_CHECK_RECORD, result)
+        writer.annotate_runs(list(runs.values()), mon.JUDGE_CHECK_RECORD, result)  # all or none
     finally:
         writer.close()
     publish(mon.JUDGE_CHECK_PATH, result)
@@ -2097,6 +2128,20 @@ def online_run(
     from agent_evals.suites import write_suite
 
     cfg = _config(config)
+    from agent_evals import monitor as mon
+
+    frozen = (
+        json.loads(mon.REFERENCE_PATH.read_text(encoding="utf-8")).get("days") or {}
+        if mon.REFERENCE_PATH.exists()
+        else {}
+    )
+    if str(day) in frozen:  # a second run would make the reference ambiguous
+        console.print(
+            f"[red]Day {day} is a frozen reference day ({frozen[str(day)]}): another run of it "
+            "would make the reference, and the judge check drawn on it, ambiguous. Nothing was "
+            "run.[/red]"
+        )
+        raise typer.Exit(code=2)
     if judge_answers:  # refused before the agent is paid for, not after
         version = JudgeGrader(AnthropicClient(), cfg.judge).version
         if version != ONLINE_JUDGE_VERSION:

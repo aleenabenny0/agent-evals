@@ -159,6 +159,7 @@ def _config(tmp_path: Path, monkeypatch: pytest.MonkeyPatch, runs: dict[int, str
     config.write_text(
         f'paths:\n  db: "{(tmp_path / "evals.duckdb").as_posix()}"\n', encoding="utf-8"
     )
+    _reference_days(monkeypatch, REFERENCE)  # score loads the days first; a test may swap them
     return config
 
 
@@ -322,18 +323,32 @@ def test_only_a_recorded_pass_on_unchanged_grades_puts_the_judge_in(
     assert _cli_score(config)[0] == 0 and _enabled(tmp_path, runs.values())
     assert not _enabled(tmp_path, ["r1", "r2", "r3", "r4", "other"])  # another reference
     store = ResultsStore(tmp_path / "evals.duckdb")
-    try:  # a record under another labeler's name puts nothing in
+    try:  # the store itself refuses to change a written record, whoever asks
         kept = mon.recorded_judge_check(store, runs.values())
         assert kept is not None
-        for run in runs.values():
-            store.annotate_run(run, mon.JUDGE_CHECK_RECORD, kept | {"labeler": "bob"})
+        with pytest.raises(ValueError, match="written once"):
+            store.annotate_run("r1", mon.JUDGE_CHECK_RECORD, kept | {"labeler": "bob"})
+        store.annotate_run("r1", mon.JUDGE_CHECK_RECORD, kept)  # the same record: a no-op
     finally:
         store.close()
+    assert _enabled(tmp_path, runs.values())
+
+    def manifests(record: dict[str, Any]) -> None:  # a raw write, past the store's guard
+        store = ResultsStore(tmp_path / "evals.duckdb")
+        try:
+            for run in runs.values():
+                manifest = store.run_info(run)["manifest"] | {mon.JUDGE_CHECK_RECORD: record}
+                store.con.execute(
+                    "UPDATE runs SET manifest = ? WHERE run_id = ?", [json.dumps(manifest), run]
+                )
+        finally:
+            store.close()
+
+    manifests(kept | {"labeler": "bob"})  # a record under another labeler puts nothing in
     assert not _enabled(tmp_path, runs.values())
+    manifests(kept)
     store = ResultsStore(tmp_path / "evals.duckdb")
-    try:  # back to her record, then the sampled answers re-judged after the pass
-        for run in runs.values():
-            store.annotate_run(run, mon.JUDGE_CHECK_RECORD, kept)
+    try:  # her record back, then the sampled answers re-judged after the pass
         case = sample["r1"][0]
         store.delete_grades("r1", "judge", [(case, 1)])
         store.add_grades("r1", case, 1, [("judge", Grade(metric="judge_supported", value=0.5))])
@@ -455,7 +470,7 @@ def test_the_check_runs_only_on_the_frozen_reference_and_its_records_are_written
     mon.REFERENCE_PATH.write_text(json.dumps(edited), encoding="utf-8")
     monkeypatch.setattr(cli, "label", lambda **kwargs: None)
     result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
-    assert result.exit_code == 2 and "not that day's one complete champion" in " ".join(
+    assert result.exit_code == 2 and "not that day's complete champion online run" in " ".join(
         result.output.split()
     )
     mon.REFERENCE_PATH.write_text(frozen, encoding="utf-8")
@@ -505,7 +520,7 @@ def test_a_forged_result_file_is_moved_aside_and_any_label_blocks_a_draw(
     result = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
     output = " ".join(result.output.split())
     assert (
-        "matched no score in the results database" in output and not mon.JUDGE_CHECK_PATH.exists()
+        "matched no record in the results database" in output and not mon.JUDGE_CHECK_PATH.exists()
     )
     assert list((mon.REFERENCE_PATH.parent / "archive").glob(f"*/{mon.JUDGE_CHECK_PATH.name}"))
     assert result.exit_code == 2 and "already have labels" in output  # anyone's, any name
@@ -540,6 +555,138 @@ def test_the_reason_the_judge_is_out_is_said(
     assert "re-judged after its check" in standing()
     html = dash.render([], {"days": {}}, False, standing())
     assert "re-judged after its check" in html and "until the judge passes" not in html
+
+
+def test_the_store_writes_the_check_records_once_and_all_together(tmp_path: Path) -> None:
+    runs = _store(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.annotate_run("r1", "judge_check_sample", {"a": 1})
+        store.annotate_run("r1", "judge_check_sample", {"a": 1})  # the same: allowed
+        with pytest.raises(ValueError, match="written once"):
+            store.annotate_run("r1", "judge_check_sample", {"a": 2})
+        store.annotate_run("r1", "online", {"day": 9})  # other entries stay writable
+        with pytest.raises(ValueError, match="written once"):  # r1 fails: r2 is rolled back
+            store.annotate_runs(["r2", "r1"], "judge_check_sample", {"a": 3})
+        assert "judge_check_sample" not in store.run_info("r2")["manifest"]
+    finally:
+        store.close()
+    assert runs
+
+
+def test_a_judge_named_like_another_record_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    for name in ("judge_check_sample", "judge_check", "online"):
+        other = tmp_path / f"{name}.yaml"
+        other.write_text(config.read_text(encoding="utf-8") + f"judge:\n  grader_name: {name}\n")
+        result = CliRunner().invoke(cli.app, ["judge", "r1", "--limit", "0", "-c", str(other)])
+        assert result.exit_code == 2 and "Nothing was judged" in " ".join(result.output.split())
+
+
+def test_a_replay_of_a_reference_day_stays_blind(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    sample = _cli_draw(config, monkeypatch)
+    case = sample["r1"][0]
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # a free cache replay: the same case ids and the same verdicts in a new run
+        store.start_run(
+            "replay", agent="docs", agent_version="v", suite="x", attempts=1, manifest={}
+        )
+        for (c, attempt), grades in store.grades_for("r1", "judge").items():
+            answer = AgentResult(output={"answer": "a", "citations": [], "abstained": False})
+            graded = [("judge", Grade(metric=m, value=v)) for m, v in grades.items()]
+            store.record_attempt("replay", c, attempt, answer, 0.0, graded)
+    finally:
+        store.close()
+    trace = CliRunner().invoke(cli.app, ["trace", "replay", case, "-c", str(config)])
+    assert trace.exit_code == 0 and "judge_supported" not in trace.output
+    compare = ["compare", "r1", "replay", "--metric", "judge_supported", "-c", str(config)]
+    refused = CliRunner().invoke(cli.app, compare)
+    assert refused.exit_code == 2 and "labeled blind" in " ".join(refused.output.split())
+    probe = CliRunner().invoke(cli.app, ["judge-probe", "replay", "-c", str(config)])
+    assert probe.exit_code == 2 and "labeled blind" in " ".join(probe.output.split())
+
+
+def test_a_score_refusal_never_depends_on_the_labels(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    for supported in (True, False):
+        base = tmp_path / str(supported)
+        base.mkdir()
+        runs = _store(base)
+        config = _config(base, monkeypatch, runs)
+        _label_sample(base, _cli_draw(config, monkeypatch), supported=supported)
+
+        def moved(store: ResultsStore, run: str, traffic_dir: Path) -> mon.DayValues:
+            raise ValueError(f"{run}: its traffic file is missing or not the one it ran")
+
+        monkeypatch.setattr(mon, "load_day", moved)
+        code, output = _cli_score(config)
+        assert code == 2 and "traffic file" in output and not mon.JUDGE_CHECK_PATH.exists()
+        store = ResultsStore(base / "evals.duckdb", read_only=True)
+        try:  # nothing was recorded, whichever way the labels went
+            assert mon.recorded_judge_check(store, runs.values()) is None
+        finally:
+            store.close()
+
+
+def test_a_reference_day_cannot_run_again_and_a_drawn_check_survives_a_second_run(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    result = CliRunner().invoke(cli.app, ["online-run", "1", "--no-judge", "-c", str(config)])
+    assert result.exit_code == 2 and "frozen reference day" in " ".join(result.output.split())
+    sample = _cli_draw(config, monkeypatch)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # a second complete champion run of day 1 all the same (from before the rule)
+        store.start_run(
+            "r1b", agent="docs", agent_version="v", suite="x", attempts=1, manifest={}, online=True
+        )
+        store.annotate_run("r1b", "online", {"day": 1, "champion": True})
+        store.finish_run("r1b", "complete")
+    finally:
+        store.close()
+    assert _cli_draw(config, monkeypatch) == sample  # the drawn check carries on
+    _label_sample(tmp_path, sample, supported=True)
+    assert _cli_score(config)[0] == 0
+
+
+def test_a_draw_cut_short_is_completed_and_stray_copies_are_moved_aside(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    mon.JUDGE_SAMPLE_PATH.write_text('{"runs": {}}', encoding="utf-8")  # a copy of nothing
+    sample = _cli_draw(config, monkeypatch)  # moves the stray copy aside, then draws
+    assert list((mon.REFERENCE_PATH.parent / "archive").glob(f"*/{mon.JUDGE_SAMPLE_PATH.name}"))
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # as if the draw had died after its first write
+        for run in ("r3", "r4", "r5"):
+            manifest = store.run_info(run)["manifest"]
+            manifest.pop(mon.JUDGE_SAMPLE_RECORD)
+            store.con.execute(
+                "UPDATE runs SET manifest = ? WHERE run_id = ?", [json.dumps(manifest), run]
+            )
+    finally:
+        store.close()
+    mon.JUDGE_SAMPLE_PATH.unlink()
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)
+    again = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
+    output = " ".join(again.output.split())
+    assert again.exit_code == 0 and "copied to r3, r4, r5" in output and "restored" in output
+    store = ResultsStore(tmp_path / "evals.duckdb", read_only=True)
+    try:
+        assert all(mon.JUDGE_SAMPLE_RECORD in store.run_info(r)["manifest"] for r in runs.values())
+    finally:
+        store.close()
+    assert json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))["runs"] == sample
 
 
 def test_a_null_stdin_is_not_a_person_at_a_terminal(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -168,9 +168,11 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
     anyone's labels.
   - The sample carries a digest of the judge's grades on it, reasons included. Labeling and
     scoring are refused if they changed, which catches any re-judging after the draw.
-  - Until the first complete score, the judge's verdicts on the sampled answers are held back
-    by every command that would show them: `label --show-judge`, `judge-validate` and `trace`
-    (with any config). Only a deliberate query of the database itself could still reach them.
+  - Until the first complete score, the judge's verdicts on the sampled answers are held back,
+    in every run that holds them (a replay of a reference day included), by every command that
+    would show them: `label --show-judge`, `judge-validate`, `judge-probe`, `compare` on a
+    judge metric, and `trace` with any config. Only a deliberate look into the database or the
+    call cache itself could still reach them.
   - Only Aleena's labels count.
   - The first complete score is final, because its result shows the judge's verdicts and a
     later relabel and rescore would no longer be blind. No file written, edited, moved or
@@ -178,9 +180,11 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   - judge_supported is in the alert family only while the recorded score passed and the
     judge's grades on the sample are still the ones it was scored on: a re-judge afterwards
     takes it out. The monitor and dashboard say which reason keeps it out.
-  - The check runs only on the frozen reference: each day's one complete champion run. Its
-    records are written once, so no check on another or a hand-edited reference can overwrite
-    them. A run belongs to one judge check.
+  - The check runs only on the frozen reference: each day's one complete champion run at the
+    draw, and the runs it was drawn on after. `online-run` refuses a frozen reference day. The
+    records are written once, enforced by the store itself and written all together, so
+    nothing, not even a judge whose config names it after a record, can overwrite them. A run
+    belongs to one judge check.
   - No test can touch the real `results/online/`: each test's monitor files go to a temporary
     folder, and the test run fails if a real file changed.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
@@ -557,4 +561,17 @@ fixed:
 | After a re-judge of a passed check, the monitor and dashboard said the judge "has not yet passed" | They give the actual reason |
 | A hand-written judge-check.json was ignored but left in place, where a commit could publish it | `judge-check` moves a result file with no score in the database to the archive, and says so |
 | The no-labels-before-the-draw rule matched the labeler's name exactly | Labels under any name block a draw |
+
+A last reviewer then attacked the write-once records at commit d9974e3. It took about five
+hours, with replays and refreezes on copies, and found 6 more problems, all confirmed and
+fixed:
+
+| Finding | Done |
+|---|---|
+| `evals judge` keeps its notes in the manifest under the config's judge name. A config naming its judge `judge_check` could erase a final score, or lock a drawn check out for good, with `--limit 0` and no API call | The store itself refuses to change a written record, whoever asks. `judge` refuses a judge name that names any other record of the run |
+| A free cache replay of a reference day gave a new run with the same answers and verdicts, where nothing was held back | The blind holds back the sampled case ids in every run (online ids name their day). `compare` on a judge metric and `judge-probe` are refused on runs holding them |
+| `score` checked the five days only when the labels passed, so a refusal hinted at the outcome and let passing labels be redone | It checks the days first, whatever the labels say |
+| A second champion run of a reference day (`online-run N`, free from the cache) locked a drawn check out for good | `online-run` refuses a frozen reference day, and a drawn check accepts the runs it was drawn on |
+| The sample's five writes were separate, so a draw cut short left some runs unguarded | Written in one transaction, and a partial record is completed on the next call |
+| The published copies were not always restored or archived | Every `judge-check` call restores both from the database, or moves a copy of nothing aside |
 

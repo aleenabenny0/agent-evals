@@ -509,27 +509,37 @@ def _kept(store: ResultsStore, reference_runs: Iterable[str], key: str) -> dict[
     return None
 
 
+def pending_blind(store: ResultsStore) -> set[str]:
+    """Every case id of a drawn judge-check sample whose check awaits its first complete score,
+    read from the results database. Online case ids name their day (online-dNN-...), and a free
+    cache replay of a reference day answers and judges them the same, so they are held back in
+    any run that holds them, not only in the reference runs."""
+    out: set[str] = set()
+    for run in store.online_runs():
+        manifest = run["manifest"]
+        drawn = manifest.get(JUDGE_SAMPLE_RECORD)
+        if not drawn:
+            continue
+        scored = manifest.get(JUDGE_CHECK_RECORD)
+        done = sorted((scored or {}).get("reference_runs") or []) == sorted(
+            drawn.get("reference_runs") or []
+        )
+        if scored and scored.get("complete") and done:
+            continue
+        for cases in (drawn.get("runs") or {}).values():
+            out.update(cases)
+    return out
+
+
 def blind_cases(store: ResultsStore, run_id: str) -> set[str]:
-    """The judge check's sampled answers in this run while the check awaits its first complete
-    score. Their judge verdicts and reasons must not reach the labeler: `label --show-judge`,
-    `judge-validate` and `trace` hold them back. Read from the results database, so moving or
-    deleting a file lifts nothing. Empty once the check is scored, or for a run the check did
-    not sample."""
-    try:
-        manifest = store.run_info(run_id)["manifest"]
-    except KeyError:
+    """The pending judge check's sampled answers that this run holds (pending_blind). Their
+    judge verdicts and reasons must not reach the labeler before the first complete score:
+    `label --show-judge`, `judge-validate`, `judge-probe`, `compare` on a judge metric and
+    `trace` hold them back. Empty once the check is scored, or for a run holding none."""
+    pending = pending_blind(store)
+    if not pending:
         return set()
-    drawn = manifest.get(JUDGE_SAMPLE_RECORD)
-    if not drawn:
-        return set()
-    scored = manifest.get(JUDGE_CHECK_RECORD)
-    if (
-        scored
-        and scored.get("complete")
-        and sorted(scored.get("reference_runs") or []) == sorted(drawn.get("reference_runs") or [])
-    ):
-        return set()
-    return set((drawn.get("runs") or {}).get(run_id, []))
+    return pending & {str(a["case_id"]) for a in store.all_attempts(run_id)}
 
 
 def _verdicts(store: ResultsStore, run: str) -> dict[str, bool]:

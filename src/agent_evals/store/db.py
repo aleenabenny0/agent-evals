@@ -13,6 +13,10 @@ import duckdb
 
 from agent_evals.types import AgentResult, Grade
 
+# Manifest entries that, once written, never change: the online judge check's sample and its
+# first complete score (phase 7). No later annotation, whatever its name, may overwrite them.
+WRITE_ONCE = frozenset({"judge_check", "judge_check_sample"})
+
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
     run_id        VARCHAR PRIMARY KEY,
@@ -183,12 +187,26 @@ class ResultsStore:
             )
 
     def annotate_run(self, run_id: str, key: str, value: Any) -> None:
-        """Add one entry to a run's manifest, e.g. which judge version graded it."""
+        """Add one entry to a run's manifest, e.g. which judge version graded it. An entry in
+        WRITE_ONCE, once written, is never changed, whoever asks."""
         manifest = self.run_info(run_id)["manifest"]
+        if key in WRITE_ONCE and key in manifest and manifest[key] != value:
+            raise ValueError(f"{run_id} already holds its {key} record, which is written once")
         manifest[key] = value
         self.con.execute(
             "UPDATE runs SET manifest = ? WHERE run_id = ?", [json.dumps(manifest), run_id]
         )
+
+    def annotate_runs(self, run_ids: Sequence[str], key: str, value: Any) -> None:
+        """annotate_run on several runs in one transaction: all of them, or none."""
+        self.con.execute("BEGIN TRANSACTION")
+        try:
+            for run_id in run_ids:
+                self.annotate_run(run_id, key, value)
+        except BaseException:
+            self.con.execute("ROLLBACK")
+            raise
+        self.con.execute("COMMIT")
 
     def record_label(
         self,
