@@ -353,6 +353,15 @@ warning.
    model calls alerts about 4 times in 10, so a miss is likely; larger, model calls and errors
    alert almost surely. Shadows on the blind days are optional, by cost.
 
+   **Sealed 2026-10-21T17:08:39Z** (`results/online/blind.json`; a first seal Aleena could not
+   recall, which no day ran under, is archived beside it). **Verdicts, each recorded before
+   anyone read the run's config:**
+   - Day 9 (`docs-20261021-170913-be166c`, shadow `docs-20261021-173412-d31ff6`): **alert on
+     model calls**, +0.88 per attempt (p < 0.0001); latency +14% and tokens -14%, under their
+     floors; nothing else moved. Served minus shadow: model calls +0.68 (CI +0.48 to +0.90),
+     tokens -19%, errors +0.5 points; so the served config, not the traffic
+     (`results/online/shadow-day-09.txt`).
+
 ## Cost and Aleena's time
 
 - **Money**, recomputed 2026-10-19. The first figure, "about $25 in all", did not match its
