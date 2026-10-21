@@ -170,6 +170,12 @@ Format:
 
 ## Unreleased
 
+- 2026-10-21: day 7 of the online demo, the pre-registered honest miss: a rollback to prompt
+  v2 on 200 questions raised no family alert (every p above 0.39), and the champion shadow on
+  the same questions matched it on every family metric. The judge's reported line rose 14
+  points, with the shadow at the reference's level, so the fault is visible only to the metric
+  that cannot alert (plan, part 5, item 3). Day 8's traffic generated; decision 8 pre-registers
+  its stronger retrieval fault.
 - 2026-10-21: phase 7 part 5 groundwork. `evals simulate DAY --halves 2` generates a
   200-question day as two halves of 100, the second from its own seed with ids 100 to 199, the
   duplicate check running across both; a 100-question day is half 1, so days 0 to 6 are

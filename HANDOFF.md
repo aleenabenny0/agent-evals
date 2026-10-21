@@ -500,12 +500,13 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   **Decision 7 approved and done:** day 7 (a rollback to prompt v2) is pre-registered as an
   honest miss, no family alert expected (plan, part 5, item 3; `scripts/predict_day.py`).
   `evals simulate DAY --halves 2` makes the 200-question days. **Decision 8 approved:** day 8
-  serves `configs/retrieval-k1-short.yaml` (expected alerts: model calls and errors). Day 7's
-  traffic is generated and committed; its served and shadow runs are the next step, then
-  `uv run evals monitor 7`, `uv run python scripts/predict_day.py served=RUN shadow=RUN --cases
-  results/online/cases/online-day-07.jsonl`, `uv run evals dashboard`, and the same for day 8
-  with `uv run evals simulate 8 --halves 2` and `uv run evals online-run 8 -c
-  configs/retrieval-k1-short.yaml`. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
+  serves `configs/retrieval-k1-short.yaml` (expected alerts: model calls and errors). **Day 7
+  done: no alert, the honest miss as pre-registered** (plan, part 5, item 3; about $4.05).
+  Day 8's traffic is generated; its served and shadow runs are next, then `uv run evals
+  monitor 8`, `uv run python scripts/predict_day.py served=RUN shadow=RUN --cases
+  results/online/cases/online-day-08.jsonl`, `uv run evals dashboard`, and the record. Then the
+  blind days 9 to 11 (plan, part 5, item 5): Aleena seals her three choices first. About
+  $13.75 spent after day 7; ask before day 10. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
   day 10 (the plan's Cost section).
 
 ## Target: the three project briefs

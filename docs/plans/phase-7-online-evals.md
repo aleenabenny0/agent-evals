@@ -290,6 +290,19 @@ warning.
    25% judge-trust shift, so day 7's judge may be flagged untrusted; the reported judge line is
    read from the served run and the shadow comparison either way. Cost about $3.90: two halves
    generated, two runs of 200, both judged for the advisory line.
+
+   **Done 2026-10-21: no alert, the miss as pre-registered.** Served run
+   `docs-20261021-035945-2a3734` (200 attempts, 0 errors), shadow `docs-20261021-041227-842174`
+   (3 errors). Against the reference: uncited +0.0 points, declines +0.1, errors -0.6, model
+   calls -0.02, latency +1%, tokens -3%, fabricated p 0.94; every p above 0.39
+   (`results/online/alerts.json`). Served minus shadow on the same questions
+   (`results/online/shadow-day-07.txt`): all near zero, latency +4% (CI -0% to +8%). The
+   judge's reported line rose from 0.747 to 0.891 not fully supported (+14.4 points, at the
+   low end of the predicted +14.5 to +25.1), while the shadow on the same questions scored
+   0.749, so the move is the prompt, not the traffic. v2's answers were 42% longer than the
+   reference's (median 120.5 words against 85), past the 25% trust shift, so the judge was
+   flagged untrusted that day, as allowed for. Cost about $4.05: generation about $1.30, the
+   two agent runs $0.38 each, their judging $1.07 and $0.97.
 4. **Day 8** degrades retrieval, with 200 questions and a shadow. Its expected alerts are
    predicted first, by running that config on the dev split offline. **Predicted 2026-10-21,
    open for Aleena (decision 8).** The planned fault, one search result
@@ -328,9 +341,10 @@ warning.
   their online runs, about $3.30; and day 6, about $1.30 (agent $0.19, judge $0.47 for 82
   answers). A few one-off checks come on top. Day 8's two prediction runs on the dev split cost
   $0.18 and $0.19, and day 7's was free (a cache replay of the 2026-10-11 v2 run): about $9.70
-  in all on 2026-10-21. Days 7 and 8 cost about $3.90 each with their shadows, so about $17.50
-  after day 8 and $21.40 after day 9; day 10 would pass $25, so the ask comes before it, unless
-  days 9 to 11 run without shadows (about $2.50 each, $25.00 in all). Day sizes,
+  in all on 2026-10-21. Day 7 cost about $4.05 measured (generation about $1.30, two agent runs
+  of 200 at $0.38 each, their judging $1.07 and $0.97), so about $13.75 after day 7 and about
+  $17.80 after day 8; day 9 with a shadow brings it to about $21.85, and day 10 would pass $25,
+  so the ask comes before day 10, unless days 9 to 11 run without shadows (about $2.65 each). Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
