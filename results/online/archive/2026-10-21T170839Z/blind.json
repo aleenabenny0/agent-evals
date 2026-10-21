@@ -1,0 +1,24 @@
+{
+  "sealed_at": "2026-10-21T17:04:42+00:00",
+  "days": [
+    9,
+    10,
+    11
+  ],
+  "options": {
+    "unchanged": "configs/default.yaml",
+    "subtle": "configs/retrieval-k1.yaml",
+    "larger": "configs/retrieval-k1-short.yaml"
+  },
+  "expected_alerts": {
+    "unchanged": [],
+    "subtle": [
+      "model_calls"
+    ],
+    "larger": [
+      "model_calls",
+      "error"
+    ]
+  },
+  "commitment": "6619ba659569d4eab7896a83b00a1fe44878f65f7b7c1de9be36c6243e348cf6"
+}
