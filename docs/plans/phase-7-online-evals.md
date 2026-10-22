@@ -368,16 +368,28 @@ warning.
      ran another (the two agree on 1 answer of 200, and only each question's first model call,
      which all three choices share, came from the first's cache). Which run counts is settled
      by the seal, not by anyone's judgment: `evals blind match 10` (added 2026-10-22) takes the
-     choices and the passphrase hidden, checks them against the hash, and shows only which runs
-     match the day's sealed choice; the first that matches is the day's run, for
-     `evals monitor 10 --run`. Before the match the coding agent saw each run's totals while
-     finding the repeats (model calls 949, 1063 and 1063; errors 1, 4 and 4; answers judged 165,
-     160 and 160), never a config; the match is mechanical, so those totals cannot choose the
-     run. If the second run counts, latency is untested on day 10: every one of its attempts had
-     its first call served from the first run's cache. From day 10 the verdict is recorded
-     before the shadow runs, so not even the shadow's cache hits are seen first (day 9's shadow
-     ran before its verdict). `evals blind run DAY` now refuses a day that already has a
-     complete served run.
+     choices and the passphrase hidden, checks them against the hash, compares each run's
+     recorded config with the day's sealed choice in code, and names only the first run under
+     it (never a choice, a config, or how the other runs compare); that run is the day's, for
+     `evals monitor 10 --run`. If none matches, `evals blind run 10` runs the day under the
+     sealed choice. Before the match the coding agent saw each run's totals while finding the
+     repeats (model calls 949, 1063 and 1063; errors 1, 4 and 4; answers judged 165, 160 and
+     160), never a config; the match is mechanical, so those totals cannot choose the run. If
+     the second run counts, latency is untested on day 10: every one of its attempts had its
+     first call served from the first run's cache.
+
+     Closed the same day, after a two-lens review of the first fix: `evals blind run DAY` now
+     takes all three choices and the passphrase, hidden, and checks the hash before anything is
+     spent, so a mistyped choice runs nothing (the likely cause of day 10's two settings); it
+     refuses a day that already ran under its sealed choice, and only that, so a day whose runs
+     all missed the seal can still run under it. `evals online-run` refuses to serve a blind day
+     (only `blind run` does) and runs a blind day's shadow only once the monitor has recorded
+     the day's verdict, so not even the shadow's cache hits are seen first (day 9's shadow ran
+     before its verdict). A locked database is refused before anything secret is typed. The
+     pick is not recorded for the monitor and the reveal to enforce: with these guards a blind
+     day can have only one run under its sealed choice, and day 10's second match would be an
+     exact replay (the same answers, calls and tokens, latency untested on both), so the
+     verdict is the same whichever of the two the monitor reads.
 
 ## Cost and Aleena's time
 

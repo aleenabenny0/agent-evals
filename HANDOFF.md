@@ -517,8 +517,10 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   two settings: Aleena runs `uv run evals blind match 10` (choices and passphrase hidden; it
   names the first run under the sealed choice), then the agent runs
   `uv run evals monitor 10 --run <that run>`, the shadow, the comparison and the dashboard.
-  `evals blind run` now refuses a day that already ran. Then day 11 (`uv run evals blind run
-  11`), then `uv run evals blind reveal` (Aleena) and the record. About $26.55 spent after day
+  `evals blind run` now checks all three choices and the passphrase against the seal before
+  spending, and refuses a day that already ran under its sealed choice; `evals online-run`
+  refuses to serve a blind day and runs its shadow only after its verdict. Then day 11
+  (`uv run evals blind run 11`), then `uv run evals blind reveal` (Aleena) and the record. About $26.55 spent after day
   10's runs; finishing with shadows comes to about $30.25, about $1.05 past the approved
   $29.20, so ask Aleena before the spend passes $29.20 (the plan's Cost section).
 
