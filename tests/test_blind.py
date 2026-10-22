@@ -88,12 +88,104 @@ def test_run_needs_a_seal_and_runs_the_choices_config(
     cli.BLIND_PATH.write_text('{"commitment": "x"}', encoding="utf-8")
     assert CliRunner().invoke(cli.app, ["blind", "run", "12"]).exit_code == 2  # not a blind day
     seen = _answers(monkeypatch, ["subtle"])
-    result = CliRunner().invoke(cli.app, ["blind", "run", "9", "--no-judge"])
+    result = CliRunner().invoke(cli.app, ["blind", "run", "9", "--no-judge", "-c", str(blind)])
     assert result.exit_code == 0, result.output
     assert seen[0]["hidden"] and ran == [
         {"day": 9, "judge_answers": False, "shadow": False, "config": cli.BLIND_CHOICES["subtle"]}
     ]
     assert "evals monitor 9" in " ".join(result.output.split())  # the verdict comes next
+
+
+def _served(tmp_path: Path, runs: dict[str, tuple[int, str]], *, shadow: str = "") -> None:
+    """Complete served runs (run id: day, config), started a minute apart in this order."""
+    from datetime import datetime
+
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        for minute, (run_id, (d, config)) in enumerate(runs.items()):
+            store.start_run(
+                run_id,
+                agent="docs",
+                agent_version="v",
+                suite="x",
+                attempts=1,
+                manifest={},
+                online=True,
+            )
+            role = {"day": d, "config": config, "shadow": run_id == shadow}
+            store.annotate_run(run_id, "online", role)
+            store.finish_run(run_id, "complete")
+            store.con.execute(
+                "UPDATE runs SET started_at = ? WHERE run_id = ?",
+                [datetime(2026, 10, 21, 18, minute), run_id],
+            )
+    finally:
+        store.close()
+
+
+def test_run_refuses_a_day_that_already_ran(blind: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    ran: list[dict[str, Any]] = []
+    monkeypatch.setattr(cli, "online_run", lambda **kwargs: ran.append(kwargs))
+    cli.BLIND_PATH.write_text('{"commitment": "x"}', encoding="utf-8")
+    _served(
+        blind.parent,
+        {"shadow10": (10, "configs/default.yaml"), "a9": (9, "configs/default.yaml")},
+        shadow="shadow10",
+    )
+    seen = _answers(monkeypatch, ["subtle"])
+    result = CliRunner().invoke(cli.app, ["blind", "run", "10", "-c", str(blind)])
+    assert result.exit_code == 0, result.output  # a shadow is not a run of the day
+    assert len(ran) == 1 and seen
+    seen = _answers(monkeypatch, ["subtle"])
+    result = CliRunner().invoke(cli.app, ["blind", "run", "9", "-c", str(blind)])
+    assert result.exit_code == 2 and "already ran (a9)" in " ".join(result.output.split())
+    assert len(ran) == 1 and not seen  # refused before the choice is asked
+    _served(blind.parent, {"b9": (9, "configs/default.yaml")})
+    result = CliRunner().invoke(cli.app, ["blind", "run", "9", "-c", str(blind)])
+    assert result.exit_code == 2 and "evals blind match 9" in " ".join(result.output.split())
+
+
+def test_match_names_the_first_run_under_the_sealed_choice_and_nothing_else(
+    blind: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _answers(monkeypatch, ["subtle", "unchanged", "larger", "pw", "pw"])
+    assert CliRunner().invoke(cli.app, ["blind", "seal"]).exit_code == 0
+    match = ["blind", "match", "10", "-c", str(blind)]
+    assert CliRunner().invoke(cli.app, match).exit_code == 2  # no run of the day yet
+    _served(
+        blind.parent,
+        {
+            "first": (10, "configs/retrieval-k1.yaml"),
+            "second": (10, "configs/default.yaml"),
+            "replay": (10, "configs/default.yaml"),
+            "other-day": (9, "configs/default.yaml"),
+        },
+    )
+    _answers(monkeypatch, ["subtle", "unchanged", "larger", "wrong"])
+    result = CliRunner().invoke(cli.app, match)
+    assert result.exit_code == 2 and "do not match the seal" in " ".join(result.output.split())
+    seen = _answers(monkeypatch, ["subtle", "unchanged", "larger", "pw"])
+    result = CliRunner().invoke(cli.app, match)
+    assert result.exit_code == 0, result.output
+    assert all(s["hidden"] for s in seen) and len(seen) == 4  # nothing typed in the clear
+    out = " ".join(result.output.split())
+    assert "Day 10's run is second" in out and "evals monitor 10 --run second" in out
+    assert "other-day" not in out
+    for secret in [*cli.BLIND_CHOICES, "default.yaml", "retrieval-k1"]:  # never a choice or config
+        assert secret not in out
+    rows = [line.split() for line in result.output.splitlines() if line.strip().startswith("│")]
+    assert [(row[1], row[-2]) for row in rows if row[1] in ("first", "second", "replay")] == [
+        ("first", "no"),
+        ("second", "yes"),
+        ("replay", "yes"),
+    ]
+    other = cli._commitment({9: "unchanged", 10: "larger", 11: "larger"}, "pw")  # no run matches
+    cli.BLIND_PATH.write_text(json.dumps({"commitment": other}), encoding="utf-8")
+    _answers(monkeypatch, ["unchanged", "larger", "larger", "pw"])
+    result = CliRunner().invoke(cli.app, match)
+    assert result.exit_code == 1 and "No run of day 10 ran under" in " ".join(result.output.split())
+    monkeypatch.setattr(cli, "_interactive", lambda: False)
+    assert CliRunner().invoke(cli.app, match).exit_code == 2
 
 
 def _verdicts(tmp_path: Path, configs: dict[int, str], alerts: dict[int, list[str]]) -> None:

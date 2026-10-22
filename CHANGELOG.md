@@ -170,6 +170,14 @@ Format:
 
 ## Unreleased
 
+- 2026-10-22: `evals blind match DAY` settles which run counts when a blind day ran more than
+  once (day 10 ran three times, under two settings): it takes the choices and the passphrase
+  hidden, checks them against the hash, and shows only which runs match the day's sealed
+  choice, never a choice or a config; the first match is the day's run. `evals blind run DAY`
+  now refuses a day that already has a complete served run (plan, part 5, item 5).
+- 2026-10-21: day 9 of the online demo, the first blind day: an alert on model calls (+0.88
+  per attempt, p < 0.0001), recorded before anyone read the run's config; served minus the
+  champion shadow, +0.68 calls (plan, part 5, item 5; `results/online/shadow-day-09.txt`).
 - 2026-10-21: day 8 of the online demo, the first caught fault: retrieval cut to one search
   result and a quarter of each page raised the two pre-registered alerts, model calls (+1.85
   per attempt, p < 0.0001) and errors (+2.9 points, p 0.0075), while the champion shadow on the

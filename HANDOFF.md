@@ -509,13 +509,18 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   (`uv run evals simulate DAY --halves 2`, then `uv run evals blind run DAY` in her own
   terminal), the agent checks it (`uv run evals monitor DAY`) without reading the run's config,
   and she reveals at the end. Aleena approved about $29.20 in all, with a champion shadow on
-  each blind day (`uv run evals online-run DAY --shadow`, run by the agent after her served run
-  and before `monitor DAY`; one writer at a time on the database). Days 9 to 11's questions are
-  generated and committed; about $21.50 spent before any blind day ran. Sealed
-  2026-10-21T17:08:39Z. **Day 9: alert on model calls** (verdict recorded before the config was
-  read; plan, part 5, item 5). Next: day 10 the same way, then day 11, then
-  `uv run evals blind reveal` (Aleena) and the record. About $9.70 spent on phase 7; days 7 and 8 cost about $3.90 each; ask before
-  day 10 (the plan's Cost section).
+  each blind day (`uv run evals online-run DAY --shadow`, run by the agent after her served run;
+  from day 10, after `monitor DAY` has recorded the verdict; one writer at a time on the
+  database). Days 9 to 11's questions are generated and committed; about $21.50 spent before
+  any blind day ran. Sealed 2026-10-21T17:08:39Z. **Day 9: alert on model calls** (verdict
+  recorded before the config was read; plan, part 5, item 5). **Day 10 ran three times**, under
+  two settings: Aleena runs `uv run evals blind match 10` (choices and passphrase hidden; it
+  names the first run under the sealed choice), then the agent runs
+  `uv run evals monitor 10 --run <that run>`, the shadow, the comparison and the dashboard.
+  `evals blind run` now refuses a day that already ran. Then day 11 (`uv run evals blind run
+  11`), then `uv run evals blind reveal` (Aleena) and the record. About $26.55 spent after day
+  10's runs; finishing with shadows comes to about $30.25, about $1.05 past the approved
+  $29.20, so ask Aleena before the spend passes $29.20 (the plan's Cost section).
 
 ## Target: the three project briefs
 
