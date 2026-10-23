@@ -517,17 +517,15 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   two settings; `uv run evals blind match 10` (Aleena: choices and passphrase hidden) named the
   first, `docs-20261021-181707-fd12e1`. **Day 10: no alert** (verdict recorded before the
   shadow ran); its champion shadow, nearly all from the cache, matched it on every metric it
-  could compare (latency not comparable).
-  `evals blind run` now checks all three choices and the passphrase against the seal before
-  spending, and refuses a day that already ran under its sealed choice; `evals online-run`
-  refuses to serve a blind day and runs its shadow only after its verdict. Next: day 11
-  (`uv run evals blind run 11`, Aleena), then the agent runs `uv run evals monitor 11`, the
-  shadow (`uv run evals online-run 11 --shadow`), the comparison
-  (`uv run python scripts/predict_day.py served=RUN shadow=RUN --cases
-  results/online/cases/online-day-11.jsonl`)
-  and the dashboard; then `uv run evals blind reveal` (Aleena) and the record. About $26.55
-  spent after day 10; day 11 with its shadow should bring it to about $29.15, within the
-  approved $29.20; ask Aleena before the spend passes $29.20 (the plan's Cost section).
+  could compare (latency not comparable). `evals blind run` now checks all three choices and
+  the passphrase against the seal before spending, and refuses a day that already ran under its
+  sealed choice; `evals online-run` refuses to serve a blind day and runs its shadow only after
+  its verdict. **Day 11: alert on model calls** (+0.52 per attempt, p 0.0013; verdict recorded
+  before the shadow ran); served minus shadow +0.72 calls (CI +0.54 to +0.92)
+  (`results/online/shadow-day-11.txt`). Next: `uv run evals blind reveal` (Aleena: the three
+  choices in the clear, the passphrase hidden), then the agent records each day's outcome
+  (caught, missed, quiet as expected, false alarm) in the plan, CHANGELOG and here. About
+  $29.05 spent on phase 7, within the approved $29.20 (the plan's Cost section).
 
 ## Target: the three project briefs
 

@@ -385,13 +385,16 @@ warning.
      fabricated citations 3.6% against 2.8% (p 0.38); all six family metrics tested
      (`results/online/alerts.json`). Reported only: the judge's line, 0.806 not fully supported
      against 0.747. The champion shadow `docs-20261023-165302-b1ddf4`, run after the verdict,
-     took 948 of its 949 model calls from the call cache. Served minus shadow is +0.0 on uncited
+     took 948 of its 949 model calls from the call cache and gave the same answer on 199 of the
+     200 questions (on the other, its last call was not in the cache, and the answer came out
+     slightly different). Served minus shadow is +0.0 on uncited
      answers, declines, errors, model calls and fabricated citations, and 0% (rounded) on tokens;
      latency is not comparable, as every shadow attempt took calls from the cache
      (`results/online/shadow-day-10.txt`). The served run behaved as the champion does; whether
      that was the sealed choice is for the reveal.
 
-     Closed 2026-10-22, the day `blind match` was added, after a two-lens review of the first fix: `evals blind run DAY` now
+     Closed 2026-10-22, the day `blind match` was added, after a two-lens review of the first
+     fix: `evals blind run DAY` now
      takes all three choices and the passphrase, hidden, and checks the hash before anything is
      spent, so a mistyped choice runs nothing (the likely cause of day 10's two settings); it
      refuses a day that already ran under its sealed choice, and only that, so a day whose runs
@@ -412,6 +415,19 @@ warning.
      2.5% and 3.2% on 157 questions). The shadow files for days 7 to 9 were regenerated with it;
      every effect and interval is unchanged. The pre-registered day 7 table in item 3 keeps its
      unpaired columns, as recorded.
+   - Day 11 (`docs-20261023-204129-8e2a07`, its one run, 2026-10-23 20:41 UTC; shadow
+     `docs-20261023-214120-3e72df`). **Verdict 2026-10-23T21:41:02Z: alert on model calls**,
+     5.33 per attempt against 4.81 (+0.52, p 0.0013), just past the +0.50 floor. Errors 2.0%
+     against 0.6% (+1.4 points, p 0.11, under the 2-point floor); latency +4% (p 0.12); tokens
+     -23%; declines 2.5% (4 of 157) against 3.0%; uncited 0; fabricated citations 1.7% against
+     2.8% (p 0.85); all six family metrics tested. Reported only: the judge's line, 0.733 not
+     fully supported against 0.747. Served minus shadow, the champion on the same questions, run
+     after the verdict: model calls +0.72 (CI +0.54 to +0.92), errors +1.5 points (CI -0.5 to
+     +4.0), tokens -17% (CI -22% to -12%), fabricated citations -2.4 points (CI -5.9 to +0.6);
+     latency is not comparable, as the shadow's first call per question came from the cache
+     (`results/online/shadow-day-11.txt`). The shadow used fewer calls than the reference (4.61
+     against 4.81), so on these questions the served config's rise is larger than the monitor's
+     +0.52: the config, not the traffic.
 
 ## Cost and Aleena's time
 
@@ -439,9 +455,9 @@ warning.
   each with its judging). Day 10's three runs cost $2.44: the first $1.29, the second $1.15 (its
   first calls came from the first's cache), the third nothing (a replay); so one paid run more
   than planned, about $1.15, and about $26.55 after day 10's runs. Day 10's shadow cost
-  $0.0025: one new call, the rest (its judging too) replayed from the cache. Day 11 with its
-  shadow would add about $2.60, as day 9's did, so about $29.15 in all, within the approval;
-  Aleena is asked before the spend passes $29.20. Day sizes,
+  $0.0025: one new call, the rest (its judging too) replayed from the cache. Day 11 cost $2.52
+  (served run $1.22, shadow $1.30, each with its judging), so about $29.05 in all, within the
+  approval of about $29.20. Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
   champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question

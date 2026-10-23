@@ -170,6 +170,11 @@ Format:
 
 ## Unreleased
 
+- 2026-10-23: day 11 of the online demo, the last blind day: an alert on model calls (5.33
+  per attempt against the reference's 4.81, +0.52, p 0.0013), recorded before the shadow ran;
+  errors rose 1.4 points, under their floor. Served minus the champion shadow on the same
+  questions, +0.72 calls (CI +0.54 to +0.92) (plan, part 5, item 5;
+  `results/online/shadow-day-11.txt`). Next, the reveal.
 - 2026-10-23: day 10 of the online demo, the second blind day: no alert. `evals blind match 10`
   named its first run as the one under the sealed choice; every family metric stayed within
   the reference (model calls 4.75 against 4.81, errors 0.5% against 0.6%), and the champion
