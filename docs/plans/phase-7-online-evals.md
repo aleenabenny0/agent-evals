@@ -374,11 +374,24 @@ warning.
      `evals monitor 10 --run`. If none matches, `evals blind run 10` runs the day under the
      sealed choice. Before the match the coding agent saw each run's totals while finding the
      repeats (model calls 949, 1063 and 1063; errors 1, 4 and 4; answers judged 165, 160 and
-     160), never a config; the match is mechanical, so those totals cannot choose the run. If
-     the second run counts, latency is untested on day 10: every one of its attempts had its
-     first call served from the first run's cache.
+     160), never a config; the match is mechanical, so those totals cannot choose the run.
+     **Matched 2026-10-23:** `evals blind match 10` named the first run,
+     `docs-20261021-181707-fd12e1`, so the second and third ran under another choice and do not
+     count. The first run had no cache hits, so latency is tested.
 
-     Closed the same day, after a two-lens review of the first fix: `evals blind run DAY` now
+     **Verdict 2026-10-23T16:52:49Z: no alert.** Against the reference: model calls 4.75 per
+     attempt against 4.81 (-0.07, p 0.68), errors 0.5% against 0.6% (p 0.74), declines 3.75%
+     (6 of 160) against 3.0% (p 0.42), uncited 0, latency +0% (p 0.45), tokens -8% (p 0.91);
+     fabricated citations 3.6% against 2.8% (p 0.38); all six family metrics tested
+     (`results/online/alerts.json`). Reported only: the judge's line, 0.806 not fully supported
+     against 0.747. The champion shadow `docs-20261023-165302-b1ddf4`, run after the verdict,
+     took 948 of its 949 model calls from the call cache. Served minus shadow is +0.0 on uncited
+     answers, declines, errors, model calls and fabricated citations, and 0% (rounded) on tokens;
+     latency is not comparable, as every shadow attempt took calls from the cache
+     (`results/online/shadow-day-10.txt`). The served run behaved as the champion does; whether
+     that was the sealed choice is for the reveal.
+
+     Closed 2026-10-22, the day `blind match` was added, after a two-lens review of the first fix: `evals blind run DAY` now
      takes all three choices and the passphrase, hidden, and checks the hash before anything is
      spent, so a mistyped choice runs nothing (the likely cause of day 10's two settings); it
      refuses a day that already ran under its sealed choice, and only that, so a day whose runs
@@ -387,9 +400,18 @@ warning.
      the day's verdict, so not even the shadow's cache hits are seen first (day 9's shadow ran
      before its verdict). A locked database is refused before anything secret is typed. The
      pick is not recorded for the monitor and the reveal to enforce: with these guards a blind
-     day can have only one run under its sealed choice, and day 10's second match would be an
-     exact replay (the same answers, calls and tokens, latency untested on both), so the
-     verdict is the same whichever of the two the monitor reads.
+     day can have only one run under its sealed choice, and on day 10 a second match could only
+     have been the third run, an exact replay of the second.
+
+     **`scripts/predict_day.py`, 2026-10-23:** its two run columns are now paired like the
+     effect, over the cases where both runs have a value (shown as n both), so the effect is one
+     column minus the other (for latency and tokens, which are geometric means, one over the
+     other, minus 1). They were each run's own values, which can show the opposite sign for
+     a metric that has no value on errored attempts: on day 9 the shadow's 2 extra declines fell
+     on questions the served run errored on (shadow 3.8%, served 3.2%, effect +0.6 points; paired,
+     2.5% and 3.2% on 157 questions). The shadow files for days 7 to 9 were regenerated with it;
+     every effect and interval is unchanged. The pre-registered day 7 table in item 3 keeps its
+     unpaired columns, as recorded.
 
 ## Cost and Aleena's time
 
@@ -416,8 +438,9 @@ warning.
   call-cache entries at the configs' prices: day 9 cost $2.60 (served run $1.28, shadow $1.32,
   each with its judging). Day 10's three runs cost $2.44: the first $1.29, the second $1.15 (its
   first calls came from the first's cache), the third nothing (a replay); so one paid run more
-  than planned, about $1.15, and about $26.55 after day 10's runs. Day 10's shadow and day 11
-  with its shadow would add about $3.70, so about $30.25 in all, about $1.05 past the approval:
+  than planned, about $1.15, and about $26.55 after day 10's runs. Day 10's shadow cost
+  $0.0025: one new call, the rest (its judging too) replayed from the cache. Day 11 with its
+  shadow would add about $2.60, as day 9's did, so about $29.15 in all, within the approval;
   Aleena is asked before the spend passes $29.20. Day sizes,
   settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
   against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the

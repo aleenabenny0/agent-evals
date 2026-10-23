@@ -1,0 +1,10 @@
+served minus shadow on results\online\cases\online-day-10.jsonl (case bootstrap); a day of 200 questions against the frozen reference
+shadow and served: over the cases where both have a value (n both), so served minus shadow is the effect (for latency and tokens, geometric means: served over shadow, minus 1)
+metric                    shadow    served              effect (95% CI) n both  reference   floor  n day  power
+uncited_answer              0.0%      0.0% +0.0 pts (+0.0 pts to +0.0 pts)    165       0.0%  +5 pts    172   0.00
+in_scope_abstention         3.8%      3.8% +0.0 pts (+0.0 pts to +0.0 pts)    160       3.0%  +5 pts    159   0.00
+error                       0.5%      0.5% +0.0 pts (+0.0 pts to +0.0 pts)    200       0.6%  +2 pts    200   0.00
+model_calls                 4.75      4.75       +0.00 (+0.00 to +0.00)    200       4.81   +0.50    200   0.00
+latency                        -         - no case with a value in both
+tokens                     20.6k     20.6k             -0% (-0% to +0%)    165      22.3k    +25%    172   0.00
+fabricated_citation         3.6%      3.6% +0.0 pts (+0.0 pts to +0.0 pts)    165       2.8%  +0 pts    172   0.00

@@ -614,5 +614,158 @@
       "model_calls"
     ],
     "untested": []
+  },
+  "10": {
+    "checked_at": "2026-10-23T16:52:49+00:00",
+    "run_id": "docs-20261021-181707-fd12e1",
+    "reference_runs": [
+      "docs-20261019-161300-f4f40b",
+      "docs-20261019-162038-dd2eba",
+      "docs-20261019-162659-a169f2",
+      "docs-20261019-163359-1bb93d",
+      "docs-20261019-164105-82a046"
+    ],
+    "family_size": 6,
+    "metrics": [
+      {
+        "metric": "judge_supported",
+        "label": "answers the judge found not fully supported",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 165,
+        "n_ref": 431,
+        "day": 0.806060606060606,
+        "ref": 0.7470997679814385,
+        "effect": 0.05896083807916752,
+        "p": null,
+        "detectable": 0.12033368449558268,
+        "status": "out of the family: the judge failed Aleena's 30 blind labels",
+        "detectable_alpha": 0.0071428571428571435
+      },
+      {
+        "metric": "uncited_answer",
+        "label": "answers with no citation",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 165,
+        "n_ref": 431,
+        "day": 0.0,
+        "ref": 0.0,
+        "effect": 0.0,
+        "p": 1.0,
+        "detectable": 0.06825980266295073,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "in_scope_abstention",
+        "label": "lookups and comparisons declined",
+        "kind": "rate",
+        "floor": 0.05,
+        "n_day": 160,
+        "n_ref": 398,
+        "day": 0.0375,
+        "ref": 0.03015075376884422,
+        "effect": 0.007349246231155779,
+        "p": 0.41545997897999803,
+        "detectable": 0.07483656382858242,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "error",
+        "label": "attempts that errored",
+        "kind": "rate",
+        "floor": 0.02,
+        "n_day": 200,
+        "n_ref": 500,
+        "day": 0.005,
+        "ref": 0.006,
+        "effect": -0.001,
+        "p": 0.7405863257331348,
+        "detectable": 0.03902776653961329,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "model_calls",
+        "label": "model calls per attempt",
+        "kind": "mean",
+        "floor": 0.5,
+        "n_day": 200,
+        "n_ref": 500,
+        "day": 4.745,
+        "ref": 4.814,
+        "effect": -0.06899999999999995,
+        "p": 0.6821158942052897,
+        "detectable": 0.610111014241688,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "latency",
+        "label": "latency of uncached attempts (log ms)",
+        "kind": "mean",
+        "floor": 0.22314355131420976,
+        "n_day": 200,
+        "n_ref": 500,
+        "day": 9.189010000528812,
+        "ref": 9.185258806166864,
+        "effect": 0.0037511943619481514,
+        "p": 0.4538773061346933,
+        "detectable": 0.24920261975209745,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      },
+      {
+        "metric": "tokens",
+        "label": "tokens per answer (log)",
+        "kind": "mean",
+        "floor": 0.22314355131420976,
+        "n_day": 165,
+        "n_ref": 431,
+        "day": 9.93279695370585,
+        "ref": 10.011892147835464,
+        "effect": -0.0790951941296143,
+        "p": 0.9147542622868856,
+        "detectable": 0.266026505067414,
+        "detectable_alpha": 0.008333333333333333,
+        "holm_rejected": false,
+        "status": "ok"
+      }
+    ],
+    "fabricated_citation": {
+      "n_day": 165,
+      "n_ref": 431,
+      "p": 0.3780915606775783,
+      "day": 0.03636363636363636,
+      "ref": 0.027842227378190254,
+      "detectable": 0.06735856614240217,
+      "alert": false
+    },
+    "judge": {
+      "in_family": false,
+      "standing": "out of the family: the judge failed Aleena's 30 blind labels",
+      "trusted": true,
+      "shifts": {
+        "median_answer_words": 0.0353,
+        "source_named_share": 0.0244
+      }
+    },
+    "reported": {
+      "judge_supported_over_all_in_scope": 0.1875,
+      "outside_snapshot_answered": 0.0,
+      "false_premise_declined": 0.4211,
+      "judge_core_supported": 0.9455,
+      "median_answer_words": 88.0,
+      "source_named_share": 0.9394
+    },
+    "alerts": [],
+    "untested": []
   }
 }

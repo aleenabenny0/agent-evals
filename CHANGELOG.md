@@ -170,6 +170,15 @@ Format:
 
 ## Unreleased
 
+- 2026-10-23: day 10 of the online demo, the second blind day: no alert. `evals blind match 10`
+  named its first run as the one under the sealed choice; every family metric stayed within
+  the reference (model calls 4.75 against 4.81, errors 0.5% against 0.6%), and the champion
+  shadow, run after the verdict, matched it on every metric it could compare (plan, part 5,
+  item 5;
+  `results/online/shadow-day-10.txt`). `scripts/predict_day.py` now shows both runs' columns
+  over the cases where both have a value, as its effect is, so the effect is one minus the
+  other (for latency and tokens, one over the other, minus 1); the shadow files for days 7 to
+  9 were regenerated, every effect unchanged.
 - 2026-10-22: `evals blind match DAY` settles which run counts when a blind day ran more than
   once (day 10 ran three times, under two settings): it takes the choices and the passphrase
   hidden, checks them against the hash, and names only the first run under the day's sealed

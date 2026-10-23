@@ -9,6 +9,13 @@ to the reference rate (exact for rates, the normal approximation for means). Bef
 two configs' dev runs predict it. After it: the served run against its shadow gives the paired
 difference, which separates the agent from the traffic.
 
+The two runs' columns are paired, like the effect: both are over the cases where both runs have
+a value (n both), so the effect is one minus the other (for latency and tokens, which are
+geometric means, one over the other, minus 1). A metric with no value on errored
+attempts (declines, uncited, fabricated, tokens) can otherwise show the opposite sign: until
+2026-10-23 the columns were each run's own values, and on day 9 the shadow's 2 extra declines
+fell on questions the served run errored on (shadow 3.8%, served 3.2%, effect +0.6 points).
+
 Free and read-only. Run from the project folder:
 
     uv run python scripts/predict_day.py deploy=RUN champion=RUN [--cases PATH] [--questions N]
@@ -135,28 +142,35 @@ def main() -> None:
         f"{deploy_label} minus {champ_label} on {args.cases} (case bootstrap); a day of "
         f"{args.questions} questions against the frozen reference"
     )
+    print(
+        f"{champ_label} and {deploy_label}: over the cases where both have a value (n both), so "
+        f"{deploy_label} minus {champ_label} is the effect (for latency and tokens, geometric "
+        f"means: {deploy_label} over {champ_label}, minus 1)"
+    )
     head = (
         "metric",
         champ_label,
         deploy_label,
         "effect (95% CI)",
+        "n both",
         "reference",
         "floor",
         "n day",
         "power",
     )
     print(
-        f"{head[0]:22s} {head[1]:>9s} {head[2]:>9s} {head[3]:>28s} {head[4]:>10s} "
-        f"{head[5]:>7s} {head[6]:>6s} {head[7]:>6s}"
+        f"{head[0]:22s} {head[1]:>9s} {head[2]:>9s} {head[3]:>28s} {head[4]:>6s} {head[5]:>10s} "
+        f"{head[6]:>7s} {head[7]:>6s} {head[8]:>6s}"
     )
     for m in (*specs, "fabricated_citation"):
         if m == "judge_supported":
             continue
         d, c = deploy[m], champion[m]
-        df = [x for xs in d.values() for x in xs]
-        cf = [x for xs in c.values() for x in xs]
+        both = sorted(set(d) & set(c))
+        df = [x for case in both for x in d[case]]
+        cf = [x for case in both for x in c[case]]
         if not df or not cf:
-            print(f"{m:22s} {'-':>9s} {'-':>9s} {'no values on one side':>28s}")
+            print(f"{m:22s} {'-':>9s} {'-':>9s} {'no case with a value in both':>28s}")
             continue
         e, lo, hi = effect(d, c, seed=1)
         r = ref_vals[m]
@@ -206,7 +220,7 @@ def main() -> None:
                 shown = (f"{fmean(cf):.2f}", f"{fmean(df):.2f}", f"{fmean(r):.2f}", f"+{floor:.2f}")
         ci = f"{fmt(e)} ({fmt(lo)} to {fmt(hi)})"
         print(
-            f"{m:22s} {shown[0]:>9s} {shown[1]:>9s} {ci:>28s} {shown[2]:>10s} "
+            f"{m:22s} {shown[0]:>9s} {shown[1]:>9s} {ci:>28s} {len(both):>6d} {shown[2]:>10s} "
             f"{shown[3]:>7s} {n_day:>6d} {power:>6.2f}"
         )
 
