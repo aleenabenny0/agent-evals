@@ -522,10 +522,18 @@ bias probes; stability across re-judging. Pin judge model and prompt version.
   sealed choice; `evals online-run` refuses to serve a blind day and runs its shadow only after
   its verdict. **Day 11: alert on model calls** (+0.52 per attempt, p 0.0013; verdict recorded
   before the shadow ran); served minus shadow +0.72 calls (CI +0.54 to +0.92)
-  (`results/online/shadow-day-11.txt`). Next: `uv run evals blind reveal` (Aleena: the three
-  choices in the clear, the passphrase hidden), then the agent records each day's outcome
-  (caught, missed, quiet as expected, false alarm) in the plan, CHANGELOG and here. About
-  $29.05 spent on phase 7, within the approved $29.20 (the plan's Cost section).
+  (`results/online/shadow-day-11.txt`). **Revealed 2026-10-23T21:56:17Z, after all three
+  verdicts were committed: subtle, unchanged, subtle; caught, quiet as expected, caught**, each
+  counted run under its sealed config (day 10's two uncounted runs ran the subtle config by
+  mistake) (`results/online/blind-reveal.json`; plan, part 5, item 5, which also weighs why the
+  subtle fault was caught both times against a predicted 4 in 10, the second only just). **Phase 7
+  done 2026-10-23**, about $29.05 spent, within the approved $29.20 (the plan's Cost section).
+  Next, agreed in principle with Aleena 2026-10-21 (plan, "Agreed in principle with Aleena
+  2026-10-21"): a judge improvement round, so judge_supported can earn
+  its place in the alert family (claim-by-claim checking, a 0 to 100 score with a tuned
+  threshold, a skeptic pass). It touches `graders/`, so the approach is written up and agreed
+  with her before any code, and it needs 30 fresh blind labels to validate. Then Brief 01
+  (`docs/plans/brief-alignment.md`, revised roadmap, item 5).
 
 ## Target: the three project briefs
 
@@ -536,6 +544,11 @@ the briefs want: a chart of holdout success, hallucination rate and cost per suc
 over gated iterations, with a failure taxonomy shrinking beside it.
 
 ## Next tasks, in order
+
+**As of 2026-10-23** phase 7 is done, and the next tasks are at the end of "Current status"
+above: the judge improvement round, then Brief 01. The list below is the phase 2 to 5 list,
+kept as history; its "Next" lines are done, except two items still open: 1(i), three dev case
+decisions waiting for Aleena, and 2, the output-contract metric, deferred to the code agent.
 
 1. **Phase 2 (Measurement)**, plan in `docs/plans/phase-2-measurement.md`. Done without Aleena:
    drafting (280 across six files), evidence groups, paraphrase mechanics, validators, the five

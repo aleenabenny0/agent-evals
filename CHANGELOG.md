@@ -170,9 +170,18 @@ Format:
 
 ## Unreleased
 
+- 2026-10-23: the blind days revealed, after all three verdicts were committed. Aleena's
+  choices were subtle, unchanged and subtle: caught, quiet as expected, caught, each counted
+  run under its sealed config (`results/online/blind-reveal.json`; day 10's two uncounted runs
+  ran the subtle config by mistake). The subtle fault was caught both times, the second only
+  just (+0.52 against a +0.50 floor), against a pre-registered chance of about 4 in 10 a day,
+  computed at the dev estimate of +0.47 calls; online it added 0.68 and 0.72 calls against the
+  champion on the same questions (0.57 in day 10's uncounted run). Phase 7 is done (plan, part
+  5, item 5).
 - 2026-10-23: day 11 of the online demo, the last blind day: an alert on model calls (5.33
   per attempt against the reference's 4.81, +0.52, p 0.0013), recorded before the shadow ran;
-  errors rose 1.4 points, under their floor. Served minus the champion shadow on the same
+  errors 2.0% against 0.6% (p 0.11: not significant, and under the 2-point floor). Served minus
+  the champion shadow on the same
   questions, +0.72 calls (CI +0.54 to +0.92) (plan, part 5, item 5;
   `results/online/shadow-day-11.txt`). Next, the reveal.
 - 2026-10-23: day 10 of the online demo, the second blind day: no alert. `evals blind match 10`
@@ -201,7 +210,8 @@ Format:
   same questions stayed normal (plan, part 5, item 4; `results/online/shadow-day-08.txt`).
 - 2026-10-21: the blind days' protocol (phase 7 part 5, item 5). `evals blind seal` takes
   Aleena's choice for each of days 9 to 11 (unchanged, subtle or larger) and a passphrase, typed
-  hidden, and keeps only a hash. `evals blind run DAY` runs a day under its sealed choice.
+  hidden, and keeps only a hash. `evals blind run DAY` runs a day under the choice typed,
+  hidden (checked against the seal only from 2026-10-22; see day 10).
   `evals blind reveal` refuses until every blind day has its monitor verdict and the repeated
   choices and passphrase match the hash, then checks each run's recorded config against the
   revealed choice and writes each day's outcome: caught, missed, quiet as expected, or false

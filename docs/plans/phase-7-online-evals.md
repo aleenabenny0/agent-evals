@@ -1,5 +1,12 @@
 # Phase 7: online evals with a simulated user (Brief 02 M7)
 
+**Done 2026-10-23.** Parts 1 to 5 are built and run. The demo's six days (part 5): a normal
+day stayed quiet (day 6), the rollback was the pre-registered honest miss (day 7), the larger
+retrieval fault was caught (day 8), and on the blind days the subtle fault was caught twice,
+against a pre-registered chance of about 4 in 10 a day and the second time only just, with the
+unchanged day quiet (days 9 to 11). Day 10 ran three times, two of them under the wrong config
+by mistake; the seal settled which run counted.
+
 **Status:** plan v2, 2026-10-18. v1 was reviewed by two isolated agents: one on statistics, one on
 the simulated user and the demo. Both rated it "weakened", with 21 fixable problems, and this
 version takes them all in (the table at the end). The online-case grader guards (part 2) and the
@@ -393,6 +400,14 @@ warning.
      (`results/online/shadow-day-10.txt`). The served run behaved as the champion does; whether
      that was the sealed choice is for the reveal.
 
+     *Corrected 2026-10-23, after the reveal:* on the one question that differed, the answer and
+     its citations were the same and only the stated confidence differed (0.75 against 0.8), so
+     the answers and citations matched on all 200. And the replay already fitted only the
+     champion's config: the champion shadow found 948 of its 949 calls in the cache the served
+     run had filled, where a run under either fault shares only each question's first call with
+     the champion (day 10's uncounted runs: 200 cached of 1,063). So the reveal could only
+     confirm the choice.
+
      Closed 2026-10-22, the day `blind match` was added, after a two-lens review of the first
      fix: `evals blind run DAY` now
      takes all three choices and the passphrase, hidden, and checks the hash before anything is
@@ -429,6 +444,57 @@ warning.
      against 4.81), so on these questions the served config's rise is larger than the monitor's
      +0.52: the config, not the traffic.
 
+     *Corrected 2026-10-23, after the reveal:* errors were not significant (p 0.11), so the
+     floor played no part in keeping them quiet. The alert is the config, not the traffic,
+     because the shadow did not rise. Its 4.61 calls is within a normal 200-question day's range
+     (about 4.57 to 5.08, the dashboard's band), and reading the gap one way only would be
+     one-sided: day 9's shadow sat as far above the reference (5.01), which widened day 9's
+     margin over the floor as day 11's gap narrowed this one.
+
+   **Revealed 2026-10-23T21:56:17Z** (`results/online/blind-reveal.json`). All three verdicts
+   were committed before it: day 9's on 2026-10-21 (de6c293), day 10's at 2026-10-23T17:11:49Z
+   (0396ea7) and day 11's at 21:54:45Z (b8eead1). Aleena's choices were subtle, unchanged and
+   subtle. The hash matched the seal, and each verdict's run had recorded its sealed choice's
+   config.
+
+   | Day | Choice | Alerts raised | Expected | Outcome |
+   |---|---|---|---|---|
+   | 9 | subtle (`retrieval-k1.yaml`) | model calls | model calls, about 4 times in 10 | caught |
+   | 10 | unchanged (`default.yaml`) | none | none | quiet, as expected |
+   | 11 | subtle (`retrieval-k1.yaml`) | model calls | model calls, about 4 times in 10 | caught |
+
+   Day 10's two runs that do not count (the second and third) ran `configs/retrieval-k1.yaml`,
+   the subtle fault, not the sealed choice.
+
+   Reading it. The monitor caught the subtle fault on both blind days, where the dev prediction
+   gave each day about 4 chances in 10 (both, about 0.18). That figure is the alert chance at the
+   dev point estimate, +0.47 model calls per attempt; across the dev interval (+0.27 to +0.70) it
+   runs from about 0.04 to 0.94. Online, against the champion on the same questions, the fault
+   added 0.68 calls on day 9 (CI +0.48 to +0.90), just inside the top of the dev interval, and
+   0.72 on day 11 (CI +0.54 to +0.92), just above it. Day 10's two uncounted runs, which ran the
+   subtle fault by mistake, give a third, unblinded measurement on day 10's questions: +0.57
+   against the champion's counted run (CI +0.39 to +0.75;
+   `results/online/day-10-uncounted-vs-counted.txt`), and +0.50 against the reference, at the
+   floor. Run through the rule in memory, not as a recorded verdict, it would have alerted on
+   model calls by 0.001 calls per attempt (p 0.002; latency untested, as its first calls came
+   from the cache). So the
+   online effect, 0.57 to 0.72, ran above the dev point estimate but within reach of its
+   interval; dev coming in low by chance is a plain explanation. One possible reason beyond
+   chance, not tested: online questions take more searching (4.81 calls per attempt on the
+   reference days against 4.00 on dev), so cutting search to one result costs more extra calls;
+   the three online days do not show it, though (the champion's calls against the fault's
+   effect: 5.01 and 0.68, 4.75 and 0.57, 4.61 and 0.72). At the point estimates, the power
+   column of the shadow tables gives a day of 200 about 9 chances in 10 to alert (0.92 and
+   0.96); the same formula gives 0.44 and 0.63 at the lower ends of their intervals, and 0.70 at
+   day 10's 0.57. Both margins over
+   the floor depended on the day's questions: day 9's needed more calls than usual (its shadow
+   5.01) and its +0.88 against the reference cleared the floor easily; day 11's needed fewer
+   (4.61) and its +0.52 cleared it by 0.02 calls per attempt; both shadows are within a normal
+   day's range (about 4.57 to 5.08). The unchanged day stayed quiet; one quiet day says little
+   about the false-alarm rate, which the rule's levels cap at about 6% a day (5% for the Holm
+   family, 1% for the fabricated-citation rule; the floors make it lower). Three blind days
+   demonstrate the monitor; they do not measure its power.
+
 ## Cost and Aleena's time
 
 - **Money**, recomputed 2026-10-19. The first figure, "about $25 in all", did not match its
@@ -458,17 +524,20 @@ warning.
   $0.0025: one new call, the rest (its judging too) replayed from the cache. Day 11 cost $2.52
   (served run $1.22, shadow $1.30, each with its judging), so about $29.05 in all, within the
   approval of about $29.20. Day sizes,
-  settled so the demo and this section agree: days 1 to 6 have 100 questions (day 6 is checked
-  against the reference, so it matches it); days 7 to 11 have 200, each with a shadow run of the
-  champion. That is about $7 for days 1 to 5, $1.35 for day 6 and about $4 for each 200-question
-  day with its shadow, so about $28 in all, plus about $1.50 already spent generating day 0
-  twice. Aleena approved about $25; the work stops to ask before passing it, at day 7 at the
-  latest. Without shadow runs on the blind days 9 to 11 the total is about $24 (each such day
-  saves about $1.40: the champion's second agent run and its judging).
+  settled on 2026-10-19 so the demo and this section agree: days 1 to 6 have 100 questions (day
+  6 is checked against the reference, so it matches it); days 7 to 11 have 200, each with a
+  shadow run of the champion. The projection then was about $7 for days 1 to 5, $1.35 for day 6
+  and about $4 for each 200-question day with its shadow, so about $28 in all, plus about $1.50
+  already spent generating day 0 twice, against an approval of about $25 (the work was to stop
+  and ask before passing it, at day 7 at the latest), or about $24 without shadow runs on the
+  blind days. The approval was raised to about $29.20 on 2026-10-21 (above), and the measured
+  total came to about $29.05.
 - **Aleena's time:** about 40 minutes, in three short tasks: the pilot of 30 questions (done,
-  2026-10-18), 30 judge labels from reference days, and sealing the blind configs. Optional: the
-  10-question realism read of generator v2, about 3 minutes (`evals pilot-review 0 --quick`), not
-  taken so far.
+  2026-10-18), 30 judge labels from reference days (done, scored 2026-10-21), and sealing the
+  blind configs (done, 2026-10-21). Beyond the estimate, the blind days took her runs of days 9
+  to 11 (day 10 three times), `evals blind match 10` and the reveal (2026-10-21 to 2026-10-23).
+  Optional: the 10-question realism read of generator v2, about 3 minutes
+  (`evals pilot-review 0 --quick`), not taken.
 
 ## Decisions for Aleena (answered 2026-10-19)
 
@@ -698,6 +767,17 @@ Both are retrieval faults a bad deploy could plausibly cause. Proposed: the stro
 day 8, so the demo has one caught fault before the blind days, and the two faults as the blind
 days' "subtle" and "larger" configs (part 5, item 5), with `configs/default.yaml` as
 "unchanged".
+
+## Agreed in principle with Aleena 2026-10-21: a judge improvement round after the demo
+
+Recorded 2026-10-23, from the session in which it was agreed. Asked whether the judge could be
+made better and more versatile, Aleena agreed ("ok sounds good") to a round after days 7 and 8:
+claim-by-claim checking, a 0 to 100 score with a tuned threshold, and a skeptic pass. Its aim
+is to let judge_supported earn a place in the alert family, which it did not get when the judge
+failed her 30 blind labels (part 3: 4 false passes of 15, against a bar of 2). It was put off
+while the blind days ran. This agrees only the direction: the round touches `graders/`, so its
+approach is written up and approved before any code, and it needs 30 fresh blind labels to
+validate.
 
 ## Check of decisions 5 and 6 (2026-10-20)
 
