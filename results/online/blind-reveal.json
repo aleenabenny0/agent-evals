@@ -1,0 +1,49 @@
+{
+  "revealed_at": "2026-10-23T21:56:17+00:00",
+  "commitment": "1e39c8fa2a8b9462a8dc685dd6e4aa8162c2d21daa76298121fa2262d7025b62",
+  "choices": {
+    "9": "subtle",
+    "10": "unchanged",
+    "11": "subtle"
+  },
+  "days": [
+    {
+      "day": 9,
+      "choice": "subtle",
+      "run_id": "docs-20261021-170913-be166c",
+      "config_recorded": "configs/retrieval-k1.yaml",
+      "config_matches": true,
+      "alerts": [
+        "model_calls"
+      ],
+      "expected_alerts": [
+        "model_calls"
+      ],
+      "outcome": "caught"
+    },
+    {
+      "day": 10,
+      "choice": "unchanged",
+      "run_id": "docs-20261021-181707-fd12e1",
+      "config_recorded": "configs/default.yaml",
+      "config_matches": true,
+      "alerts": [],
+      "expected_alerts": [],
+      "outcome": "quiet, as expected"
+    },
+    {
+      "day": 11,
+      "choice": "subtle",
+      "run_id": "docs-20261023-204129-8e2a07",
+      "config_recorded": "configs/retrieval-k1.yaml",
+      "config_matches": true,
+      "alerts": [
+        "model_calls"
+      ],
+      "expected_alerts": [
+        "model_calls"
+      ],
+      "outcome": "caught"
+    }
+  ]
+}
