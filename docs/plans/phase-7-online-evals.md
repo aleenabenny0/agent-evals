@@ -405,8 +405,9 @@ warning.
      the answers and citations matched on all 200. And the replay already fitted only the
      champion's config: the champion shadow found 948 of its 949 calls in the cache the served
      run had filled, where a run under either fault shares only each question's first call with
-     the champion (day 10's uncounted runs: 200 cached of 1,063). So the reveal could only
-     confirm the choice.
+     the champion (day 10's second run, under the subtle fault: 200 of its 1,063 calls cached,
+     one per question; the third replayed the second in full). So the reveal could only confirm
+     the choice.
 
      Closed 2026-10-22, the day `blind match` was added, after a two-lens review of the first
      fix: `evals blind run DAY` now
