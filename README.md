@@ -118,11 +118,13 @@ the 142 it shares with v2.
   spans zero). The gate, the dev numbers, the one cost (run-to-run consistency dipped from 97%
   to 93%) and the grader fix it exposed are in [CHANGELOG.md](CHANGELOG.md) and ADR 0008.
   Iterations 2 and 3 were rejected by the gate and are recorded there too. Iteration 3's prompt
-  doubled the dev fully-supported rate (0.31 to 0.60), but it abstained on more answerable
-  questions and correctness slipped, so v3 stays. Iteration 4 (v4 plus an abstention guard)
+  doubled the judge's dev fully-supported rate (0.31 to 0.60), but its answers were 27% shorter,
+  so under its pre-registered check that number is not trusted without a 30-answer human spot
+  check, which never ran; it also abstained on more answerable questions and correctness
+  slipped, so v3 stays. Iteration 4 (v4 plus an abstention guard)
   passed the dev gate, but a pre-registered human spot check found the judge too lenient on its
-  shorter answers. Two attempts to repair the judge each missed their rule by one answer, so it
-  is not shipped. By the labeler's own 90 labels its answers are fully supported 60% of the time,
+  shorter answers. Two attempts to repair the judge (one rubric paragraph, tested and then
+  retested) each narrowly missed their rule, so it is not shipped. By the labeler's own 90 labels its answers are fully supported 60% of the time,
   against 34% for v3, on different samples (a random 90 for v5, the first 80 in case-id order
   for v3), so not a paired comparison.
   "Core supported" (just the claims that answer the question; 89.3% pass) is reported as
@@ -131,8 +133,8 @@ the 142 it shares with v2.
   on 40 fresh labels under a rule fixed in advance, and neither replaced it: the second tied on
   the labels and missed one planted error, on a mutant later found to plant none. "Responsive"
   (0.997 pass) is validated on 61 closed-book answers at kappa 0.68 to 0.84. Planted-error
-  mutants were caught 100% of the time on the first dev run and 55 of 56 on the current
-  champion's run (the miss planted no error); verdict stability under re-sampling is 84% and 95%
+  mutants were caught 57 of 58 times on the first dev run (qualifier mutants 4 of 5) and 55 of 56
+  on the current champion's run (the miss planted no error); verdict stability under re-sampling is 84% and 95%
   on those runs. Everything, including the rounds that failed:
   [docs/judge-validation.md](docs/judge-validation.md).
 - What broke: all 32 failing dev attempts were read. None states a wrong fact. 13 are keyword
@@ -144,10 +146,10 @@ the 142 it shares with v2.
 The docs agent was then watched as it would be in production, on simulated traffic. Five LLM
 personas (claude-sonnet-5-5) write each day's questions from snapshot pages, with no answer key,
 and a checker call confirms that each lookup or comparison is answerable from one section of
-its page. Aleena
-found all 30 sampled questions of the first generator realistic; the revised generator that
-wrote days 1 to 11 passed automated answerability and copying checks, but no human read its
-questions for realism. With no answer key, only checks that need none score the answers:
+its page. Aleena found all 30 sampled questions of the first generator realistic; the revised
+generator that wrote days 1 to 11 passed automated answerability and copying checks, but no
+human read its questions for realism. With no answer key, only checks that need none score the
+answers:
 citation checks, uncited answers, declined in-scope questions, errors, model calls, latency and
 tokens. The LLM judge's "fully supported" verdict is recorded and drawn too, but never alerts.
 
