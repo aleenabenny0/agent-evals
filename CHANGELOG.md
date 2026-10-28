@@ -28,14 +28,15 @@ Format:
   +0.240 to +0.370); correct 0.969 -> 0.967, wrong_abstention 0.017 -> 0.008, missed_abstention
   0.056 -> 0.028, fabricated_citation 0.013 -> 0.005, all no detectable change; no category
   regressed; no errors. **Gate passed.**
-- Pre-registered spot check (answers 28% shorter): the judge passed 3 of 30 answers Aleena
+- Pre-registered spot check (answers 28% shorter): the judge passed 3 of 30 answers the author
   failed, against a bar of 2, so its number was not trusted and the test split was not run. Two
   repair attempts on the judge (rubric v2.1, validation doc sections 9 and 10) each failed their
   pre-registered rule by one answer: the first on core supported, the second on fully supported.
   The judge's leniency on v5's answers is real: false passes 9/90 on v5's answers against 2/80 on
   v3's.
-- Human evidence, dev only: Aleena's labels give fully supported **54/90 (0.60)** on v5's answers,
-  hash-sampled, against 27/80 (0.34) on v3's, which are case-id ordered, so the two samples differ.
+- Human evidence, dev only: the author's labels give fully supported **54/90 (0.60)** on v5's
+  answers, hash-sampled, against 27/80 (0.34) on v3's, which are case-id ordered, so the two
+  samples differ.
 - Decision: **not shipped**. v3 stays the champion. By the rule, iteration 4 is better by the
   labeler's 90 labels but not proven by the judge. v5 stays selectable for a later test under a
   judge validated on its answers.
@@ -44,11 +45,11 @@ Format:
 ## Instrument (2026-10-17): 10 more dev keyword lists widened; all six dev runs regraded
 
 - Change: the keyword lists of 10 dev cases gained the correct wordings that the iteration-3
-  review found the grader missing in both runs' answers (4 misses in v3's, 11 in v4's), approved
-  by Aleena; the additions are listed in `scripts/keyword_fix_counterfactual.py`. Gold answers
-  are unchanged and test cases untouched. All six runs on the dev suite were regraded for free
-  with the current code graders, including the closed-book and oracle baselines, which the
-  iteration-1 regrade had skipped. Every dev number now rests on the same keyword lists.
+  review found the grader missing in both runs' answers (4 misses in v3's, 11 in v4's), an
+  approved widening; the additions are listed in `scripts/keyword_fix_counterfactual.py`. Gold
+  answers are unchanged and test cases untouched. All six runs on the dev suite were regraded
+  for free with the current code graders, including the closed-book and oracle baselines, which
+  the iteration-1 regrade had skipped. Every dev number now rests on the same keyword lists.
 - correct, before -> after (`results/iteration-3/dev-runs-before-keyword-fix.json`, `...-after-...`):
   v2 0.954 -> 0.956; v3 0.959 -> 0.969; iteration-2 challenger 0.951 -> 0.962; v4 0.931 -> 0.959;
   closed-book 0.546 -> 0.585; oracle 0.923 -> 0.938. The only other metric that moved is the
@@ -105,8 +106,8 @@ Format:
 - Decision: **not shipped**. v3 stays the champion. The cost of v4 is abstention: told to say only
   what it can quote, it gives up where it cannot find the sentence. Candidate for iteration 4: v4
   plus an abstention guard (search again for the answer's own sentence before abstaining; an
-  answer that answers is never marked abstained), after the keyword-list widening if Aleena
-  approves it, with the 30-answer spot check planned in advance.
+  answer that answers is never marked abstained), after the keyword-list widening if it is
+  approved, with the 30-answer spot check planned in advance.
 - Runs: champion `docs-20261016-214710-02abb7`, challenger `docs-20261017-163240-f5782a`.
 
 ## Rejected: iteration 2 (2026-10-16) - number coverage check at submit time
@@ -149,8 +150,8 @@ Format:
   Cost per success $0.0027 -> $0.0028; p95 latency 17.3 s -> 15.2 s.
 - Gate (`results/gates/iteration-1-dev-gate.txt`): **passed**. Under the first wording of
   condition 3 (flat flip-rate band) it had tripped on storage, 4 attempt flips of 36; reading them
-  showed 3 keyword-grader misses the judge contradicted and 1 markup rejection. Aleena approved
-  widening the keyword lists of 20 dev cases (page or agent wording, gold unchanged, test cases
+  showed 3 keyword-grader misses the judge contradicted and 1 markup rejection. Widening the
+  keyword lists of 20 dev cases was approved (page or agent wording, gold unchanged, test cases
   untouched); both runs were regraded for free. Correct then read 0.954 -> 0.959 and the flip
   rate fell from 0.100 to 0.031, so most of the measured noise had been the grader. Condition 3
   was rewritten as a paired per-category interval (ADR 0008 records the change and its timing):
@@ -170,7 +171,7 @@ Format:
 
 ## Unreleased
 
-- 2026-10-23: the blind days revealed, after all three verdicts were committed. Aleena's
+- 2026-10-23: the blind days revealed, after all three verdicts were committed. The author's
   choices were subtle, unchanged and subtle: caught, quiet as expected, caught, each counted
   run under its sealed config (`results/online/blind-reveal.json`; day 10's two uncounted runs
   ran the subtle config by mistake). The subtle fault was caught both times, the second only
@@ -208,8 +209,8 @@ Format:
   result and a quarter of each page raised the two pre-registered alerts, model calls (+1.85
   per attempt, p < 0.0001) and errors (+2.9 points, p 0.0075), while the champion shadow on the
   same questions stayed normal (plan, part 5, item 4; `results/online/shadow-day-08.txt`).
-- 2026-10-21: the blind days' protocol (phase 7 part 5, item 5). `evals blind seal` takes
-  Aleena's choice for each of days 9 to 11 (unchanged, subtle or larger) and a passphrase, typed
+- 2026-10-21: the blind days' protocol (phase 7 part 5, item 5). `evals blind seal` takes the
+  author's choice for each of days 9 to 11 (unchanged, subtle or larger) and a passphrase, typed
   hidden, and keeps only a hash. `evals blind run DAY` runs a day under the choice typed,
   hidden (checked against the seal only from 2026-10-22; see day 10).
   `evals blind reveal` refuses until every blind day has its monitor verdict and the repeated
@@ -231,14 +232,14 @@ Format:
   pre-registered as an honest miss (plan, part 5): a rollback to prompt v2 moves no family
   metric, only the judge's reported line. Day 8's fault is decision 8. The monitor and the
   dashboard now say why the judge is out of the family, and a test covers `online-run --shadow`.
-- 2026-10-21: the online judge check scored, and the judge failed. Aleena labeled 30
+- 2026-10-21: the online judge check scored, and the judge failed. The author labeled 30
   reference-day answers blind (3 the judge passed and 3 it failed from each of days 1 to 5).
-  Of the 15 the judge passed, she failed 4, against a bar of 2; of the 15 it failed, she passed
-  2. judge_supported stays out of the alert family for the whole demo, reported but never
-  alerting; the family is the six code-graded metrics. The result is final and recorded in the
-  results database and `results/online/judge-check.json` (plan, part 3 "Judge check"). Day 7's
-  expected alert is now decision 7 for Aleena.
-- 2026-10-20: Aleena's decisions 5 and 6 (plan), both approved. Every monitored metric, the
+  Of the 15 the judge passed, the author failed 4, against a bar of 2; of the 15 it failed, the
+  author passed 2. judge_supported stays out of the alert family for the whole demo, reported
+  but never alerting; the family is the six code-graded metrics. The result is final and
+  recorded in the results database and `results/online/judge-check.json` (plan, part 3 "Judge
+  check"). Day 7's expected alert is now decision 7 (plan).
+- 2026-10-20: decisions 5 and 6 (plan), both approved. Every monitored metric, the
   fabricated-citation rule included, now publishes its blind spot as the smallest true rise
   that alerts on 8 days in 10, floor included. It is exact for rates (`stats/monitor.py`
   `detectable_rate_rise`) and by the normal approximation for means. On the reference, uncited
@@ -258,25 +259,25 @@ Format:
   judge's verdicts on the sampled answers holds them back (`label --show-judge`,
   `judge-validate`, `trace`). The sample leaves out the answers the dashboard publishes with
   the judge's verdict, only `label` draws it, never after labels exist, and a digest of the
-  judge's grades catches any re-judging. Only Aleena's labels count. Interactive screens need a
-  real console on Windows. A refreeze of the same runs keeps the freeze date. No test can touch
-  the real `results/online/`.
-- 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved by Aleena (plan,
+  judge's grades catches any re-judging. Only the author's labels count. Interactive screens
+  need a real console on Windows. A refreeze of the same runs keeps the freeze date. No test can
+  touch the real `results/online/`.
+- 2026-10-19: phase 7 parts 3 and 4, the monitor and the dashboard, approved (plan,
   parts 3 and 4). `evals monitor --freeze` checks days 1 to 5 against each other, leaving one
   day out at a time, and freezes them as the reference. `evals monitor DAY` tests a later day
   against them: one-sided Fisher and permutation tests, Holm-corrected, each with a practical
   floor. Fabricated citations get their own rule at p < 0.01. It exits 1 on an alert and 3 when
   a quiet day is still not cleared. `evals judge-check label` and `score` let judge_supported
-  alert only after Aleena's 30 blind labels pass (at most 2 false passes) and the reference
+  alert only after the author's 30 blind labels pass (at most 2 false passes) and the reference
   stays quiet with it. `evals dashboard` writes the static page `docs/dashboard/index.html`.
   The real days 1 to 5 were frozen as the reference; no day alerted against the other four
   (plan, part 3). A code review found ten problems and a statistics review eleven. All are fixed
-  or written into the plan, except two put to Aleena first: the detectable-rise formula (in
+  or written into the plan, except two held for a decision first: the detectable-rise formula (in
   `stats/`) and the judge check's sample (plan, "Code review of parts 3 and 4"). Most important:
   an unjudged or empty run no longer reads as a quiet day, and the frozen reference cannot be
   replaced or re-rolled by accident. Each run records the hash of the traffic it ran. The
   dashboard's band now shows where a normal day falls.
-- 2026-10-19: prompt caching on every API call, at Aleena's request. The client asks for the
+- 2026-10-19: prompt caching on every API call. The client asks for the
   API's prompt cache only as it sends a call: a breakpoint on the system prompt (the tools come
   before it), shared by every call of a run, and for a conversation of more than one message
   automatic caching too, so each turn of the agent's tool loop reuses the turns before it. A
@@ -293,7 +294,7 @@ Format:
   second answer on, both its system prompts (1,563 tokens) were read from the cache, about 68%
   less input cost per answer. Every new run now stores its cache tokens. Latency drops too, so
   latency from before and after this change is not comparable; every online day runs with it.
-- 2026-10-19: phase 7 part 2, online runs, approved by Aleena (plan, part 2). Online cases (suite,
+- 2026-10-19: phase 7 part 2, online runs, approved (plan, part 2). Online cases (suite,
   split "online", provenance "simulated") have no gold, except a false premise's key. The keyword
   grader records only `abstained` on them (`answer_keywords` version 3); the evidence metrics and
   the judge's responsive check are skipped. `evals online-run DAY` writes the day's cases to

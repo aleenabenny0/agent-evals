@@ -1,5 +1,14 @@
 # Walkthrough: Wilson score intervals
 
+**Summary.** The report switched from a pure bootstrap to Wilson score intervals for pass/fail
+metrics, because the bootstrap collapses when every case agrees: at 7 of 7 it gives 1.000 to
+1.000, while Wilson gives 0.646 to 1.000. This walkthrough explains the math behind the formula,
+works that example by hand, and shows where it lives: `wilson_ci` in
+`src/agent_evals/stats/core.py`, chosen by `_interval` in `src/agent_evals/report.py`. The
+method is picked from the data, so a metric whose per-case values are all exactly 0 or 1 gets
+Wilson and any other metric keeps the bootstrap; `compare` still uses the paired bootstrap. The
+decision record is ADR 0004.
+
 Why the report switched from a pure bootstrap to Wilson intervals for pass/fail metrics, the
 math behind the formula, and where it lives in the code. Decision record: ADR 0004.
 
@@ -86,7 +95,7 @@ right tool there.
 because per-case means can be 0.5; a single-attempt run where all four cases pass reports
 `wilson` with a lower bound near 0.51, where the bootstrap would have said 1.0.
 
-## 5. Likely interview questions
+## 5. Questions a reader might ask
 
 **Why not always Wilson?** Wilson is for proportions. `model_calls` is a count, and a per-case
 mean over three attempts is not a 0/1 outcome. The bootstrap handles those without assumptions.

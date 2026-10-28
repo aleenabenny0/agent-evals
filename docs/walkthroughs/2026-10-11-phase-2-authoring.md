@@ -1,8 +1,21 @@
 # Walkthrough: Phase 2 so far, the measurement instrument
 
+**Summary.** This walkthrough covers phase 2 so far: what was built after the leaked-citations
+fix to turn the suite into a measurement instrument, in the order it landed. A power calculation
+set the size at 150 test cases plus about 100 dev cases, and the documentation snapshot grew from
+8 pages to 334 across roughly 100 services, with a monthly drift check and evidence recorded as
+groups of alternative pages. Cases are drafted by an agent, but each carries a support quote,
+copied word for word, that `evals validate` checks against the page in the snapshot, and
+`evals run` refuses to score a draft (a synthetic case with no `verified_by`) unless
+`--allow-drafts` is passed. The pilot review of the first 49 AI/ML drafts found two AWS pages
+that disagree, keyword rules that passed wrong answers, a grader bug that matched substrings, and
+a mix that was too easy. Closed-book and oracle baselines were built early, and `evals report`
+computes paraphrase consistency; at the time of writing, verification, the split and the judge
+were still ahead.
+
 Covers everything built after the leaked-citations fix, in the order it landed, with the
 reasoning in plain language. Companion to `docs/plans/phase-2-measurement.md` and ADRs 0004 to
-0006. Written so each piece can be explained in an interview without the original conversation.
+0006. Written so each piece can be explained from this page alone.
 
 ## 1. Why the suite needed to grow, and by how much
 
@@ -73,7 +86,7 @@ project measures. The design makes the risk mechanical:
 
 ## 6. What the pilot review taught
 
-Aleena's review of the first 49 AI/ML drafts, after Codex ran a second-opinion pass:
+The author's review of the first 49 AI/ML drafts, after Codex ran a second-opinion pass:
 
 - **Two AWS pages disagree.** The Provisioned Throughput page says a customized Bedrock model
   requires Provisioned Throughput; the newer custom-model inference page documents on-demand
@@ -87,12 +100,13 @@ Aleena's review of the first 49 AI/ML drafts, after Codex ran a second-opinion p
   inside `100`. `phrase_in` in `corpus.py` now requires whole words and numbers, with the edges
   tuned so `/16`, `10%` and `3-63` still match. The grader and the validator share it.
 - **Reviews describe; they do not edit.** Codex's fixes were written in past tense and did not
-  exist on disk. Rule since: a described change is a to-do until the diff shows it.
+  exist on disk. Rule since: a described change is not done until the diff shows it.
 - **The mix was too easy.** 40 of 49 pilot cases were lookups. Later batches were built hardest
-  first. Across the 234 capability drafts the realized mix is still lookup-heavy (see HANDOFF),
-  because quota pages yield lookups; changed-default cases are the scarce kind and are worth
-  mining deliberately (deprecation schedules, closures like Cloud9 and Kendra, default changes
-  like S3 bucket quotas, DynamoDB on-demand, Organizations root credentials).
+  first. Across the 234 capability drafts the realized mix is still lookup-heavy (ADR 0006
+  gives the mix of the final split), because quota pages yield lookups; changed-default cases
+  are the scarce kind and are worth mining deliberately (deprecation schedules, closures like
+  Cloud9 and Kendra, default changes like S3 bucket quotas, DynamoDB on-demand, Organizations
+  root credentials).
 
 ## 7. Baselines (phase 4, built early because they need no new infrastructure)
 
@@ -111,16 +125,16 @@ A robustness case names the case it paraphrases and shares its gold. `evals repo
 and this measures that independently of whether the answers were right. Fifteen paraphrases of
 the five verified pilot cases are drafted; robustness cases stay in dev.
 
-## 9. Things an interviewer might ask
+## 9. Questions a reader might ask
 
 **Why not let the judge grade everything?** Because code never drifts and costs nothing. The
 deterministic graders settle what they can settle; the judge is reserved for what they cannot,
 and it has to pass validation against hand labels before any of its numbers count.
 
-**How do you know the drafts are right?** I don't; the verifier does. My job was to make
-verification a two-minute read with a machine-checked pointer, and to make it impossible for an
-unverified case to be scored.
+**How do you know the drafts are right?** Drafting does not establish that; verification does.
+The design's job was to make verification a two-minute read with a machine-checked pointer, and
+to make it impossible for an unverified case to be scored.
 
-**What would you do with more time?** Mine changed-default cases deliberately, finish
-verification, split, then build and validate the judge. Then the learning loop in phase 5 can
-start, because only then is there a trustworthy signal to learn from.
+**What is left?** Next: mine changed-default cases deliberately, finish verification, split,
+then build and validate the judge. Then the learning loop in phase 5 can start, because only
+then is there a trustworthy signal to learn from.

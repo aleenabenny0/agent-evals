@@ -1,5 +1,17 @@
 # Iteration 3: system prompt v4 (pre-registered 2026-10-17, before any v4 run)
 
+**Summary.** This document pre-registers iteration 3, a single prompt change from v3 to v4,
+written before any v4 run, and records its result. v4 targets the causes of unsupported claims
+found in the error analysis: it tells the agent to check its draft sentence by sentence, to quote
+whole sentences, list items and table rows, and to say only what its quotes say. A harness-side
+alternative picked by the error-analysis panel was not adopted, because about 44% of its expected
+dev gain came from one table and it would change the harness's output rather than the agent. On
+dev, judge_supported rose far more than predicted (0.311 to 0.604), though with answers 27%
+shorter that number waits on a 30-answer spot check; correctness and wrong abstentions regressed,
+as did correctness on lookup, ai_ml and databases, so the gate rejected v4 on 2026-10-17 and v3
+stays the champion. Half of the 18 new failures were keyword-grader misses, but with those fixed
+in both runs v4 still fails on wrong_abstention and lookup; the full entry is in CHANGELOG.md.
+
 **Change.** One prompt version, the change type ADR 0008 allows: `docs_agent.prompt_version` v3
 to v4 (`configs/challenger-v4.yaml`, text in `src/agent_evals/agents/docs/prompts.py`). v4 keeps
 every v3 rule except the quote-length cap and adds:
@@ -24,9 +36,9 @@ the edited answers are re-judged. It was not adopted. The adversarial check foun
 of its expected dev gain comes from one table cited by 13 dev cases, 9 of them paraphrases that
 never appear in test. It changes the harness's output, not the agent, and would hide a later
 regression in the agent's own quoting. ADR 0008 has no change type for rewriting output after
-acceptance, so adopting it would first need an ADR amendment approved by Aleena. It stays a
-documented option. The per-sentence submit schema is also deferred: it is the largest code
-change, and its attribution mixes a structure change with new wording.
+acceptance, so adopting it would first need an approved ADR amendment. It stays a documented
+option. The per-sentence submit schema is also deferred: it is the largest code change, and its
+attribution mixes a structure change with new wording.
 
 **Prediction.** judge_supported on dev rises from 0.308 to about 0.39 (central +0.08; plausible
 range +0.05 to +0.14), from the designer's compliance-discounted arithmetic. A full re-run's
@@ -46,7 +58,7 @@ copy exactly.
 **Checks fixed now, applied after the run.**
 
 1. *Answer look.* If the median answer length of v4's answered attempts differs from v3's by
-   more than 25%, the judge's number is not trusted until Aleena spot-checks 30 v4 answers
+   more than 25%, the judge's number is not trusted until the author spot-checks 30 v4 answers
    against the judge, as ADR 0008 requires.
 2. *No hedge deletion.* The share of answered attempts that state an absence ("does not say",
    "does not state", "says nothing", and the like) is reported for v3 and v4. A fall of more than
@@ -56,7 +68,7 @@ copy exactly.
 
 If the gate passes, the frozen test split is run once and judged once, and the CHANGELOG entry
 records both splits. Shipping, which means setting `prompt_version: v4` in `default.yaml`, is
-Aleena's decision. If the gate fails, v3 stays the champion and the rejection is recorded.
+the author's decision. If the gate fails, v3 stays the champion and the rejection is recorded.
 
 ## Result (2026-10-17): rejected by the gate
 

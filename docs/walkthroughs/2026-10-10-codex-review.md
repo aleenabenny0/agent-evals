@@ -1,8 +1,19 @@
 # Codex review of commits f081f42..08ca110 (2026-10-10)
 
+**Summary.** This is a second-opinion code review of the leaked-citations fix (commits
+f081f42..08ca110), run with Codex and pasted verbatim. It raises eight findings: seven rated P2,
+two of them pre-existing, and one rated P3. They cover false positives and false negatives in the
+tool-markup detector, rejection loops that lose their cause, a comparison that reverses the new
+metric's verdict, enforcement behavior the version fingerprint misses, a format metric that does
+not establish a well-formed result, tests that do not show markup alone causes rejection, and
+nearby graders that violate the architecture rules. Ruff, strict mypy and all 56 offline tests
+passed; full-suite testing required an in-memory temporary-directory fixture workaround for
+sandbox permissions, and no repository files changed. Triage and decisions are recorded in
+section 7 of `2026-10-10-leaked-citations-fix.md` and in the commits that followed.
+
 Second-opinion review requested with the prompt in the appendix of
 `2026-10-10-leaked-citations-fix.md`. Pasted verbatim; triage and decisions are recorded in
-HANDOFF.md and in the commits that followed.
+section 7 of that walkthrough and in the commits that followed.
 
 ---
 

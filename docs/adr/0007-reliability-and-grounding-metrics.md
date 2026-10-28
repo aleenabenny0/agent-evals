@@ -1,6 +1,6 @@
 # ADR 0007: Reliability and grounding metrics
 
-**Status:** accepted (2026-10-11). Approved by Aleena in one go after the brief alignment
+**Status:** accepted (2026-10-11). Approved in one go after the brief alignment
 (`docs/plans/brief-alignment.md`).
 
 ## Context

@@ -1,5 +1,16 @@
 # Iteration 4: system prompt v5, v4 plus an abstention guard (pre-registered 2026-10-17)
 
+**Summary.** This document pre-registers iteration 4, a single prompt change from v3 to v5 (v4
+plus an abstention guard), and records its outcome. On dev, v5 passed the gate: judge_supported,
+the judge's fully-supported rate, rose from 0.308 to 0.612, with no detectable change in
+correctness and no case type or area regressing. Because v5's median answer was more than 25%
+shorter than v3's, that number could be trusted only after a pre-registered 30-answer human spot
+check; the judge passed 3 answers the author failed, one more than the rule allowed, so the
+number is not trusted and the test split was not run. Two attempts to fix the judge (rubric v2.1,
+then a retest under a corrected rule) each failed its rule. Iteration 4 closed on 2026-10-17
+without shipping, as better by the labeler's 90 v5 labels (0.60 fully supported against 0.34 for
+v3, on different cases) but not proven by the judge; v3 stays the champion.
+
 **Change.** One prompt version, the change type ADR 0008 allows: `docs_agent.prompt_version` v3
 to v5 (`configs/challenger-v5.yaml`). v5 is v4 (iteration 3, rejected) with two rules added:
 
@@ -54,11 +65,11 @@ with the keyword lists of commit `2cbd972` and the validated judge (v2, `2cf75fa
 **Checks fixed now, applied after the run.**
 
 1. *Answer look and the spot check.* If v5's median answer length is more than 25% below v3's,
-   the judge's number is not trusted, and the test split is not run, until Aleena spot-checks 30
-   answers. The sample is the first 30 of v5's answered attempt-1 dev answers, sorted by
-   sha256("iteration-4-spot-check:" + case id). She labels them with rubric v2 on screen and no
-   judge visible. The number is trusted if the judge passes at most 2 answers she fails on fully
-   supported; overall agreement is reported too.
+   the judge's number is not trusted, and the test split is not run, until the author spot-checks
+   30 answers. The sample is the first 30 of v5's answered attempt-1 dev answers, sorted by
+   sha256("iteration-4-spot-check:" + case id). The author labels them with rubric v2 on screen
+   and no judge visible. The number is trusted if the judge passes at most 2 answers the author
+   fails on fully supported; overall agreement is reported too.
 2. *Errors.* Attempts that end in an error (for example the 12-turn limit) are invisible to the
    abstention metrics. If v5 has more than 3 errored attempts beyond v3's, that is disclosed
    beside the result.
@@ -72,7 +83,7 @@ with the keyword lists of commit `2cbd972` and the validated judge (v2, `2cf75fa
 
 If the gate passes and the spot check holds, the frozen test split is run once and judged once,
 and the CHANGELOG entry records both splits. Shipping, which means setting `prompt_version: v5`
-in `default.yaml`, is Aleena's decision. If the gate fails, v3 stays the champion and the
+in `default.yaml`, is the author's decision. If the gate fails, v3 stays the champion and the
 rejection is recorded.
 
 ## Dev result (2026-10-17): gate passed; spot check pending
@@ -104,13 +115,14 @@ docs-ai-002-p1 (attempt 1 of each).
 
 ## Spot check (2026-10-17): the rule failed by one, so the judge's v5 number is not trusted
 
-Aleena labeled the 30 pre-registered answers (`results/labels/docs-20261017-174739-1c0e8e.jsonl`,
-exported in `a4c3efa` before any comparison). Against the validated judge on fully supported:
-agreement 27 of 30, kappa 0.78, the judge failing none that she passed and **passing 3 that she
-failed** (the rule allowed 2). Under the rule, the judge's 0.612 for v5 is not trusted, and the
-test split has not been run.
+The author labeled the 30 pre-registered answers
+(`results/labels/docs-20261017-174739-1c0e8e.jsonl`, exported in `a4c3efa` before any
+comparison). Against the validated judge on fully supported: agreement 27 of 30, kappa 0.78, the
+judge failing none that the author passed and **passing 3 that the author failed** (the rule
+allowed 2). Under the rule, the judge's 0.612 for v5 is not trusted, and the test split has not
+been run.
 
-The three answers the judge passed and she failed:
+The three answers the judge passed and the author failed:
 
 - docs-ai-001-p2: "according to the Amazon Bedrock cross-Region inference documentation".
 - docs-mix-049: "this is stated in the Aurora Serverless v2 user guide".
@@ -119,21 +131,21 @@ The three answers the judge passed and she failed:
 
 In the first two, the judge's reason credits the attribution because the cited URL is that page.
 Rubric v2 makes a statement about where the documentation says something a claim that needs a
-quote, so her reading follows the rubric's letter. The third is a paraphrase read as plain
-rewording.
+quote, so the author's reading follows the rubric's letter. The third is a paraphrase read as
+plain rewording.
 
 Facts that bear on the next step (post hoc, not part of the rule):
 
 | | v3 answers | v5 answers |
 |---|---|---|
-| Fully supported by Aleena's labels | 27 of 80 (0.34, 95% CI 0.24 to 0.45) | 18 of 30 (0.60, 0.42 to 0.75) |
-| Judge passes she failed | 2 of 25 | 3 of 21 |
+| Fully supported by the author's labels | 27 of 80 (0.34, 95% CI 0.24 to 0.45) | 18 of 30 (0.60, 0.42 to 0.75) |
+| Judge passes the author failed | 2 of 25 | 3 of 21 |
 | Answers naming their source page ("according to the ... documentation") | 10.9% of 349 | 11.4% of 352 |
 | Of those, the judge passed | 37% | 70% |
 
 The v3 labels are the first 80 attempt-1 answers in case-id order, and the v5 labels are a hash
-sample, so the two rates compare different cases. By her labels v5 is better by about 26
-points; the judge says 30.
+sample, so the two rates compare different cases. By the author's labels v5 is better by about
+26 points; the judge says 30.
 
 The judge's error is not new. v5 names its source as often as v3 did, but in v5 that phrase is
 more often the only unsupported claim left, so the judge's blind spot weighs more. This is the
@@ -141,16 +153,17 @@ drift the spot-check rule exists to catch.
 
 ## Judge fix attempt (2026-10-17): not adopted
 
-Aleena chose to fix the judge before going further. Rubric v2.1 (validation doc section 9) halved
-the false passes on 30 fresh v5 answers but failed its pre-registered rule on core supported. v2
-stays, and the v5 number stays untrusted. Her 60 labels on v5's answers give 0.58 fully
-supported, against 0.34 on v3's. The next step is her decision.
+The author chose to fix the judge before going further. Rubric v2.1 (validation doc section 9)
+halved the false passes on 30 fresh v5 answers but failed its pre-registered rule on core
+supported. v2 stays, and the v5 number stays untrusted. The author's 60 labels on v5's answers
+give 0.58 fully supported, against 0.34 on v3's. The next step was the author's decision.
 
 ## Closed (2026-10-17): not shipped
 
 The retest of judge v2.1 under the corrected rule (validation doc section 10) failed by one answer,
 so v2 stays the validated judge and its v5 number stays untrusted. Under section 10's rule
-iteration 4 closes as **better by the labeler's 90 v5 labels but not proven by the judge**. Her
-labels give fully supported 54/90 (0.60) on v5's answers against 27/80 (0.34) on v3's. The test
-split was not run. v3 stays the champion; v5 stays selectable (`configs/challenger-v5.yaml`).
+iteration 4 closes as **better by the labeler's 90 v5 labels but not proven by the judge**. The
+author's labels give fully supported 54/90 (0.60) on v5's answers against 27/80 (0.34) on v3's.
+The test split was not run. v3 stays the champion; v5 stays selectable
+(`configs/challenger-v5.yaml`).
 

@@ -1,8 +1,23 @@
 # Judge validation
 
+**Summary.** This document records the validation of the LLM judge: agreement with the code
+graders, agreement with hand labels, mutation tests and bias probes, and the tests of three later
+candidate judge versions. The "fully supported" verdict, the project's hallucination metric,
+agreed with all 65 blind judge-test labels (kappa 1.00) and is validated; on a later set of 40
+fresh labels it reached kappa 0.80. "Core supported" reached kappa 0.37, is not validated and is
+reported as advisory; "responsive" scored kappa 0.68 to 0.84 on closed-book answers but has met
+no failures on the docs agent's own answers. In the fourth probe round, against the final judge,
+planted number and citation errors were caught every time, while verdict stability fell below
+its 0.95 bar under padding (0.92) and re-sampling (0.84). Candidates v3, v4 and v2.1 (v2.1
+twice, the second time under a corrected rule) were each scored against a decision rule committed
+before scoring, and each failed it, so judge v2 (`2cf75fa03e09`) remains the validated judge.
+
 **Status:** scored, 2026-10-16. Fully supported: kappa 1.00 on 65 blind judge-test labels (validated).
 Core supported: kappa 0.37 (not validated; advisory). Responsive: 0.68 to 0.84 on closed-book labels.
 Probes passed. Judge `2cf75fa03e09`.
+*(Corrected 2026-10-28: section 3 records otherwise for the final judge, in round four: padding
+stability 0.92 and re-sampling stability 0.84, both under their 0.95 bar, and qualifier mutants 4
+of 5, too few to judge; the planted number and citation errors were all caught.)*
 The judge does not ship until every bar below is met on judge-test labels. Plan and bars: `docs/plans/llm-judge.md`. Mechanics: `graders/judge.py`.
 
 | Item | Value |
@@ -31,12 +46,12 @@ read but did not quote. Whether that strictness matches a human reader is the qu
 
 ## 2. Agreement with hand labels (2026-10-12)
 
-Aleena labeled all 114 attempt-1 answers of the run (`evals label`), 49 on judge-dev and 65 on
+The author labeled all 114 attempt-1 answers of the run (`evals label`), 49 on judge-dev and 65 on
 judge-test, assigned by case-id hash before any verdict was seen. Labels are exported to
 `results/labels/docs-20261011-223111-702e87.jsonl`. Scoring is `evals judge-validate`; positive
 class = a real failure.
 
-| Split | Verdict | n | kappa | TPR (judge catches her fails) | TNR (judge passes her passes) | tp/fp/fn/tn | Bar 0.7 |
+| Split | Verdict | n | kappa | TPR (judge catches the labeler's fails) | TNR (judge passes the labeler's passes) | tp/fp/fn/tn | Bar 0.7 |
 |---|---|---|---|---|---|---|---|
 | judge-test | supported | 65 | **0.256** | 1.00 (0.88 to 1.00) | 0.28 (0.16 to 0.44) | 29/26/0/10 | **missed** |
 | judge-test | responsive | 65 | 1.000 (degenerate) | undefined, no human fails | 1.00 (0.94 to 1.00) | 0/0/0/65 | not testable yet |
@@ -46,19 +61,19 @@ class = a real failure.
 **Reading, from the judge-dev disagreements only** (the 26 judge-test disagreements were not
 read, so judge-test can still be scored once after a revision):
 
-- The judge never passes an answer Aleena failed (TPR 1.00 everywhere). Every disagreement is
-  an answer she passed and the judge failed: 24 on judge-dev.
+- The judge never passes an answer the labeler failed (TPR 1.00 everywhere). Every disagreement is
+  an answer the labeler passed and the judge failed: 24 on judge-dev.
 - All 24 are the same shape: the fact that answers the question is quoted, and the answer adds
   context the quotes do not carry ("the quota is adjustable", "check Service Quotas", "a public
   NAT gateway must be in a public subnet", "each document is at most 5 KB", a named API
   parameter). Six of them are table-row quotes with no column header, where a reader who knows
   AWS quota tables sees "Yes" as "adjustable" and the judge, correctly by the letter, does not.
-- Her own "no" notes fail answers for exactly that kind of added context (workaround steps,
-  API names, tier details not quoted). Across all 114 she split those cases about evenly: 47
-  fails, 50 passes. So the written definition ("every factual claim backed by the quotes") is
-  being applied consistently by the judge and inconsistently by the labels, with a lenient lean.
-  A judge cannot reach kappa 0.7 against a reference that disagrees with itself at that rate; a
-  prompt revision alone will not fix this.
+- The labeler's own "no" notes fail answers for exactly that kind of added context (workaround
+  steps, API names, tier details not quoted). Across all 114 the labeler split those cases about
+  evenly: 47 fails, 50 passes. So the written definition ("every factual claim backed by the
+  quotes") is being applied consistently by the judge and inconsistently by the labels, with a
+  lenient lean. A judge cannot reach kappa 0.7 against a reference that disagrees with itself at
+  that rate; a prompt revision alone will not fix this.
 - "Responsive" agreed 114 of 114 because neither rater failed anything. Kappa is undefined
   when both raters are constant; the table shows 1.0 only because the code returns 1.0 for
   perfect agreement. The verdict is untested until it meets answers that are not responsive.
@@ -66,7 +81,7 @@ read, so judge-test can still be scored once after a revision):
   `InvokeModel`, which belong to `docs-ai-001`'s answer, not this one. Probably typed at the
   wrong prompt during the revisit; the label itself may be wrong too.
 
-**Decision needed (Aleena):**
+**Proposed next steps:**
 
 1. **Sharpen the rubric and split the verdict.** Two questions instead of one: *core supported*
    (the claims that answer the question are in the quotes) and *fully supported* (every claim
@@ -83,7 +98,7 @@ Until then the judge's "supported" number is reported as unvalidated, as it is i
 
 ## 2b. Second round: judge-dev relabeled under the two-question rubric (2026-10-13)
 
-Aleena relabeled the 49 judge-dev answers with both questions; the judge (`8251be566ff1`,
+The author relabeled the 49 judge-dev answers with both questions; the judge (`8251be566ff1`,
 `JUDGE_SUPPORTED_V2`) was re-run over the dev run. Judge-test is untouched and unread.
 
 | Verdict | n | kappa | TPR | TNR | tp/fp/fn/tn |
@@ -92,7 +107,7 @@ Aleena relabeled the 49 judge-dev answers with both questions; the judge (`8251b
 | fully supported | 49 | 0.137 | 1.00 (0.87 to 1.00) | 0.13 (0.05 to 0.32) | 26/20/0/3 |
 | responsive | 49 | 1.0 (degenerate) | undefined | 1.00 | 0/0/0/49 |
 
-Raw agreement on core is 44 of 49; kappa is low because Aleena failed only 3 answers, so each
+Raw agreement on core is 44 of 49; kappa is low because the labeler failed only 3 answers, so each
 disagreement weighs heavily. Reading the disagreements, judge-dev only:
 
 - **Core, 5 disagreements.** Four are the rubric's headerless-table-row rule: a row like
@@ -109,12 +124,12 @@ disagreement weighs heavily. Reading the disagreements, judge-dev only:
 
 Conclusion: no prompt change is indicated on judge-dev. The judge applies the written rubric;
 the labels do not yet apply it consistently, on the strict question especially. Calibration step:
-Aleena revisits judge-dev with the judge's verdicts and reasons shown (`evals label --revisit
+the author revisits judge-dev with the judge's verdicts and reasons shown (`evals label --revisit
 all --split judge-dev --show-judge`, a flag the tool refuses on judge-test), keeps or changes each
 label on the merits, and decides the open rubric point below. Judge-test is then labeled fresh,
 without the judge in view, and scored once.
 
-Rubric decision (Aleena, 2026-10-16): the headerless-row rule **stays strict**. A table row or
+Rubric decision (2026-10-16): the headerless-row rule **stays strict**. A table row or
 cell quoted without its header proves only what it literally says; which column a value belongs
 to cannot be inferred. This binds the labels as it already binds the judge, so the three judge-dev
 core passes on headerless rows (`docs-ai-004-p1`, `docs-chg-013`, `docs-chg-030`) are expected to
@@ -123,7 +138,7 @@ goes on the improvement-loop list.
 
 ## 2c. Calibration pass and the closed-book labels (2026-10-16)
 
-Aleena revisited all 49 judge-dev labels with the judge's verdicts in view (`--show-judge`,
+The author revisited all 49 judge-dev labels with the judge's verdicts in view (`--show-judge`,
 refused on judge-test), changed what the rubric required, and labeled 41 closed-book answers
 (run `closed-book-20261011-225242-b58341`, same model with no tools, 54.6% correct) for the
 responsive question. The judge was then run over the closed-book answers (98 calls).
@@ -156,14 +171,14 @@ Reading, judge-dev only:
   the session (the first answer's note had landed on the second answer, and the second's verdict
   had followed); both corrections are recorded in the exported file.
 
-## 2d. Decisions before the final scoring (Aleena, 2026-10-16)
+## 2d. Decisions before the final scoring (2026-10-16)
 
 1. The strict headerless-row rule applies everywhere, refined: a quoted header fragment naming
    the column counts as the header; prose near the row does not. `docs-chg-013` and
    `docs-chg-030` flipped to core = no (neither quote set names the date column). The rubric
    text, read by the judge and shown on the label screen, carries the refinement; the judge was
    re-run with it.
-2. The 14 strict disputes: Aleena agreed that a factual sentence no quote states fails "fully
+2. The 14 strict disputes: the author agreed that a factual sentence no quote states fails "fully
    supported", re-checked each against its quotes, and flipped those where the judge was right.
    Any kept are listed with the quote that supports them.
 3. Then the 65 judge-test answers are labeled blind, once, and scored once.
@@ -174,7 +189,7 @@ The remaining strict disputes turned out to be a screen problem: the label scree
 quote inside 200 characters of page context, and the notes on 13 kept labels cited header rows
 and neighbouring rows that were visible there but absent from the stored citations the judge
 sees. The screen now shows the citations first, alone and verbatim, and dims the context as
-uncited. Aleena redid the disputed pass on the fixed screen. Judge `2cf75fa03e09` (final rubric).
+uncited. The author redid the disputed pass on the fixed screen. Judge `2cf75fa03e09` (final rubric).
 
 | Verdict | n | kappa | TPR | TNR | tp/fp/fn/tn |
 |---|---|---|---|---|---|
@@ -183,8 +198,8 @@ uncited. Aleena redid the disputed pass on the fixed screen. Judge `2cf75fa03e09
 | responsive | 49 | degenerate | no failures on dev | 1.00 | 0/0/0/49 |
 
 Three disagreements remain on core, all reasoned and recorded: `docs-int-002` and `docs-mix-049`
-(Aleena: the core claim is in quote 1, the judge: the claim leans on which workflow type or on
-"remove" versus "add"), and `docs-mix-056` (Aleena: the cited row does not say 100 is the
+(the labeler: the core claim is in quote 1, the judge: the claim leans on which workflow type or on
+"remove" versus "add"), and `docs-mix-056` (the labeler: the cited row does not say 100 is the
 default; the judge passes it). These are the kind of disagreement a judge is allowed to have.
 
 Both support bars are met on judge-dev. Judge-dev was used for tuning (two rubric revisions, one
@@ -194,12 +209,12 @@ without the judge in view, then judged once with the final judge.
 
 ## 2f. Published result: judge-test, labeled blind, scored once (2026-10-16)
 
-Aleena relabeled the 65 judge-test answers fresh on the fixed screen (`--revisit all --split
+The author relabeled the 65 judge-test answers fresh on the fixed screen (`--revisit all --split
 judge-test --fresh`: no previous answers shown, no judge in view, two-question rubric, strict
 headerless-row rule, a note on 58 of 65). The final judge (`2cf75fa03e09`, `JUDGE_SUPPORTED_V2`
 with the refined rubric) then graded those 65 answers, 130 calls, and `judge-validate` ran once.
 
-| Verdict | n | kappa | TPR (judge catches her fails) | TNR (judge passes her passes) | tp/fp/fn/tn | Bar 0.7 |
+| Verdict | n | kappa | TPR (judge catches the labeler's fails) | TNR (judge passes the labeler's passes) | tp/fp/fn/tn | Bar 0.7 |
 |---|---|---|---|---|---|---|
 | **fully supported** | 65 | **1.000** | 1.00 (0.94 to 1.00) | 1.00 (0.65 to 1.00) | 58/0/0/7 | **met** |
 | core supported | 65 | **0.366** | 0.33 (0.12 to 0.65) | 0.96 (0.88 to 0.99) | 3/2/6/54 | **missed** |
@@ -320,7 +335,8 @@ both verdicts under the stricter rubric, so n fell):
 | padding | probe | 38 | verdicts unchanged | 0.92 (0.79 to 0.97) | 0.95 | **just missed** |
 | resample | probe | 38 | verdicts unchanged | 0.84 (0.70 to 0.93) | 0.95 | **missed** |
 
-268 judge calls, 107 from cache. The mutants are caught. The probes slipped against round three:
+268 judge calls, 107 from cache. The mutants are caught (the qualifier class 4 of 5, too few to judge; this note added
+2026-10-28). The probes slipped against round three:
 the final rubric is stricter, so more "fully supported" verdicts sit on the edge and move between
 samples; 6 of 38 answers changed a verdict on re-sampling with nothing else changed. That is the
 judge's own noise, about 16% per answer on this version; it averages out in a rate over 346
@@ -330,13 +346,19 @@ both change the judge version and both are validated on new labels, not these.
 
 ## 4. Decision
 
+*(Written before the final scoring, and superseded on hand labels by sections 2b to 2f: kappa
+1.00 on 65 blind judge-test labels. Corrected 2026-10-28: the mutants were not caught in every
+round. Qualifier mutants missed their bar in round one (0 of 11, a flaw in the mutant, which was
+then redesigned) and round two (9 of 11), met it in round three (11 of 11), and scored 4 of 5 in
+round four, too few to judge; see section 3.)*
+
 - Hand-label agreement: **supported missed the bar (kappa 0.26 on judge-test)**; the cause is a
   rubric that the judge applies literally and the labels apply leniently and unevenly. Next
   step is the two-question rubric above, not a prompt tweak. "Responsive" is untested.
 - Mutation tests and bias probes: mutants **passed** in every round; stability probes passed in
   round three (0.95) and slipped to 0.84 against the final, stricter judge (round four). Reported
   as such; temperature 0 is the planned fix for the next version.
-- Agreement with hand labels: **pending** Aleena's labels (step 2). The judge does not ship, and
+- Agreement with hand labels: **pending** the labels (step 2). The judge does not ship, and
   no judge number appears in a headline, until kappa is reported on judge-test.
 - What the judge is already allowed to do: flag dev answers where code says fail and the judge
   says responsive, as suspected grader misses for human confirmation (failure taxonomy, A).
@@ -363,7 +385,7 @@ comparison is clean. Until then the validated judge stays in the gate.
 
 ## 6. Judge v2 or v3: decision rule, committed before scoring (2026-10-16)
 
-Aleena labeled 40 attempt-1 answers of the champion dev run (`docs-20261016-214710-02abb7`) on
+The author labeled 40 attempt-1 answers of the champion dev run (`docs-20261016-214710-02abb7`) on
 the fixed screen (citations first, rubric v2 text shown, no judge in view): 25 on the judge-test
 side, 15 on the judge-dev side; core supported 37 yes / 3 no, fully supported 18 / 22,
 responsive 40 / 0. Both judges (`2cf75fa03e09` validated, `9e7b588e83f8` candidate) graded these
@@ -435,7 +457,7 @@ rubric v3 separately; then, for each rater the panel's majority overruled, a def
 that rater's verdict from the rubric's own words and says whether the case holds. Diagnostic
 only: the hand labels remain the reference, and nothing here changes a label or the scores above.
 
-**The first run was not blind, and was re-run.** Workflow subagents receive the user's global
+**The first run was not blind, and was re-run.** Workflow subagents receive the author's global
 CLAUDE.md, whose rule to start every task-oriented session with the task-observer skill led 11 of
 the 25 first-run reviewers to load that skill; 9 located or searched the shared observation log
 and 6 read it in full. That log describes this evaluation, including (observation 14) which way the
@@ -479,17 +501,16 @@ Findings:
    the labeler for a second look on the label screen, without the judge in view. Any change is
    recorded as a correction made after adjudication, and the scores above stay as first computed.
 5. **Isolation must be checked, not assumed.** A subagent told to read one named file still
-   followed a standing user rule to load a skill and read a shared log. Blind or isolated agents
+   followed a standing global rule to load a skill and read a shared log. Blind or isolated agents
    now run as an agent type without CLAUDE.md, and their transcripts are audited; the expected
    tool-call count is a cheap leak detector.
 
-### Decisions on the two rubric questions (Aleena, 2026-10-16)
+### Decisions on the two rubric questions (2026-10-16)
 
 1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
    (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
 2. **Price factors are not part of the main answer** when a question asks how something is
-   billed; they are peripheral. Wording drafted by the agent and approved by Aleena on
-   2026-10-17; it is in rubric v4.
+   billed; they are peripheral. Wording drafted, then approved on 2026-10-17; it is in rubric v4.
 
 What follows from them:
 
@@ -509,7 +530,7 @@ What follows from them:
   31.8% on test) are v2-judge numbers and stay labelled as such until a re-judge under an adopted
   v4.
 
-Recheck result (2026-10-17): Aleena re-opened docs-chg-003 on the label screen, without the judge
+Recheck result (2026-10-17): the author re-opened docs-chg-003 on the label screen, without the judge
 in view, and kept "fully supported: yes". The label stands as the reference; the panel's and both
 judges' reading ("stops providing patches" is stronger than the quote's "may no longer apply")
 is recorded as a disagreement with it, not a correction.
@@ -592,23 +613,23 @@ this run were saved before the second judge graded it. They now read only the co
 ## 9. Judge v2.1: rubric v2 plus one paragraph on reporting phrases (rule committed 2026-10-17, before any v2.1 grading or scoring)
 
 **Why.** Iteration 4's pre-registered spot check (`docs/plans/iteration-4.md`) found the
-validated judge passing 3 of 30 v5 answers that Aleena failed. Two were attributions the judge
+validated judge passing 3 of 30 v5 answers that the labeler failed. Two were attributions the judge
 credited from the cited URL: "according to the Amazon Bedrock cross-Region inference
 documentation", and "this is stated in the Aurora Serverless v2 user guide, so this applies to
-Aurora Serverless v2". Her earlier labels pass plain reporting frames ("The documentation says
+Aurora Serverless v2". The earlier labels pass plain reporting frames ("The documentation says
 ...", "According to the Amazon Bedrock docs ..."). Rubric v2.1 adds one paragraph that states
 the line, in `src/agent_evals/graders/judge_prompts.py`, with judge version `88db72ba4022` and
 config `configs/judge-v2.1.yaml`.
 
 **Review before commit.** Two isolated reviewer agents checked a draft against all 224 labeled
-answers. They found 101 with an attribution, and the draft matched her verdicts on 95. The final
+answers. They found 101 with an attribution, and the draft matched the labels on 95. The final
 wording fixes the six disagreements. The publisher, the service's own name and generic words for a
 kind of page add nothing. The question can clear only the source a phrase names. Pointers to
 other pages are reported content. The test applies only to names a reporting phrase introduces.
 Spot checks of the final wording: docs-ai-045, docs-ai-032, docs-core-039, docs-ai-004, docs-ai-011
-and docs-ai-028 come out supported, as she labeled them; docs-ai-001-p2, docs-mix-049 and
-docs-core-028 come out unsupported, as she labeled them. Known residual risk: a question that
-names the wrong version clears "according to the v1 docs" for the source name.
+and docs-ai-028 come out supported, as labeled; docs-ai-001-p2, docs-mix-049 and docs-core-028
+come out unsupported, as labeled. Known residual risk: a question that names the wrong version
+clears "according to the v1 docs" for the source name.
 
 **Labels.** The 30 fresh labels are the next 30 answered attempt-1 answers of
 `docs-20261017-174739-1c0e8e` in the spot check's hash order, positions 31 to 60: docs-ai-005-p1, docs-ai-002, docs-int-020, docs-mix-055, docs-chg-023, docs-ai-005, docs-ai-005-p2, docs-int-041, docs-ai-033, docs-mix-056, docs-core-011, docs-ai-029, docs-chg-013, docs-int-029, docs-ai-002-p2, docs-int-007, docs-core-034, docs-mix-050, docs-core-018, docs-core-025, docs-ai-038, docs-core-039, docs-mix-060, docs-mix-085, docs-chg-010, docs-ai-001, docs-chg-019, docs-ai-007, docs-core-016, docs-mix-077.
@@ -624,8 +645,8 @@ pass on an answer the labeler failed.
 1. **Fresh labels.** On the 30 fresh labels, v2.1's agreement is at least v2's on fully supported
    and on core supported. Its false passes on fully supported are no more than v2's and at most 2.
    If v2 and v2.1 give identical fully-supported verdicts on all 30, the 30 cannot tell them apart.
-   Aleena then labels positions 61 to 90 under the same conditions, and this criterion is applied
-   to all 60.
+   The author then labels positions 61 to 90 under the same conditions, and this criterion is
+   applied to all 60.
 2. **Earlier labels.** The earlier sets are 114 labels on `docs-20261011-223111-702e87`, 80 on
    `docs-20261016-214710-02abb7` and the 30 spot-check labels on `docs-20261017-174739-1c0e8e`.
    v2.1 is graded once with the default salt and compared with the stored v2 verdicts. In each
@@ -669,8 +690,8 @@ Under the rule, **v2 stays the validated judge**, and iteration 4's v5 number st
 What happened on the fresh 30. v2.1 did what the paragraph was for: false passes on fully
 supported fell from 4 to 2, and agreement rose from 26 to 28. The two core failures, docs-int-020
 and docs-int-029, are not attributions. In both, v2.1 flagged the same unsupported claim that
-Aleena's note names, so its fully-supported verdict agrees with hers. But it called that claim
-core where she called it peripheral:
+the labeler's note names, so its fully-supported verdict agrees with the label. But it called that
+claim core where the labeler called it peripheral:
 
 - docs-int-020: the premise correction "Parameter Store does not bill per parameter like Secrets
   Manager".
@@ -681,7 +702,7 @@ figure includes the spot-check 30 that informed the paragraph.
 
 Facts that bear on the next step (post hoc, not part of the rule):
 
-- Aleena's labels on v5's answers, all 60 hash-sampled, give fully supported 35/60 (0.58). Her
+- The labels on v5's answers, all 60 hash-sampled, give fully supported 35/60 (0.58). The
   80 labels on v3's answers give 27/80 (0.34). The v3 labels are the first 80 in case-id order, not
   a random sample.
 - v2's false passes on fully supported are 7 of 60 on v5's answers and 2 of 80 on v3's. The judge
@@ -699,7 +720,7 @@ monitor it. v2.1 met every criterion on the validated verdict and failed only on
 answers where it called core a claim the labeler called peripheral. This rule gates on fully
 supported and reports core supported, with only a wide guard against gross breakage. The change
 is made after seeing v2.1 fail, so it is tested only on labels collected after it is written, as
-section 9 provides, and it is disclosed here. Aleena chose this path on 2026-10-17.
+section 9 provides, and it is disclosed here. The author chose this path on 2026-10-17.
 
 **Labels.** Positions 61 to 90 in the same hash order on `docs-20261017-174739-1c0e8e`:
 docs-ai-023, docs-int-034, docs-chg-001, docs-ai-004-p3, docs-mix-067, docs-chg-027, docs-int-037, docs-mix-090, docs-int-045, docs-mix-022, docs-ai-003-p3, docs-ai-005-p3, docs-ai-036, docs-ai-010, docs-chg-003, docs-mix-042, docs-core-028, docs-chg-004, docs-mix-043, docs-chg-007, docs-mix-078, docs-chg-025, docs-core-019, docs-core-037, docs-ai-020, docs-ai-003-p2, docs-chg-008, docs-int-014, docs-ai-001-p1, docs-chg-022. They are labeled with rubric v2 on screen and no judge in view. v2.1's
@@ -745,7 +766,7 @@ The judges differ on three answers:
 
 On the first two the labeler is right and v2.1 wrong; on the third, v2.1 is right. The paragraph
 does what it was for, catching names that attributions add, but it also reaches hedges about the
-documentation, which the labeler treats as no claim at all (her rubric decision of section 7).
+documentation, which the labeler treats as no claim at all (the rubric decision of section 7).
 
 Over the 60 labels collected after the paragraph was written (positions 31 to 90), v2 agrees on
 50 and v2.1 on 51. False passes are 6 for v2 and 4 for v2.1; false fails are 4 for v2 and 5 for

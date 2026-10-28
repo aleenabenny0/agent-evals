@@ -1,5 +1,19 @@
 # Failure taxonomy: first dev run
 
+**Summary.** This taxonomy reads every failure in the docs agent's first dev run
+(`docs-20261011-223111-702e87`): 32 failing attempts out of 390, each read in full and given one
+cause. None of the 32 contains a factually wrong claim: 13 are keyword-grader false negatives, 12
+are hedged abstentions (the right answer, marked `abstained: true`), and the other 6 come from two
+cases, one unanswerable case answered as a false premise and one case defect. Baselines show that
+retrieval is worth about 37 points of correctness on this suite, and that handing the agent the
+gold pages adds no detectable gain. A later section, from the iteration 3 error analysis
+(2026-10-17), classifies the 157 unsupported claims in the 82 v3 champion answers that the
+validated judge fails on fully supported, and finds that the agent mostly had the evidence and
+did not quote it. On the first run the judge, not yet validated against hand labels, passed only
+0.177 of cited answers as supported, and 82% of answers carried at least one claim drawn from
+pages the agent read but did not quote. Both analyses cover the dev split only; the test split's
+three failures were not read.
+
 **Run:** `docs-20261011-223111-702e87` (docs agent `fbfc5355d106`, dev split, 130 cases, 3
 attempts, 390 attempts). **Result:** correct 0.918 (95% CI 0.874 to 0.956); 32 failing attempts.
 Every one of the 32 was read in full with `evals trace` (the compact dump is reproducible from the
@@ -38,14 +52,14 @@ the agent's phrasing.
   `docs-ai-001-p2` #2 ("do not currently support" vs "do not support"), `docs-chg-016` #2 (listed
   the sixteen Regions instead of the "May 20, 2025" cut-off; same fact, other side of the table).
 
-What to do: this is exactly what the judge's "responsive" verdict is for. The judge pass over
+Proposed fix: this is exactly what the judge's "responsive" verdict is for. The judge pass over
 this run (judge `b23a6c3aef09`, same evening) marked **21 of the 32 failing attempts as
 responsive**: all 13 in this category, the 3 in category C, the 3 in category D, and the two
 `docs-ai-001` attempts that answered without abstaining. The 11 it did not mark are the hedged
-abstentions, which the judge skips by design. Once the judge is validated against Aleena's
+abstentions, which the judge skips by design. Once the judge is validated against the author's
 labels, a dev answer with `correct = 0` and `judge_responsive = 1` becomes a suspected grader
-miss for her to confirm; confirmed ones get wider alternatives. The test split is never touched
-this way (its false negatives stay, and are reported as such).
+miss, to be confirmed by the author; confirmed ones get wider alternatives. The test split is
+never touched this way (its false negatives stay, and are reported as such).
 
 ## B. Hedged abstention (12 attempts, 6 cases)
 
@@ -62,12 +76,12 @@ does not get an answer.
 - `docs-int-017`, 3 attempts: rejects the premise exactly as the gold does ("managed rotation
   doesn't use a Lambda function"), then abstains because the second half of the question, where
   the template lives, is on a page outside the snapshot. A compound question with an
-  unanswerable half; see the note to Aleena below.
+  unanswerable half; see the case note under C below.
 - Also `docs-chg-007` #1 ("Probably not. Don't plan a new platform around Model Monitor...",
   abstained), `docs-mix-050` #1 and #3 (the overview page only names the "Scaling to Zero ACUs"
   section; the detail page is not in the snapshot).
 
-What to do: a prompt rule in the next gated iteration (phase 5): "If the documents let you
+Proposed fix: a prompt rule in the next gated iteration (phase 5): "If the documents let you
 answer, answer; `abstained` is for when they do not. Put your uncertainty in `confidence`, not in
 `abstained`." Plus a retrieval rule: read the top search hit before reasoning from other pages.
 Both are measured, not assumed: champion versus challenger on dev, then test, with CHANGELOG.
@@ -78,16 +92,17 @@ Both are measured, not assumed: champion versus challenger on dev, then test, wi
 abstain, nothing is announced. The agent, three times: "There is no date... the limit is a hard
 quota... the premise is not supported", `abstained: false`, citing the quota row. The content is
 right and the format is the opposite of category B. The question reads like a false premise, so
-the agent treated it as one. Note to Aleena: either reclassify the case as `false_premise` with
+the agent treated it as one. Case note: either reclassify the case as `false_premise` with
 "no date" alternatives, or keep it unanswerable and let the prompt rule above settle the format.
 
 ## D. Case defect (3 attempts, 1 case)
 
 `docs-chg-025` asks only whether PITR is fixed at 35 days; the gold also requires the clause
 "changing the window does not change the price", which the question does not ask. The agent
-answered the question asked, correctly, three times. Drafting error (the agent's, 2026-10-11),
-caught by the first run. Fix is Aleena's call: drop that `must_include` group or extend the
-question. It is a case fix, not a gold-to-pass edit, and HANDOFF carries it as item (i).
+answered the question asked, correctly, three times. Drafting error (in the LLM-drafted case,
+2026-10-11), caught by the first run. The fix is the author's call: drop that `must_include` group
+or extend the question. It is a case fix, not a gold-to-pass edit, and the decision is still
+open.
 
 ## What the judge adds on the passing attempts
 
@@ -102,7 +117,7 @@ did not quote ("inference profiles are used to route requests across Regions", "
 belongs to the Global profile", when the cited table row has no headers). By the brief's
 definition that is a claim-level unsupported rate, and 82% of answers carry at least one such
 claim. Whether a human reader agrees that this should fail an answer is exactly what the
-judge-test kappa will tell; if Aleena's labels pass those answers, the judge prompt is too
+judge-test kappa will tell; if the author's labels pass those answers, the judge prompt is too
 strict and is revised on judge-dev. Either way the agent-side fix is the same and belongs to
 phase 5: cite what you state, or do not state it.
 
@@ -149,9 +164,9 @@ them also fail core supported. **Method:** eight reader agents of a type that in
 instructions, with read-only tools, each took 10 or 11 answers. Each reader listed every
 unsupported claim under the judge's rubric, not only the one the judge named, and gave it the
 first cause that applies in the order below. "On a page the agent read" was decided by searching
-the exported text of every page the agent read or cited, never from memory. Aleena's notes went
-in as evidence for the 55 answers that had one. A ninth reader re-read 15 answers on its own. Dev
-only. Data, per answer and per claim: `results/iteration-3/error-analysis.json`; export
+the exported text of every page the agent read or cited, never from memory. The author's notes
+went in as evidence for the 55 answers that had one. A ninth reader re-read 15 answers on its
+own. Dev only. Data, per answer and per claim: `results/iteration-3/error-analysis.json`; export
 `scripts/export_unsupported_claims.py`; workflow `results/iteration-3/error-analysis-workflow.js`.
 
 | Cause (first that applies) | Claims | Core | Answers with it | Answers where it is the only cause |

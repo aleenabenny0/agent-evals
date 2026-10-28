@@ -1,8 +1,18 @@
 # Walkthrough: reliability and grounding metrics
 
+**Summary.** Five metrics were added and approved on 2026-10-11, with ADR 0007 as the decision
+record: flip rate, the noise floor for comparisons; pass@k beside pass^k; repeated calls, for loop
+detection; evidence precision; and unsupported entities, a deterministic check that every number
+and URL in an answer appears in the question or on a page the agent read or cited. This
+walkthrough gives what each number means, its formula where there is one, and where it lives in
+the code. The grounding check is called "unsupported" rather than "fabricated" because it cannot
+tell an invented figure from a converted one. Numbers written as words are not checked. The
+same number extraction also drives the review screen, which marks the gold answer's facts around
+the quote and lists the ones no quote covers.
+
 The five additions approved on 2026-10-11, what each number means, the formula where there is
-one, and where it lives. Decision record: ADR 0007. Written so each can be explained in an
-interview without the original conversation.
+one, and where it lives. Decision record: ADR 0007. Written so each can be explained from this
+page alone.
 
 ## 1. Flip rate: the noise floor
 
@@ -103,8 +113,8 @@ checked.
 
 ## 6. The same extraction fixes the review screen
 
-Aleena's observation: the yellow highlight showed the quote, but facts from the gold answer often
-sat in the unhighlighted text after it. Two changes, both in `review.py` and `evals review`:
+The author's observation: the yellow highlight showed the quote, but facts from the gold answer
+often sat in the unhighlighted text after it. Two changes, both in `review.py` and `evals review`:
 
 - `answer_terms(case)` collects every required phrase, every standalone number and every
   digit-bearing identifier (`python3.10`, `AL2023`, `/16`) from the gold answer, minus anything

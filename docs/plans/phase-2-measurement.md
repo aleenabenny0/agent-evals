@@ -1,5 +1,16 @@
 # Phase 2 plan: Measurement
 
+**Summary.** This plan, proposed on 2026-10-10, sets out how to turn the 7-case smoke suite into a
+measurement instrument: enough cases, in the right mix, to detect a 10-point change in accuracy,
+and graders that can score answers keyword matching cannot settle. A paired power analysis puts
+the test split at 150 cases, which gives 80% power at a discordance of up to 0.19, the share of
+cases on which the two versions compared disagree. The plan widens the documentation snapshot to
+333 pages across roughly 100 AWS services, with AI and ML as a named focus, and adds a
+case-authoring workflow in which every LLM-drafted case is verified by hand, a paraphrase
+robustness suite, an open decision on a local NLI cross-check (deferral is recommended) and a
+validation protocol for the LLM judge. Its status is proposed; of its open decisions, the
+case-authoring changes are recorded as done (ADR 0006).
+
 **Status:** proposed, 2026-10-10. Becomes "agreed" once the open decisions below are settled.
 Significant decisions get their own ADR as they are made.
 
@@ -39,7 +50,7 @@ n = 2.80^2 * d / delta^2  =  7.84 * d / delta^2
 
 Discordance is unknown until two real agents are compared, but 15 to 25% is typical for two
 prompt versions of the same model. **150 test cases** gives 80% power at d <= 0.19, which
-matches HANDOFF's 100 dev / 150 test split. The dev split has no power requirement; it needs
+matches the planned 100 dev / 150 test split. The dev split has no power requirement; it needs
 enough cases per failure type for lesson-writing and prompt work.
 
 **Code:** `stats/power.py` with `cases_for_paired_delta(delta, discordance, alpha, power)` and
@@ -75,14 +86,14 @@ Outposts. Two further unanswerable classes need no held-out service at all: pric
 pages never state, and dates of future launches or deprecations that only appear in
 announcements.
 
-**Decision needed:** approve the page list, or name services to add or remove.
+**Decision needed:** approval of the page list, or the services to add or remove.
 
 ### 3. Case authoring workflow (eval integrity)
 
-- Agent-drafted cases go in `suites/docs/<name>.drafts.jsonl` with `"provenance": "synthetic"`.
+- LLM-drafted cases go in `suites/docs/<name>.drafts.jsonl` with `"provenance": "synthetic"`.
   Each draft cites the page and quotes the sentence the gold answer rests on, so verification
   is a two-minute read, not a search.
-- Aleena verifies every draft against its page. Add `verified_by: str | None` to `Case`;
+- The author verifies every draft against its page. `Case` gains `verified_by: str | None`;
   `evals run` refuses a suite containing unverified synthetic cases unless `--allow-drafts`.
 - `evals validate` gains a sanity check for answerable cases: at least one alternative of every
   `must_include` group should appear, after normalization, on an evidence page. A miss is a
@@ -112,8 +123,8 @@ PyTorch (large install on a Windows CPU machine) or an ONNX runtime build (small
 
 - (a) `sentence-transformers` cross-encoder, simplest code, heaviest install;
 - (b) ONNX runtime with an exported small NLI model, lighter, more setup;
-- (c) defer: go code -> judge for now, add NLI once the judge exists and we can measure what
-  it would save.
+- (c) defer: go code -> judge for now, add NLI once the judge exists and what it would save can
+  be measured.
 
 Recommendation: (c), then revisit with judge-vs-NLI agreement data in hand. ADR when decided.
 
@@ -124,7 +135,7 @@ judge scores only what code cannot: whether the answer's claims are supported by
 quotes and whether the answer actually answers the question. Validation protocol before any
 judge number counts:
 
-1. ~100 hand labels from Aleena on dev-split answers (this doubles as the first human review
+1. ~100 hand labels from the author on dev-split answers (this doubles as the first human review
    queue), Cohen's kappa >= 0.7.
 2. Mutation tests: take correct answers, plant one error each (wrong number, wrong service,
    dropped qualifier), judge must catch >= 90%.
@@ -135,8 +146,8 @@ All judge calls go through `LLMClient`, so they are cached and counted like agen
 
 ## Open decisions, in the order they block work
 
-1. Agree the power-analysis approach above (step 1).
-2. Approve the snapshot page list (step 2).
+1. Agreement on the power-analysis approach above (step 1).
+2. Approval of the snapshot page list (step 2).
 3. Done: `verified_by`, `area` and `gold.support` on cases, the `--allow-drafts` guard,
    snapshot-backed `evals validate`, and seeded `evals split` (ADR 0006).
 4. NLI option (a), (b) or (c) (step 5), can wait until step 6 is underway.

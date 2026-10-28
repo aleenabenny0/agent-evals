@@ -1,5 +1,19 @@
 # Phase 7: online evals with a simulated user (Brief 02 M7)
 
+**Summary.** This plan covers phase 7: monitoring the docs agent the way it would be in
+production, with fresh questions from a simulated user, graded only by checks that need no
+answer key and watched by an alert rule that was tested blind. Days 1 to 5 were frozen as the
+reference on 2026-10-19; the automated judge then failed its blind check against 30 hand labels
+(4 false passes of 15, against a bar of 2), so its score is reported but never alerts, and the
+alert family is the six code-graded metrics. Each later day's expected outcome was
+pre-registered before it ran: the normal day stayed quiet, the rollback to prompt v2 was the
+expected honest miss, the larger retrieval fault was caught, and on the three blind days the
+subtle fault was caught twice (the second time only just) while the unchanged day stayed quiet;
+three blind days demonstrate the monitor but do not measure its power. One protocol slip is
+disclosed: blind day 10 ran three times, two of them under the wrong config by mistake, and the
+seal settled which run counted. Phase 7 is done as of 2026-10-23, at a measured cost of about
+$29.05 against an approval of about $29.20.
+
 **Done 2026-10-23.** Parts 1 to 5 are built and run. The demo's six days (part 5): a normal
 day stayed quiet (day 6), the rollback was the pre-registered honest miss (day 7), the larger
 retrieval fault was caught (day 8), and on the blind days the subtle fault was caught twice,
@@ -7,11 +21,11 @@ against a pre-registered chance of about 4 in 10 a day and the second time only 
 unchanged day quiet (days 9 to 11). Day 10 ran three times, two of them under the wrong config
 by mistake; the seal settled which run counted.
 
-**Status:** plan v2, 2026-10-18. v1 was reviewed by two isolated agents: one on statistics, one on
-the simulated user and the demo. Both rated it "weakened", with 21 fixable problems, and this
-version takes them all in (the table at the end). The online-case grader guards (part 2) and the
-alert rule (part 3) touch `graders/` and `stats/`, so they are agreed with Aleena before they are
-coded. Part 1 needs no decision.
+**Status:** plan v2, 2026-10-18. v1 was reviewed by two isolated reviewer agents: one on
+statistics, one on the simulated user and the demo. Both rated it "weakened", with 21 fixable
+problems, and this version takes them all in (the table under "How the review of v1 was taken
+in"). The online-case grader guards (part 2) and the alert rule (part 3) touch `graders/` and
+`stats/`, so they are agreed before they are coded. Part 1 needs no decision.
 
 **Goal.** Show the docs agent monitored the way it would be in production. Fresh questions with no
 answer key are graded only by checks that need none, summarized per simulated day, and watched by
@@ -60,20 +74,21 @@ tested blind.
   rebuilt exactly. `day-NN.meta.json` records hashes of the questions and of every input
   (snapshot, test split, area map, slot plan), and `evals simulate` refuses to overwrite a day
   with different questions unless given `--force`.
-- **Pilot before day 1** (`evals pilot-review 0`). Aleena reviews 30 generated questions, 6 per
-  persona, stratified by intent: 3 lookups, 1 comparison, 1 false premise and 1 outside-snapshot
-  question each, so every intent gets at least 5 reviews (a plain random 30 held one
-  outside-snapshot question). She marks each realistic or not, and answerable from the snapshot
-  or not; outside-snapshot questions should be "not", and for a false premise the question is
-  whether the snapshot shows the premise wrong. The tool shows the two passages of the source
-  page that the agent's own search ranks best, with the page link, because they can miss the
-  answer; she answers "unsure" rather than guess. Each answer is saved as it is given.
+- **Pilot before day 1** (`evals pilot-review 0`). The author reviews 30 generated questions, 6
+  per persona, stratified by intent: 3 lookups, 1 comparison, 1 false premise and 1
+  outside-snapshot question each, so every intent gets at least 5 reviews (a plain random 30 held
+  one outside-snapshot question). Each is marked realistic or not, and answerable from the
+  snapshot or not; outside-snapshot questions should be "not", and for a false premise the
+  question is whether the snapshot shows the premise wrong. The tool shows the two passages of
+  the source page that the agent's own search ranks best, with the page link, because they can
+  miss the answer; the author answers "unsure" rather than guess. Each answer is saved as it is
+  given.
 - **The pilot's bar, fixed before any answer exists.** The realistic share is weighted by each
   intent's share of a day (70/10/10/10), because the sample over-samples the rare intents. It is
   decided only once all 30 are reviewed. Below two thirds, the generator prompts are revised
   before day 1. The rates are published, per intent.
 
-## 2. Online runs (grader guards, approved by Aleena 2026-10-19)
+## 2. Online runs (grader guards, approved 2026-10-19)
 
 **Built** (commit 1e96ed6, then the review's 16 fixes): `evals online-run DAY [--no-judge]` turns
 the day's traffic into `results/online/cases/online-day-NN.jsonl`, runs the docs agent once per
@@ -98,7 +113,7 @@ run records its day, its config and whether that was the champion's.
 - **Kept apart.** Online runs never become `latest_run_id`, so `evals report` keeps showing suite
   runs.
 
-## 3. Monitor and alert (`evals monitor`, approved by Aleena 2026-10-19)
+## 3. Monitor and alert (`evals monitor`, approved 2026-10-19)
 
 **Built** (commit 96284ab, then the review's fixes; see "Code review of parts 3 and 4"):
 `evals monitor --freeze` runs the leave-one-day-out check on days 1 to 5 and, if no day alerts
@@ -113,7 +128,7 @@ nothing alerts but the day is not cleared, because a family metric went untested
 in the family and untrusted that day. It exits 2 when the day cannot be checked: its run is not
 complete, is not judged in full by the pinned judge, or its cases or traffic file has changed
 since it ran. Each reference day must have exactly one complete champion run; which of two runs
-counts is a decision, never a default. `evals judge-check label` walks Aleena through the 30
+counts is a decision, never a default. `evals judge-check label` walks the author through the 30
 blind labels: from each reference day, 3 answers the judge passed and 3 it failed, drawn with a
 seed per day and shown in an order that reveals neither. `evals judge-check score` counts the
 judge's false passes, and reports its false fails. If the labels pass, it reruns the
@@ -159,11 +174,11 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   the reference, that day's judge_supported is marked untrusted. The 25% is relative to the
   reference value, in either direction; with source naming near 96%, only a fall below about
   72% can trip it. An alert still stands, but a non-alert does not clear the day.
-- **Judge check.** Before judge_supported may alert at all, Aleena labels 30 answers from
+- **Judge check.** Before judge_supported may alert at all, the author labels 30 answers from
   reference days blind: from each day, 3 the judge passed and 3 it failed (decision 6). A plain
   random 30 would hold only about 7 or 8 judge passes (10 in the draw of 2026-10-19), since the
   judge passes about a quarter of online answers, and a false pass can happen only on those.
-  The judge must pass at most 2 she fails, of its 15 passes: the bar of iteration 4's spot
+  The judge must pass at most 2 the author fails, of its 15 passes: the bar of iteration 4's spot
   check. Its false fails are reported too. The record of the check is the results database:
   the sample, when drawn, and the first complete score, when made, are kept on every reference
   run. `results/online/judge-check-sample.json` and `judge-check.json` are only their published
@@ -180,7 +195,7 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
     would show them: `label --show-judge`, `judge-validate`, `judge-probe`, `compare` on a
     judge metric, and `trace` with any config. Only a deliberate look into the database or the
     call cache itself could still reach them.
-  - Only Aleena's labels count.
+  - Only the author's labels count.
   - The first complete score is final, because its result shows the judge's verdicts and a
     later relabel and rescore would no longer be blind. No file written, edited, moved or
     deleted can make, change or reopen it, and nor can a re-record of the same runs.
@@ -202,15 +217,16 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   were in. It then reran the leave-one-day-out check with the judge in the family on the real
   days, which stayed quiet, and a second score only reported the first.
 
-  **Scored 2026-10-21T02:45:11Z: the judge failed.** Of the 15 answers it passed, Aleena failed
-  4, against a bar of 2. Of the 15 it failed, she passed 2. They agreed on 24 of 30. The false
-  passes fell one on each of days 1 to 4; both false fails were on day 4. The result is final
-  and recorded (`results/online/judge-check.json`, and on every reference run in the results
-  database). **judge_supported stays out of the alert family for the whole demo:** it is
-  reported and drawn, never alerting, and the monitor's family is the six code-graded
-  metrics. This agrees with iteration 4's finding that the judge is lenient on the champion's
-  answers (its spot check then failed by one, and the judge passed 9 of 90 v5 answers she
-  failed): here it passes answers she finds not fully supported about a quarter of the time.
+  **Scored 2026-10-21T02:45:11Z: the judge failed.** Of the 15 answers it passed, the author
+  failed 4, against a bar of 2. Of the 15 it failed, the author passed 2. The judge and the
+  author agreed on 24 of 30. The false passes fell one on each of days 1 to 4; both false fails
+  were on day 4. The result is final and recorded (`results/online/judge-check.json`, and on
+  every reference run in the results database). **judge_supported stays out of the alert family
+  for the whole demo:** it is reported and drawn, never alerting, and the monitor's family is
+  the six code-graded metrics. This agrees with iteration 4's finding that the judge is lenient
+  on the champion's answers (its spot check then failed by one, and the judge passed 9 of 90 v5
+  answers the author failed): here it passes answers the author finds not fully supported about
+  a quarter of the time.
 - **Mechanics.** Permutations use at least 20,000 draws, with p = (k+1)/(R+1). Any day with cache
   hits is refused for latency. A metric that cannot be tested that day (refused, or no data)
   leaves the Holm family, the report gives the number tested, and the day is not cleared.
@@ -227,7 +243,7 @@ same decisions. The first record is in `results/online/archive/2026-10-20T172459
   alert" instead of a number.
 - **Output.** A table, `results/online/alerts.json`, and a non-zero exit code on an alert.
 
-## 4. Dashboard (`evals dashboard`, static HTML chosen by Aleena 2026-10-19)
+## 4. Dashboard (`evals dashboard`, static HTML chosen 2026-10-19)
 
 **Built:** `evals dashboard` writes `docs/dashboard/index.html`: one page with no scripts and no
 outside requests, rebuilt from the stored runs and the monitor's files. It has one small chart
@@ -312,7 +328,7 @@ warning.
    two agent runs $0.38 each, their judging $1.07 and $0.97.
 4. **Day 8** degrades retrieval, with 200 questions and a shadow. Its expected alerts are
    predicted first, by running that config on the dev split offline. **Predicted 2026-10-21,
-   open for Aleena (decision 8).** The planned fault, one search result
+   open as decision 8.** The planned fault, one search result
    (`configs/retrieval-k1.yaml`; dev run `docs-20261021-031002-e724f3`, $0.18, one attempt, no
    judge), moves model calls +0.47 per attempt (CI +0.27 to +0.70; floor +0.50; alert chance
    0.42) and in-scope declines +2.7 points (chance 0.08); errors +0.3 points; tokens fall 19%.
@@ -343,10 +359,10 @@ warning.
    cache. Reported only: the judge's line was 0.698 not fully supported against 0.747, and the
    shadow's 0.739. Cost about $3.86: generation about $1.30, the agent runs $0.30 and $0.36,
    their judging $0.92 and $0.98.
-5. **Days 9 to 11** are blind. Aleena chooses a config for each day: unchanged
+5. **Days 9 to 11** are blind. The author chooses a config for each day: unchanged
    (`configs/default.yaml`), a subtle fault (`configs/retrieval-k1.yaml`, one search result) or
-   a larger one (`configs/retrieval-k1-short.yaml`, one result and a quarter of each page). She
-   commits only a hash of her choices. The monitor's call is made before the choices are
+   a larger one (`configs/retrieval-k1-short.yaml`, one result and a quarter of each page). The
+   author commits only a hash of the choices. The monitor's call is made before the choices are
    revealed and checked against the hash. **Built 2026-10-21:** `evals blind seal` takes the
    three choices and a passphrase, typed hidden, and keeps only the hash
    (`results/online/blind.json`); a seal can be replaced (`--again`, the old one archived) only
@@ -360,7 +376,7 @@ warning.
    model calls alerts about 4 times in 10, so a miss is likely; larger, model calls and errors
    alert almost surely. Shadows on the blind days are optional, by cost.
 
-   **Sealed 2026-10-21T17:08:39Z** (`results/online/blind.json`; a first seal Aleena could not
+   **Sealed 2026-10-21T17:08:39Z** (`results/online/blind.json`; a first seal the author could not
    recall, which no day ran under, is archived beside it). **Verdicts, each recorded before
    anyone read the run's config:**
    - Day 9 (`docs-20261021-170913-be166c`, shadow `docs-20261021-173412-d31ff6`): **alert on
@@ -379,9 +395,9 @@ warning.
      recorded config with the day's sealed choice in code, and names only the first run under
      it (never a choice, a config, or how the other runs compare); that run is the day's, for
      `evals monitor 10 --run`. If none matches, `evals blind run 10` runs the day under the
-     sealed choice. Before the match the coding agent saw each run's totals while finding the
-     repeats (model calls 949, 1063 and 1063; errors 1, 4 and 4; answers judged 165, 160 and
-     160), never a config; the match is mechanical, so those totals cannot choose the run.
+     sealed choice. Before the match, each run's totals were seen while the repeats were being
+     found (model calls 949, 1063 and 1063; errors 1, 4 and 4; answers judged 165, 160 and 160),
+     never a config; the match is mechanical, so those totals cannot choose the run.
      **Matched 2026-10-23:** `evals blind match 10` named the first run,
      `docs-20261021-181707-fd12e1`, so the second and third ran under another choice and do not
      count. The first run had no cache hits, so latency is tested.
@@ -454,7 +470,7 @@ warning.
 
    **Revealed 2026-10-23T21:56:17Z** (`results/online/blind-reveal.json`). All three verdicts
    were committed before it: day 9's on 2026-10-21 (de6c293), day 10's at 2026-10-23T17:11:49Z
-   (0396ea7) and day 11's at 21:54:45Z (b8eead1). Aleena's choices were subtle, unchanged and
+   (0396ea7) and day 11's at 21:54:45Z (b8eead1). The revealed choices were subtle, unchanged and
    subtle. The hash matched the seal, and each verdict's run had recorded its sealed choice's
    config.
 
@@ -496,7 +512,7 @@ warning.
    family, 1% for the fabricated-citation rule; the floors make it lower). Three blind days
    demonstrate the monitor; they do not measure its power.
 
-## Cost and Aleena's time
+## Cost and human time
 
 - **Money**, recomputed 2026-10-19. The first figure, "about $25 in all", did not match its
   own unit costs, which came to about $34. Measured since: the generator and its checker cost
@@ -514,7 +530,7 @@ warning.
   of 200 at $0.38 each, their judging $1.07 and $0.97), so about $13.75 after day 7, and day 8
   about $3.86 measured, so about $17.60 after day 8. The blind days without shadows cost about
   $2.65 each (generation, one run, its judging), so about $25.55 for all three, and about
-  $29.20 with shadows; either passes $25, so Aleena was asked before day 9. **Approved
+  $29.20 with shadows; either passes $25, so approval was sought before day 9. **Approved
   2026-10-21: with shadows, about $29.20 in all.** The three days' questions were generated
   first (about $3.90; day 9's first attempt died on a DNS failure and was regenerated from the
   cache), so about $21.50 was spent before any blind day ran. Measured since, from the new
@@ -530,22 +546,22 @@ warning.
   shadow run of the champion. The projection then was about $7 for days 1 to 5, $1.35 for day 6
   and about $4 for each 200-question day with its shadow, so about $28 in all, plus about $1.50
   already spent generating day 0 twice, against an approval of about $25 (the work was to stop
-  and ask before passing it, at day 7 at the latest), or about $24 without shadow runs on the
+  for approval before passing it, at day 7 at the latest), or about $24 without shadow runs on the
   blind days. The approval was raised to about $29.20 on 2026-10-21 (above), and the measured
   total came to about $29.05.
-- **Aleena's time:** about 40 minutes, in three short tasks: the pilot of 30 questions (done,
+- **Human time:** about 40 minutes, in three short tasks: the pilot of 30 questions (done,
   2026-10-18), 30 judge labels from reference days (done, scored 2026-10-21), and sealing the
-  blind configs (done, 2026-10-21). Beyond the estimate, the blind days took her runs of days 9
-  to 11 (day 10 three times), `evals blind match 10` and the reveal (2026-10-21 to 2026-10-23).
-  Optional: the 10-question realism read of generator v2, about 3 minutes
+  blind configs (done, 2026-10-21). Beyond the estimate, the blind days took the author's runs of
+  days 9 to 11 (day 10 three times), `evals blind match 10` and the reveal (2026-10-21 to
+  2026-10-23). Optional: the 10-question realism read of generator v2, about 3 minutes
   (`evals pilot-review 0 --quick`), not taken.
 
-## Decisions for Aleena (answered 2026-10-19)
+## Decisions (answered 2026-10-19)
 
 1. The online-case grader guards (part 2) and the alert rule (part 3): **approved**.
 2. Dashboard: **static HTML**.
 3. The budget (about $25 as then estimated) and the three short tasks: **approved**. The
-   estimate has since been corrected (see "Cost"), so anything past $25 is asked first.
+   estimate has since been corrected (see "Cost"), so anything past $25 needs approval first.
 4. The 10-question realism read of generator v2 (`evals pilot-review 0 --quick`): open, and
    optional.
 
@@ -589,8 +605,8 @@ then regenerated; its first version had never been reviewed.
 | The pilot judged the source page from its headings and skipped outside questions | Asks about the snapshot for every question, shows the closest passage, enforces the bar |
 | Minor: stopwords in the overlap, headings inside code, pilot resume and torn writes, silent overwrites, unnamed services, the judge's strict flag reused | All fixed |
 
-Then the pilot command itself was tested the way Aleena runs it, after the command as first
-given to her failed (the day was an option) and a markup crash turned up while fixing it. One
+Then the pilot command itself was tested the way the author runs it, after the command as first
+given failed (the day was an option) and a markup crash turned up while fixing it. One
 agent drove `evals pilot-review` on a copy of day 0, a second parsed every command in the docs,
 and an independent agent reproduced each failure. That confirmed 6 problems in the command, left
 4 more unverified, and found 3 outdated commands in old notes. All 10 command problems are fixed,
@@ -613,17 +629,17 @@ instruction failed to parse.
 
 ## Pilot and generator v2 (2026-10-18)
 
-**The pilot.** Aleena reviewed the 30 sampled questions of day 0. All 30 were realistic, so the
-bar was met. Her answerability answers were then checked against the whole snapshot: one agent
-per 6 questions searched and read it, every quote was verified on its page, and a second agent
-re-checked each disagreement from scratch (all 10 re-checks held). The check found two things.
-The tool did not say what to do with an outside-snapshot question, which has no page to open, so
-she answered "unsure" on all 5; she then changed them to "no". More important, the questions
-often asked more than the docs say. The whole snapshot fully answered only 6 of the 20 lookups
-and comparisons, answered 10 partly and 4 not at all. Generator v1 saw only a page's title and
-headings, so it asked about the topic, not about what the text says. Those answers would muddy
-the online numbers: a correct decline would count as an in-scope abstention. Her answers, the
-check and v1's traffic are kept in `results/online/pilot-v1/`.
+**The pilot.** The author reviewed the 30 sampled questions of day 0. All 30 were realistic, so
+the bar was met. The author's answerability answers were then checked against the whole
+snapshot: one agent per 6 questions searched and read it, every quote was verified on its page,
+and a second agent re-checked each disagreement from scratch (all 10 re-checks held). The check
+found two things. The tool did not say what to do with an outside-snapshot question, which has
+no page to open, so the author answered "unsure" on all 5, then changed them to "no". More
+important, the questions often asked more than the docs say. The whole snapshot fully answered
+only 6 of the 20 lookups and comparisons, answered 10 partly and 4 not at all. Generator v1 saw
+only a page's title and headings, so it asked about the topic, not about what the text says.
+Those answers would muddy the online numbers: a correct decline would count as an in-scope
+abstention. The pilot answers, the check and v1's traffic are kept in `results/online/pilot-v1/`.
 
 **The change, one only (v2).** A lookup or comparison is written from one section of its page,
 which the generator sees: at least 300 characters, and not a callout, a list of links or mostly
@@ -640,8 +656,8 @@ nothing its sentence does not settle.
    snapshot, and at most 1 not answered at all (v1: 6 and 4).
 2. Copying: at most 10% of the in-snapshot questions share 6 or more consecutive words with their
    page (v1: 1 of 90).
-3. Realism, if Aleena opts in: she reads 10 of v2's questions, 2 per persona. Fewer than 7
-   realistic means the prompt is revised.
+3. Realism, if the author opts in: the author reads 10 of v2's questions, 2 per persona. Fewer
+   than 7 realistic means the prompt is revised.
 
 If check 1 or 2 fails, the prompt is revised and the day regenerated, and every attempt is
 reported here.
@@ -653,21 +669,21 @@ rerun unchanged. Check 2 passes: 2 of the 90 in-snapshot questions copy 6 or mor
 words from their page (2%). While generating, the checker rejected 6 drafts that their section
 did not fully answer, and each was rewritten. One thing is left to the realism read: some
 questions follow the page's own example closely, such as its Ohio-to-Oregon transaction or its
-Auto Scaling group of 4, 6 and 12. Check 3 is Aleena's to take or skip:
+Auto Scaling group of 4, 6 and 12. Check 3 is optional:
 `uv run evals pilot-review 0 --quick` (10 questions, realism only, at least 7 to pass).
 
 ## Session audit (2026-10-19)
 
-Aleena asked for a check that nothing was wrong or missing. A docs auditor checked every number
-and claim written in the last day against the result files and the code; a code auditor hunted
-for bugs in the pilot tool, generator v2 and prompt caching, replaying day 0 from the call cache
-with misses refused (it rebuilds byte for byte) and testing the store migration on a copy of the
-results database. Their verifier stopped at a usage limit, so each finding was checked by hand
-before it was fixed. Fourteen findings, all fixed or written down:
+The audit was requested as a check that nothing was wrong or missing. A docs auditor checked
+every number and claim written in the last day against the result files and the code; a code
+auditor hunted for bugs in the pilot tool, generator v2 and prompt caching, replaying day 0 from
+the call cache with misses refused (it rebuilds byte for byte) and testing the store migration
+on a copy of the results database. Their verifier stopped at a usage limit, so each finding was
+checked by hand before it was fixed. Fourteen findings, all fixed or written down:
 
 | Finding | Done |
 |---|---|
-| The budget's total never matched its unit costs ($34 against "$25") | Recomputed from measured costs ("Cost"); asked before passing $25 |
+| The budget's total never matched its unit costs ($34 against "$25") | Recomputed from measured costs ("Cost"); approval sought before passing $25 |
 | Snowball and Snow Family counted as two of a day's 10 different services | One product family a day (generator v2.1); days 1 to 5 regenerated |
 | A retry quoted only the last rejected draft, so the generator went back to an earlier one | Every rejection on the page is quoted (v2.1) |
 | A failed checker call was counted as a generator failure | Counted apart, as `check_failed` (v2.1) |
@@ -702,7 +718,7 @@ reproduced every finding there. The code review's ten findings:
 | From the wrong folder, the commands opened a new, empty database and exited 0 | A config file must exist. The monitor and dashboard open the database read-only, so a missing one is an error |
 | The leave-one-day-out check never ran with judge_supported in the family | `judge-check score` reruns it with the judge in, once the labels pass. The judge joins only if it stays quiet |
 | A NaN latency was Holm-rejected yet showed "ok", and alerts.json got NaN | Latencies that are not finite and positive are skipped; the JSON files refuse NaN |
-| The published detectable rise was about 0 when the reference rate is 0 | In `stats/`, so put to Aleena first; approved 2026-10-20 and built (decision 5) |
+| The published detectable rise was about 0 when the reference rate is 0 | In `stats/`, so put to a decision first; approved 2026-10-20 and built (decision 5) |
 
 The frozen reference stands. On the real data, with the fixed code, all five runs pass the new
 checks and each is its day's only complete champion run. With judge_supported in the family the
@@ -714,13 +730,13 @@ simulated reference days drawn from one distribution:
 
 | Finding | Done |
 |---|---|
-| The detectable rise was badly understated for rare rates: uncited answers showed +0.04 points against +7.7 exact. It also ignored the floors: latency showed +17%, though nothing under +25% can alert | Put to Aleena, being in `stats/`; approved 2026-10-20 and built (decision 5) |
+| The detectable rise was badly understated for rare rates: uncited answers showed +0.04 points against +7.7 exact. It also ignored the floors: latency showed +17%, though nothing under +25% can alert | Put to a decision, being in `stats/`; approved 2026-10-20 and built (decision 5) |
 | No detectable rise was given for fabricated citations, for judge_supported while pending, or for refused latency | Built with decision 5 |
 | The leave-one-day-out check never ran with judge_supported in the family | Fixed with the code review's finding |
 | Five days from one distribution still stop the demo at that check about 10% of the time (up to 17% with day-to-day variation), and the plan did not say so | Stated in part 3. Days 1 to 5 passed, so the rule stays as approved |
 | A failed reference check could be re-rolled | Refused, after a stop as well; `--refreeze` archives everything first |
 | With a metric refused, Holm ran over fewer metrics, but the report still said 6 or 7 | The report gives the number tested; part 3 says how a refused metric is handled |
-| Only about 10 of the judge check's 30 answers are ones the judge passed (10 in today's draw), and a false pass can happen only on those, so the bar of 2 is weaker than it looks | Put to Aleena before any label existed; approved 2026-10-20 and built (decision 6) |
+| Only about 10 of the judge check's 30 answers are ones the judge passed (10 in today's draw), and a false pass can happen only on those, so the bar of 2 is weaker than it looks | Put to a decision before any label existed; approved 2026-10-20 and built (decision 6) |
 | The reported in-scope support also counted false premises | Lookups and comparisons only, as everywhere else |
 | The dashboard's band was the pooled mean's interval, which normal days often fall outside (13 of 40 dots) | Each day sits over the range a normal day of its n shows |
 | The monitor table showed judge_supported as the unsupported share, and latency and tokens as logs | Rows show their labels; latency and tokens are in seconds and tokens |
@@ -729,7 +745,7 @@ simulated reference days drawn from one distribution:
 An independent verifier then checked every finding against the code at 96284ab and a copy of the
 database: 20 of the 21 held, and only the last statistics finding was rejected.
 
-## Decisions for Aleena (asked 2026-10-19, both approved 2026-10-20)
+## Decisions (raised 2026-10-19, both approved 2026-10-20)
 
 5. **The "detectable" column** (`stats/`). **Approved and built** ("Blind spots" in part 3).
    It should be the smallest real rise the monitor
@@ -743,9 +759,9 @@ database: 20 of the 21 held, and only the last statistics finding was rejected.
    in part 3). Proposed: draw 15 answers the judge
    passed and 15 it failed (3 and 3 a day) in place of 30 at random. Keep the bar (at most 2
    false passes), now applied to 15 judge passes, and also report the answers the judge failed
-   that Aleena passes. Same 30 labels, same time.
+   that the author passes. Same 30 labels, same time.
 
-## Decision 7 (approved by Aleena 2026-10-21): day 7 stays the rollback, as an honest miss
+## Decision 7 (approved 2026-10-21): day 7 stays the rollback, as an honest miss
 
 The prediction and its reading are in part 5, item 3. The dev run of v2 budgeted below turned
 out free: it replayed the 2026-10-11 run from the call cache, call for call. The proposal as put:
@@ -759,7 +775,7 @@ the rollback as a reported-only day (an honest miss: a fault the family is blind
 judge_supported drawn as advisory) and make day 8's retrieval fault the demo's first caught
 alert. Either way, the choice is written down before day 7 runs.
 
-## Decision 8 (approved by Aleena 2026-10-21): day 8 gets the stronger retrieval fault
+## Decision 8 (approved 2026-10-21): day 8 gets the stronger retrieval fault
 
 Part 5, item 4 has the numbers and the pre-registration. The proposal as put: Keep the planned fault, one search result, which the family
 would catch about 4 times in 10 through model calls; or strengthen it to one search result and
@@ -769,16 +785,16 @@ day 8, so the demo has one caught fault before the blind days, and the two fault
 days' "subtle" and "larger" configs (part 5, item 5), with `configs/default.yaml` as
 "unchanged".
 
-## Agreed in principle with Aleena 2026-10-21: a judge improvement round after the demo
+## Agreed in principle 2026-10-21: a judge improvement round after the demo
 
-Recorded 2026-10-23, from the session in which it was agreed. Asked whether the judge could be
-made better and more versatile, Aleena agreed ("ok sounds good") to a round after days 7 and 8:
-claim-by-claim checking, a 0 to 100 score with a tuned threshold, and a skeptic pass. Its aim
+Recorded 2026-10-23, from the working session in which it was agreed informally. The question
+was whether the judge could be made better and more versatile, and a round after days 7 and 8 was
+agreed: claim-by-claim checking, a 0 to 100 score with a tuned threshold, and a skeptic pass. Its aim
 is to let judge_supported earn a place in the alert family, which it did not get when the judge
-failed her 30 blind labels (part 3: 4 false passes of 15, against a bar of 2). It was put off
-while the blind days ran. This agrees only the direction: the round touches `graders/`, so its
-approach is written up and approved before any code, and it needs 30 fresh blind labels to
-validate.
+failed the author's 30 blind labels (part 3: 4 false passes of 15, against a bar of 2). It was
+put off while the blind days ran. This agrees only the direction: the round touches `graders/`,
+so its approach is written up and approved before any code, and it needs 30 fresh blind labels
+to validate.
 
 ## Check of decisions 5 and 6 (2026-10-20)
 
@@ -796,19 +812,19 @@ all are fixed:
 | After a complete score, its result shows the judge's verdicts; a failed check could then be relabeled and rescored, and the first result was overwritten without a trace | The first complete score is final, and a later score only reports it |
 | 16 of the 30 sampled answers sit on judge-dev, where `label --show-judge` shows the judge's verdicts before scoring | `--show-judge` is refused on the check's runs |
 | A re-judge after the draw that swaps one pass and one fail on a day kept the 3-and-3 count and was scored silently | The sample is saved with a digest of the judge's grades, reasons included (only 20 splits are possible, so a digest of the values alone could be reversed). Labeling and scoring are refused if it changed |
-| Any labeler name could switch the judge on; the plan says Aleena's labels | Only her labels count; `judge-check` has no `--labeler` |
+| Any labeler name could switch the judge on; the plan says the author's labels | Only the author's labels count; `judge-check` has no `--labeler` |
 | On Windows, a stdin of NUL (a shell with no terminal) reports isatty(), so the labeling screens started and aborted at the first prompt | Interactive screens also require a real console (`label`, `review`, `pilot-review`) |
 | A re-recorded reference would carry today's date, after day 6 ran, against the plan's "frozen before any later day ran" | A refreeze of the same runs keeps the freeze date and points to the archived first record |
 | A blind spot of "no count can ever alert" showed as "-", like a number not computed | Shown as "cannot alert" |
 | The blind spot's wiring in check_day (Holm level, pending and refused metrics, the fabricated rule) had no test: setting the level to 0.5 passed every test | Tested |
 | "A random 30 would hold about 10 judge passes": the expectation is 7 or 8; 10 was one draw | Corrected in the plan, the docstring and the CHANGELOG |
 | alert_count scanned one exact Fisher test per count, minutes at n of 10,000 | Bisection, about log2(n) tests; the project's days are 80 to 200 |
-| Found by the author afterwards: the published dashboard lists each reference day's five least-supported answers with the judge's reasons. These are judge fails, and a sampled one would not be blind | The sample leaves them out, and the dashboard never shows a sampled answer |
+| Found afterwards, not by the reviewers: the published dashboard lists each reference day's five least-supported answers with the judge's reasons. These are judge fails, and a sampled one would not be blind | The sample leaves them out, and the dashboard never shows a sampled answer |
 
 Rejected by the verifier: that no test would catch a wrong mean formula (the closed-form tests
-fail on a wrong standard error or sign), and that HANDOFF's next step skipped day 6 (part 5
+fail on a wrong standard error or sign), and that the documented next step skipped day 6 (part 5
 starts with it). The reviewers' simulations put the mean blind spots at 0.76 to 0.82 of days
-alerting, as did the author's (see "Blind spots").
+alerting, as did the plan's own simulation (see "Blind spots").
 
 ## Re-check of the fixes (2026-10-20)
 
@@ -820,9 +836,9 @@ them the same problem seen twice, and all are fixed:
 | Finding | Done |
 |---|---|
 | A re-record of the same runs (`--freeze --refreeze`) archived the judge check's sample and result. The next score then redrew the same 30 and rescored edited labels, so a failed check could be passed | A re-record of the same runs keeps both in place; only a refreeze on other runs archives them |
-| `judge-check score` drew a sample when none was saved, even with Aleena's labels already in | Only `label` draws, and never once her labels exist on the reference runs |
+| `judge-check score` drew a sample when none was saved, even with the author's labels already in | Only `label` draws, and never once the author's labels exist on the reference runs |
 | Running the test suite would have moved the real judge-check sample: one test's refreeze used the real path for it (no sample had been drawn yet, so nothing was lost) | Every test's monitor and dashboard files go to a temporary folder. The run fails if a real `results/online/` file changed, which a probe test confirmed |
-| `judge-validate` on a reference run gave the judge's verdicts on her sampled labels before the score (its false negatives are the false passes), so labels could be tuned blind until the check passed | Refused on the check's runs until the check is scored |
+| `judge-validate` on a reference run gave the judge's verdicts on the author's sampled labels before the score (its false negatives are the false passes), so labels could be tuned blind until the check passed | Refused on the check's runs until the check is scored |
 | `trace` printed the judge's verdict and reason on a sampled answer | Held back until the check is scored |
 | Deleting or editing judge-check.json reopened a final score | The first complete result is also kept in the results database on every reference run; the next score restores the file from it |
 | The CHANGELOG claimed the judge's view was refused, while only `label --show-judge` was | Now true of every command that shows it, and worded as such |

@@ -1,7 +1,18 @@
 # Proposal: the LLM judge (phase 2 step 6)
 
-**Status:** proposed, 2026-10-11. Touches `graders/`, so it needs Aleena's agreement before code.
-Running it costs money (Sonnet 5.5 calls), so the validation run is also hers to approve.
+**Summary.** This proposal defines the LLM judge: the two questions it answers that code cannot
+settle (is every factual claim backed by the cited quotes, and does the answer address the question
+as asked), how it runs, how it is validated before any of its numbers count, and what it costs.
+The plan was approved on 2026-10-11 with three decisions (two verdicts, terminal-based hand
+labeling, claude-sonnet-5-5 as the judge model), and the code shipped the same day. A first
+validation against 114 hand labels gave kappa 0.26 on "supported", which led to splitting that
+verdict into "core supported" and "fully supported" under one written rubric shared by the judge
+and the labeler. Two later rubric decisions from a blind adjudication apply from judge v4 on, and
+v2 stays the validated judge until v4 is scored against fresh labels under a rule fixed in advance.
+Validation results go in `docs/judge-validation.md`.
+
+**Status:** proposed, 2026-10-11. Touches `graders/`, so it needed approval before code.
+Running it costs money (Sonnet 5.5 calls), so the validation run also needed approval.
 
 ## What the judge decides, and what it does not
 
@@ -47,7 +58,7 @@ answer for the "supported" question (it judges answer against citations only) an
 
 ## Validation before any judge number counts (from the roadmap)
 
-1. **Hand labels.** Aleena labels 100 to 200 dev-split answers (supported? responsive?) with
+1. **Hand labels.** The author labels 100 to 200 dev-split answers (supported? responsive?) with
    `evals review`-style tooling extended for answers. The labels are split into **judge-dev**
    (for tuning the judge prompt) and **judge-test** (for reporting only; never looked at while
    tuning). On judge-test, report Cohen's kappa (at least 0.7 on each question), **TPR** (the
@@ -69,7 +80,7 @@ Judging one answer is one Sonnet 5.5 call with the answer, citations and questio
 input tokens and 200 output tokens, under a cent per answer at first-party rates. Validating on
 100 labeled answers plus mutants and probes is a few hundred calls.
 
-## Decisions (Aleena, 2026-10-11)
+## Decisions (2026-10-11)
 
 - **Two verdicts**, supported and responsive. No separate "complete": an incomplete answer to a
   multi-step question is not responsive, so it fails that verdict.
@@ -80,7 +91,7 @@ input tokens and 200 output tokens, under a cent per answer at first-party rates
 The plan is approved with these answers. The code shipped the same day (see Mechanics); what
 remains is the validation run: labels, `evals judge`, `evals judge-validate`, mutants, probes.
 
-## Revision (Aleena, 2026-10-12): two levels of "supported"
+## Revision (2026-10-12): two levels of "supported"
 
 The first validation against 114 hand labels gave kappa 0.26 on "supported" (see
 `docs/judge-validation.md`). Every disagreement was an answer whose core fact was quoted and whose
@@ -105,7 +116,7 @@ prompt, so the judge version moved and the dev run was re-judged before the fina
 rubric, tune the judge against it, relabel judge-test once and score once. "Responsive" gets its
 first real negatives from 30 to 40 closed-book answers, labeled with that question only.
 
-## Revision (Aleena, 2026-10-16): two rubric questions from the v2-vs-v3 adjudication
+## Revision (2026-10-16): two rubric questions from the v2-vs-v3 adjudication
 
 The blind adjudication of the 40-label comparison (`docs/judge-validation.md` section 7) left two
 disagreements that belonged to the rubric rather than to anyone's mistake. Decisions:
@@ -113,11 +124,10 @@ disagreements that belonged to the rubric rather than to anyone's mistake. Decis
 1. **"The docs don't say X" is a hedge** and needs no support. Written into draft rubric v4
    (`SUPPORT_RUBRICS["v4"]` in `graders/judge_prompts.py`, `configs/judge-v4.yaml`).
 2. **Price factors are not part of the main answer** when a question asks how something is
-   billed; they are peripheral. Wording drafted by the agent and approved by Aleena on
-   2026-10-17 ("write it"): "When a question asks how something is billed, the core claims
-   are how and when you are charged (for example, billed hourly until you delete it). The
-   factors that set the price, such as the model, the number of units bought or the length
-   of a commitment, are peripheral."
+   billed; they are peripheral. Wording drafted, then approved on 2026-10-17: "When a question
+   asks how something is billed, the core claims are how and when you are charged (for example,
+   billed hourly until you delete it). The factors that set the price, such as the model, the
+   number of units bought or the length of a commitment, are peripheral."
 
 Both apply from judge v4 on (`bf1a8e9f376a`). v2 stays the validated judge until v4
 is scored against fresh labels under a rule fixed in advance; if v4 is adopted, every run in the

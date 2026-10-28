@@ -25,7 +25,8 @@ synthetic and a human verifies them. This ADR makes those rules mechanical.
   reads it.
 - `evals split SOURCE --dev N --test M --seed S` assigns verified cases to dev and test at random
   within each (type, area) stratum, so both splits share the mix, and writes `dev.jsonl` and
-  `test.jsonl`. The seed is recorded in HANDOFF.md. Nobody hand-picks which cases become test.
+  `test.jsonl`. The seed, 20261011, is recorded in the 2026-10-11 amendment below and in the
+  README quickstart. Nobody hand-picks which cases become test.
 - Verification is a human step: read the question, the gold answer and the support quote
   against the page, then set `verified_by`. Fix a gold answer only if the page says otherwise,
   never to make the agent pass.
@@ -57,9 +58,9 @@ that question to anyone tuning on dev, and paraphrase consistency is measured wi
 the group has to be scored together. Robustness is therefore a dev-split measurement; the test
 split measures the headline numbers.
 
-The split ran once, on 2026-10-11, over the 280 cases Aleena verified (249 in the five original
-draft files plus 31 changed-default cases), all drafted synthetically with verbatim support
-quotes and none rejected:
+The split ran once, on 2026-10-11, over the 280 cases the author verified (249 in the five
+original draft files plus 31 changed-default cases), all drafted synthetically with verbatim
+support quotes and none rejected:
 
 ```
 evals split suites/docs/verified.jsonl --dev 130 --test 150 --seed 20261011

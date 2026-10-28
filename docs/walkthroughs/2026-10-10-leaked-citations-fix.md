@@ -1,16 +1,27 @@
 # Walkthrough: the leaked-citations fix
 
+**Summary.** On smoke case `docs-smoke-003` the model wrote its citations as tool-call markup
+inside the `answer` string and submitted an empty `citations` list, and the schema accepted it.
+Commits `f081f42` and `08ca110` (2026-10-10) added a guard that returns a submission to the
+model as a tool error, so it retries, when an answer that is not an abstention has no citations
+or the answer contains tool-call markup; a markup detector shared with a new `FormatGrader`; and
+the `malformed_output` metric. In the re-run, case 003 was rejected twice and then submitted
+cleanly with three citations that verified word for word; at seven cases, `evals compare` can
+only read "no detectable change" for a one-case effect. A second-opinion review by Codex
+followed, every concrete claim in it reproduced, and section 7 records the changes made in
+response (commits eacb715 to 742d494). A full output-contract check was not done.
+
 Commits `f081f42` (agent guard) and `08ca110` (metric), 2026-10-10. This note explains every
-changed line in plain language so the reasoning can be reproduced in an interview without the
-original conversation. Terms are defined the first time they appear.
+changed line in plain language, so the reasoning can be reproduced from this page alone. Terms
+are defined the first time they appear.
 
 ## 1. The bug
 
 The docs agent ends its loop by calling a tool named `submit_answer`. A **tool call** is a
 structured request the model makes instead of writing prose: it names a tool and supplies a
 JSON object of inputs. The API checks that object against a **schema**, a description of which
-fields exist and what types they have. Our schema requires `answer` (string), `citations` (list
-of url + quote), `abstained` (bool) and `confidence` (number).
+fields exist and what types they have. The `submit_answer` schema requires `answer` (string),
+`citations` (list of url + quote), `abstained` (bool) and `confidence` (number).
 
 On smoke case `docs-smoke-003` the model produced a tool call whose `answer` string ended with:
 
@@ -87,7 +98,7 @@ rejection message and the grader puts it in the grade's `reason`.
 Why a separate module? `AGENTS.md` forbids graders from importing agent internals. The agent
 and the grader both need the detector, so it lives in a neutral place that both may import.
 
-Why not an XML parser? The leaked text is not well-formed XML, and we only need to detect
+Why not an XML parser? The leaked text is not well-formed XML, and the task is only to detect
 presence, not parse structure. A small regex is easier to read and to test.
 
 ### `src/agent_evals/agents/docs/prompts.py`
@@ -300,12 +311,12 @@ one-case improvement; that is what the ~250-case phase 2 suite is for.
 `McNemar p` is the exact McNemar test on the discordant cases (passed in one run only). With
 0 and 1 discordant cases it is 1.0, the same conclusion.
 
-**Known quirk, now HANDOFF task 1:** `compare` assumes higher is better. For `uncited_answer`
-it printed "newly failing: docs-smoke-003" for a case that improved, and a CI entirely below
-zero would read "regressed". The direction set `LOWER_IS_BETTER` is only used by the summary
-table today.
+**Known quirk at the time, fixed later (section 7):** `compare` assumes higher is better. For
+`uncited_answer` it printed "newly failing: docs-smoke-003" for a case that improved, and a CI
+entirely below zero would read "regressed". The direction set `LOWER_IS_BETTER` is only used by
+the summary table today.
 
-## 6. Likely interview questions
+## 6. Questions a reader might ask
 
 **Why not just fix the prompt?** The prompt already says to put citations in the citations
 array. Prompts reduce how often a failure happens; the guard makes the failure recoverable
@@ -336,7 +347,7 @@ are unchanged, which is why the cache still hit.
 
 ## Appendix: prompt for the Codex review
 
-Paste this into Codex in the repo root. It reads `AGENTS.md` on its own.
+The prompt below was given to Codex in the repository root; Codex reads `AGENTS.md` on its own.
 
 ```
 Review commits f081f42..08ca110 on main as a second opinion. Do not edit any files. Write the
@@ -424,8 +435,8 @@ import from the agent package. Imports only, no logic changed.
 case accordingly, and exposes `verdict`. For `uncited_answer` the earlier comparison now prints
 "newly passing: docs-smoke-003".
 
-**Not done, recorded in HANDOFF.md:** a full output-contract check (Codex P3). It needs a
-decision on where shared output types live, which is best taken when a second agent exists.
+**Not done, left open:** a full output-contract check (Codex P3). It needs a decision on where
+shared output types live, which is best taken when a second agent exists.
 
 **Run 3 result** (`docs-20261010-205341-14beef`, agent `ef8b253524b8`): 7/7 correct,
 `rejected_submissions` 0, `tool_errors` 0, `malformed_output` 0, 27 model calls all paid because

@@ -21,7 +21,7 @@ so CI cannot diff pages directly.
 - `.github/workflows/docs-drift.yml` runs the check at 06:00 UTC on the first of each month and
   on demand. On drift it opens an issue labelled `docs-drift`, or comments on the open one, with
   the report. It never edits suites, gold answers or the lock.
-- A human (Aleena) then refreshes the snapshot, re-reads each listed case against its page,
+- A human (the author) then refreshes the snapshot, re-reads each listed case against its page,
   changes a gold answer only if the documentation changed, and commits the lock with the case
   changes. The eval-integrity rule stands: never edit a gold answer to make the agent pass.
 - `evals compare` notes when two runs used different snapshot fingerprints, since their scores
@@ -29,7 +29,7 @@ so CI cannot diff pages directly.
 
 ## Consequences
 
-- Staleness becomes a monthly to-do with a precise list of what to re-check, instead of a
+- Staleness becomes a monthly task with a precise list of what to re-check, instead of a
   silent drift in what "correct" means.
 - The hash is over extracted markdown text. If a page carries volatile text (dates, counters)
   that survives the noise filters, it will show as changed every month; the fix is to extend
