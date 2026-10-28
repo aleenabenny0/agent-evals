@@ -52,8 +52,7 @@ the roadmap; docs/adr/ explains past decisions.
   against moto in the no-network sandbox (code agent phase).
 - Don't delete `.cache/`, `results/` or `data/snapshots/` unless asked.
 
-## Working with the author
+## Changes to graders and statistics
 
-The author must be able to explain every line in an interview. In `graders/` and `stats/`,
-explain the approach and wait for agreement before writing code, keep changes small, and add
-a test for each behavior. Prefer clear code over clever code everywhere.
+In `graders/` and `stats/`, write up the approach and have it agreed before writing code, keep
+changes small, and add a test for each behavior. Prefer clear code over clever code everywhere.

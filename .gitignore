@@ -27,3 +27,6 @@ data/snapshots/
 !.vscode/extensions.json
 .DS_Store
 Thumbs.db
+
+# Local development notes for coding sessions; kept out of the public repository.
+HANDOFF.md

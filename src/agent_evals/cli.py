@@ -319,7 +319,9 @@ def split(
     source: Path,
     dev: Annotated[int, typer.Option(min=0, help="Cases for the dev split.")],
     test: Annotated[int, typer.Option(min=0, help="Cases for the held-out test split.")],
-    seed: Annotated[int, typer.Option(help="Random seed. Record it in HANDOFF.md.")] = 0,
+    seed: Annotated[
+        int, typer.Option(help="Random seed. Record it with the suite (ADR 0006).")
+    ] = 0,
     out_dir: Annotated[Path, typer.Option(help="Writes dev.jsonl and test.jsonl here.")] = Path(
         "suites/docs"
     ),
@@ -365,7 +367,7 @@ def split(
     if groups := paraphrase_groups(cases):
         n = len(groups) + sum(len(m) for m in groups.values())
         console.print(f"{n} cases in {len(groups)} paraphrase group(s) placed in dev")
-    console.print(f"seed={seed}; record it with the suite in HANDOFF.md")
+    console.print(f"seed={seed}; record it with the suite (ADR 0006)")
 
 
 @app.command()
