@@ -301,8 +301,8 @@ Next, in order:
 
 5. **A judge improvement round**: claim-by-claim checking, a scored verdict with a tuned
    threshold, and a skeptic pass, validated on fresh blind labels, so that `judge_supported` can
-   join the online alert. The design ([docs/plans/judge-v5.md](docs/plans/judge-v5.md)) is
-   reviewed before any code.
+   join the online alert. Its design ([docs/plans/judge-v5.md](docs/plans/judge-v5.md)) was
+   approved on 2026-10-28, and the build is under way.
 6. **LLM Ops**: the docs agent as a service, with a prompt registry, failover to a second
    provider, tracing and metrics, an eval gate in CI, a canary and rollback drill, and a load test.
 7. **Model routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers

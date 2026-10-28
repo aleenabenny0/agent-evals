@@ -6,12 +6,14 @@ was kept out of the online alert. This proposal replaces its single overall verd
 table that code can check, a confidence score per claim with one tuned threshold, and a skeptical
 second pass. Validation is fixed in advance: tuning on dev labels, a regression screen on older
 labels, then one test on fresh blind labels, the only stage that can admit the new judge to the
-alert. Status: proposed, reviewed in three adversarial rounds, not yet built.
+alert. Status: approved on 2026-10-28 with every decision at its recommended default, after three
+adversarial review rounds; the build is under way.
 
 **Status:** proposed 2026-10-28 and revised the same day after three rounds of adversarial
-review (34, 27 and 9 findings, all taken in; the tables at the end). Not yet approved. It changes
-`graders/`, so under AGENTS.md the approach is agreed before any code is written, and the paid
-steps are approved separately. The direction was agreed in principle on 2026-10-21 (phase 7 plan,
+review (34, 27 and 9 findings, all taken in; the tables at the end). **Approved 2026-10-28:**
+all seven decisions at their recommended defaults (the decisions section), which covers the
+`graders/` changes AGENTS.md requires agreement for and the paid steps up to the approved
+budget. The direction was agreed in principle on 2026-10-21 (phase 7 plan,
 "Agreed in principle 2026-10-21"): claim-by-claim checking, a 0 to 100 score with a tuned
 threshold, and a skeptic pass. This document turns that into a design, a validation plan whose
 rules are fixed now, a cost, and seven open decisions (the last section).
@@ -41,11 +43,11 @@ document calls the new judge "the claim judge".
   makes no false pass at all. So the old labels can catch a new judge breaking, but cannot show
   it is better. Only fresh blind labels, drawn after the judge is frozen, can, and only they can
   put `judge_supported` into the alert family.
-- **Human time.** About 15 minutes for the seven decisions, then 60 or 30 blind labels (about 55
-  or 30 minutes), only if every earlier stage passes.
-- **Money.** About $45 to $60 before any label, measured on a pilot first (or a leaner run at
-  about $30); about $17 to $22 more only if the judge passes; and online judging would then cost
-  about $3 instead of $1 a day.
+- **Human time.** 60 blind labels (about 55 minutes) at stage C, only if every earlier stage
+  passes.
+- **Money.** About $45 to $60 before any label (approved), measured on a pilot first; about $17
+  to $22 more only if the judge passes; and online judging would then cost about $3 instead of $1
+  a day.
 
 ## Why the current judge falls short
 
@@ -555,9 +557,11 @@ or about 30 for 30.
   (section 10's correction).
 - The judge credited attributions from the URL: the claim judge does not see URLs.
 
-## Open decisions
+## Decisions (approved 2026-10-28)
 
-Each has a recommended default; together the defaults form one consistent plan.
+All seven were approved on 2026-10-28 at the recommended defaults marked below: the full
+design, rubric v4 plus two paragraphs, 60 fresh labels, the bars as stated, the phase 7 rule
+changes, online-only scope, and the budget in 7(a).
 
 1. **The design**, all three parts: the claim table with its code checks, the confidence scores
    with one tuned threshold, and the skeptic pass. Approval also covers up to three revisions of
