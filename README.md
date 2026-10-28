@@ -10,11 +10,13 @@ The platform evaluates two agents that engineers use every day:
 | **AWS docs agent** *(built)* | Answers AWS questions using a dated docs snapshot, citing each claim with a verbatim quote | Every quote is checked against the cited page; invented pages and misquotes are flagged by code, not by an LLM |
 | **AWS code agent** *(next)* | Writes boto3 code for AWS tasks | Every API call is checked against botocore's service models; code runs against moto in a no-network sandbox |
 
-> Status: **measurement and the first improvement loop are done for the docs agent.** The
-> harness, graders, statistics, results store, an LLM judge validated against a human, and four
-> gated improvement iterations (one shipped) work end to end; the charts below summarize them.
-> Next: online evals with a simulated user, then the LLM Ops and routing briefs, then the code
-> agent (see [Roadmap](#roadmap)).
+> Status: **measurement, the first improvement loop and online monitoring are done for the docs
+> agent.** The harness, graders, statistics, results store, an LLM judge validated against a
+> human on dev answers, four gated improvement iterations (one shipped), and an online alert
+> tested on simulated days, three of them blind, work end to end; the charts and tables below
+> summarize them. Next, agreed in principle: a judge improvement round, so that the judge's
+> score can join the online alert (the current judge failed a blind check on online answers);
+> then the LLM Ops and routing briefs and the code agent (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -60,10 +62,11 @@ uv run evals compare <baseline-run-id> <candidate-run-id>
 Before your first real run, set a monthly spend limit in the Claude Console and fill in
 `pricing` in `configs/default.yaml` so the per-run budget cap can work.
 
-## Results so far (updated 2026-10-17)
+## Results so far (updated 2026-10-28)
 
-Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. Every number has its
-95% interval and n; the test split is frozen and was run once per shipped version.
+Docs agent on claude-haiku-5-5 over a 334-page AWS documentation snapshot. In the offline
+results every number has its 95% interval and n; the test split is frozen and was run once per
+shipped version. The online results (phase 7) are below them.
 
 ![Gated improvement loop: holdout results for each shipped version and dev results for every
 iteration, with 95% intervals](docs/charts/improvement.svg)
@@ -136,6 +139,67 @@ the 142 it shares with v2.
   grader misses, 12 are the agent answering correctly while marking itself abstained, 6 are case
   defects. Details and two traces per category in [docs/failure-taxonomy.md](docs/failure-taxonomy.md).
 
+### Online: a simulated user, an alert, and a blind test (phase 7, done 2026-10-23)
+
+The docs agent was then watched as it would be in production, on simulated traffic. Five LLM
+personas (claude-sonnet-5-5) write each day's questions from snapshot pages, with no answer key,
+and a checker call confirms that each lookup or comparison is answerable from one section of
+its page. Aleena
+found all 30 sampled questions of the first generator realistic; the revised generator that
+wrote days 1 to 11 passed automated answerability and copying checks, but no human read its
+questions for realism. With no answer key, only checks that need none score the answers:
+citation checks, uncited answers, declined in-scope questions, errors, model calls, latency and
+tokens. The LLM judge's "fully supported" verdict is recorded and drawn too, but never alerts.
+
+`evals monitor DAY` compares a day with five frozen reference days (100 questions each, 500
+attempts). The six code-graded metrics are tested as one family (Holm at 0.05), and each must
+rise past a floor to alert (5 points, 2 points for errors, 0.5 model calls, +25% for latency and
+tokens); fabricated citations have their own rule (p < 0.01, no floor). A floor is the smallest
+rise that may alert, not what is reliably caught: on a 200-question day a rise is caught 8 times
+in 10 only from about +3.9 points of errors, +0.61 model calls, +28% latency, +30% tokens, +7
+points of uncited answers or declines, and +6.5 points of fabricated citations (from 2.8% to
+about 9%). On days 7 to 11 (200 questions each, 165 to 174 of them answered) the champion also
+answers the same questions as a shadow, so a paired difference tells a changed config from
+unusual traffic. The dashboard ([docs/dashboard/index.html](docs/dashboard/index.html), one HTML
+file: download it and open it in a browser) draws every day against a normal day's range.
+
+| Day | What served the day | Pre-registered | Monitor's verdict, against the reference days | Served minus shadow on the same questions, model calls per attempt (95% CI) |
+| --- | --- | --- | --- | --- |
+| 6 | the champion, 100 questions | no alert | no alert | no shadow |
+| 7 | a rollback to prompt v2 | no alert: an honest miss | no alert | +0.01 (-0.14 to +0.17) |
+| 8 | one search result, and page reads cut from 8,000 to 2,000 characters | model calls and errors | **alert**: model calls +1.85, errors +2.9 points | +1.99 (+1.74 to +2.25) |
+| 9, blind | one search result ("subtle") | model calls, about 4 times in 10 | **alert**: model calls +0.88 | +0.68 (+0.48 to +0.90) |
+| 10, blind | the champion ("unchanged") | no alert | no alert | +0.00: a cache replay of the served run, not an independent check |
+| 11, blind | one search result ("subtle") | model calls, about 4 times in 10 | **alert**: model calls +0.52, against a +0.50 floor | +0.72 (+0.54 to +0.92) |
+
+- **Day 7 misses on purpose.** The rollback makes answers less fully supported, and no alerting
+  metric sees that. The judge's "not fully supported" share rose from 0.747 to 0.891, while the
+  shadow on the same questions stayed at 0.749. The monitor flagged that day's judge as
+  untrusted, because v2's answers were 42% longer than the reference's (its rule allows 25%), so
+  the reading rests on the paired shadow. The judge cannot alert at all: after day 6 and before
+  day 7 it failed a blind check, in which Aleena failed 4 of the 15 reference-day answers it
+  passed, against a bar of 2.
+- **The blind days.** Before day 9, Aleena sealed a choice for each of days 9 to 11 (unchanged,
+  subtle or larger) as a hash with a passphrase. Every verdict was committed before the reveal,
+  and the reveal checked the hash and each counted run's recorded config: caught, quiet as
+  expected, caught. Two gaps are on the record: day 9's shadow ran before its verdict, and day
+  10's run totals were seen before the seal picked its run. The verdicts are computed by code
+  under rules frozen beforehand, so neither could change them.
+- **What three blind days do not show.** They demonstrate the alert; they do not measure its
+  power. The subtle fault was predicted from the dev split to alert about 4 times in 10, at the
+  dev estimate of +0.47 calls (95% CI +0.27 to +0.70). Online it added +0.68 and +0.72 against
+  the champion on the blind days (and +0.57 in a mistaken day-10 run); at those effects a
+  200-question day alerts about 9 times in 10, so the dev estimate ran low. Day 11 cleared the
+  floor by only 0.02 calls per attempt: its shadow used fewer calls than the reference (4.61
+  against 4.81), so its rise against the reference was smaller than against its own shadow, as
+  day 9's shadow, above the reference, had widened day 9's margin.
+- **A protocol slip, kept on the record.** Day 10 ran three times by mistake, twice under the
+  wrong setting. The seal, not a person, decided which run counted, and `evals blind run` now
+  checks the seal before it spends anything.
+- The phase cost about $29. Every pre-registration, verdict, review and correction is in
+  [docs/plans/phase-7-online-evals.md](docs/plans/phase-7-online-evals.md), and the records are
+  in `results/online/`.
+
 ## Metrics so far
 
 | Metric | Meaning | Better |
@@ -150,7 +214,7 @@ the 142 it shares with v2.
 | `unsupported_entity` | Answer states a number or URL found in neither the question nor any page the agent read or cited | lower |
 | `repeated_calls` | Identical tool calls (same tool, same input) within one trajectory: loop detection | lower |
 | `model_calls`, `tool_errors`, `rejected_submissions` | Efficiency and recovery signals from the trajectory | lower |
-| `judge_supported` | LLM judge, validated: every claim in the answer is backed by its cited quotes (claim-level hallucination, inverted) | higher |
+| `judge_supported` | LLM judge: every claim in the answer is backed by its cited quotes (claim-level hallucination, inverted). Validated on 65 blind labels of dev answers; two later blind checks found it too lenient (3 false passes in 30 labels of a challenger's shorter answers, against a bar of 2; 4 in 15 passed online answers, against 2), so online it is reported but never alerts | higher |
 | `judge_core_supported` | LLM judge, advisory: the claims that answer the question are backed by the cited quotes | higher |
 | `judge_responsive` | LLM judge: the answer addresses the question as asked and agrees with the gold on substance | higher |
 | pass^k | Chance that all k attempts at a case pass; what a user who asks once gets | higher |
@@ -177,6 +241,10 @@ src/agent_evals/
   stats/                bootstrap CIs, paired differences, pass^k, McNemar
   store/                DuckDB results store
   report.py             run summaries and paired comparisons
+  simulate.py           simulated user: an LLM persona writes each online day's questions
+  online.py             online cases (no answer key) and the judge pinned for online runs
+  monitor.py            the online alert: a day against the frozen reference days
+  dashboard.py          the static HTML dashboard of the online days
   cli.py                `evals` command
 suites/docs/            eval cases, one JSON object per line
 configs/                default config and the docs page list
@@ -186,15 +254,28 @@ tests/                  offline tests using a scripted fake model
 
 ## Roadmap
 
-1. **Foundations** *(done)*: agent protocol, docs agent, call cache, deterministic graders, store, CLI, CI.
-2. **Measurement**: 250 docs cases (dev/test splits), claim extraction, NLI cross-check, LLM judge validated against 100 hand labels and mutation tests.
-3. **Code agent**: boto3 agent, botocore API-model checker, Docker + moto sandbox with no network.
-4. **Baselines and reporting**: closed-book and oracle-evidence baselines, Streamlit dashboard, PR comment bot.
-5. **Learning loops**: failure memory, reflective prompt optimization benchmarked against DSPy GEPA, champion-vs-challenger release gate.
-6. **Red team and write-up**: prompt-injection suites, ablations, technical report.
+Done:
+
+1. **Foundations**: agent protocol, docs agent, call cache, deterministic graders, results store, CLI, CI.
+2. **Measurement**: 280 verified docs cases in frozen dev and test splits, closed-book and oracle baselines, an LLM judge validated against blind hand labels on dev answers, mutation tests and bias probes, and a failure taxonomy.
+3. **The improvement loop**: a champion-versus-challenger gate on held-out data (ADR 0008) and four gated iterations, one shipped ([CHANGELOG.md](CHANGELOG.md)).
+4. **Online evals (phase 7)**: a simulated user, a pre-registered alert, a static HTML dashboard and a blind test (above).
+
+Next, in order:
+
+5. **A judge improvement round**, agreed in principle: claim-by-claim checking, a scored verdict with a tuned threshold, and a skeptic pass, validated on fresh blind labels, so that `judge_supported` can join the online alert. The approach is agreed before any code.
+6. **Brief 01, LLM Ops**: the docs agent as a service, with a prompt registry, failover to a second provider, tracing and metrics, an eval gate in CI, a canary and rollback drill, and a load test.
+7. **Brief 03, routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers between them.
+8. **The code agent** (boto3, checked against botocore's service models, run against moto with no network), then **a red team** (prompt-injection suites) and a technical report.
+
+The mapping to the three project briefs is in [docs/plans/brief-alignment.md](docs/plans/brief-alignment.md).
 
 ## Limitations
 
 - The AWS docs snapshot is a point-in-time copy; answers reflect the snapshot date, not today.
 - Keyword grading (`must_include`) can't judge nuance; it is a first pass before the LLM judge.
 - The snapshot is not committed. Check the AWS documentation license before redistributing it.
+- The online days are simulated: five LLM personas write the questions, and no human read the
+  scored days' questions for realism. Online, the alert rests on code-graded signals only, so a
+  fault that no alerting metric sees goes unflagged (day 7's showed only in the judge's score and
+  in answer length, both report-only) until a judge passes a blind check on online answers.
