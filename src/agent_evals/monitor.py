@@ -6,8 +6,10 @@ tested one-sided in its bad direction against the pooled reference days (stats/m
 family is Holm-corrected, and an alert also needs the effect to reach the metric's practical
 floor. Fabricated citations have their own rule outside Holm, because at this volume Holm would
 fire only at several times the baseline. Some numbers are only reported. judge_supported joins
-the family only once Aleena's 30 blind labels have passed, and a day whose answers changed style
-marks the judge untrusted: an alert still stands, but a quiet judge_supported does not clear it.
+the family only once the 30 blind labels have passed, and a day whose answers changed style, or
+whose judge errors pass 2% of its cited answers, marks the judge untrusted: an alert still
+stands, but a quiet judge_supported does not clear it. A day's verdict is recorded once, in
+alerts.json; a later reading of a recorded day is post hoc and goes to post-hoc.json.
 """
 
 from __future__ import annotations
@@ -23,7 +25,7 @@ from typing import Any, Literal
 
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.manifest import file_sha256
-from agent_evals.online import ONLINE_JUDGE_VERSION
+from agent_evals.online import judge_pin
 from agent_evals.simulate import TrafficQuestion, load_traffic
 from agent_evals.stats.monitor import (
     detectable_mean_rise,
@@ -32,27 +34,56 @@ from agent_evals.stats.monitor import (
     holm,
     permutation_greater,
 )
-from agent_evals.store.db import ResultsStore
+from agent_evals.store.db import ResultsStore, check_record_key
 from agent_evals.suites import load_suite
 from agent_evals.types import Case
 
 ALPHA = 0.05
 FABRICATION_P = 0.01  # the separate safety rule: one-sided Fisher, no floor
 TRUST_SHIFT = 0.25  # a style shift past this marks the day's judge_supported untrusted
+# Judge errors (the claim judge's judge_error grade, an answer it could not judge) past this
+# share of the day's cited answers mark the judge untrusted too (docs/plans/judge-v5.md).
+JUDGE_ERROR_SHARE = 0.02
+JUDGE_ERROR = "judge_error"
 REFERENCE_DAYS = (1, 2, 3, 4, 5)
 REFERENCE_PATH = Path("results/online/reference.json")
-ALERTS_PATH = Path("results/online/alerts.json")
+ALERTS_PATH = Path("results/online/alerts.json")  # each day's verdict, recorded once
+POST_HOC_PATH = Path("results/online/post-hoc.json")  # readings of recorded days: never verdicts
 JUDGE_CHECK_PATH = Path("results/online/judge-check.json")
 JUDGE_SAMPLE_PATH = Path("results/online/judge-check-sample.json")
 JUDGE_CHECK_PER_DAY = 6  # 30 answers over the five reference days
 JUDGE_CHECK_PASSED_PER_DAY = 3  # of each day's 6: 3 the judge passed, 3 it failed (decision 6)
 JUDGE_CHECK_MAX_FALSE_PASSES = 2  # the bar of iteration 4's spot check, over the 15 passes
-JUDGE_CHECK_LABELER = "aleena"  # the plan: Aleena's 30 blind labels, nobody else's
-JUDGE_CHECK_RECORD = "judge_check"  # the first complete score, kept on each reference run
-JUDGE_SAMPLE_RECORD = "judge_check_sample"  # the drawn sample and its digests, likewise
+JUDGE_CHECK_LABELER = "aleena"  # the plan: the author's 30 blind labels, nobody else's
+# The first check's two records, the validated judge's, kept on each reference run: its first
+# complete score, and its drawn sample with its digests. Another judge's check on the same runs
+# keeps its own two, keyed by its grader name (check_record, sample_record).
+JUDGE_CHECK_RECORD = "judge_check"
+JUDGE_SAMPLE_RECORD = "judge_check_sample"
 CANNOT_ALERT = "no day of this n can alert"  # a blind spot with no number: the worst kind
-PENDING = "pending: the judge has not yet passed Aleena's 30 blind labels"
+PENDING = "pending: the judge has not yet passed the 30 blind labels"
 IN_SCOPE = ("lookup", "multi_step")  # lookups and comparisons: declining one is a failure
+
+
+def check_record(grader: str = "judge") -> str:
+    """The manifest key of a judge's check result: JUDGE_CHECK_RECORD for the validated judge,
+    the same name with the grader name after it for any other."""
+    return check_record_key(JUDGE_CHECK_RECORD, grader)
+
+
+def sample_record(grader: str = "judge") -> str:
+    """The manifest key of a judge's check sample, keyed like check_record."""
+    return check_record_key(JUDGE_SAMPLE_RECORD, grader)
+
+
+def _is_sample_key(key: str) -> bool:
+    """A manifest key holding a judge-check sample, of any judge."""
+    return key == JUDGE_SAMPLE_RECORD or key.startswith(JUDGE_SAMPLE_RECORD + ":")
+
+
+def _check_key_of(sample_key: str) -> str:
+    """The key of the result that completes a sample record: the same judge's."""
+    return JUDGE_CHECK_RECORD + sample_key.removeprefix(JUDGE_SAMPLE_RECORD)
 
 
 @dataclass(frozen=True)
@@ -95,6 +126,8 @@ class DayValues:
     answer_words: list[int]
     source_named: list[int]  # 1 when an answered in-snapshot question cites its source page
     reported: dict[str, float | None]
+    judge_errors: int = 0  # cited answers the judge could not judge: no verdict, counted apart
+    cited_answers: int = 0  # answered, not abstained, with a citation: the ones the judge grades
 
 
 def _share(xs: Sequence[float]) -> float | None:
@@ -106,18 +139,33 @@ def _positive(x: object) -> bool:
     return isinstance(x, int | float) and isfinite(x) and x > 0
 
 
+def _cited(output: Mapping[str, Any]) -> bool:
+    """An answer the judge grades: one with at least one citation."""
+    raw = output.get("citations")
+    return isinstance(raw, list) and any(isinstance(c, dict) for c in raw)
+
+
+def _judge_error(grades: Mapping[str, float]) -> bool:
+    """An answer the judge could not judge: its only judge grade is judge_error."""
+    return set(grades) == {JUDGE_ERROR}
+
+
 def day_values(
     store: ResultsStore,
     run_id: str,
     cases: Mapping[str, Case],
     traffic: Mapping[str, TrafficQuestion],
+    judge: str = "judge",
 ) -> DayValues:
-    """The plan's per-question values for one online run, from its stored attempts and grades."""
+    """The plan's per-question values for one online run, from its stored attempts and grades,
+    judge_supported from the grades of one judge (by grader name, the validated judge unless
+    asked). A judge error is no verdict: it is left out of judge_supported's values, the
+    reported shares included, and counted."""
     outputs = {(a["case_id"], a["attempt"]): a["output"] for a in store.all_attempts(run_id)}
     keywords = store.grades_for(run_id, "answer_keywords")
     citations = store.grades_for(run_id, "citations")
     trajectory = store.grades_for(run_id, "trajectory")
-    judge = store.grades_for(run_id, "judge")
+    verdicts = store.grades_for(run_id, judge)
     v: dict[str, list[float]] = {s.name: [] for s in ALERT_FAMILY}
     fabricated: list[float] = []
     words: list[int] = []
@@ -127,6 +175,8 @@ def day_values(
     premise_declined: list[float] = []
     core: list[float] = []
     cache_hits = 0
+    judge_errors = 0
+    cited_answers = 0
     for u in store.attempt_usage(run_id):
         key = (str(u["case_id"]), int(u["attempt"]))
         case = cases.get(key[0])
@@ -140,8 +190,9 @@ def day_values(
         calls = trajectory.get(key, {}).get("model_calls", float(u["model_calls"] or 0))
         if isfinite(calls):
             v["model_calls"].append(calls)
-        judged = judge.get(key, {})
-        if case.type in IN_SCOPE:  # abstained, uncited and errored count as unsupported
+        judged = verdicts.get(key, {})
+        errored = _judge_error(judged)  # no verdict, so not unsupported either: left out
+        if case.type in IN_SCOPE and not errored:  # abstained, uncited, errored: unsupported
             in_scope_supported.append(float(judged.get("judge_supported") == 1.0))
         if failed:
             continue
@@ -154,6 +205,8 @@ def day_values(
             premise_declined.append(float(abstained))
         if abstained:
             continue
+        output = outputs.get(key, {})
+        cited_answers += _cited(output)
         cited = citations.get(key, {})
         if "uncited_answer" in cited:
             v["uncited_answer"].append(cited["uncited_answer"])
@@ -162,10 +215,11 @@ def day_values(
         if "judge_supported" in judged:
             v["judge_supported"].append(1.0 - judged["judge_supported"])
             core.append(judged.get("judge_core_supported", 0.0))
+        elif errored:
+            judge_errors += 1
         tokens = int(u["input_tokens"] or 0) + int(u["output_tokens"] or 0)
         if tokens:
             v["tokens"].append(log(tokens))
-        output = outputs.get(key, {})
         words.append(len(str(output.get("answer", "")).split()))
         q = traffic.get(key[0])
         if q is not None and q.source_url:
@@ -177,14 +231,16 @@ def day_values(
             )
             named.append(int(q.source_url in urls))
     reported: dict[str, float | None] = {  # nothing judged is unknown, not 0 supported
-        "judge_supported_over_all_in_scope": _share(in_scope_supported) if judge else None,
+        "judge_supported_over_all_in_scope": _share(in_scope_supported) if verdicts else None,
         "outside_snapshot_answered": _share(outside_answered),
         "false_premise_declined": _share(premise_declined),
         "judge_core_supported": _share(core),
         "median_answer_words": float(median(words)) if words else None,
         "source_named_share": _share(named),
     }
-    return DayValues(run_id, v, fabricated, cache_hits, words, named, reported)
+    return DayValues(
+        run_id, v, fabricated, cache_hits, words, named, reported, judge_errors, cited_answers
+    )
 
 
 def _shift(day: float | None, ref: float | None) -> float | None:
@@ -202,7 +258,9 @@ def check_day(
     judge_note: str | None = None,
 ) -> dict[str, Any]:
     """The full rule for one day against the pooled reference days. judge_note says why the
-    judge is out of the family, when it is (judge_standing)."""
+    judge is out of the family, when it is (judge_standing). The judge is untrusted on a day
+    whose answers shifted style past TRUST_SHIFT, or whose judge errors pass JUDGE_ERROR_SHARE
+    of its cited answers; the report counts the judge errors either way."""
     family = [s for s in ALERT_FAMILY if judge_enabled or s.name != "judge_supported"]
     rows: dict[str, dict[str, Any]] = {}
     pvalues: dict[str, float] = {}
@@ -290,7 +348,9 @@ def check_day(
             day.reported["source_named_share"], fmean(ref_named) if ref_named else None
         ),
     }
-    trusted = all(s is None or s <= TRUST_SHIFT for s in shifts.values())
+    errors, cited = day.judge_errors, day.cited_answers
+    erring = bool(cited) and errors / cited > JUDGE_ERROR_SHARE  # the exact share, not rounded
+    trusted = all(s is None or s <= TRUST_SHIFT for s in shifts.values()) and not erring
     if not trusted and rows["judge_supported"]["status"] == "ok":
         rows["judge_supported"]["status"] = "ok, but the judge is untrusted today: not a clear"
     alerts = [name for name, row in rows.items() if row["status"] == "alert"]
@@ -307,6 +367,9 @@ def check_day(
             "standing": "in the family" if judge_enabled else (judge_note or PENDING),
             "trusted": trusted,
             "shifts": shifts,
+            "errors": errors,  # judge_error grades: no verdict, so out of judge_supported
+            "cited": cited,
+            "error_share": round(errors / cited, 4) if cited else None,
         },
         "reported": day.reported,
         "alerts": alerts,
@@ -329,6 +392,14 @@ def not_cleared(report: Mapping[str, Any]) -> list[str]:
     return reasons
 
 
+def verdict_code(report: Mapping[str, Any]) -> int:
+    """The monitor's exit code for a day's report: 1 on an alert, 3 when there is none but the
+    day is not cleared, 0 when it is clear. A recorded day is answered with its record's code."""
+    if report["alerts"]:
+        return 1
+    return 3 if not_cleared(report) else 0
+
+
 def leave_one_day_out(days: Sequence[DayValues], *, judge_enabled: bool) -> list[dict[str, Any]]:
     """Each reference day against the other four, with the full rule. Any alert, or a family
     metric left untested, means the reference is too noisy (or too thin) to judge later days
@@ -347,38 +418,52 @@ def noisy_days(days: Mapping[int, str], checks: Sequence[Mapping[str, Any]]) -> 
     return out
 
 
-def judge_standing(store: ResultsStore, reference_runs: Iterable[str]) -> tuple[bool, str]:
-    """Whether judge_supported is in the alert family, and why or why not: the judge passed
-    Aleena's 30 blind labels (at most 2 false passes) on these reference runs, and the
-    leave-one-day-out check with it in the family raised no alert. Read from the results
-    database, never from judge-check.json, which is only its published copy. A check on another
-    reference or with anyone else's labels does not count, nor does one whose sampled answers
-    were re-judged since."""
+def judge_standing(
+    store: ResultsStore, reference_runs: Iterable[str], grader: str = "judge"
+) -> tuple[bool, str]:
+    """Whether a judge's judge_supported (by grader name, the validated judge unless asked) is
+    in the alert family, and why or why not: the judge passed the author's blind labels in its
+    own judge check on these reference runs (for the validated judge, the 30 with at most 2
+    false passes), and the leave-one-day-out check with it in the family raised no alert. Read
+    from the results database, never from judge-check.json, which is only its published copy. A
+    check on another reference or with anyone else's labels does not count, nor does one whose
+    sampled answers were re-judged since. Another judge's check never counts for this one, and
+    a pin (online.ONLINE_JUDGE_PINS) counts for nothing here."""
     runs = list(reference_runs)
-    kept = recorded_judge_check(store, runs)
+    validated = grader == "judge"
+    name = "the judge" if validated else grader
+    labels = "the 30 blind labels" if validated else "its blind labels"
+    kept = recorded_judge_check(store, runs, grader)
     if kept is None:
-        return False, PENDING
+        return False, PENDING if validated else f"pending: {name} has not yet passed {labels}"
     if kept.get("labeler") != JUDGE_CHECK_LABELER:
-        return False, "out of the family: the recorded judge check is not Aleena's"
+        return False, "out of the family: the recorded judge check is not the author's"
     if not kept.get("passed"):
         if kept.get("labels_passed"):
-            return False, "out of the family: the reference is too noisy with the judge in it"
-        return False, "out of the family: the judge failed Aleena's 30 blind labels"
-    drawn = recorded_sample(store, runs)
-    if drawn is None or verdict_digests(store, drawn["runs"]) != drawn.get("verdict_digests"):
+            return False, f"out of the family: the reference is too noisy with {name} in it"
+        return False, f"out of the family: {name} failed {labels}"
+    drawn = recorded_sample(store, runs, grader)
+    if drawn is None or verdict_digests(store, drawn["runs"], grader) != drawn.get(
+        "verdict_digests"
+    ):
         return False, "out of the family: the sampled answers were re-judged after its check"
-    return True, "in the family: the judge passed Aleena's 30 blind labels"
+    return True, f"in the family: {name} passed {labels}"
 
 
-def judge_enabled(store: ResultsStore, reference_runs: Iterable[str]) -> bool:
-    """Whether judge_supported is in the alert family (judge_standing, without the reason)."""
-    return judge_standing(store, reference_runs)[0]
+def judge_enabled(
+    store: ResultsStore, reference_runs: Iterable[str], grader: str = "judge"
+) -> bool:
+    """Whether a judge's judge_supported is in the alert family (judge_standing, without the
+    reason)."""
+    return judge_standing(store, reference_runs, grader)[0]
 
 
 def foreign_record(store: ResultsStore, reference_runs: Iterable[str], key: str) -> str | None:
-    """A reference run that already carries a judge-check record of this kind made for another
-    set of runs, or None. Records are written once: a run belongs to one judge check, so no
-    check on another (or hand-edited) reference can overwrite the real one's record."""
+    """A reference run that already carries this judge-check record (one judge's sample or
+    result: sample_record, check_record) made for another set of runs, or None. Records are
+    written once: a run belongs to one judge check per judge, so no check on another (or
+    hand-edited) reference can overwrite the real one's record, while another judge's check on
+    the same runs keeps its own records beside it."""
     runs = sorted(reference_runs)
     for run in runs:
         try:
@@ -416,10 +501,21 @@ def _stored_path(raw: object) -> Path:
     return Path(str(raw).replace("\\", "/"))
 
 
-def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
-    """An online run's values. Refused unless the run is complete, has attempts, was judged in
-    full by the pinned judge, and its cases and traffic files are the ones it ran: a gap would
-    otherwise read as a quiet day."""
+def load_day(
+    store: ResultsStore, run_id: str, traffic_dir: Path, judge: str = "judge"
+) -> DayValues:
+    """An online run's values, judge_supported from one judge's grades (by grader name, the
+    validated judge unless asked). Refused unless the run is complete, has attempts, was judged
+    in full by that judge at its pin (online.ONLINE_JUDGE_PINS), as its judge note says, and its
+    cases and traffic files are the ones it ran: a gap would otherwise read as a quiet day. A
+    cited answer is judged when it has a verdict, or when its only judge grade is judge_error:
+    the judge could not judge it, which is counted, never read as a verdict."""
+    pin = judge_pin(judge)
+    if pin is None:
+        raise ValueError(
+            f"{judge} has no online pin, so its grades on {run_id} are not read: only a pinned "
+            "judge grades online runs"
+        )
     info = store.run_info(run_id)
     if not info["online"]:
         raise ValueError(f"{run_id} is not an online run")
@@ -438,28 +534,33 @@ def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
         raise ValueError(
             f"{run_id}: its traffic file {traffic_path} is missing or not the one it ran"
         )
-    version = (info["manifest"].get("judge") or {}).get("version")
-    if version != ONLINE_JUDGE_VERSION:
+    note = info["manifest"].get(judge)
+    version = note.get("version") if isinstance(note, dict) else None
+    if version != pin:
+        named = "" if judge == "judge" else f" ({judge})"
         raise ValueError(
-            f"{run_id} is not judged by the pinned judge {ONLINE_JUDGE_VERSION}: "
-            f"uv run evals judge {run_id}"
+            f"{run_id} is not judged by the pinned judge {pin}{named}: uv run evals judge {run_id}"
         )
-    judge = store.grades_for(run_id, "judge")
-    unjudged = [
-        a["case_id"]
+    grades = store.grades_for(run_id, judge)
+    cited = [
+        (a["case_id"], grades.get((a["case_id"], a["attempt"]), {}))
         for a in store.answered_attempts(run_id)
-        if isinstance(a["output"].get("citations"), list)
-        and any(isinstance(c, dict) for c in a["output"]["citations"])
-        and "judge_supported" not in judge.get((a["case_id"], a["attempt"]), {})
+        if _cited(a["output"])
     ]
+    unjudged = [case for case, g in cited if "judge_supported" not in g and not _judge_error(g)]
     if unjudged:
         raise ValueError(
             f"{run_id}: {len(unjudged)} cited answer(s) have no judge verdict (first "
             f"{unjudged[0]}); judge them before checking the day"
         )
+    if both := [case for case, g in cited if "judge_supported" in g and JUDGE_ERROR in g]:
+        raise ValueError(
+            f"{run_id}: {len(both)} answer(s) hold both a judge verdict and a judge error (first "
+            f"{both[0]}); judge the run again with --replace"
+        )
     traffic = {q.id: q for q in load_traffic(traffic_path)}
     cases = {c.id: c for c in load_suite(path)}
-    values = day_values(store, run_id, cases, traffic)
+    values = day_values(store, run_id, cases, traffic, judge)
     if not values.values["error"]:
         raise ValueError(f"{run_id} has no attempts")
     return values
@@ -467,12 +568,13 @@ def load_day(store: ResultsStore, run_id: str, traffic_dir: Path) -> DayValues:
 
 def archive_reference_files(stamp: str, *, keep_judge_check: bool = False) -> list[Path]:
     """Move everything made against the current reference into results/online/archive/STAMP/,
-    so no alert or judge check made against the old reference is read against a new one. With
-    keep_judge_check (a re-record of the same runs), the judge check's sample and result stay:
-    they belong to the runs, not to the code, and moving them would reopen a final score."""
+    so no alert, post-hoc reading or judge check made against the old reference is read against
+    a new one. With keep_judge_check (a re-record of the same runs), the judge check's sample and
+    result stay: they belong to the runs, not to the code, and moving them would reopen a final
+    score."""
     moved = []
     check = REFERENCE_PATH.with_name("reference-check.json")
-    paths = [REFERENCE_PATH, check, ALERTS_PATH]
+    paths = [REFERENCE_PATH, check, ALERTS_PATH, POST_HOC_PATH]
     if not keep_judge_check:
         paths += [JUDGE_SAMPLE_PATH, JUDGE_CHECK_PATH]
     for path in paths:
@@ -485,21 +587,42 @@ def archive_reference_files(stamp: str, *, keep_judge_check: bool = False) -> li
 
 
 def recorded_judge_check(
-    store: ResultsStore, reference_runs: Iterable[str]
+    store: ResultsStore, reference_runs: Iterable[str], grader: str = "judge"
 ) -> dict[str, Any] | None:
-    """The first complete judge-check result for these reference runs, as kept in the results
-    database (every reference run carries it once scored), or None. The database is the record;
-    judge-check.json is only its published copy, so no file written, edited or deleted by hand
-    can make, change or reopen a final score."""
-    kept = _kept(store, reference_runs, JUDGE_CHECK_RECORD)
+    """A judge's first complete judge-check result for these reference runs (the validated
+    judge's unless another grader is named), as kept in the results database (every reference
+    run carries it once scored), or None. The database is the record; judge-check.json is only
+    its published copy, so no file written, edited or deleted by hand can make, change or reopen
+    a final score."""
+    kept = _kept(store, reference_runs, check_record(grader))
     return kept if kept is not None and kept.get("complete") else None
 
 
-def recorded_sample(store: ResultsStore, reference_runs: Iterable[str]) -> dict[str, Any] | None:
-    """The judge-check sample drawn for these reference runs, as kept in the results database
-    (every reference run carries it from the draw): drawn_at, reference_runs, runs (run -> case
-    ids) and verdict_digests. judge-check-sample.json is only its published copy."""
-    return _kept(store, reference_runs, JUDGE_SAMPLE_RECORD)
+def recorded_sample(
+    store: ResultsStore, reference_runs: Iterable[str], grader: str = "judge"
+) -> dict[str, Any] | None:
+    """A judge's check sample drawn for these reference runs (the validated judge's unless
+    another grader is named), as kept in the results database (every reference run carries it
+    from the draw): drawn_at, reference_runs, runs (run -> case ids) and verdict_digests.
+    judge-check-sample.json is only its published copy."""
+    return _kept(store, reference_runs, sample_record(grader))
+
+
+def sampled_cases(store: ResultsStore, reference_runs: Iterable[str]) -> dict[str, set[str]]:
+    """Run -> case ids of every judge's check sample drawn for these reference runs: answers
+    labeled blind, which the dashboard never shows with a verdict."""
+    runs = sorted(reference_runs)
+    keys: set[str] = set()
+    for run in runs:
+        try:
+            keys.update(k for k in store.run_info(run)["manifest"] if _is_sample_key(k))
+        except KeyError:  # a run the database does not know holds no record
+            continue
+    out: dict[str, set[str]] = {}
+    for key in sorted(keys):
+        for run, cases in ((_kept(store, runs, key) or {}).get("runs") or {}).items():
+            out.setdefault(str(run), set()).update(cases)
+    return out
 
 
 def _kept(store: ResultsStore, reference_runs: Iterable[str], key: str) -> dict[str, Any] | None:
@@ -515,32 +638,35 @@ def _kept(store: ResultsStore, reference_runs: Iterable[str], key: str) -> dict[
 
 
 def pending_blind(store: ResultsStore) -> set[str]:
-    """Every case id of a drawn judge-check sample whose check awaits its first complete score,
-    read from the results database. Online case ids name their day (online-dNN-...), and a free
-    cache replay of a reference day answers and judges them the same, so they are held back in
-    any run that holds them, not only in the reference runs."""
+    """Every case id of a drawn judge-check sample, of any judge, whose check awaits its first
+    complete score, read from the results database. Online case ids name their day
+    (online-dNN-...), and a free cache replay of a reference day answers and judges them the
+    same, so they are held back in any run that holds them, not only in the reference runs. One
+    judge's scored check releases its own sample only."""
     out: set[str] = set()
     for run in store.online_runs():
         manifest = run["manifest"]
-        drawn = manifest.get(JUDGE_SAMPLE_RECORD)
-        if not drawn:
-            continue
-        scored = manifest.get(JUDGE_CHECK_RECORD)
-        done = sorted((scored or {}).get("reference_runs") or []) == sorted(
-            drawn.get("reference_runs") or []
-        )
-        if scored and scored.get("complete") and done:
-            continue
-        for cases in (drawn.get("runs") or {}).values():
-            out.update(cases)
+        for key in [k for k in manifest if _is_sample_key(k)]:
+            drawn = manifest[key]
+            if not drawn:
+                continue
+            scored = manifest.get(_check_key_of(key))
+            done = sorted((scored or {}).get("reference_runs") or []) == sorted(
+                drawn.get("reference_runs") or []
+            )
+            if scored and scored.get("complete") and done:
+                continue
+            for cases in (drawn.get("runs") or {}).values():
+                out.update(cases)
     return out
 
 
 def blind_cases(store: ResultsStore, run_id: str) -> set[str]:
-    """The pending judge check's sampled answers that this run holds (pending_blind). Their
-    judge verdicts and reasons must not reach the labeler before the first complete score:
-    `label --show-judge`, `judge-validate`, `judge-probe`, `compare` on a judge metric and
-    `trace` hold them back. Empty once the check is scored, or for a run holding none."""
+    """The pending judge checks' sampled answers that this run holds (pending_blind), whichever
+    judge drew them. Their judge verdicts and reasons, every judge's, must not reach the labeler
+    before that check's first complete score: `label --show-judge`, `judge-validate`,
+    `judge-probe`, `compare` on a judge metric and `trace` hold them back. Empty once every
+    check is scored, or for a run holding none."""
     pending = pending_blind(store)
     if not pending:
         return set()
@@ -589,15 +715,18 @@ def judge_check_sample(
     return out
 
 
-def verdict_digests(store: ResultsStore, sample: Mapping[str, Sequence[str]]) -> dict[str, str]:
-    """Per run, a digest of the judge's grades on the sampled answers, values and reasons both.
-    Saved with the sample when it is drawn and compared before labeling and scoring, so any
-    re-judging after the draw is caught, even a swap of one pass and one fail that keeps a day
-    at 3 and 3. The reasons, which the labeler never sees, keep the digest from being worked
-    back to the verdicts: a day's 6 answers have only 20 possible 3-and-3 splits."""
+def verdict_digests(
+    store: ResultsStore, sample: Mapping[str, Sequence[str]], grader: str = "judge"
+) -> dict[str, str]:
+    """Per run, a digest of one judge's grades on the sampled answers (the validated judge's
+    unless another grader is named), values and reasons both. Saved with the sample when it is
+    drawn and compared before labeling and scoring, so any re-judging after the draw is caught,
+    even a swap of one pass and one fail that keeps a day at 3 and 3. The reasons, which the
+    labeler never sees, keep the digest from being worked back to the verdicts: a day's 6
+    answers have only 20 possible 3-and-3 splits."""
     out: dict[str, str] = {}
     for run, cases in sample.items():
-        grades = store.grade_reasons(run, "judge")
+        grades = store.grade_reasons(run, grader)
         rows = [
             [case, sorted([m, v, why] for m, (v, why) in grades.get((case, 1), {}).items())]
             for case in sorted(cases)

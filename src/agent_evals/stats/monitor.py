@@ -6,7 +6,7 @@ and an alert also needs the effect to reach the metric's practical floor, so a t
 significant shift on a big day does not page anyone. Every metric reports the smallest true
 rise that would alert on 8 days in 10, floor included, so a quiet day is read with its blind
 spots in view: exactly for rates, by the normal approximation for means (decision 5, approved
-by Aleena 2026-10-20).
+2026-10-20).
 """
 
 from __future__ import annotations

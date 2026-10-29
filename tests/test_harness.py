@@ -342,3 +342,41 @@ def test_two_judges_on_one_run_are_never_averaged(tmp_path: Path) -> None:
     assert gate(store, one, two, cases, judge="judge-v4").target.baseline == 0.0
     assert summarize(store, one).metrics["correct"].mean == 1.0  # code graders unaffected
     store.close()
+
+
+def test_judge_errors_are_a_count_over_the_judged_answers_and_lower_is_better(
+    tmp_path: Path,
+) -> None:
+    from typer.testing import CliRunner
+
+    from agent_evals import cli
+    from agent_evals.report import LOWER_IS_BETTER
+    from agent_evals.types import Grade
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id=c) for c in ("a", "b", "c")]
+    run = _run(store, FakeAgent({c.id: {1} for c in cases}), cases, attempts=1)
+    clean = _run(store, FakeAgent({c.id: {1} for c in cases}), cases, attempts=1)
+    for case_id in ("a", "b"):
+        for rid in (run, clean):
+            store.add_grades(
+                rid, case_id, 1, [("judge-v5", Grade(metric="judge_supported", value=1.0))]
+            )
+    failed = Grade(metric="judge_error", value=1.0, passed=False, reason="failed twice")
+    store.add_grades(run, "c", 1, [("judge-v5", failed)])  # written only where one happened
+    s = summarize(store, run, judge="judge-v5")
+    assert "judge_error" not in s.metrics  # as a mean per case it would always be 1
+    assert s.judge_errors == (1, 3) and "judge_error" in LOWER_IS_BETTER
+    assert summarize(store, run).judge_errors is None  # v2, "judge", leaves none
+    assert summarize(store, clean, judge="judge-v5").judge_errors is None
+    store.annotate_run(clean, "judge-v5", {"version": "abc", "method": "claims"})
+    assert summarize(store, clean, judge="judge-v5").judge_errors == (0, 2)  # the claim judge's
+    store.close()
+    config = tmp_path / "config.yaml"
+    db = (tmp_path / "e.duckdb").as_posix()
+    config.write_text(f'paths:\n  db: "{db}"\njudge:\n  grader_name: judge-v5\n', encoding="utf-8")
+    result = CliRunner().invoke(cli.app, ["report", run, "-c", str(config)])
+    assert result.exit_code == 0, result.output
+    printed = " ".join(result.output.split())
+    assert "judge errors: 1 of the 3 answers 'judge-v5' judged (33.3%) have no verdict" in printed
+    assert "judge_error" not in printed

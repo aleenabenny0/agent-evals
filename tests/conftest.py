@@ -146,6 +146,26 @@ def _monitor_files_in_tmp(
     from agent_evals import dashboard, monitor
 
     base = tmp_path_factory.mktemp("online-results")
-    for name in ("REFERENCE_PATH", "ALERTS_PATH", "JUDGE_CHECK_PATH", "JUDGE_SAMPLE_PATH"):
+    for name in (
+        "REFERENCE_PATH",
+        "ALERTS_PATH",
+        "POST_HOC_PATH",
+        "JUDGE_CHECK_PATH",
+        "JUDGE_SAMPLE_PATH",
+    ):
         monkeypatch.setattr(monitor, name, base / getattr(monitor, name).name)
     monkeypatch.setattr(dashboard, "DASHBOARD_PATH", base / "dashboard" / "index.html")
+
+
+@pytest.fixture(autouse=True)
+def _spend_ledger_in_tmp(
+    tmp_path_factory: pytest.TempPathFactory, monkeypatch: pytest.MonkeyPatch
+) -> Path:
+    """The judge round's spend ledger, and the pilot record read beside it, go to a temporary
+    folder in every test: a command that judges with the claim judge records its spend there,
+    never in results/judge-v5/. A test may ask for the path."""
+    from agent_evals import spend
+
+    path = tmp_path_factory.mktemp("judge-v5") / spend.DEFAULT_PATH.name
+    monkeypatch.setattr(spend, "DEFAULT_PATH", path)
+    return path

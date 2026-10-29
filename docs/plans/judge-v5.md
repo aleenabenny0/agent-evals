@@ -595,6 +595,27 @@ changes, online-only scope, and the budget in 7(a).
    day for online judging after that. *Recommended.* (b) The leaner run, about $30 before any
    label, with single passes and caps widened as stated above.
 
+## Clarifications made during the build (2026-10-28)
+
+A review of the first build found places where the design's wording left room for a reading that
+would undercut it. These clarifications follow the design's intent and were fixed before any paid
+step:
+
+- **Spans match on word and number boundaries.** A quote span of "5 GB" does not occur in "15 GB",
+  and a claim's "1 hour" is not found in a quote's "1.5 hours".
+- **No URL reaches the judge inside quote text either.** Link targets and bare URLs are stripped
+  from quote text (the link's visible text stays), on both the message and the span check.
+- **A number is a token that starts with a digit.** Names that contain digits, such as EC2, S3 or
+  IPv6, count as names, so advice that names them can be cleared as not a claim, while a quantity
+  never can.
+- **The skeptic's per-item score measures support only.** "Not a claim" clears a name, never a
+  number; a flagged number passes only when the quotes support it at the threshold.
+- **Normalization** also drops markdown emphasis asterisks and maps the remaining dash characters.
+- **Judge errors count as errors** in stage A's named-case ranking and its build check, so an answer
+  the claim judge cannot judge never counts as fixed.
+- **The pilot's 20 answers** are drawn with a fixed seed, stratified by dev run, not taken in
+  case-id order (which gave 20 answers from one service area and no named case).
+
 ## Appendix: named cases (frozen 2026-10-28)
 
 Cases this document quotes, paraphrases, or built a pattern from, by id: online-d01-085,

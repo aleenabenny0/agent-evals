@@ -9,7 +9,7 @@ from agent_evals.corpus import Corpus
 from agent_evals.review import quote_context, quote_pattern
 from conftest import make_page
 
-# The case Aleena hit while labeling: bold markers and a line break inside the cited sentence.
+# The case the author hit while labeling: bold markers and a line break inside the cited sentence.
 PROV_THROUGHPUT_PAGE = (
     "## Provisioned Throughput\n\n"
     "You can purchase **Provisioned Throughput** to provision a higher level of throughput for a\n"

@@ -173,6 +173,27 @@ def test_run_checks_the_seal_before_anything_is_spent(
     assert CliRunner().invoke(cli.app, ["blind", "run", "9"]).exit_code == 2
 
 
+def test_run_refuses_an_unpinned_judge_in_any_choice_before_anything_is_typed(
+    blind: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ran = _ran(monkeypatch)
+    answers = _seal()  # day 9: subtle
+    larger = cli.BLIND_CHOICES["larger"]  # not day 9's choice, and its judge has no pin
+    larger.write_text(
+        larger.read_text(encoding="utf-8") + "judge:\n  grader_name: judge-v2.1\n",
+        encoding="utf-8",
+    )
+    seen = _answers(monkeypatch, [])
+    result = CliRunner().invoke(cli.app, ["blind", "run", "9"])
+    out = _clean(result.output)  # it names no choice and no config
+    assert result.exit_code == 2 and "judge-v2.1, has no pin" in out
+    assert "Nothing was typed or run" in out and not seen and not ran
+    seen = _answers(monkeypatch, answers)  # without the judge, the day runs as before
+    result = CliRunner().invoke(cli.app, ["blind", "run", "9", "--no-judge"])
+    assert result.exit_code == 0, result.output
+    assert len(seen) == 4 and [r["config"] for r in ran] == [cli.BLIND_CHOICES["subtle"]]
+
+
 def test_run_refuses_only_a_day_that_ran_under_its_sealed_choice(
     blind: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

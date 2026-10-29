@@ -4,7 +4,7 @@
    answer cites? 2. `judge_supported`: is every claim, including added context, backed by them?
    Both come from one call that sees the question, the answer and the citations, never the gold.
 3. `judge_responsive`: does the answer answer the question as asked? This call sees the gold,
-   so an online case, which has none, skips it.
+   so an online case, which has none, skips it, as does a config with `responsive: false`.
 
 The judge never changes a grade code already decided. It skips errored and abstained attempts,
 and skips the support verdicts when there are no citations, because `uncited_answer` has that
@@ -55,6 +55,11 @@ V = TypeVar("V", bound=BaseModel)
 
 class JudgeGrader:
     def __init__(self, llm: LLMClient, config: JudgeConfig, *, salt: str = "judge") -> None:
+        if config.method != "verdict":  # never the verdict judge where a config asks for another
+            raise ValueError(
+                f"judge.method is {config.method!r}: JudgeGrader is the verdict judge; the claim "
+                "judge is ClaimJudgeGrader (graders/claim_judge.py)"
+            )
         self.llm = llm
         self.config = config
         self.salt = salt
@@ -70,7 +75,8 @@ class JudgeGrader:
         self.usage = Usage()  # every judge call, for the cost line
         self._lock = threading.Lock()
         # Changes with the model (temperature included), any prompt word, or a tool schema. Not
-        # with pricing, salt or the grader name.
+        # with pricing, salt or the grader name, nor with `responsive` (which skips a question
+        # and changes no verdict) or the claim judge's settings: v2 stays 2cf75fa03e09.
         fingerprint = {
             "grader": "judge",
             "model": config.model.model_dump(mode="json", exclude={"pricing"}),
@@ -100,8 +106,8 @@ class JudgeGrader:
             full_ok = s.fully_supported == "pass"
             grades.append(_grade("judge_core_supported", core_ok, s.reason))
             grades.append(_grade("judge_supported", full_ok, s.reason))
-        if case.is_online or case.gold is None:  # no reference answer to judge it against
-            return grades
+        if not self.config.responsive or case.is_online or case.gold is None:
+            return grades  # not asked for, or no reference answer to judge it against
         r = self._ask(
             JUDGE_RESPONSIVE_V1,
             responsive_message(case.question, case.gold.answer, answer),

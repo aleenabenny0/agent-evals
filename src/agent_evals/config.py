@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field
@@ -79,6 +80,19 @@ class JudgeConfig(_Strict):
     grader_name: str = "judge"
     # Which support rubric the judge and the label screen read (keys of SUPPORT_RUBRICS).
     rubric_version: str = "v2"
+    # "verdict": one call returns the two support verdicts (judges v2 to v4). "claims": the claim
+    # judge (docs/plans/judge-v5.md), a claim table that code checks, then a skeptic pass.
+    method: Literal["verdict", "claims"] = "verdict"
+    # The claim judge's two thresholds, both part of its version: a claim is supported at this
+    # score or above (t), and the skeptic's search for a missed claim fails the answer at this
+    # confidence or above (s; null turns that search off). The claim judge refuses any value off
+    # stage A's grid (t 50, 70 or 85; s null, 70 or 90: T_GRID and S_GRID in
+    # graders/claim_judge.py). The verdict judge reads neither.
+    support_threshold: int = Field(default=70, ge=0, le=100)
+    skeptic_threshold: int | None = Field(default=90, ge=0, le=100)
+    # Whether the verdict judge also asks if the answer responds to the question, which needs a
+    # gold answer. The claim judge never asks it, so its config says false.
+    responsive: bool = True
 
 
 class SuitesConfig(_Strict):

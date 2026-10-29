@@ -286,8 +286,7 @@ def render(
         judge = f"judge_supported is shown but cannot alert, being {judge_note}."
     else:
         judge = (
-            "judge_supported is shown but cannot alert until the judge passes Aleena's 30 "
-            "blind labels."
+            "judge_supported is shown but cannot alert until the judge passes the 30 blind labels."
         )
     figures = []
     for i, spec in enumerate((*ALERT_FAMILY, EXTRA)):

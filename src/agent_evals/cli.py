@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
 
@@ -11,9 +12,11 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
-from agent_evals.config import Config, load_config
+from agent_evals.config import Config, JudgeConfig, load_config
 
 if TYPE_CHECKING:
+    from agent_evals.harness.llm import LLMClient
+    from agent_evals.spend import MeteredLLM, SpendLedger
     from agent_evals.stats.core import Estimate
     from agent_evals.store.db import ResultsStore
     from agent_evals.types import Case, Grade
@@ -553,6 +556,47 @@ def trace(
     )
 
 
+@dataclass(frozen=True)
+class _RoundSpend:
+    """A paid claim-judge command's spend in the judge round's ledger (docs/plans/judge-v5.md):
+    its meter, checked with an estimate before the first call and held to what the round's cap
+    leaves, and the ledger it is recorded in after, however the command ends."""
+
+    step: str
+    ledger: SpendLedger
+    meter: MeteredLLM
+
+    def record(self, *, done: bool) -> None:
+        entry = self.ledger.record(
+            self.step if done else f"{self.step} (stopped early)", self.meter
+        )
+        console.print(
+            f"spent ${entry.usd:.4f}: {entry.uncached_calls} of {entry.calls} calls sent to the "
+            "API, the rest from the call cache. The judge round has spent "
+            f"${self.ledger.total_usd():.2f} of its ${self.ledger.cap_usd:.2f} cap "
+            f"({self.ledger.path})."
+        )
+
+
+def _round_spend(step: str, answers: int, llm: LLMClient, judge: JudgeConfig) -> _RoundSpend:
+    """The claim judge's calls are the judge round's spend: estimated at the pilot's cost per
+    answer (the design's estimate before the pilot), refused (exit 2) before any call when that
+    would take the round past its cap, and stopped during the command when the cap is reached."""
+    from agent_evals import spend
+
+    ledger = spend.SpendLedger(spend.DEFAULT_PATH)
+    estimate = answers * spend.cost_per_answer(ledger.path.parent)
+    try:
+        meter = spend.MeteredLLM(llm, judge.model.pricing, ledger.check(step, estimate))
+    except spend.SpendCapError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+    except ValueError as exc:  # no pricing, or a ledger written under another cap
+        console.print(f"[red]{exc}: nothing was judged.[/red]")
+        raise typer.Exit(code=2) from exc
+    return _RoundSpend(step, ledger, meter)
+
+
 @app.command()
 def judge(
     run_id: str,
@@ -573,17 +617,23 @@ def judge(
     ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Judge a run's stored answers (supported? responsive?) with the LLM judge. Costs money."""
+    """Judge a run's stored answers (supported? responsive?) with the LLM judge, or their support
+    alone with the claim judge when the config's judge.method is claims. Costs money. The claim
+    judge's spend is the judge round's: checked against its ledger before the first call, stopped
+    at its cap, and recorded in it. An online run is judged only by a pinned judge: its grader
+    name has a pin (online.ONLINE_JUDGE_PINS) and its version is that pin."""
     from concurrent.futures import ThreadPoolExecutor
 
     from rich.progress import Progress
 
+    from agent_evals.graders.claim_judge import ClaimJudgeGrader
     from agent_evals.graders.judge import JudgeGrader
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
-    from agent_evals.online import ONLINE_JUDGE_VERSION
-    from agent_evals.store.db import WRITE_ONCE, ResultsStore
+    from agent_evals.online import pin_refusal
+    from agent_evals.spend import SpendCapError
+    from agent_evals.store.db import ResultsStore, is_write_once
     from agent_evals.suites import load_suite
     from agent_evals.types import AgentResult
 
@@ -595,18 +645,20 @@ def judge(
         name = cfg.judge.grader_name  # its notes go in the manifest under this name
         held = info["manifest"].get(name)
         is_judge_note = isinstance(held, dict) and {"version", "rubric"} <= held.keys()
-        if name in WRITE_ONCE or (held is not None and not is_judge_note):
+        if is_write_once(name) or (held is not None and not is_judge_note):
             console.print(
                 f"[red]The judge's name {name!r} is the name of another record of {run_id}, "
                 "which its notes would overwrite. Nothing was judged.[/red]"
             )
             raise typer.Exit(code=2)
-        grader = JudgeGrader(AnthropicClient(CallCache(cfg.paths.cache_dir)), cfg.judge, salt=salt)
-        if info["online"] and grader.version != ONLINE_JUDGE_VERSION:
-            console.print(
-                f"[red]An online run is judged only by the validated judge "
-                f"{ONLINE_JUDGE_VERSION}; this config's judge is {grader.version}.[/red]"
-            )
+        llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
+        grader: JudgeGrader | ClaimJudgeGrader = (
+            ClaimJudgeGrader(llm, cfg.judge, salt=salt)  # support only: no responsive call
+            if cfg.judge.method == "claims"
+            else JudgeGrader(llm, cfg.judge, salt=salt)
+        )
+        if info["online"] and (refusal := pin_refusal(name, grader.version)):
+            console.print(f"[red]{refusal}.[/red]")
             raise typer.Exit(code=2)
         suite_path = Path(str(info["manifest"].get("suite", {}).get("path", "")))
         if not suite_path.exists():
@@ -615,6 +667,7 @@ def judge(
         _require_unchanged_cases(info, suite_path)
         cases = {c.id: c for c in load_suite(suite_path)}
         todo = [a for a in store.answered_attempts(run_id) if a["case_id"] in cases]
+        keys: list[tuple[str, int]] | None = None  # the grades replaced; None: all of the judge's
         if only_labeled is not None:
             labeled = {
                 (x["case_id"], x["attempt"])
@@ -623,43 +676,63 @@ def judge(
             }
             todo = [a for a in todo if (a["case_id"], a["attempt"]) in labeled]
             keys = [(a["case_id"], a["attempt"]) for a in todo]
-            store.delete_grades(run_id, cfg.judge.grader_name, keys)
-        else:
-            if store.grade_count(run_id, cfg.judge.grader_name) and not replace:
-                console.print(
-                    f"[red]This run already has {cfg.judge.grader_name} grades; pass "
-                    "--replace.[/red]"
-                )
-                raise typer.Exit(code=2)
-            store.delete_grades(run_id, cfg.judge.grader_name)
+        elif store.grade_count(run_id, cfg.judge.grader_name) and not replace:
+            console.print(
+                f"[red]This run already has {cfg.judge.grader_name} grades; pass --replace.[/red]"
+            )
+            raise typer.Exit(code=2)
         todo = todo[:limit]
+        # Checked before any grade is deleted: a refusal leaves the run as it was.
+        round_spend: _RoundSpend | None = None
+        if isinstance(grader, ClaimJudgeGrader):
+            round_spend = _round_spend(f"evals judge {run_id}", len(todo), llm, cfg.judge)
+            grader = ClaimJudgeGrader(round_spend.meter, cfg.judge, salt=salt)
+        store.delete_grades(run_id, cfg.judge.grader_name, keys)
 
         def one(a: dict[str, object]) -> tuple[dict[str, object], list[tuple[str, Grade]]]:
             case = cases[str(a["case_id"])]
             result = AgentResult(output=a["output"])  # type: ignore[arg-type]
-            return a, grade_all([grader], case, result)
+            graded = grade_all([grader], case, result)
+            stopped = round_spend.meter.stopped if round_spend is not None else None
+            if stopped is not None:  # the cap stopped the step, not this answer: store nothing
+                raise SpendCapError(stopped)
+            return a, graded
 
         judged = 0
-        with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool, Progress() as progress:
-            task = progress.add_task("Judging", total=len(todo))
-            for a, graded in pool.map(one, todo):
-                store.add_grades(run_id, str(a["case_id"]), int(str(a["attempt"])), graded)
-                judged += 1
-                progress.advance(task)
-        store.annotate_run(
-            run_id,
-            cfg.judge.grader_name,
-            {
-                "version": grader.version,
-                "model": cfg.judge.model.name,
-                "rubric": cfg.judge.rubric_version,
-                "salt": salt,
-            },
-        )
+        done = False
+        try:
+            with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool, Progress() as progress:
+                task = progress.add_task("Judging", total=len(todo))
+                for a, graded in pool.map(one, todo):
+                    store.add_grades(run_id, str(a["case_id"]), int(str(a["attempt"])), graded)
+                    judged += 1
+                    progress.advance(task)
+            done = True
+        except SpendCapError as exc:
+            console.print(
+                f"[red]{exc} {judged} of the {len(todo)} answers were judged before the stop and "
+                f"keep their grades; the rest have none from {cfg.judge.grader_name}, and the "
+                "run's judge note is not written.[/red]"
+            )
+            raise typer.Exit(code=2) from exc
+        finally:
+            if round_spend is not None:
+                round_spend.record(done=done)
+        note: dict[str, Any] = {
+            "version": grader.version,
+            "model": cfg.judge.model.name,
+            "rubric": cfg.judge.rubric_version,
+            "salt": salt,
+        }
+        if isinstance(grader, ClaimJudgeGrader):  # its thresholds, and the salts of its retries
+            note |= grader.run_note()
+        store.annotate_run(run_id, cfg.judge.grader_name, note)
         u = grader.usage
-        cost = u.cost_usd(cfg.judge.model.pricing)
-        uncached = (cost or 0.0) * (u.model_calls - u.cached_calls) / max(u.model_calls, 1)
-        spent = f"; about ${uncached:.2f} spent" if cost is not None else ""
+        spent = ""  # the claim judge's spend is metered, and printed above as recorded
+        if round_spend is None:
+            cost = u.cost_usd(cfg.judge.model.pricing)
+            uncached = (cost or 0.0) * (u.model_calls - u.cached_calls) / max(u.model_calls, 1)
+            spent = f"; about ${uncached:.2f} spent" if cost is not None else ""
         console.print(
             f"judged {judged} answers with {cfg.judge.model.name} (judge {grader.version}): "
             f"{u.model_calls} calls ({u.cached_calls} from cache), {u.input_tokens} in / "
@@ -982,7 +1055,7 @@ def judge_validate(
     cfg = _config(config)
     store = ResultsStore(cfg.paths.db)
     try:
-        if mon.blind_cases(store, run_id):  # its counts would tell her the judge's verdicts
+        if mon.blind_cases(store, run_id):  # its counts would tell the labeler the judge's verdicts
             console.print(
                 f"[red]{run_id} holds answers of the online judge check, which are labeled blind "
                 "until it is scored: judge-validate is refused on it until then.[/red]"
@@ -1045,17 +1118,22 @@ def judge_probe(
     limit: Annotated[int, typer.Option(help="Passed answers to build variants from.")] = 40,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Mutation tests and bias probes for the judge, on answers it passed. Costs money."""
+    """Mutation tests and bias probes for the judge, on answers it passed. Costs money. With the
+    claim judge (judge.method claims), on the answers it passed on judge_supported, scored on
+    judge_supported alone, and its spend is the judge round's: checked against its ledger before
+    the first call, stopped at its cap, and recorded in it."""
     import json
     from concurrent.futures import ThreadPoolExecutor
 
     from rich.progress import Progress
 
+    from agent_evals.graders.claim_judge import ClaimJudgeGrader
     from agent_evals.graders.judge import JudgeGrader
     from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import AnthropicClient
     from agent_evals.harness.runner import grade_all
     from agent_evals.judge_probes import MUTANTS, Variant, behaved, report_path, variants
+    from agent_evals.spend import SpendCapError
     from agent_evals.stats.core import wilson_ci
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import load_suite
@@ -1083,12 +1161,15 @@ def judge_probe(
     if not verdicts:
         console.print("[red]No judge grades on this run yet; run `evals judge` first.[/red]")
         raise typer.Exit(code=2)
+    claims = cfg.judge.method == "claims"
+    # The verdicts a probe reads. The claim judge gives no responsive verdict, and its support
+    # score and a judge error are no verdict (docs/plans/judge-v5.md).
+    scored = ("judge_supported",) if claims else ("judge_supported", "judge_responsive")
     passed_both = [
         a
         for a in answered
         if a["case_id"] in cases
-        and verdicts.get((a["case_id"], a["attempt"]), {}).get("judge_supported") == 1.0
-        and verdicts.get((a["case_id"], a["attempt"]), {}).get("judge_responsive") == 1.0
+        and all(verdicts.get((a["case_id"], a["attempt"]), {}).get(m) == 1.0 for m in scored)
     ][:limit]
     pool = [
         (str(c.get("url", "")), str(c.get("quote", "")))
@@ -1097,37 +1178,60 @@ def judge_probe(
         if isinstance(c, dict)
     ]
     llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
-    graders = {
-        "judge": JudgeGrader(llm, cfg.judge, salt="judge"),
-        "probe": JudgeGrader(llm, cfg.judge, salt="probe"),
-    }
     jobs = [(a, v) for a in passed_both for v in variants(a["output"], pool)]
+    round_spend = (
+        _round_spend(f"evals judge-probe {run_id}", len(jobs), llm, cfg.judge) if claims else None
+    )
+    client: LLMClient = llm if round_spend is None else round_spend.meter
+
+    def grader(salt: str) -> JudgeGrader | ClaimJudgeGrader:
+        if claims:
+            return ClaimJudgeGrader(client, cfg.judge, salt=salt)
+        return JudgeGrader(client, cfg.judge, salt=salt)
+
+    graders = {salt: grader(salt) for salt in ("judge", "probe")}
 
     def one(job: tuple[dict[str, Any], Variant]) -> tuple[dict[str, Any], Variant, bool, str]:
         a, v = job
         graded = grade_all([graders[v.salt]], cases[a["case_id"]], AgentResult(output=v.output))
+        stopped = round_spend.meter.stopped if round_spend is not None else None
+        if stopped is not None:  # the cap stopped the step, not this variant: no result for it
+            raise SpendCapError(stopped)
         judged = {g.metric: g.value for _, g in graded if g.metric != "grader_error"}
-        ok = behaved(v, verdicts[(a["case_id"], a["attempt"])], judged)
+        original = verdicts[(a["case_id"], a["attempt"])]
+        if claims:
+            judged = {m: x for m, x in judged.items() if m in scored}
+            original = {m: x for m, x in original.items() if m in scored}
+        ok = behaved(v, original, judged)
         reasons = "; ".join(f"{g.metric}={g.value:g} {g.reason}" for _, g in graded)
         return a, v, ok, reasons
 
     tally: dict[str, list[bool]] = {}
     misses: list[dict[str, Any]] = []
-    with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool_, Progress() as progress:
-        task = progress.add_task("Probing the judge", total=len(jobs))
-        for a, v, ok, reasons in pool_.map(one, jobs):
-            tally.setdefault(v.probe, []).append(ok)
-            if not ok:
-                misses.append(
-                    {
-                        "case_id": a["case_id"],
-                        "attempt": a["attempt"],
-                        "probe": v.probe,
-                        "answer": v.output.get("answer"),
-                        "judge": reasons,
-                    }
-                )
-            progress.advance(task)
+    done = False
+    try:
+        with ThreadPoolExecutor(max_workers=cfg.run.workers) as pool_, Progress() as progress:
+            task = progress.add_task("Probing the judge", total=len(jobs))
+            for a, v, ok, reasons in pool_.map(one, jobs):
+                tally.setdefault(v.probe, []).append(ok)
+                if not ok:
+                    misses.append(
+                        {
+                            "case_id": a["case_id"],
+                            "attempt": a["attempt"],
+                            "probe": v.probe,
+                            "answer": v.output.get("answer"),
+                            "judge": reasons,
+                        }
+                    )
+                progress.advance(task)
+        done = True
+    except SpendCapError as exc:
+        console.print(f"[red]{exc} No probe result is reported.[/red]")
+        raise typer.Exit(code=2) from exc
+    finally:
+        if round_spend is not None:
+            round_spend.record(done=done)
 
     table = Table(show_header=True, header_style="bold", title=f"judge probes on {run_id}")
     for col in ("probe", "kind", "n", "expected", "observed (95% CI)", "bar"):
@@ -1588,8 +1692,77 @@ def _print_monitor(report: dict[str, Any], title: str) -> None:
     judge = report["judge"]
     trust = "trusted" if judge["trusted"] else "[yellow]untrusted today[/yellow]"
     standing = judge.get("standing") or ("in the family" if judge["in_family"] else "pending")
-    console.print(f"judge: {standing}; {trust}")
+    errors = judge.get("errors") or 0
+    erred = (  # answers with no verdict, kept out of judge_supported
+        f"; {errors} judge error(s) in {judge.get('cited')} cited answers (untrusted past "
+        f"{mon.JUDGE_ERROR_SHARE:.0%})"
+        if errors
+        else ""
+    )
+    console.print(f"judge: {standing}; {trust}{erred}")
     console.print(f"reported only: {json.dumps(report['reported'])}")
+
+
+# What a recorded day's report must hold to be shown and to give its exit code.
+MONITOR_REPORT_KEYS = (
+    "run_id",
+    "metrics",
+    "fabricated_citation",
+    "judge",
+    "reported",
+    "alerts",
+    "untested",
+)
+
+
+def _recorded_verdicts() -> dict[str, Any]:
+    """Each checked day's recorded verdict, from alerts.json: day -> the monitor's report."""
+    from agent_evals import monitor as mon
+
+    if not mon.ALERTS_PATH.exists():
+        return {}
+    return dict(json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")))
+
+
+def _verdict_line(day: int, report: dict[str, Any]) -> int:
+    """Print a day's verdict; return the monitor's exit code for it (monitor.verdict_code)."""
+    from agent_evals import monitor as mon
+
+    code = mon.verdict_code(report)
+    if code == 1:
+        console.print(f"[red]ALERT on day {day}: {', '.join(report['alerts'])}[/red]")
+    elif code == 3:
+        reasons = "; ".join(mon.not_cleared(report))
+        console.print(f"[yellow]Day {day}: no alert, but not cleared: {reasons}.[/yellow]")
+    else:
+        console.print(f"[green]Day {day}: no alert.[/green]")
+    return code
+
+
+def _recorded_day(day: int, recorded: Any, run_id: str | None) -> int:
+    """A day whose verdict is recorded: the record printed and its exit code returned, with
+    nothing recomputed or written, so asking again can never change a pre-registered verdict."""
+    from agent_evals import monitor as mon
+
+    if not isinstance(recorded, dict) or not all(k in recorded for k in MONITOR_REPORT_KEYS):
+        console.print(
+            f"[red]Day {day}'s record in {mon.ALERTS_PATH} is not a monitor report, so its "
+            "verdict cannot be shown. It stands all the same: the day is not checked again.[/red]"
+        )
+        return 2
+    run = recorded["run_id"]
+    _print_monitor(recorded, f"day {day} ({run}) against the reference days, as recorded")
+    console.print(
+        f"Day {day}'s verdict was recorded at {recorded.get('checked_at', '?')} "
+        f"({mon.ALERTS_PATH}) and stands: it is shown, not checked again. To read the day again "
+        f"after it: uv run evals monitor {day} --post-hoc"
+    )
+    if run_id is not None and run_id != run:
+        console.print(
+            f"[yellow]The recorded verdict is {run}'s, not {run_id}'s: a day has one verdict."
+            "[/yellow]"
+        )
+    return _verdict_line(day, recorded)
 
 
 @app.command()
@@ -1610,20 +1783,34 @@ def monitor(
         typer.Option(
             "--refreeze",
             help="With --freeze: check again although a reference is frozen, or a check already "
-            "stopped the demo. Everything from before (the reference, its check, alerts, the "
-            "judge check) is first moved to results/online/archive/, never deleted.",
+            "stopped the demo. Everything from before (the reference, its check, alerts, "
+            "post-hoc readings, the judge check) is first moved to results/online/archive/, "
+            "never deleted.",
         ),
     ] = False,
     run_id: Annotated[
         str | None,
         typer.Option("--run", help="The online run to check; needed when the day has several."),
     ] = None,
+    post_hoc: Annotated[
+        bool,
+        typer.Option(
+            "--post-hoc",
+            help="Read a day whose verdict is recorded again, from today's stored grades, into "
+            "results/online/post-hoc.json: a post-hoc reading, never a verdict, and never "
+            "written to alerts.json. It reads the recorded run unless --run names another.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Is a day worse than the reference days (phase 7 part 3)? Reads stored runs only, so it is
     free. Exits 0 when the day is clear, 1 on an alert (or a reference too noisy to freeze), 3
     when there is no alert but the day is not cleared (a family metric untested, or the judge
-    untrusted), and 2 when the day cannot be checked."""
+    untrusted), and 2 when the day cannot be checked. A day's verdict is recorded once, in
+    alerts.json, so no pre-registered verdict can be overwritten: asked again, the monitor
+    prints the recorded verdict and exits with its code, recomputing and writing nothing.
+    --post-hoc reads a recorded day again and writes only to post-hoc.json; it exits 0 once the
+    reading is written, whatever it found, since a post-hoc reading is never a verdict."""
     from datetime import UTC, datetime
 
     from agent_evals import monitor as mon
@@ -1631,6 +1818,25 @@ def monitor(
 
     cfg = _config(config)
     now = datetime.now(UTC).isoformat(timespec="seconds")
+    if post_hoc and (freeze or day is None):
+        console.print(
+            "[red]--post-hoc reads one day whose verdict is recorded: give that day, without "
+            "--freeze.[/red]"
+        )
+        raise typer.Exit(code=2)
+    recorded: Any = None  # the day's recorded verdict, read before anything else
+    if not freeze and day is not None and day not in mon.REFERENCE_DAYS:
+        recorded = _recorded_verdicts().get(str(day))
+        if recorded is not None and not post_hoc:
+            raise typer.Exit(code=_recorded_day(day, recorded, run_id))
+        if recorded is None and post_hoc:
+            console.print(
+                f"[red]Day {day} has no recorded verdict: uv run evals monitor {day} records "
+                "it. A post-hoc reading comes after the verdict, never instead of it.[/red]"
+            )
+            raise typer.Exit(code=2)
+        if post_hoc and run_id is None and isinstance(recorded, dict) and recorded.get("run_id"):
+            run_id = str(recorded["run_id"])  # the run the verdict was given on, unless named
     try:
         store = ResultsStore(cfg.paths.db, read_only=True)
     except FileNotFoundError as exc:
@@ -1777,24 +1983,45 @@ def monitor(
             raise typer.Exit(code=2) from None
     finally:
         store.close()
+    if post_hoc:  # to its own file, never alerts.json, and never read as a verdict
+        readings = (
+            json.loads(mon.POST_HOC_PATH.read_text(encoding="utf-8"))
+            if mon.POST_HOC_PATH.exists()
+            else {}
+        )
+        source = recorded if isinstance(recorded, dict) else {}
+        verdict = {k: source.get(k) for k in ("checked_at", "run_id", "alerts")}
+        reading = {"checked_at": now, "post_hoc": True, "recorded_verdict": verdict, **report}
+        readings.setdefault(str(day), []).append(reading)  # every reading kept, in order
+        mon.POST_HOC_PATH.parent.mkdir(parents=True, exist_ok=True)
+        mon.POST_HOC_PATH.write_text(
+            json.dumps(readings, indent=2, allow_nan=False) + "\n", encoding="utf-8"
+        )
+        _print_monitor(report, f"day {day} ({target}) against the reference days, post hoc")
+        now_shows = f"alerts on {', '.join(report['alerts'])}" if report["alerts"] else "no alert"
+        recorded_alerts = ", ".join(verdict["alerts"] or []) or "no alert"
+        console.print(
+            f"[yellow]Post hoc, not a verdict: read again now, day {day} shows {now_shows}. Its "
+            f"recorded verdict ({verdict['checked_at']}) stands: {recorded_alerts}. This "
+            f"reading is written to {mon.POST_HOC_PATH} only.[/yellow]"
+        )
+        return
+    alerts = _recorded_verdicts()  # read again: another check may have recorded the day since
+    if str(day) in alerts:
+        console.print(
+            f"[red]Day {day}'s verdict was recorded while this check ran "
+            f"({alerts[str(day)].get('checked_at', '?')}). It stands; this check is not written."
+            "[/red]"
+        )
+        raise typer.Exit(code=2)
     _print_monitor(report, f"day {day} ({target}) against the reference days")
-    alerts = (
-        json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) if mon.ALERTS_PATH.exists() else {}
-    )
     alerts[str(day)] = {"checked_at": now, **report}
     mon.ALERTS_PATH.parent.mkdir(parents=True, exist_ok=True)
     mon.ALERTS_PATH.write_text(
         json.dumps(alerts, indent=2, allow_nan=False) + "\n", encoding="utf-8"
     )
-    if report["alerts"]:
-        console.print(f"[red]ALERT on day {day}: {', '.join(report['alerts'])}[/red]")
-        raise typer.Exit(code=1)
-    if reasons := mon.not_cleared(report):
-        console.print(
-            f"[yellow]Day {day}: no alert, but not cleared: {'; '.join(reasons)}.[/yellow]"
-        )
-        raise typer.Exit(code=3)
-    console.print(f"[green]Day {day}: no alert.[/green]")
+    if code := _verdict_line(day, report):
+        raise typer.Exit(code=code)
 
 
 @app.command()
@@ -1834,8 +2061,8 @@ def dashboard(config: ConfigOpt = DEFAULT_CONFIG) -> None:
                         ref_runs[d] = found
                 except ValueError as exc:
                     console.print(f"[yellow]day {d} left out: {exc}[/yellow]")
-        drawn = mon.recorded_sample(store, ref_runs.values()) if ref_runs else None
-        blind = (drawn or {}).get("runs") or {}  # the judge check's: never shown with a verdict
+        # every judge's check sample: never shown with a verdict, the validated judge's or not
+        blind = mon.sampled_cases(store, ref_runs.values()) if ref_runs else {}
         judge_in, standing = (
             mon.judge_standing(store, ref_runs.values()) if reference is not None else (False, None)
         )
@@ -1884,9 +2111,9 @@ def judge_check(
     ],
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """May judge_supported alert (phase 7 part 3)? Aleena labels 30 judged answers from the
+    """May judge_supported alert (phase 7 part 3)? The author labels 30 judged answers from the
     reference days, blind: 3 the judge passed and 3 it failed from each day, in an order that
-    shows neither. The judge may pass at most 2 of the ones she fails. If so, the
+    shows neither. The judge may pass at most 2 of the ones the author fails. If so, the
     leave-one-day-out check runs again with judge_supported in the family and must stay quiet.
     `label` draws the sample the first time and can be stopped with q and run again to
     continue. `score` records the result for the monitor, and its first complete result is
@@ -2118,7 +2345,9 @@ def online_run(
     day: Annotated[int, typer.Argument(help="Simulated day to run.")],
     judge_answers: Annotated[
         bool,
-        typer.Option("--judge/--no-judge", help="Judge the answers with the pinned judge."),
+        typer.Option(
+            "--judge/--no-judge", help="Judge the answers with the config's judge, if pinned."
+        ),
     ] = True,
     shadow: Annotated[
         bool,
@@ -2131,7 +2360,8 @@ def online_run(
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """Run the docs agent on one simulated day, grade what needs no reference answer, and judge it
-    with the pinned judge (phase 7 part 2). Costs money. The run is never the latest run. Any
+    with the config's judge (phase 7 part 2), which must be pinned: its grader name has a pin and
+    its version is that pin, or nothing runs. Costs money. The run is never the latest run. Any
     config may run (part 5's fault and shadow days need others); the run records which, whether
     it was the champion's (configs/default.yaml), whether it is a shadow, and the hash of the
     traffic file it ran. A blind day is served only by `evals blind run DAY`; here it takes
@@ -2156,17 +2386,30 @@ def online_run(
     _online_run(day=day, judge_answers=judge_answers, shadow=shadow, config=config)
 
 
-def _online_run(*, day: int, judge_answers: bool, shadow: bool, config: Path) -> str:
-    """online-run's work, which `evals blind run` calls too. Returns the run's id."""
+def _online_judge_refusal(judge: JudgeConfig) -> str | None:
+    """Why this judge config may not grade an online run, or None when it may: its grader name
+    is pinned and its judge's version is that pin (online.pin_refusal). Builds the judge the
+    config names, the claim judge or the verdict judge, and calls nothing."""
+    from agent_evals.graders.claim_judge import ClaimJudgeGrader
     from agent_evals.graders.judge import JudgeGrader
     from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.online import pin_refusal
+
+    try:
+        grader: JudgeGrader | ClaimJudgeGrader = (
+            ClaimJudgeGrader(AnthropicClient(), judge)
+            if judge.method == "claims"
+            else JudgeGrader(AnthropicClient(), judge)
+        )
+    except ValueError as exc:  # a judge config no judge accepts grades nothing
+        return f"The config's judge cannot be built: {exc}"
+    return pin_refusal(judge.grader_name, grader.version)
+
+
+def _online_run(*, day: int, judge_answers: bool, shadow: bool, config: Path) -> str:
+    """online-run's work, which `evals blind run` calls too. Returns the run's id."""
     from agent_evals.harness.manifest import file_sha256
-    from agent_evals.online import (
-        ONLINE_CASES_DIR,
-        ONLINE_JUDGE_VERSION,
-        online_case,
-        online_suite_name,
-    )
+    from agent_evals.online import ONLINE_CASES_DIR, online_case, online_suite_name
     from agent_evals.simulate import load_traffic
     from agent_evals.store.db import ResultsStore
     from agent_evals.suites import write_suite
@@ -2186,14 +2429,9 @@ def _online_run(*, day: int, judge_answers: bool, shadow: bool, config: Path) ->
             "run.[/red]"
         )
         raise typer.Exit(code=2)
-    if judge_answers:  # refused before the agent is paid for, not after
-        version = JudgeGrader(AnthropicClient(), cfg.judge).version
-        if version != ONLINE_JUDGE_VERSION:
-            console.print(
-                f"[red]An online run is judged only by the validated judge "
-                f"{ONLINE_JUDGE_VERSION}; this config's judge is {version}. Nothing was run.[/red]"
-            )
-            raise typer.Exit(code=2)
+    if judge_answers and (refusal := _online_judge_refusal(cfg.judge)):  # before the agent runs
+        console.print(f"[red]{refusal}. Nothing was run.[/red]")
+        raise typer.Exit(code=2)
     traffic_path = TRAFFIC_DIR / f"day-{day:02d}.jsonl"
     if not traffic_path.exists():
         console.print(
@@ -2227,7 +2465,7 @@ def _online_run(*, day: int, judge_answers: bool, shadow: bool, config: Path) ->
     return run_id
 
 
-BLIND_DAYS = (9, 10, 11)  # part 5, item 5: the days Aleena's sealed choices decide
+BLIND_DAYS = (9, 10, 11)  # part 5, item 5: the days the author's sealed choices decide
 BLIND_CHOICES: dict[str, Path] = {  # what each choice runs
     "unchanged": DEFAULT_CONFIG,
     "subtle": Path("configs/retrieval-k1.yaml"),
@@ -2249,7 +2487,7 @@ app.add_typer(blind_app, name="blind")
 
 
 def _commitment(choices: dict[int, str], passphrase: str) -> str:
-    """The sealed hash: the three choices and the passphrase, which only Aleena knows."""
+    """The sealed hash: the three choices and the passphrase, which only the author knows."""
     from agent_evals.harness.cache import sha256_text
 
     text = ";".join(f"{d}={choices[d]}" for d in sorted(choices)) + f";pass={passphrase}"
@@ -2409,19 +2647,31 @@ def _verified_choices(sealed: dict[str, Any]) -> dict[int, str]:
 def blind_run(
     day: Annotated[int, typer.Argument(help="A blind day, 9 to 11.")],
     judge_answers: Annotated[
-        bool, typer.Option("--judge/--no-judge", help="Judge the answers with the pinned judge.")
+        bool,
+        typer.Option(
+            "--judge/--no-judge", help="Judge the answers with the config's judge, if pinned."
+        ),
     ] = True,
 ) -> None:
     """Run one blind day under its sealed choice. The three choices and the passphrase are typed
     hidden and checked against the seal before anything is spent, so the day runs under its
     sealed choice or not at all, and only once: a day that already ran under it is refused. The
     run's record names its config, as every run's must; it is not read until `evals monitor DAY`
-    has given its verdict."""
+    has given its verdict. With --judge, every choice's judge must be pinned, checked before
+    anything is typed, so a refusal never depends on the choice."""
     if day not in BLIND_DAYS:
         console.print(f"[red]The blind days are {list(BLIND_DAYS)}.[/red]")
         raise typer.Exit(code=2)
     sealed = _sealed()
     served = _served_configs(_blind_db(), day)
+    if judge_answers:  # all three, whichever the seal holds
+        for path in BLIND_CHOICES.values():
+            if refusal := _online_judge_refusal(_config(path).judge):
+                console.print(
+                    "[red]One of the blind choices' configs cannot judge an online run. "
+                    f"{refusal}. Nothing was typed or run.[/red]"
+                )
+                raise typer.Exit(code=2)
     if not _interactive():
         console.print("[red]evals blind run needs an interactive terminal.[/red]")
         raise typer.Exit(code=2)
@@ -2780,6 +3030,13 @@ def _print_summary(store: ResultsStore, run_id: str, judge: str = "judge") -> No
             "-" if name in NEUTRAL else "lower" if name in LOWER_IS_BETTER else "higher",
         )
     console.print(table)
+    if s.judge_errors is not None:  # no verdict, so in no judge metric above; lower is better
+        errors, judged = s.judge_errors
+        share = f" ({errors / judged:.1%})" if judged else ""
+        console.print(
+            f"judge errors: {errors} of the {judged} answers '{judge}' judged{share} have no "
+            "verdict, and are left out of its judge metrics (lower is better)"
+        )
     if s.pass_hat_k:
         console.print("pass^k: " + "  ".join(f"k={k}: {v:.3f}" for k, v in s.pass_hat_k.items()))
     if len(s.pass_at_k) > 1:

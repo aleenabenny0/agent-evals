@@ -36,7 +36,11 @@ LOWER_IS_BETTER = {
     "tool_errors",
     "model_calls",
     "grader_error",
+    "judge_error",
 }
+# A judge error is no verdict, and is written only on the answers where one happened, so its mean
+# per case would always be 1. It is counted over the judged answers instead (judge_error_count).
+COUNTED = frozenset({"judge_error"})
 
 
 @dataclass
@@ -60,6 +64,8 @@ class RunSummary:
     pass_at_k: dict[int, float] = field(default_factory=dict)
     # Share of cases whose repeated attempts disagree; None with a single attempt per case.
     flip_rate: Estimate | None = None
+    # The judge's judge errors and the answers it judged; None for a judge that leaves none.
+    judge_errors: tuple[int, int] | None = None
 
 
 def paraphrase_consistency(
@@ -99,13 +105,32 @@ def other_judges(store: ResultsStore, run_id: str, judge: str) -> tuple[str, ...
     return tuple(g for g in store.judge_graders(run_id) if g != judge)
 
 
+def judge_error_count(store: ResultsStore, run_id: str, judge: str) -> tuple[int, int] | None:
+    """How many answers the judge left a judge error on instead of a verdict, and how many it
+    judged (a verdict or a judge error). None for a judge that leaves none: it wrote no judge
+    error, and its run note is not the claim judge's (docs/plans/judge-v5.md)."""
+    judged = [
+        metrics
+        for metrics in store.grades_for(run_id, judge).values()
+        if "judge_supported" in metrics or "judge_error" in metrics
+    ]
+    errors = sum("judge_error" in metrics for metrics in judged)
+    note = store.run_info(run_id)["manifest"].get(judge)
+    if not errors and not (isinstance(note, dict) and note.get("method") == "claims"):
+        return None
+    return errors, len(judged)
+
+
 def summarize(store: ResultsStore, run_id: str, judge: str = "judge") -> RunSummary:
     """Every metric of a run with its interval. Judge metrics come from the grader named
-    `judge` only; a candidate judge's grades on the same answers are left out."""
+    `judge` only; a candidate judge's grades on the same answers are left out. Judge errors are
+    a count over the judged answers, not a metric with a mean."""
     info = store.run_info(run_id)
     skip = other_judges(store, run_id, judge)
     metrics: dict[str, Estimate] = {}
     for metric in store.metrics(run_id, skip):
+        if metric in COUNTED:
+            continue
         per_case = store.metric_by_case(run_id, metric, skip)
         case_means = [sum(v) / len(v) for v in per_case.values()]
         metrics[metric] = _interval(case_means)
@@ -156,6 +181,7 @@ def summarize(store: ResultsStore, run_id: str, judge: str = "judge") -> RunSumm
         p95,
         pak,
         flip_rate(passes),
+        judge_error_count(store, run_id, judge),
     )
 
 

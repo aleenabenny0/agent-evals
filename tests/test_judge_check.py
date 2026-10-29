@@ -12,10 +12,10 @@ from typing import Any
 import pytest
 from typer.testing import CliRunner
 
-from agent_evals import cli
+from agent_evals import cli, online
 from agent_evals import dashboard as dash
 from agent_evals import monitor as mon
-from agent_evals.store.db import ResultsStore
+from agent_evals.store.db import ResultsStore, check_record_key, is_write_once
 from agent_evals.types import AgentResult, Grade
 from test_monitor import REFERENCE
 from test_monitor import _day as synthetic_day
@@ -113,11 +113,11 @@ def _score(tmp_path: Path, labels: dict[str, list[bool]]) -> dict[str, Any]:
 
 
 def test_the_score_counts_false_passes_and_needs_every_label(tmp_path: Path) -> None:
-    agree = {f"r{d}": [True] * 6 for d in range(1, 6)}  # she passes everything: no false pass
+    agree = {f"r{d}": [True] * 6 for d in range(1, 6)}  # the labeler passes all: no false pass
     result = _score(tmp_path / "a", agree)
     assert result["complete"] and result["false_passes"] == 0 and result["labels_passed"]
     assert result["judge_passed"] == 15 and result["false_fails"] == 15  # reported, no bar
-    harsh = {f"r{d}": [False] * 6 for d in range(1, 6)}  # she fails everything the judge passed
+    harsh = {f"r{d}": [False] * 6 for d in range(1, 6)}  # the labeler fails all the judge passed
     result = _score(tmp_path / "b", harsh)
     assert result["false_passes"] == sum(r["judge_supported"] for r in result["rows"]) == 15
     assert not result["labels_passed"] and result["false_fails"] == 0
@@ -171,7 +171,7 @@ def _reference_days(monkeypatch: pytest.MonkeyPatch, days: list[mon.DayValues]) 
 
 
 def _cli_draw(config: Path, monkeypatch: pytest.MonkeyPatch) -> dict[str, list[str]]:
-    """Draw and save the sample as `judge-check label` does (she quits at once); return it."""
+    """Draw and save the sample as `judge-check label` does (quitting at once); return it."""
     monkeypatch.setattr(cli, "label", lambda **kwargs: None)
     drew = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
     assert drew.exit_code == 0 and "Stopped" in drew.output, drew.output
@@ -233,7 +233,7 @@ def test_the_judge_stays_out_if_the_reference_is_noisy_with_it(
     assert not _enabled(tmp_path, runs.values())
 
 
-def test_score_never_draws_and_no_draw_follows_her_labels(
+def test_score_never_draws_and_no_draw_follows_the_labels(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     runs = _store(tmp_path)
@@ -271,7 +271,7 @@ def test_the_judges_verdicts_stay_hidden_until_the_check_is_scored(
     assert "judge_supported" in shown.output
 
 
-def test_label_walks_the_reference_runs_and_stops_when_she_quits(
+def test_label_walks_the_reference_runs_and_stops_when_the_labeler_quits(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     runs = _store(tmp_path)
@@ -348,7 +348,7 @@ def test_only_a_recorded_pass_on_unchanged_grades_puts_the_judge_in(
     assert not _enabled(tmp_path, runs.values())
     manifests(kept)
     store = ResultsStore(tmp_path / "evals.duckdb")
-    try:  # her record back, then the sampled answers re-judged after the pass
+    try:  # the real record back, then the sampled answers re-judged after the pass
         case = sample["r1"][0]
         store.delete_grades("r1", "judge", [(case, 1)])
         store.add_grades("r1", case, 1, [("judge", Grade(metric="judge_supported", value=0.5))])
@@ -363,7 +363,7 @@ def test_the_first_complete_score_is_final(tmp_path: Path, monkeypatch: pytest.M
     runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
     sample = _cli_draw(config, monkeypatch)
-    _label_sample(tmp_path, sample, supported=False)  # she fails all 15 judge passes
+    _label_sample(tmp_path, sample, supported=False)  # the labeler fails all 15 judge passes
     _reference_days(monkeypatch, REFERENCE)
     code, output = _cli_score(config)
     assert code == 0 and "it fails" in output
@@ -386,7 +386,7 @@ def test_a_re_judged_sample_is_refused_before_labeling_and_scoring(
 ) -> None:
     runs = _store(tmp_path)
     config = _config(tmp_path, monkeypatch, runs)
-    monkeypatch.setattr(cli, "label", lambda **kwargs: None)  # she quits at once
+    monkeypatch.setattr(cli, "label", lambda **kwargs: None)  # the labeler quits at once
     drew = CliRunner().invoke(cli.app, ["judge-check", "label", "-c", str(config)])
     assert drew.exit_code == 0 and "Stopped" in drew.output  # the sample is drawn and saved
     saved = json.loads(mon.JUDGE_SAMPLE_PATH.read_text(encoding="utf-8"))
@@ -499,7 +499,7 @@ def test_a_forged_result_file_is_moved_aside_and_any_label_blocks_a_draw(
     config = _config(tmp_path, monkeypatch, runs)
     _label_sample(tmp_path, {"r2": ["c1"]}, supported=True)
     store = ResultsStore(tmp_path / "evals.duckdb")
-    try:  # the same label again under another spelling of her name
+    try:  # the same label again under another spelling of the labeler's name
         for label in store.labels("r2"):
             store.record_label(
                 "r2",
@@ -693,3 +693,128 @@ def test_a_null_stdin_is_not_a_person_at_a_terminal(monkeypatch: pytest.MonkeyPa
     with open(os.devnull) as null:  # on Windows the NUL device reports isatty() as well
         monkeypatch.setattr(sys, "stdin", null)
         assert not cli._interactive()
+
+
+def test_each_judges_check_records_have_their_own_keys_and_are_written_once(
+    tmp_path: Path,
+) -> None:
+    # the first check, the validated judge's, keeps its names; another judge's carry its name
+    assert (mon.sample_record(), mon.check_record()) == ("judge_check_sample", "judge_check")
+    assert mon.sample_record("judge-v5") == "judge_check_sample:judge-v5"
+    assert mon.check_record("judge-v5") == "judge_check:judge-v5"
+    records = ("judge_check", "judge_check_sample", "judge_check:judge-v5")
+    assert all(is_write_once(k) for k in (*records, "judge_check_sample:judge-v5"))
+    assert not any(is_write_once(k) for k in ("judge", "judge-v5", "online", "judge_checks"))
+    with pytest.raises(ValueError, match="not a judge-check record"):
+        check_record_key("online", "judge-v5")
+    runs = _store(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        key = mon.sample_record("judge-v5")
+        store.annotate_run("r1", key, {"a": 1})
+        store.annotate_run("r1", key, {"a": 1})  # the same: allowed
+        with pytest.raises(ValueError, match="written once"):
+            store.annotate_run("r1", key, {"a": 2})
+        store.annotate_run("r1", mon.sample_record(), {"b": 1})  # the first check's, beside it
+        assert store.run_info("r1")["manifest"][key] == {"a": 1}
+        scored = mon.check_record("judge-v5")
+        store.annotate_run("r1", scored, {"c": 1})
+        with pytest.raises(ValueError, match="written once"):  # r1 fails: r2 is rolled back
+            store.annotate_runs(["r2", "r1"], scored, {"c": 2})
+        assert scored not in store.run_info("r2")["manifest"]
+    finally:
+        store.close()
+    assert runs
+
+
+def test_a_judge_named_like_another_judges_check_record_is_refused(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    for n, name in enumerate((mon.sample_record("judge-v5"), mon.check_record("judge-v5"))):
+        other = tmp_path / f"record-{n}.yaml"  # a colon cannot be in a Windows file name
+        other.write_text(config.read_text(encoding="utf-8") + f"judge:\n  grader_name: '{name}'\n")
+        result = CliRunner().invoke(cli.app, ["judge", "r1", "--limit", "0", "-c", str(other)])
+        assert result.exit_code == 2 and "Nothing was judged" in " ".join(result.output.split())
+
+
+def test_a_run_holds_one_check_per_judge_and_each_judge_stands_on_its_own(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    runs = _store(tmp_path)
+    config = _config(tmp_path, monkeypatch, runs)
+    first = _cli_draw(config, monkeypatch)  # the first check, the validated judge's: passed
+    _label_sample(tmp_path, first, supported=True)
+    _reference_days(monkeypatch, REFERENCE)
+    assert _cli_score(config)[0] == 0 and _enabled(tmp_path, runs.values())
+    reference = sorted(runs.values())
+    v5 = "judge-v5"
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # the claim judge grades the same answers under its own name, then draws its sample
+        for run in reference:
+            for (case, attempt), grades in store.grades_for(run, "judge").items():
+                verdict = Grade(
+                    metric="judge_supported", value=grades["judge_supported"], reason=case
+                )
+                store.add_grades(run, case, attempt, [(v5, verdict)])
+        mine = {
+            r: [c for c in (f"c{i}" for i in range(16)) if c not in first[r]][:4] for r in reference
+        }
+        drawn = {
+            "drawn_at": "2026-11-02T00:00:00+00:00",
+            "reference_runs": reference,
+            "runs": mine,
+            "verdict_digests": mon.verdict_digests(store, mine, v5),
+        }
+        assert mon.foreign_record(store, reference, mon.sample_record(v5)) is None
+        store.annotate_runs(reference, mon.sample_record(v5), drawn)  # beside the first check's
+        sample = mon.recorded_sample(store, reference)
+        assert sample is not None and sample["runs"] == first  # the first check's, untouched
+        assert mon.recorded_sample(store, reference, v5) == drawn
+        assert mon.recorded_judge_check(store, reference, v5) is None
+        pending = (False, "pending: judge-v5 has not yet passed its blind labels")
+        assert mon.judge_standing(store, reference, v5) == pending
+        pins = {"judge": online.ONLINE_JUDGE_VERSION, v5: "abcdefabcdef"}
+        monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", pins)  # pinned: it may grade online
+        assert mon.judge_standing(store, reference, v5) == pending  # but that puts it in nothing
+        assert mon.judge_standing(store, reference)[0]  # v2 stays in on its own check
+        # its sample is held back, though the first check is scored, and kept off the dashboard
+        assert mon.pending_blind(store) == {c for cases in mine.values() for c in cases}
+        assert set(mine["r1"]) <= mon.blind_cases(store, "r1")  # case ids repeat across runs here
+        assert mon.sampled_cases(store, reference)["r1"] == set(first["r1"]) | set(mine["r1"])
+        # another reference that shares r1 to r4 can take neither judge's records
+        other = [*reference[:4], "x5"]
+        assert mon.foreign_record(store, other, mon.sample_record(v5)) == "r1"
+        assert mon.foreign_record(store, other, mon.sample_record()) == "r1"
+    finally:
+        store.close()
+    trace = CliRunner().invoke(cli.app, ["trace", "r1", mine["r1"][0], "-c", str(config)])
+    assert trace.exit_code == 0 and "judge_supported" not in trace.output  # neither judge's
+    validate = ["judge-validate", "r1", "--split", "all", "-c", str(config)]
+    assert CliRunner().invoke(cli.app, validate).exit_code == 2
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        result = {
+            "labeler": mon.JUDGE_CHECK_LABELER,
+            "reference_runs": reference,
+            "complete": True,
+            "labels_passed": True,
+            "passed": True,
+        }
+        store.annotate_runs(reference, mon.check_record(v5), result)
+        assert mon.judge_standing(store, reference, v5) == (
+            True,
+            "in the family: judge-v5 passed its blind labels",
+        )
+        assert mon.pending_blind(store) == set()  # its own score releases its own sample
+        assert mon.blind_cases(store, "r1") == set()
+        with pytest.raises(ValueError, match="written once"):
+            store.annotate_run("r1", mon.check_record(v5), result | {"passed": False})
+        case = mine["r2"][0]  # one of its sampled answers re-judged after its check
+        store.delete_grades("r2", v5, [(case, 1)])
+        store.add_grades("r2", case, 1, [(v5, Grade(metric="judge_supported", value=0.5))])
+        assert "re-judged after its check" in mon.judge_standing(store, reference, v5)[1]
+        assert mon.judge_standing(store, reference)[0]  # v2's digests read v2's grades only
+    finally:
+        store.close()

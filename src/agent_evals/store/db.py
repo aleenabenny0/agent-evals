@@ -13,9 +13,26 @@ import duckdb
 
 from agent_evals.types import AgentResult, Grade
 
-# Manifest entries that, once written, never change: the online judge check's sample and its
-# first complete score (phase 7). No later annotation, whatever its name, may overwrite them.
+# Manifest entries that, once written, never change: an online judge check's sample and its
+# first complete score (phase 7). A run holds one check per judge (docs/adr/0009): the first
+# check, the validated judge's ("judge"), keeps these two names, and another judge's records are
+# keyed by its grader name after them (check_record_key). No later annotation, whatever its
+# name, may overwrite any of them.
 WRITE_ONCE = frozenset({"judge_check", "judge_check_sample"})
+
+
+def check_record_key(record: str, grader: str) -> str:
+    """The manifest key of one judge's check record (record is a name in WRITE_ONCE): the name
+    itself for the validated judge, "judge", and "NAME:GRADER" for any other judge."""
+    if record not in WRITE_ONCE:
+        raise ValueError(f"{record!r} is not a judge-check record: {sorted(WRITE_ONCE)}")
+    return record if grader == "judge" else f"{record}:{grader}"
+
+
+def is_write_once(key: str) -> bool:
+    """Whether a manifest key holds a judge-check record, of any judge: written once."""
+    return key.partition(":")[0] in WRITE_ONCE
+
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS runs (
@@ -187,10 +204,10 @@ class ResultsStore:
             )
 
     def annotate_run(self, run_id: str, key: str, value: Any) -> None:
-        """Add one entry to a run's manifest, e.g. which judge version graded it. An entry in
-        WRITE_ONCE, once written, is never changed, whoever asks."""
+        """Add one entry to a run's manifest, e.g. which judge version graded it. A judge-check
+        record of any judge (is_write_once), once written, is never changed, whoever asks."""
         manifest = self.run_info(run_id)["manifest"]
-        if key in WRITE_ONCE and key in manifest and manifest[key] != value:
+        if is_write_once(key) and key in manifest and manifest[key] != value:
             raise ValueError(f"{run_id} already holds its {key} record, which is written once")
         manifest[key] = value
         self.con.execute(

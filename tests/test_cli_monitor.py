@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import Collection
 from pathlib import Path
+from typing import Any
 
 import pytest
 from typer.testing import CliRunner
@@ -118,6 +120,7 @@ def setup(built: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     monkeypatch.setattr(cli, "TRAFFIC_DIR", tmp_path / "traffic")
     monkeypatch.setattr(mon, "REFERENCE_PATH", tmp_path / "reference.json")
     monkeypatch.setattr(mon, "ALERTS_PATH", tmp_path / "alerts.json")
+    monkeypatch.setattr(mon, "POST_HOC_PATH", tmp_path / "post-hoc.json")
     monkeypatch.setattr(mon, "JUDGE_CHECK_PATH", tmp_path / "judge-check.json")
     config = tmp_path / "config.yaml"
     config.write_text(
@@ -268,3 +271,153 @@ def test_the_normal_range_is_as_wide_as_one_day_not_the_pooled_interval() -> Non
     lo, hi = band  # one day of 100 at 50% spans about 40% to 60%; the pooled mean's +-4 points
     assert 0.38 <= lo <= 0.42 and 0.58 <= hi <= 0.62
     assert dash.normal_range(rate, [1.0, 0.0] * 250, 100, (0, 1)) == band  # seeded
+
+
+def test_a_recorded_verdict_is_shown_again_never_recomputed_or_overwritten(
+    setup: Path, tmp_path: Path
+) -> None:
+    assert _monitor(setup, "--freeze")[0] == 0
+    code, output = _monitor(setup, "6")
+    assert code == 1 and "ALERT on day 6: uncited_answer" in output
+    recorded = mon.ALERTS_PATH.read_bytes()
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # day 6 re-graded after its verdict: checked afresh, it would be quiet
+        store.delete_grades("r6", "citations")
+        for q in _questions(6)[:16]:
+            store.add_grades(
+                "r6", q.id, 1, [("citations", Grade(metric="uncited_answer", value=0.0))]
+            )
+    finally:
+        store.close()
+    code, output = _monitor(setup, "6")
+    assert code == 1 and "ALERT on day 6: uncited_answer" in output  # its recorded verdict
+    assert "as recorded" in output and "and stands" in output
+    assert mon.ALERTS_PATH.read_bytes() == recorded  # nothing recomputed, nothing written
+    code, output = _monitor(setup, "6", "--run", "r6-again")
+    assert code == 1 and "The recorded verdict is r6's, not r6-again's" in output
+    code, output = _monitor(setup, "6", "--post-hoc")  # read again, into its own file only
+    assert code == 0 and "Post hoc, not a verdict" in output and "day 6 shows no alert" in output
+    assert "stands: uncited_answer" in output and mon.ALERTS_PATH.read_bytes() == recorded
+    readings = json.loads(mon.POST_HOC_PATH.read_text(encoding="utf-8"))
+    assert list(readings) == ["6"] and len(readings["6"]) == 1
+    reading = readings["6"][0]
+    assert reading["post_hoc"] is True and reading["run_id"] == "r6" and reading["alerts"] == []
+    assert reading["recorded_verdict"]["alerts"] == ["uncited_answer"]
+    assert _monitor(setup, "6", "--post-hoc")[0] == 0  # a second reading is kept beside the first
+    assert len(json.loads(mon.POST_HOC_PATH.read_text(encoding="utf-8"))["6"]) == 2
+    assert mon.ALERTS_PATH.read_bytes() == recorded
+    setup.write_text(  # the verdict is read from its record alone, not from the database
+        f'paths:\n  db: "{(tmp_path / "missing.duckdb").as_posix()}"\n', encoding="utf-8"
+    )
+    code, output = _monitor(setup, "6")
+    assert code == 1 and "as recorded" in output and "no results database" not in output
+
+
+def test_a_post_hoc_reading_comes_only_after_a_recorded_verdict_and_is_archived_with_it(
+    setup: Path,
+) -> None:
+    assert _monitor(setup, "--freeze")[0] == 0
+    code, output = _monitor(setup, "6", "--post-hoc")
+    assert code == 2 and "no recorded verdict" in output and not mon.POST_HOC_PATH.exists()
+    assert not mon.ALERTS_PATH.exists()  # nor does asking for a reading record a verdict
+    code, output = _monitor(setup, "--freeze", "--post-hoc")
+    assert code == 2 and "--post-hoc reads one day" in output
+    assert _monitor(setup, "6")[0] == 1 and _monitor(setup, "6", "--post-hoc")[0] == 0
+    code, output = _monitor(setup, "--freeze", "--refreeze")  # readings of the old reference too
+    assert code == 0 and not mon.POST_HOC_PATH.exists() and not mon.ALERTS_PATH.exists()
+    assert len(list((mon.REFERENCE_PATH.parent / "archive").glob("*/post-hoc.json"))) == 1
+    assert _monitor(setup, "6")[0] == 1  # against the new reference, day 6 is checked afresh
+
+
+def test_a_post_hoc_reading_reads_the_recorded_run_unless_told_otherwise(
+    setup: Path, tmp_path: Path
+) -> None:
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # a second complete run of day 6, a quiet one
+        _day(store, tmp_path, 6, uncited=1, run="r6b")
+    finally:
+        store.close()
+    assert _monitor(setup, "--freeze")[0] == 0
+    code, output = _monitor(setup, "6")
+    assert code == 2 and "2 complete online runs" in output  # which counts is a decision
+    assert _monitor(setup, "6", "--run", "r6")[0] == 1
+    assert _monitor(setup, "6", "--post-hoc")[0] == 0  # the run the verdict was given on
+    assert _monitor(setup, "6", "--post-hoc", "--run", "r6b")[0] == 0
+    readings = json.loads(mon.POST_HOC_PATH.read_text(encoding="utf-8"))["6"]
+    assert [(r["run_id"], r["alerts"]) for r in readings] == [
+        ("r6", ["uncited_answer"]),
+        ("r6b", []),
+    ]
+    assert json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8"))["6"]["run_id"] == "r6"
+
+
+def test_a_recorded_day_exits_with_its_recorded_code(setup: Path, tmp_path: Path) -> None:
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        _day(store, tmp_path, 7, uncited=1, cached=2)  # quiet, but latency cannot be tested
+        _day(store, tmp_path, 8, uncited=1)  # quiet and clear
+    finally:
+        store.close()
+    assert _monitor(setup, "--freeze")[0] == 0
+    assert _monitor(setup, "7")[0] == 3 and _monitor(setup, "8")[0] == 0
+    code, output = _monitor(setup, "7")
+    assert code == 3 and "as recorded" in output and "not cleared: latency" in output
+    code, output = _monitor(setup, "8")
+    assert code == 0 and "as recorded" in output and "Day 8: no alert" in output
+    alerts = json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8"))
+    alerts["12"] = {"run_id": "r12", "alerts": []}  # a record that is no monitor report
+    mon.ALERTS_PATH.write_text(json.dumps(alerts), encoding="utf-8")
+    code, output = _monitor(setup, "12")
+    assert code == 2 and "not a monitor report" in output and "not checked again" in output
+
+
+def test_a_verdict_recorded_while_a_check_ran_is_not_overwritten(
+    setup: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    assert _monitor(setup, "--freeze")[0] == 0
+    real = mon.check_day
+    meanwhile = {"6": {"run_id": "r6", "alerts": [], "checked_at": "2026-10-28T00:00:00+00:00"}}
+
+    def racing(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        mon.ALERTS_PATH.write_text(json.dumps(meanwhile), encoding="utf-8")  # another command
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(mon, "check_day", racing)
+    code, output = _monitor(setup, "6")
+    assert code == 2 and "recorded while this check ran" in output
+    assert json.loads(mon.ALERTS_PATH.read_text(encoding="utf-8")) == meanwhile
+
+
+def test_the_dashboard_hides_every_judges_sampled_answers(
+    setup: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from agent_evals import dashboard as dash
+
+    monkeypatch.setattr(dash, "DASHBOARD_PATH", tmp_path / "dashboard" / "index.html")
+    assert _monitor(setup, "--freeze")[0] == 0
+    runs = [f"r{d}" for d in (1, 2, 3, 4, 5)]
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # another judge's check sample on the reference runs; the first check has none yet
+        hidden = dash.least_supported(store, "r1", {})[0]["case"]  # shown until it is sampled
+        drawn = {"reference_runs": runs, "runs": {"r1": [hidden]}, "verdict_digests": {}}
+        store.annotate_runs(runs, mon.sample_record("judge-v5"), drawn)
+    finally:
+        store.close()
+    shown: dict[str, set[str]] = {}
+    real = dash.least_supported
+
+    def spy(
+        store: ResultsStore,
+        run_id: str,
+        traffic: dict[str, Any],
+        k: int = 5,
+        hidden: Collection[str] = (),
+    ) -> list[dict[str, str]]:
+        worst = real(store, run_id, traffic, k, hidden)
+        shown[run_id] = {a["case"] for a in worst}
+        return worst
+
+    monkeypatch.setattr(dash, "least_supported", spy)
+    result = CliRunner().invoke(cli.app, ["dashboard", "-c", str(setup)])
+    assert result.exit_code == 0, result.output
+    assert hidden not in shown["r1"] and len(shown["r1"]) == 5  # the next one takes its place

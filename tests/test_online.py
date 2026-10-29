@@ -32,6 +32,19 @@ from conftest import LAMBDA_URL, ScriptedLLM, make_case, tool_use
 
 PREMISE = "Functions can use between 128 MB and 10,240 MB of memory."
 V21_JUDGE = "judge:\n  rubric_version: v2.1\n  grader_name: judge-v2.1\n"
+CLAIM_JUDGE = (  # the claim judge under its own name, its model and thresholds at the defaults
+    "judge:\n  method: claims\n  grader_name: judge-v5\n  rubric_version: v5\n  responsive: false\n"
+)
+
+
+def _claim_judge_version() -> str:
+    """The version of the claim judge CLAIM_JUDGE configures."""
+    import yaml
+
+    from agent_evals.graders.claim_judge import ClaimJudgeGrader
+
+    config = JudgeConfig.model_validate(yaml.safe_load(CLAIM_JUDGE)["judge"])
+    return ClaimJudgeGrader(ScriptedLLM([]), config).version
 
 
 def _q(intent: str, kind: str, **extra: Any) -> TrafficQuestion:
@@ -270,6 +283,89 @@ def test_an_online_run_is_judged_only_by_the_pinned_judge(tmp_path: Path) -> Non
     assert "validated judge" in refused.output and ONLINE_JUDGE_VERSION in refused.output
     suite = CliRunner().invoke(cli.app, ["judge", "r-suite", "-c", str(config)])
     assert "validated judge" not in suite.output  # a candidate judge may grade a suite run
+
+
+def test_each_judge_name_has_its_own_pin(monkeypatch: pytest.MonkeyPatch) -> None:
+    assert dict(online.ONLINE_JUDGE_PINS) == {"judge": "2cf75fa03e09"}  # v2 alone, today
+    assert online.judge_pin("judge") == ONLINE_JUDGE_VERSION == "2cf75fa03e09"
+    assert online.pin_refusal("judge", ONLINE_JUDGE_VERSION) is None
+    other = online.pin_refusal("judge", "0123456789ab")
+    assert other is not None and "validated judge 2cf75fa03e09" in other
+    # a pin belongs to a name: the validated judge's version under another name has none
+    unpinned = online.pin_refusal("judge-v5", ONLINE_JUDGE_VERSION)
+    assert unpinned is not None and "judge-v5, has no pin" in unpinned
+    assert online.judge_pin("judge-v5") is None
+    monkeypatch.setattr(
+        online, "ONLINE_JUDGE_PINS", {"judge": ONLINE_JUDGE_VERSION, "judge-v5": "abcdefabcdef"}
+    )
+    assert online.pin_refusal("judge-v5", "abcdefabcdef") is None
+    moved = online.pin_refusal("judge-v5", ONLINE_JUDGE_VERSION)
+    assert moved is not None and "only at its pinned version abcdefabcdef" in moved
+    assert online.pin_refusal("judge", ONLINE_JUDGE_VERSION) is None  # v2's pin unchanged
+
+
+def test_a_pinned_claim_judge_may_grade_an_online_run_and_an_unpinned_one_may_not(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    gone = {"suite": {"path": str(tmp_path / "gone.jsonl")}}  # so a judge that gets past the
+    _start(tmp_path, "r-online", online=True, manifest=gone)  # pin stops before any call
+    _start(tmp_path, "r-suite", online=False, manifest=gone)
+    config = _config(tmp_path, CLAIM_JUDGE)
+
+    def judge(run_id: str) -> str:
+        result = CliRunner().invoke(cli.app, ["judge", run_id, "-c", str(config)])
+        return " ".join(result.output.split()) + f" (exit {result.exit_code})"
+
+    def at_the_pin(output: str) -> bool:
+        return any(why in output for why in ("has no pin", "pinned version", "validated judge"))
+
+    refused = judge("r-online")
+    assert "This config's judge, judge-v5, has no pin" in refused and "(exit 2)" in refused
+    assert "suite file" not in refused  # refused at the pin, before anything else
+    suite = judge("r-suite")  # a candidate judge may grade a suite run
+    assert not at_the_pin(suite) and "suite file" in suite
+    stale_pin = {"judge": ONLINE_JUDGE_VERSION, "judge-v5": "0123456789ab"}
+    monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", stale_pin)
+    stale = judge("r-online")
+    assert "judge-v5 only at its pinned version 0123456789ab" in stale and "(exit 2)" in stale
+    pinned = {"judge": ONLINE_JUDGE_VERSION, "judge-v5": _claim_judge_version()}
+    monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", pinned)
+    allowed = judge("r-online")  # past the pin; it stops only because the run has no cases
+    assert not at_the_pin(allowed) and "suite file" in allowed
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:  # nothing was judged or noted on the way
+        assert "judge-v5" not in store.run_info("r-online")["manifest"]
+    finally:
+        store.close()
+
+
+def test_online_run_judges_with_a_pinned_claim_judge_and_refuses_an_unpinned_one(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _traffic(tmp_path, monkeypatch)
+    calls: dict[str, Any] = {}
+
+    def fake_run(**kwargs: Any) -> str:
+        calls["run"] = kwargs
+        _start(tmp_path, "r-1", online=True)
+        return "r-1"
+
+    monkeypatch.setattr(cli, "run", fake_run)
+    monkeypatch.setattr(cli, "judge", lambda **kwargs: calls.setdefault("judge", kwargs))
+    config = _config(tmp_path, CLAIM_JUDGE)
+    result = CliRunner().invoke(cli.app, ["online-run", "1", "-c", str(config)])
+    out = " ".join(result.output.split())
+    assert result.exit_code == 2 and "judge-v5, has no pin" in out and "Nothing was run" in out
+    assert not calls  # refused before the agent was paid for
+    pinned = {"judge": ONLINE_JUDGE_VERSION, "judge-v5": _claim_judge_version()}
+    monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", pinned)
+    result = CliRunner().invoke(cli.app, ["online-run", "1", "-c", str(config)])
+    assert result.exit_code == 0, result.output
+    assert calls["run"]["config"] == config and calls["judge"]["config"] == config
+    broken = _config(tmp_path, CLAIM_JUDGE + "  support_threshold: 60\n")  # off stage A's grid
+    result = CliRunner().invoke(cli.app, ["online-run", "1", "-c", str(broken)])
+    out = " ".join(result.output.split())
+    assert result.exit_code == 2 and "cannot be built" in out and "Nothing was run" in out
 
 
 def test_an_online_run_whose_cases_file_changed_is_refused(tmp_path: Path) -> None:

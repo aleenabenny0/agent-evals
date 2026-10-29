@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from math import log
 from pathlib import Path
 from typing import Any
 
 import pytest
 
+from agent_evals import online
 from agent_evals.harness.manifest import file_sha256
 from agent_evals.monitor import (
     ALERT_FAMILY,
@@ -20,6 +22,7 @@ from agent_evals.monitor import (
     leave_one_day_out,
     load_day,
     not_cleared,
+    verdict_code,
 )
 from agent_evals.online import ONLINE_JUDGE_VERSION, online_case
 from agent_evals.simulate import TrafficQuestion
@@ -377,3 +380,136 @@ def test_an_untested_metric_or_an_untrusted_judge_does_not_clear_a_quiet_day() -
         "judge_supported (the judge is untrusted today)"
     ]
     assert not_cleared(check_day(_day("d10"), REFERENCE, judge_enabled=True)) == []
+
+
+CLAIM_PIN = "abcdefabcdef"  # a made-up pin for the claim judge, judge-v5, in these tests
+PINS = {"judge": ONLINE_JUDGE_VERSION, "judge-v5": CLAIM_PIN}
+
+
+def _claim_judged_run(
+    store: ResultsStore, run_id: str, cases: Path, traffic: Path, grades: dict[str, list[Grade]]
+) -> None:
+    """Day 1's run with the lookup and the comparison answered and cited, judged by the validated
+    judge (both supported) and by judge-v5 at its pin, with these grades per case. The outside
+    question is answered without a citation, so no judge grades it."""
+    manifest = {"suite": {"path": str(cases), "sha256": file_sha256(cases)}}
+    store.start_run(
+        run_id,
+        agent="docs",
+        agent_version="v",
+        suite="x",
+        attempts=1,
+        manifest=manifest,
+        online=True,
+    )
+    role = {"day": 1, "champion": True, "traffic_sha256": file_sha256(traffic)}
+    store.annotate_run(run_id, "online", role)
+    store.annotate_run(run_id, "judge", {"version": ONLINE_JUDGE_VERSION})
+    store.annotate_run(run_id, "judge-v5", {"version": CLAIM_PIN, "method": "claims"})
+    usage = Usage(input_tokens=900, output_tokens=100, model_calls=3, latency_ms=2000.0)
+    cited = {"answer": "Up to 10,240 MB.", "citations": [{"url": LAMBDA_URL, "quote": "x"}]}
+    for case in ("q-look", "q-cmp"):
+        result = AgentResult(output=cited | {"abstained": False}, usage=usage)
+        _attempt(
+            store,
+            run_id,
+            case,
+            result,
+            {
+                "answer_keywords": [Grade(metric="abstained", value=0.0)],
+                "judge": [Grade(metric="judge_supported", value=1.0)],
+                "judge-v5": grades.get(case, []),
+            },
+        )
+    uncited = {"answer": "Braket has no such limit.", "citations": [], "abstained": False}
+    _attempt(
+        store,
+        run_id,
+        "q-out",
+        AgentResult(output=uncited, usage=usage),
+        {"answer_keywords": [Grade(metric="abstained", value=0.0)]},
+    )
+    store.finish_run(run_id, "complete")
+
+
+def test_load_day_reads_the_judge_it_is_asked_for_and_only_at_that_judges_pin(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    traffic, cases = _files(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        fails = {c: [Grade(metric="judge_supported", value=0.0)] for c in ("q-look", "q-cmp")}
+        _claim_judged_run(store, "r", cases, traffic, fails)
+        with pytest.raises(ValueError, match="judge-v5 has no online pin"):
+            load_day(store, "r", tmp_path, "judge-v5")  # graded, noted, but never pinned
+        monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", PINS)
+        assert load_day(store, "r", tmp_path).values["judge_supported"] == [0.0, 0.0]  # v2's
+        assert load_day(store, "r", tmp_path, "judge-v5").values["judge_supported"] == [1.0, 1.0]
+        store.annotate_run("r", "judge-v5", {"version": "0123456789ab"})  # judged at another one
+        with pytest.raises(ValueError, match=r"pinned judge abcdefabcdef \(judge-v5\)"):
+            load_day(store, "r", tmp_path, "judge-v5")
+        assert load_day(store, "r", tmp_path).values["judge_supported"] == [0.0, 0.0]  # unmoved
+    finally:
+        store.close()
+
+
+def test_a_judge_error_is_no_verdict_it_is_counted_and_a_day_with_one_can_be_read(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", PINS)
+    traffic, cases = _files(tmp_path)
+    passed = Grade(metric="judge_supported", value=1.0)
+    error = Grade(metric="judge_error", value=1.0, passed=False, reason="failed twice")
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        _claim_judged_run(store, "r", cases, traffic, {"q-look": [passed], "q-cmp": [error]})
+        day = load_day(store, "r", tmp_path, "judge-v5")  # accepted in place of a verdict
+        assert day.values["judge_supported"] == [0.0]  # the lookup's verdict alone: no fail added
+        assert day.judge_errors == 1 and day.cited_answers == 2
+        assert day.reported["judge_supported_over_all_in_scope"] == 1.0  # nor an unsupported one
+        assert load_day(store, "r", tmp_path).judge_errors == 0  # v2's grades hold none
+        scored = Grade(metric="judge_support_score", value=0.5)
+        _claim_judged_run(
+            store, "r2", cases, traffic, {"q-look": [passed], "q-cmp": [error, scored]}
+        )
+        with pytest.raises(ValueError, match="no judge verdict"):  # not its only judge grade
+            load_day(store, "r2", tmp_path, "judge-v5")
+        _claim_judged_run(
+            store, "r3", cases, traffic, {"q-look": [passed], "q-cmp": [error, passed]}
+        )
+        with pytest.raises(ValueError, match="both a judge verdict and a judge error"):
+            load_day(store, "r3", tmp_path, "judge-v5")
+    finally:
+        store.close()
+
+
+def test_judge_errors_past_two_percent_of_the_cited_answers_make_the_judge_untrusted() -> None:
+    at_bar = replace(_day("d15"), judge_errors=2, cited_answers=100)
+    report = check_day(at_bar, REFERENCE, judge_enabled=True)
+    assert report["judge"]["trusted"] and not_cleared(report) == []  # 2% is not past 2%
+    counted = {k: report["judge"][k] for k in ("errors", "cited", "error_share")}
+    assert counted == {"errors": 2, "cited": 100, "error_share": 0.02}
+    past = replace(at_bar, judge_errors=3)
+    report = check_day(past, REFERENCE, judge_enabled=True)
+    assert not report["judge"]["trusted"] and report["judge"]["error_share"] == 0.03
+    assert "untrusted" in _row(report, "judge_supported")["status"]
+    assert not_cleared(report) == ["judge_supported (the judge is untrusted today)"]
+    assert report["alerts"] == [] and verdict_code(report) == 3
+    out = check_day(past, REFERENCE, judge_enabled=False)  # out of the family: counted all the same
+    assert out["judge"]["errors"] == 3 and not out["judge"]["trusted"] and not_cleared(out) == []
+    clean = check_day(_day("d16"), REFERENCE, judge_enabled=True)  # none, as for the v2 judge
+    assert clean["judge"]["trusted"] and clean["judge"]["errors"] == 0
+    assert clean["judge"]["error_share"] is None and verdict_code(clean) == 0
+
+
+def test_the_monitor_prints_the_judge_errors_when_there_are_any(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    from agent_evals import cli
+
+    past = replace(_day("d17"), judge_errors=3, cited_answers=100)
+    cli._print_monitor(check_day(past, REFERENCE, judge_enabled=False), "day 17")
+    shown = " ".join(capsys.readouterr().out.split())
+    assert "untrusted today; 3 judge error(s) in 100 cited answers (untrusted past 2%)" in shown
+    cli._print_monitor(check_day(_day("d18"), REFERENCE, judge_enabled=False), "day 18")
+    assert "judge error" not in capsys.readouterr().out  # none: the line reads as before
