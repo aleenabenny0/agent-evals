@@ -171,6 +171,17 @@ Format:
 
 ## Unreleased
 
+- 2026-10-29: the judge improvement round stopped at stage A (`docs/plans/judge-v5.md`,
+  approved 2026-10-28). The claim judge was built: a claim table that code checks, a 0 to 100
+  score per claim with one tuned threshold, and a skeptic pass. So were the stage A tools, the
+  round's spend ledger, and the changes in ADR 0009: one pin and one check per judge name, a
+  `judge_error` grade, and recorded verdicts that cannot be overwritten. The pilot measured
+  $0.0105 per answer, against a $0.02 estimate. The first draft passed no cell of the grid.
+  Revision 1 (commit 7a0231a) was eligible on one pass, at t = 70. On three passes over the 106
+  tuning answers outside the named cases, it made 3.0 errors on average (cap 2.67, v2's 0.67
+  plus 2), 1.67 of them false fails (cap 1.33), so the round stopped under its pre-registered
+  rule. v2 stays the judge, and `judge_supported` stays out of the alert. The round spent $6.95
+  of its $60 cap (`results/judge-v5/`).
 - 2026-10-23: the blind days revealed, after all three verdicts were committed. The author's
   choices were subtle, unchanged and subtle: caught, quiet as expected, caught, each counted
   run under its sealed config (`results/online/blind-reveal.json`; day 10's two uncounted runs

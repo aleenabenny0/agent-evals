@@ -7,7 +7,10 @@ table that code can check, a confidence score per claim with one tuned threshold
 second pass. Validation is fixed in advance: tuning on dev labels, a regression screen on older
 labels, then one test on fresh blind labels, the only stage that can admit the new judge to the
 alert. Status: approved on 2026-10-28 with every decision at its recommended default, after three
-adversarial review rounds; the build is under way.
+adversarial review rounds. **Stopped at stage A on 2026-10-29:** no version met the
+pre-registered bar on three-pass means, so under the rules fixed in advance v2 stays the judge
+and `judge_supported` stays out of the alert. The round spent $6.95 of the $60 approved (the
+result section).
 
 **Status:** proposed 2026-10-28 and revised the same day after three rounds of adversarial
 review (34, 27 and 9 findings, all taken in; the tables at the end). **Approved 2026-10-28:**
@@ -16,11 +19,111 @@ all seven decisions at their recommended defaults (the decisions section), which
 budget. The direction was agreed in principle on 2026-10-21 (phase 7 plan,
 "Agreed in principle 2026-10-21"): claim-by-claim checking, a 0 to 100 score with a tuned
 threshold, and a skeptic pass. This document turns that into a design, a validation plan whose
-rules are fixed now, a cost, and seven open decisions (the last section).
+rules are fixed now, a cost, and seven open decisions (the last section). **Stopped at stage A,
+2026-10-29** (the next section).
 
 "Judge v5" is the judge's own version number (after v2, the validated one, and the v2.1, v3 and
 v4 candidates). It has nothing to do with the docs agent's prompt v5 of iteration 4, so this
 document calls the new judge "the claim judge".
+
+## Result: stopped at stage A (2026-10-29)
+
+Stage A ran once, as planned, and stopped at step 6: neither candidate was eligible on its
+three-pass means. Under the rules fixed in advance, the round ends there:
+
+- `judge_supported` stays out of the alert family, and v2 stays the judge everywhere.
+- Stages B and C did not run, and no further revision is made in this round.
+- No version was frozen, so `judge-v5` was never pinned, and no online run uses it.
+- No fresh label was drawn. The 376 fresh answers on the reference days are still unread, so a
+  later round can still test on them blind.
+- What was built before stage A stays (ADR 0009).
+
+Spend was $6.95 of the $60 cap (`results/judge-v5/spend.json`). Every record is in
+`results/judge-v5/`.
+
+| Step | What ran | Result | Spend |
+|---|---|---|---|
+| 1. Pilot | 20 tuning answers, three salts | $0.0105 per answer against the $0.02 estimate, so no stop; no retries or judge errors; 8 of 271 support entries dropped by the span check, flipping no verdict; at t = 70, 1 of the 20 verdicts flipped between salts | $0.63 |
+| 2. First draft | the 125, one pass | no cell eligible: at t = 70, 2 false fails outside the named cases, against a cap of 1 | $1.10 |
+| 2. Revision 1 | the 125, one pass | eligible at t = 70 at every s: 1 false pass and 1 false fail outside the named cases; 5 errors on the named cases (v2: 9) | $1.38 |
+| 5 and 6. Choice | revision 1 at t = 70 (s off and s 90) and v2, two more salts each | stop: 3.0 errors on average outside the named cases (cap 2.67), 1.67 of them false fails (cap 1.33) | $3.84 |
+
+**Every version's numbers, one pass each** (false passes and false fails; v2's stored verdicts
+make none outside the named cases, and 6 false passes and 3 false fails on them):
+
+| Cell | Draft, outside the named (106) | Draft, named (19) | Revision 1, outside the named | Revision 1, named |
+|---|---|---|---|---|
+| t 50, s off | 14 FP, 1 FF | 4 FP, 1 FF | 16 FP, 0 FF | 5 FP, 0 FF |
+| t 50, s 70 | 9 FP, 1 FF | 4 FP, 1 FF | 10 FP, 0 FF | 5 FP, 0 FF |
+| t 50, s 90 | 14 FP, 1 FF | 4 FP, 1 FF | 16 FP, 0 FF | 5 FP, 0 FF |
+| t 70, any s | 0 FP, 2 FF | 3 FP, 3 FF | 1 FP, 1 FF | 3 FP, 2 FF |
+| t 85, any s | 0 FP, 7 FF | 0 FP, 4 FF | 0 FP, 7 FF | 0 FP, 4 FF |
+
+The named answer that must keep passing passed at t = 50 and 70 in both versions, and failed at
+t = 85. No pass had a judge error or a verdict flipped by a dropped span. The skeptic's search
+changed verdicts only at t = 50 with s 70. On every error at t = 70 it named a claim, at a
+confidence of 25 to 70, and neither value of s changed any of them.
+
+**The choice, means over three passes** (salts judge, judge-s2 and judge-s3):
+
+| | False passes, outside the named | False fails, outside the named | Errors, outside the named | Errors on the named |
+|---|---|---|---|---|
+| v2 | 0.33 | 0.33 | 0.67 | 7.33 |
+| Revision 1, t 70, s off or 90 | 1.33 | 1.67 | 3.00 | 5.33 |
+| Cap (v2 plus 2 errors, of which v2 plus 1 false fails) | | 1.33 | 2.67 | |
+
+**What revision 1 changed** (commit 7a0231a). Both prompts now say that the answer's notes on
+its own search make no claim: what it could or could not open, reach, find or check, and that it
+covers only what it checked. A source, feature, version or edition that such a note names, and
+that no quote names, is still a claim, as the labels count it. It was made from the tuning labels:
+the draft listed such notes as claims on two answers labeled supported (docs-chg-008 and
+docs-ai-003-p3), and the labels fail notes that name a source or a version no quote names
+(docs-chg-022 and docs-mix-049). On the first salt it changed 3 of the 125 verdicts at t = 70.
+
+**Why it stopped.** Four answers made the 9 errors outside the named cases over the three passes:
+
+- docs-ai-003-p3 (labeled supported): under all three salts the claim table now listed the note
+  "this applies to Bedrock cross-Region inference specifically; I did not check other AWS
+  services" as no claim. Code then flagged the name Bedrock inside it, and under two salts the
+  skeptic did not clear it as no claim (support scores 35 and 55), once while its own reason said
+  the note "scopes the answer rather than adding a fact". Revision 1's fix held under the first
+  salt only.
+- docs-chg-010 on the champion's run (labeled not supported): its two weakest claims scored 70
+  to 72 under all three salts ("Start with Amazon Bedrock AgentCore instead", and "its Harness
+  service lets you define and invoke an agent with a single API call", though the judge's own
+  reason said no quote names Harness). At t = 70 it passes every time.
+- docs-mix-058 (labeled supported): "adjustable through Service Quotas" is carried only by a
+  link target inside the quote, which the claim judge does not see by design. It was a false
+  fail under every salt.
+- docs-mix-042 (labeled not supported): its weakest claim scored 50, 60 and 70 on the three
+  salts, a false pass on the third.
+
+**Read post hoc** (not a result, since the grid was fixed in advance): on revision 1's three
+passes, no setting meets both caps, for any whole t from 0 to 100 with s off or from 30 to 90 in
+steps of 10.
+The closest, t = 66 with s 50, keeps the errors outside the named cases within their cap (1.67)
+but not the false fails (1.67 against 1.33): docs-mix-058 alone gives 1 false fail at any t above
+60. So the miss is not a matter of the grid. The claim judge's scores do not separate these
+labels as well as v2's verdicts do. Those verdicts
+agree with all 106 labels partly by construction, since the labels were revisited with them in
+view, and they stayed close to that under new salts (2 errors over two extra passes).
+
+**Lessons for a later round:**
+
+- A single pass overstated a revision: its fix held under one salt of three. The three-pass
+  choice, set in advance for this reason, caught it. A later round should judge each revision
+  under more than one salt before counting it.
+- The judge gives borderline claims round scores, often exactly 70, and often the same score
+  under every salt. A threshold equal to a common score passes such a claim every time, whatever
+  its support.
+- A hedge that holds a name passes only when two calls agree: the claim table lists it as no
+  claim, and the skeptic clears the name in it. Under two salts of three, the skeptic did not.
+- The other errors concern names and evidence the judge is not shown: support carried by a link
+  inside a quote (Service Quotas), and a name in no quote passed at the threshold (Harness).
+  Fixing them means changing the rubric or the judge's inputs, which is a design question, not a
+  threshold.
+- v2 stayed steady under new salts, which kept the caps near their floor (2.67 errors and 1.33
+  false fails on the 106).
 
 ## In short
 
@@ -642,6 +745,11 @@ headerless table rows), from `docs/judge-validation.md` and the label notes.
 On the tuning set they are 19 answers (4 labeled supported, 1 of which v2 passes), holding all 9
 of v2's errors there; on the screen, 29 answers (7 labeled supported, 4 of which v2 passes),
 holding 9 of v2's 11.
+
+Added by stage A's revision 1 (2026-10-28): docs-ai-003-p3, whose note is the pattern behind the
+revision's second example. As the rules say, it stays in the counts it was in (the 106 outside the
+named cases). The revision's other examples come from docs-chg-008 and docs-chg-022, already
+listed.
 
 ## How the first review was taken in
 

@@ -1,0 +1,166 @@
+{
+ "decided_at": "2026-10-29T04:01:50.380934+00:00",
+ "salts": [
+  "judge",
+  "judge-s2",
+  "judge-s3"
+ ],
+ "candidates": [
+  {
+   "label": "rev1",
+   "t": 70,
+   "s": null,
+   "version": "d055f7dc51ad",
+   "others": {
+    "answers": 106,
+    "passes": 3,
+    "totals": {
+     "false_passes": 4,
+     "false_fails": 5,
+     "errors": 9,
+     "judge_errors": 0,
+     "errors_and_judge_errors": 9
+    },
+    "means": {
+     "false_passes": 1.3333333333333333,
+     "false_fails": 1.6666666666666667,
+     "errors": 3.0,
+     "judge_errors": 0.0,
+     "errors_and_judge_errors": 3.0
+    }
+   },
+   "named": {
+    "answers": 19,
+    "passes": 3,
+    "totals": {
+     "false_passes": 10,
+     "false_fails": 6,
+     "errors": 16,
+     "judge_errors": 0,
+     "errors_and_judge_errors": 16
+    },
+    "means": {
+     "false_passes": 3.3333333333333335,
+     "false_fails": 2.0,
+     "errors": 5.333333333333333,
+     "judge_errors": 0.0,
+     "errors_and_judge_errors": 5.333333333333333
+    }
+   },
+   "keeps": true,
+   "eligible": false,
+   "events": {
+    "judgings": 375,
+    "retried": 0,
+    "judge_errors": 0,
+    "support_entries": 1656,
+    "dropped": 20,
+    "with_dropped": 20,
+    "search_missing": 0
+   },
+   "dropped_span_flips": {
+    "total": 0,
+    "mean": 0.0
+   }
+  },
+  {
+   "label": "rev1",
+   "t": 70,
+   "s": 90,
+   "version": "446d698ca9c5",
+   "others": {
+    "answers": 106,
+    "passes": 3,
+    "totals": {
+     "false_passes": 4,
+     "false_fails": 5,
+     "errors": 9,
+     "judge_errors": 0,
+     "errors_and_judge_errors": 9
+    },
+    "means": {
+     "false_passes": 1.3333333333333333,
+     "false_fails": 1.6666666666666667,
+     "errors": 3.0,
+     "judge_errors": 0.0,
+     "errors_and_judge_errors": 3.0
+    }
+   },
+   "named": {
+    "answers": 19,
+    "passes": 3,
+    "totals": {
+     "false_passes": 10,
+     "false_fails": 6,
+     "errors": 16,
+     "judge_errors": 0,
+     "errors_and_judge_errors": 16
+    },
+    "means": {
+     "false_passes": 3.3333333333333335,
+     "false_fails": 2.0,
+     "errors": 5.333333333333333,
+     "judge_errors": 0.0,
+     "errors_and_judge_errors": 5.333333333333333
+    }
+   },
+   "keeps": true,
+   "eligible": false,
+   "events": {
+    "judgings": 375,
+    "retried": 0,
+    "judge_errors": 0,
+    "support_entries": 1656,
+    "dropped": 20,
+    "with_dropped": 20,
+    "search_missing": 0
+   },
+   "dropped_span_flips": {
+    "total": 0,
+    "mean": 0.0
+   }
+  }
+ ],
+ "v2": {
+  "version": "2cf75fa03e09",
+  "others": {
+   "answers": 106,
+   "passes": 3,
+   "totals": {
+    "false_passes": 1,
+    "false_fails": 1,
+    "errors": 2,
+    "judge_errors": 0,
+    "errors_and_judge_errors": 2
+   },
+   "means": {
+    "false_passes": 0.3333333333333333,
+    "false_fails": 0.3333333333333333,
+    "errors": 0.6666666666666666,
+    "judge_errors": 0.0,
+    "errors_and_judge_errors": 0.6666666666666666
+   }
+  },
+  "named": {
+   "answers": 19,
+   "passes": 3,
+   "totals": {
+    "false_passes": 12,
+    "false_fails": 10,
+    "errors": 22,
+    "judge_errors": 0,
+    "errors_and_judge_errors": 22
+   },
+   "means": {
+    "false_passes": 4.0,
+    "false_fails": 3.3333333333333335,
+    "errors": 7.333333333333333,
+    "judge_errors": 0.0,
+    "errors_and_judge_errors": 7.333333333333333
+   }
+  }
+ },
+ "chosen": null,
+ "stop": "no candidate is eligible on its three-pass means (stage A step 6)",
+ "frozen": null
+}

@@ -1,8 +1,8 @@
 # ADR 0009: One pin and one check per judge, judge errors, and recorded verdicts
 
 **Status:** accepted (2026-10-28) with the claim judge's design (`docs/plans/judge-v5.md`,
-decision 5), and built before stage A of that round. The round's result is added at the end of
-this record when the round ends, whether the claim judge passes or not.
+decision 5), and built before stage A of that round. The round stopped at stage A on 2026-10-29;
+its result is at the end of this record.
 
 ## Context
 
@@ -93,4 +93,16 @@ against their sealed choices.
 
 ## Result
 
-To be added when the round ends, pass or fail, with its numbers.
+The round stopped at stage A on 2026-10-29 (`docs/plans/judge-v5.md`, the result section).
+Neither candidate was eligible on its three-pass means. Outside the named cases, the best version
+made 3.0 errors on average on the 106 tuning answers, against a cap of 2.67 (v2's 0.67 plus 2),
+and 1.67 false fails, against a cap of 1.33. Under the rules fixed in advance:
+
+- `judge_supported` stays out of the alert family, and v2 stays the only pinned judge.
+- No claim judge version was frozen, so `ONLINE_JUDGE_PINS` gains no `judge-v5` entry.
+- The draw, score and online-judge record listed above as not built were not built.
+- The changes this record describes stay as built: one pin and one check per judge name, the
+  `judge_error` grade, and recorded verdicts that cannot be overwritten.
+
+The round spent $6.95 of its $60 cap. No fresh label was drawn, and the reference days' 376
+fresh answers are still unread.

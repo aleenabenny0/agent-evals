@@ -1,9 +1,9 @@
 # The claim judge, judge v5 (docs/plans/judge-v5.md, approved 2026-10-28): a claim table that
 # code checks, a 0 to 100 score per claim against one threshold, and a skeptic pass. A candidate:
 # it grades under its own name, judge-v5, beside the validated judge (v2), and no gate or alert
-# reads it. Its two thresholds are placeholders until stage A sets them, and both are part of its
-# version. Judge a run with it (costs money), once stage A's pilot has run and has not stopped the
-# work: evals judge RUN -c configs/judge-v5.yaml
+# reads it. Its two thresholds are placeholders, and both are part of its version. The round
+# stopped at stage A on 2026-10-29 with no version frozen, so they were never set, and no online
+# run uses this judge. Judging a run with it costs money: evals judge RUN -c configs/judge-v5.yaml
 
 paths:
   corpus_dir: data/snapshots/aws-docs

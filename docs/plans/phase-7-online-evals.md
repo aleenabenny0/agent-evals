@@ -796,6 +796,10 @@ put off while the blind days ran. This agrees only the direction: the round touc
 so its approach is written up and approved before any code, and it needs 30 fresh blind labels
 to validate.
 
+Outcome: the design (`docs/plans/judge-v5.md`) was approved on 2026-10-28 and stopped at its
+stage A on 2026-10-29, before any fresh label was drawn. v2 stays the judge, and
+`judge_supported` stays out of the alert family.
+
 ## Check of decisions 5 and 6 (2026-10-20)
 
 Three isolated reviewers checked commit 8f7e9f5, each on copies of the database and

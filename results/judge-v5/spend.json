@@ -1,0 +1,34 @@
+{
+  "cap_usd": 60.0,
+  "total_usd": 6.953953,
+  "entries": [
+    {
+      "time": "2026-10-29T03:30:43+00:00",
+      "step": "pilot",
+      "calls": 102,
+      "uncached_calls": 102,
+      "usd": 0.628144
+    },
+    {
+      "time": "2026-10-29T03:34:34+00:00",
+      "step": "stage-a draft",
+      "calls": 206,
+      "uncached_calls": 173,
+      "usd": 1.096741
+    },
+    {
+      "time": "2026-10-29T03:48:13+00:00",
+      "step": "stage-a rev1",
+      "calls": 217,
+      "uncached_calls": 217,
+      "usd": 1.384773
+    },
+    {
+      "time": "2026-10-29T04:01:49+00:00",
+      "step": "choose rev1:70:off rev1:70:90",
+      "calls": 671,
+      "uncached_calls": 671,
+      "usd": 3.844295
+    }
+  ]
+}

@@ -1,0 +1,5178 @@
+{
+ "judged_at": "2026-10-29T03:30:43.651179+00:00",
+ "draw": {
+  "seed": "judge-v5-pilot",
+  "rule": "from each dev run, its tuning answers in the order of the sha256 of 'seed/run_id/case_id', the first per_run",
+  "per_run": {
+   "docs-20261011-223111-702e87": 7,
+   "docs-20261016-214710-02abb7": 7,
+   "docs-20261017-174739-1c0e8e": 6
+  }
+ },
+ "answers": [
+  "docs-20261011-223111-702e87/docs-mix-055",
+  "docs-20261011-223111-702e87/docs-core-011",
+  "docs-20261011-223111-702e87/docs-ai-002",
+  "docs-20261011-223111-702e87/docs-chg-008",
+  "docs-20261011-223111-702e87/docs-ai-002-p1",
+  "docs-20261011-223111-702e87/docs-core-002",
+  "docs-20261011-223111-702e87/docs-ai-010",
+  "docs-20261016-214710-02abb7/docs-int-035",
+  "docs-20261016-214710-02abb7/docs-int-020",
+  "docs-20261016-214710-02abb7/docs-ai-036",
+  "docs-20261016-214710-02abb7/docs-ai-003-p1",
+  "docs-20261016-214710-02abb7/docs-chg-008",
+  "docs-20261016-214710-02abb7/docs-ai-017",
+  "docs-20261016-214710-02abb7/docs-chg-013",
+  "docs-20261017-174739-1c0e8e/docs-ai-038",
+  "docs-20261017-174739-1c0e8e/docs-ai-001",
+  "docs-20261017-174739-1c0e8e/docs-ai-036",
+  "docs-20261017-174739-1c0e8e/docs-ai-005-p3",
+  "docs-20261017-174739-1c0e8e/docs-core-011",
+  "docs-20261017-174739-1c0e8e/docs-chg-013"
+ ],
+ "salts": [
+  "judge",
+  "judge-s2",
+  "judge-s3"
+ ],
+ "versions": {
+  "t=50 s=off": "60666f98c3d1",
+  "t=50 s=70": "0ae4c75cde5c",
+  "t=50 s=90": "6c33dc857a8a",
+  "t=70 s=off": "fe1a907ea1a0",
+  "t=70 s=70": "a29d02d26685",
+  "t=70 s=90": "6a8fa847c6b7",
+  "t=85 s=off": "425d99657ba0",
+  "t=85 s=70": "b388faea1d05",
+  "t=85 s=90": "6e85babca13f"
+ },
+ "cost_per_answer_usd": 0.010469066666666667,
+ "estimate_per_answer_usd": 0.02,
+ "stop": false,
+ "flips": {
+  "t=50 s=off": {
+   "flipped": 2,
+   "of": 20
+  },
+  "t=50 s=70": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=50 s=90": {
+   "flipped": 2,
+   "of": 20
+  },
+  "t=70 s=off": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=70 s=70": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=70 s=90": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=85 s=off": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=85 s=70": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=85 s=90": {
+   "flipped": 0,
+   "of": 20
+  }
+ },
+ "dropped_span_flips": {
+  "t=50 s=off": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=50 s=70": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=50 s=90": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=70 s=off": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=70 s=70": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=70 s=90": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=85 s=off": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=85 s=70": {
+   "flipped": 0,
+   "of": 60
+  },
+  "t=85 s=90": {
+   "flipped": 0,
+   "of": 60
+  }
+ },
+ "events": {
+  "judgings": 60,
+  "retried": 0,
+  "judge_errors": 0,
+  "support_entries": 271,
+  "dropped": 8,
+  "with_dropped": 8,
+  "search_missing": 0
+ },
+ "assessments": {
+  "judge": {
+   "docs-20261011-223111-702e87/docs-mix-055": {
+    "claims": [
+     {
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Requests per second per distribution",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| 250,000  [Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 72,
+      "why": "The quote pair links the 250,000 value to the requests-per-second-per-distribution quota, though a bare table cell lacks a header such as 'default'."
+     },
+     {
+      "answer_span": "This quota does not apply to distributions subscribed to CloudFront flat-rate pricing plans",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "This quota doesn't apply for distributions subscribed to CloudFront flat-rate pricing plans.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you can request a higher quota",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "[Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "The quote includes a request-a-higher-quota link."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "why": "The quoted table cell 250,000 has no header showing it is the default value, and the quotes only loosely link it to the row.",
+      "confidence": 25
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change a bucket's name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 98,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you need to create a new bucket with the name you want",
+      "role": "core",
+      "support": [],
+      "score": 30,
+      "why": "No quote states creating a new bucket as the workaround, though it is implied."
+     },
+     {
+      "answer_span": "copy the objects over (for example with CopyObject or S3 Batch Replication)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Invoking CopyObject, UploadPartCopy, or replicating objects with S3 Batch Replication.",
+        "problem": null
+       }
+      ],
+      "score": 65,
+      "why": "Quote names these copy mechanisms, though not in the context of migrating between buckets."
+     },
+     {
+      "answer_span": "update your applications to point to the new bucket, and then empty and delete the old bucket if you no longer need it.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "No quote mentions updating applications or emptying and deleting the old bucket."
+     },
+     {
+      "answer_span": "after you delete a bucket in the shared global namespace, its name may not become available again right away, or at all, so the old name may not be reusable.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "you aren't guaranteed to be able to reuse the name right away, or at all.",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote states no guarantee of name reuse; 'shared global namespace' wording is extra but minor."
+     }
+    ],
+    "not_claims": [
+     "The premise is incorrect:"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002": {
+    "claims": [
+     {
+      "answer_span": "No. There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 60,
+      "why": "Standard pricing is mentioned for Geographic profiles; generalizing to the calling Region is an inference."
+     },
+     {
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "The quote lacks column headers naming Global vs Geographic, though the ordering is plausibly implied."
+     }
+    ],
+    "not_claims": [
+     "(Note that"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "why": "The quote is a bare table row with no header identifying which column is Global or Geographic, so the assignment is not stated.",
+      "confidence": 70
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "Amazon SageMaker Clarify is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so an account that has never used it likely cannot start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Reasonable inference from not open to new customers, hedged."
+     },
+     {
+      "answer_span": "Existing customers can keep using the service as normal",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Rewording of quote."
+     },
+     {
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "support": [],
+      "score": 5,
+      "why": "No quote mentions security improvements or no new features."
+     },
+     {
+      "answer_span": "The documentation says this in a note on the Clarify pages, and it points to a \"Clarify availability change\" page for details.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "Quotes do not mention a note location or the availability change page."
+     }
+    ],
+    "not_claims": [
+     "Probably not.",
+     "That page was not in the documentation snapshot I could reach, so I could not confirm the exact date or whether any exception or alternative applies.",
+     "For a new account, check with AWS support or your account team before planning work around Clarify."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "AWS",
+      "context": "For a new account, check with AWS support or your account team before planning work around Clarify.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "\"AWS support\" is only advice to contact support, not a factual claim."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "why": "Neither quote mentions security or availability improvements or a lack of planned new features.",
+      "confidence": 92
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock does not add a routing fee for cross-Region inference.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 60,
+      "why": "Standard pricing is loosely implied; quote 2 table lacks clear column headers for which profile type."
+     },
+     {
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings | Choose Global for cost optimization",
+        "problem": null
+       }
+      ],
+      "score": 65,
+      "why": "Row suggests Global has ~10% savings versus standard, but column headers (Geographic vs Global) are not in the quote."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "why": "Quote 2 is a bare row with no column headers, so it doesn't establish that Global is the ~10% savings column or that Geographic is the Standard pricing column.",
+      "confidence": 60
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-002": {
+    "claims": [
+     {
+      "answer_span": "The python3.10 Lambda runtime is scheduled for deprecation on October 31, 2026.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Python 3.10 | `python3.10` | Amazon Linux 2 | Oct 31, 2026",
+        "problem": null
+       }
+      ],
+      "score": 65,
+      "why": "Quote gives the date in a row without column header; quote 2 says table gives deprecation dates, so reasonably supported."
+     },
+     {
+      "answer_span": "This is a projected date from Lambda's runtime deprecation policy, provided for planning and subject to change.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "The table provides the currently forecasted dates for runtime deprecation, based on our Runtime deprecation policy.",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Forecasted dates based on policy supported; 'for planning and subject to change' is only loosely implied."
+     },
+     {
+      "answer_span": "function creation is blocked on July 29, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote mentions the block function create date."
+     },
+     {
+      "answer_span": "function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote mentions the block function update date."
+     }
+    ],
+    "not_claims": [
+     "Per the same table,"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "29",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 3,
+      "kind": "number_not_quoted",
+      "token": "31",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     },
+     {
+      "number": 4,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives a block-creation date of July 29."
+      },
+      {
+       "item": 2,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives 2027 for function creation block."
+      },
+      {
+       "item": 3,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives an update block date of August 31."
+      },
+      {
+       "item": 4,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives 2027 for function update block."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "function creation is blocked on July 29, 2027, and function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "why": "The cited quotes show only the Oct 31, 2026 date; no quote states block create or update dates.",
+      "confidence": 96
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-010": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock quota increases are not granted automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Quota increases aren't granted automatically.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "default account quotas may be updated based on regional factors, account age, usage and payment history, fraudulent usage, and/or approval of a quota increase request",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors, account age, usage history, payment history, fraudulent usage, and/or approval of a quota increase request",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Rewording of the quote."
+     },
+     {
+      "answer_span": "Bedrock quotas can also be lowered",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 50,
+      "why": "Quote says 'updated', not explicitly lowered."
+     },
+     {
+      "answer_span": "so the values that apply to your account may be lower than the published defaults",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 45,
+      "why": "Quote says updated, lower is implied but not stated."
+     },
+     {
+      "answer_span": "To check your account's values, use Service Quotas.",
+      "role": "peripheral",
+      "support": [],
+      "score": 0,
+      "why": "Advice naming a tool; no factual claim needing support."
+     },
+     {
+      "answer_span": "The documentation page on requesting increases (which I could not open in the snapshot) describes the request process and conditions.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "Claim about the page's content, not supported by quotes."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-035": {
+    "claims": [
+     {
+      "answer_span": "By default, your account can own 5 event buses per Region in the Custom Event Bus offering.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote gives 5 for owned buses; the 'Custom Event Bus offering' and per-Region framing are not stated, and the bare 5 lacks a header."
+     },
+     {
+      "answer_span": "Buses shared with your account do not count toward this.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Buses shared with the account do not count",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "This quota is adjustable through Service Quotas (the \"[EventsV2] Event Buses\" quota).",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "To raise the bus limit, for example, request an increase to `[EventsV2] Event Buses`.",
+        "problem": null
+       },
+       {
+        "quote": 1,
+        "quote_span": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote 2 shows an increase request for that quota; 'Service Quotas' not named, 'Yes' is bare."
+     },
+     {
+      "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Event buses | Each supported Region: 100 | [Yes]",
+        "problem": null
+       }
+      ],
+      "score": 45,
+      "why": "Quote shows 100 per Region for event buses but does not name the Classic offering."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-020": {
+    "claims": [
+     {
+      "answer_span": "Parameter Store does not charge per parameter per month like Secrets Manager.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Standard free, only advanced billed, contradicts flat per-parameter billing for all."
+     },
+     {
+      "answer_span": "Standard-tier parameters have no charge, and only advanced-tier parameters (and higher throughput) are billed.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "For 500 standard parameters, the parameter cost is $0",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free",
+        "problem": null
+       },
+       {
+        "quote": 1,
+        "quote_span": "No additional charge",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Follows from standard tier being free."
+     },
+     {
+      "answer_span": "that fits within the 10,000 standard-parameter limit per account and Region",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Maximum parameters  (per AWS account and AWS Region) | 10,000 | 100,000",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "10,000 is the first column (standard, by implication of cost quote); header not fully shown."
+     },
+     {
+      "answer_span": "If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Charges apply",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 35,
+      "why": "Advanced charges apply, but per-parameter monthly rate and pricing page are not stated."
+     },
+     {
+      "answer_span": "Secrets Manager, by contrast, is billed per secret per month plus per API call.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "Billed per secret per month and per API call",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     }
+    ],
+    "not_claims": [
+     "I could not find that rate in the documentation snapshot, so I cannot give a dollar figure."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "500",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "0",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": false,
+       "why": "500 is the user's own number; it only sets up the scenario, and standard tier being free covers it."
+      },
+      {
+       "item": 2,
+       "score": 88,
+       "not_a_claim": false,
+       "why": "$0 follows from standard tier being free / no additional charge."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "why": "No quote says advanced parameters are billed per parameter per month or names the Systems Manager pricing page.",
+      "confidence": 60
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. Including an AsyncInferenceConfig object in the endpoint configuration means the endpoint can only receive asynchronous invocations, so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote directly states the endpoint can only receive asynchronous invocations."
+     },
+     {
+      "answer_span": "For real-time requests, you would need a separate endpoint configured for real-time inference.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Follows loosely from the restriction, but no quote mentions a separate real-time endpoint."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-003-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Manual Region enablement is not required\n  for cross-Region inference to function.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 directly states manual enablement is not required."
+     },
+     {
+      "answer_span": "The documentation says cross-Region inference can route requests to Regions that are not manually enabled in your account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Cross-Region inference can route requests to AWS Regions that are not\n  manually enabled in your AWS account.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in quote 1."
+     },
+     {
+      "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| SCP requirements | Allow all destination Regions in profile |",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Table row with header in quote 2 gives Geographic column SCP requirement."
+     },
+     {
+      "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Allow `\"aws:RequestedRegion\": \"unspecified\"`",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Table row with header gives Global column SCP requirement."
+     }
+    ],
+    "not_claims": [
+     "Note that this is about opt-in only:"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Note that this is about opt-in only:",
+      "role": "peripheral",
+      "why": "The framing that opt-in is separate from SCP requirements is not stated in any quote, though it is mild; SCP claims themselves are supported by table row and header.",
+      "confidence": 12
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "the service is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated in quote 1."
+     },
+     {
+      "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Reasonable inference from no longer open to new customers; hedged with 'probably'."
+     },
+     {
+      "answer_span": "Existing customers can keep using it as normal.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Rewording of quote 2."
+     },
+     {
+      "answer_span": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access",
+      "role": "peripheral",
+      "support": [],
+      "score": 50,
+      "why": "Statement about page access; akin to a hedge, not verifiable from quotes."
+     }
+    ],
+    "not_claims": [
+     "Probably not.",
+     "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify",
+     "so I could not check its details or any exceptions."
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-017": {
+    "claims": [
+     {
+      "answer_span": "Member accounts don't need to submit the Anthropic use case form separately when it's submitted from the organization's management account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Inheritance from the root/management account implies member accounts needn't resubmit."
+     },
+     {
+      "answer_span": "The form submission is inherited by the other accounts in the organization.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated, with root account equated to management account."
+     },
+     {
+      "answer_span": "the form is needed once per account or once per organization",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote states once per account or once at the management account."
+     },
+     {
+      "answer_span": "this requirement doesn't apply to Anthropic models accessed through the bedrock-mantle endpoint.",
+      "role": "peripheral",
+      "support": [],
+      "score": 3,
+      "why": "No quote mentions bedrock-mantle."
+     },
+     {
+      "answer_span": "the docs say access is still determined per account",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Access is determined separately for each AWS account, so accounts in the same AWS Organization can have different access.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "a member account can still get AccessDeniedException if its other prerequisites (such as AWS Marketplace permissions) aren't met.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "accounts in the same AWS Organization can have different access",
+        "problem": null
+       }
+      ],
+      "score": 15,
+      "why": "Quotes don't mention AccessDeniedException or Marketplace permissions."
+     }
+    ],
+    "not_claims": [
+     "No."
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Row with header shows end of standard support is Nov 7, 2027."
+     },
+     {
+      "answer_span": "Once standard support ends, the version moves to extended support",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       },
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12 months after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Implied by quotes about extended support following standard support, though not stated explicitly."
+     },
+     {
+      "answer_span": "AWS provides only critical security fixes",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "AWS offers critical security fixes for at least 12 months after standard support ends.",
+        "problem": null
+       },
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Critical security fixes in extended support, contrasted with bug fixes in standard."
+     },
+     {
+      "answer_span": "extended support charges apply automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "For 7.10, the updated end of extended support is November 7, 2030.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Last column is updated end of extended support."
+     },
+     {
+      "answer_span": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 6,
+        "quote_span": "you will be charged the standard Extended Support rate of $0.0065 per Normalized Instance Hour (NIH) in US East (N. Virginia)",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Rate stated; start timing follows from end of standard support."
+     },
+     {
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "No quote says charges are in addition to instance costs."
+     },
+     {
+      "answer_span": "AWS recommends upgrading to a supported OpenSearch version to avoid these charges.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 7,
+        "quote_span": "To avoid these charges, upgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Upgrade to avoid charges is stated."
+     }
+    ],
+    "not_claims": [
+     "Yes."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "claim": 6,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 72,
+       "not_a_claim": false,
+       "why": "Billing starting November 2027 follows from end of standard support on Nov 7, 2027 plus automatic charges after it."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "why": "No quote says extended support charges are in addition to instance costs.",
+      "confidence": 80
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-038": {
+    "claims": [
+     {
+      "answer_span": "A single Amazon Comprehend batch (multiple-document) request can contain up to 25 documents.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "| Maximum documents per request | 25 |",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "batch operations that process multiple documents with a single API request",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote 1 gives max documents per request as 25; quote 2 ties batch operations to multi-document requests."
+     },
+     {
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Maximum document size | 5 KB |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote 3 states maximum document size 5 KB."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "why": "Quote 3 gives a maximum document size of 5 KB without saying it applies to batch requests, though it plausibly does; the 25-document limit is supported.",
+      "confidence": 15
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-001": {
+    "claims": [
+     {
+      "answer_span": "Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Quote directly states this."
+     },
+     {
+      "answer_span": "you can purchase Provisioned Throughput to increase throughput for a model",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "To increase throughput for a model, you can purchase Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "inference profiles currently don't support it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated."
+     }
+    ],
+    "not_claims": [
+     "No."
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are directly stated in the quote.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can only receive asynchronous invocations",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Quote states the endpoint can only receive asynchronous invocations."
+     },
+     {
+      "answer_span": "so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "the endpoint can only receive asynchronous invocations",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Follows directly: only asynchronous means no synchronous requests."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "core",
+      "why": "The quote states the endpoint can only receive asynchronous invocations, which supports the whole answer.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-005-p3": {
+    "claims": [
+     {
+      "answer_span": "The CloudTrail field is additionalEventData.inferenceRegion.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 names this field as identifying where requests were processed."
+     },
+     {
+      "answer_span": "CloudTrail logs cross-Region inference requests in the source Region",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "CloudTrail logs all cross-Region inference requests in your source Region.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 2 states this directly."
+     },
+     {
+      "answer_span": "you look at this field to see where each request was processed.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Quote 1 says to use the field to identify where requests were processed."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are directly stated in the quotes.",
+      "confidence": 5
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 general purpose bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change the name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in the quote."
+     },
+     {
+      "answer_span": "To use a different name, you would need to create a new bucket with that name.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Quote doesn't state creating a new bucket, though it is a plausible implication."
+     }
+    ],
+    "not_claims": [
+     "The documentation states that"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Row with column header shows end of standard support is Nov 7, 2027."
+     },
+     {
+      "answer_span": "Yes.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Still under standard support follows from end date being in the future, but current date isn't in quotes."
+     },
+     {
+      "answer_span": "After that, it moves into extended support, which runs until November 7, 2030.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Updated end of extended support is Nov 7, 2030 per the row and header."
+     },
+     {
+      "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       },
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Critical security fixes stated; absence of general bug fixes is an inference, flagged by the answer."
+     },
+     {
+      "answer_span": "extended support charges apply.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "To avoid the charges, upgrade to a supported version.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "To avoid these charges,\nupgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the documentation says extended support charges apply automatically once a version is past standard support",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Matches quote."
+     },
+     {
+      "answer_span": "the page says standard support gets bug fixes and security updates, and extended support gets critical security fixes.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       },
+       {
+        "quote": 4,
+        "quote_span": "AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Both quotes state this."
+     }
+    ],
+    "not_claims": [
+     "it does not give the exact charge for 7.10",
+     "The bug-fix wording is my reading:"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "7.10",
+      "context": "it does not give the exact charge for 7.10",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "It is a hedge that the docs don't give the exact charge; 7.10 just names the version, which quote 1 supports."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "Yes. Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "why": "No quote gives the current date, so none shows 7.10 is still under standard support now, though the end date is stated.",
+      "confidence": 25
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   }
+  },
+  "judge-s2": {
+   "docs-20261011-223111-702e87/docs-mix-055": {
+    "claims": [
+     {
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Requests per second per distribution",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| 250,000  [Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 72,
+      "why": "Quote 2 gives 250,000 and quote 1 names the quota, but the bare table cell is not explicitly linked to the row or labeled default."
+     },
+     {
+      "answer_span": "This quota does not apply to distributions subscribed to CloudFront flat-rate pricing plans",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "This quota doesn't apply for distributions subscribed to CloudFront flat-rate pricing plans.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you can request a higher quota",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "[Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "The quote shows a request-a-higher-quota link."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "why": "Quote 2 is a bare table cell with no header saying it is the default quota and no explicit link to the requests-per-second row.",
+      "confidence": 30
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change the name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you need to create a new bucket with the name you want",
+      "role": "core",
+      "support": [],
+      "score": 30,
+      "why": "No quote states creating a new bucket as the workaround."
+     },
+     {
+      "answer_span": "copy the objects over (for example with CopyObject or S3 Batch Replication)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Invoking CopyObject, UploadPartCopy, or replicating objects with S3 Batch Replication.",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Quote names these copy mechanisms, though not in a migration context."
+     },
+     {
+      "answer_span": "update your applications to point to the new bucket, and then empty and delete the old bucket if you no longer need it.",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "No quote covers updating applications or emptying/deleting the old bucket."
+     },
+     {
+      "answer_span": "after you delete a bucket in the shared global namespace, its name may not become available again right away, or at all, so the old name may not be reusable.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "you aren't guaranteed to be able to reuse the name right away, or at all.",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote states no guarantee of name reuse; 'shared global namespace' is minor extra."
+     }
+    ],
+    "not_claims": [
+     "The premise is incorrect:"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002": {
+    "claims": [
+     {
+      "answer_span": "No. There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 60,
+      "why": "Standard pricing is listed for a profile type; applying it to the calling Region is a slight inference."
+     },
+     {
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Quote lacks column headers naming Geographic and Global, so the mapping is not stated within the quote."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "why": "The quote is a bare row without column headers, so it never says which column is Global or Geographic.",
+      "confidence": 75
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "Amazon SageMaker Clarify is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so an account that has never used it likely cannot start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Reasonable inference from not open to new customers, hedged with 'likely'."
+     },
+     {
+      "answer_span": "Existing customers can keep using the service as normal",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Rewording of quote."
+     },
+     {
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "support": [],
+      "score": 5,
+      "why": "No quote mentions security improvements or no new features."
+     },
+     {
+      "answer_span": "The documentation says this in a note on the Clarify pages, and it points to a \"Clarify availability change\" page for details.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "Quotes don't mention the note's location or the linked page."
+     }
+    ],
+    "not_claims": [
+     "Probably not.",
+     "That page was not in the documentation snapshot I could reach, so I could not confirm the exact date or whether any exception or alternative applies.",
+     "For a new account, check with AWS support or your account team before planning work around Clarify."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "AWS",
+      "context": "For a new account, check with AWS support or your account team before planning work around Clarify.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "Advice to contact AWS support makes no factual claim."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "why": "No quote mentions security or availability improvements or that no new features are planned.",
+      "confidence": 92
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock does not add a routing fee for cross-Region inference.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 60,
+      "why": "Standard pricing is shown in a table cell for Geographic presumably; the inference is plausible but loosely supported."
+     },
+     {
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings | Choose Global for cost optimization",
+        "problem": null
+       }
+      ],
+      "score": 65,
+      "why": "Quote lacks column headers, but 'Choose Global for cost optimization' suggests Global has the savings; Geographic as the comparison is implied."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "why": "The quote is a bare table row without column headers, so it doesn't establish which column is Global or Geographic.",
+      "confidence": 55
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-002": {
+    "claims": [
+     {
+      "answer_span": "The python3.10 Lambda runtime is scheduled for deprecation on October 31, 2026.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Python 3.10 | `python3.10` | Amazon Linux 2 | Oct 31, 2026",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote gives the date in a row without a column header, but with quote 2 it is plausibly the deprecation date."
+     },
+     {
+      "answer_span": "This is a projected date from Lambda's runtime deprecation policy, provided for planning and subject to change.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "The table provides the currently forecasted dates for runtime deprecation, based on our Runtime deprecation policy.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Forecasted dates based on the policy; 'subject to change' and 'for planning' are loosely implied by 'forecasted'."
+     },
+     {
+      "answer_span": "function creation is blocked on July 29, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote mentions the block-creation date."
+     },
+     {
+      "answer_span": "function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote mentions the block-update date."
+     }
+    ],
+    "not_claims": [
+     "Per the same table,"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "29",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 3,
+      "kind": "number_not_quoted",
+      "token": "31",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     },
+     {
+      "number": 4,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions a function creation block date."
+      },
+      {
+       "item": 2,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions the 2027 creation block date."
+      },
+      {
+       "item": 3,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions a function update block date."
+      },
+      {
+       "item": 4,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions the 2027 update block date."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "function creation is blocked on July 29, 2027, and function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "why": "The quotes give only one date (Oct 31, 2026); no quote states block-creation or block-update dates.",
+      "confidence": 96
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-010": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock quota increases are not granted automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Quota increases aren't granted automatically.",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Quote 1 states this directly."
+     },
+     {
+      "answer_span": "default account quotas may be updated based on regional factors, account age, usage and payment history, fraudulent usage, and/or approval of a quota increase request",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors, account age, usage history, payment history, fraudulent usage, and/or approval of a quota increase request",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Quote 2 lists these factors."
+     },
+     {
+      "answer_span": "Bedrock quotas can also be lowered",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 50,
+      "why": "Quote says 'updated', not explicitly lowered."
+     },
+     {
+      "answer_span": "so the values that apply to your account may be lower than the published defaults",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 45,
+      "why": "Quote says updated, not specifically lower."
+     },
+     {
+      "answer_span": "The documentation page on requesting increases (which I could not open in the snapshot) describes the request process and conditions.",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "Claim about what an unopened page describes; no quote supports it."
+     }
+    ],
+    "not_claims": [
+     "To check your account's values, use Service Quotas."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "Service",
+      "context": "To check your account's values, use Service Quotas.",
+      "claim": null,
+      "core": false
+     },
+     {
+      "number": 2,
+      "kind": "not_claims",
+      "token": "Quotas",
+      "context": "To check your account's values, use Service Quotas.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 30,
+       "not_a_claim": true,
+       "why": "Advice to use Service Quotas; no quote mentions the tool, but it is advice, not a factual claim."
+      },
+      {
+       "item": 2,
+       "score": 30,
+       "not_a_claim": true,
+       "why": "Part of the advice naming the Service Quotas tool; no quote mentions it, but it makes no factual claim."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "Bedrock quotas can also be lowered",
+      "role": "peripheral",
+      "why": "Quote 2 says defaults might be 'updated' and never says they can be lowered or fall below published defaults.",
+      "confidence": 70
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-035": {
+    "claims": [
+     {
+      "answer_span": "By default, your account can own 5 event buses per Region",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote gives 5 for owned buses, though the column headers (default, region) are not in the quote."
+     },
+     {
+      "answer_span": "in the Custom Event Bus offering",
+      "role": "peripheral",
+      "support": [],
+      "score": 25,
+      "why": "No quote names the Custom Event Bus offering for the 5 value."
+     },
+     {
+      "answer_span": "Buses shared with your account do not count toward this.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Buses shared with the account do not count",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "This quota is adjustable through Service Quotas",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "To raise the bus limit, for example, request an increase to `[EventsV2] Event Buses`.",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Quote 2 indicates increase can be requested; 'Yes' without header is ambiguous; Service Quotas not named."
+     },
+     {
+      "answer_span": "the \"[EventsV2] Event Buses\" quota",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "request an increase to `[EventsV2] Event Buses`.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quota name stated."
+     },
+     {
+      "answer_span": "the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Event buses | Each supported Region: 100 | [Yes]",
+        "problem": null
+       }
+      ],
+      "score": 50,
+      "why": "Quote shows 100 per Region but doesn't name the Classic offering or 'default'."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-020": {
+    "claims": [
+     {
+      "answer_span": "Parameter Store does not charge per parameter per month like Secrets Manager.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Standard free and only advanced billed contradicts a flat per-parameter charge; mostly follows."
+     },
+     {
+      "answer_span": "Standard-tier parameters have no charge, and only advanced-tier parameters (and higher throughput) are billed.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       },
+       {
+        "quote": 1,
+        "quote_span": "No additional charge | Charges apply",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote 3 states this directly."
+     },
+     {
+      "answer_span": "For 500 standard parameters, the parameter cost is $0",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Follows from standard tier being free."
+     },
+     {
+      "answer_span": "that fits within the 10,000 standard-parameter limit per account and Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "| Maximum parameters  (per AWS account and AWS Region) | 10,000 | 100,000 |",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Table row gives 10,000 and 100,000; the column header isn't quoted, but the Cost row in quote 1 implies standard first column."
+     },
+     {
+      "answer_span": "If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "support": [],
+      "score": 30,
+      "why": "No quote states advanced billing is per parameter per month or mentions the pricing page."
+     },
+     {
+      "answer_span": "Secrets Manager, by contrast, is billed per secret per month plus per API call.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "Billed per secret per month and per API call",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     }
+    ],
+    "not_claims": [
+     "I could not find that rate in the documentation snapshot, so I cannot give a dollar figure.",
+     "Your premise is incorrect:"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "500",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "0",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 85,
+       "not_a_claim": false,
+       "why": "500 is the user's own count; standard tier being free applies to any number of parameters, within the 10,000 limit."
+      },
+      {
+       "item": 2,
+       "score": 82,
+       "not_a_claim": false,
+       "why": "$0 follows from 'Standard tier free' (no additional charge) for 500 standard parameters."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "why": "No quote says advanced tier is billed per parameter per month or mentions the Systems Manager pricing page.",
+      "confidence": 65
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. Including an AsyncInferenceConfig object in the endpoint configuration means the endpoint can only receive asynchronous invocations, so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote directly states the endpoint can only receive asynchronous invocations."
+     },
+     {
+      "answer_span": "For real-time requests, you would need a separate endpoint configured for real-time inference.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Quote doesn't mention a separate real-time endpoint, though it follows loosely from the exclusivity."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-003-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Manual Region enablement is not required\n  for cross-Region inference to function.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 directly states manual enablement is not required."
+     },
+     {
+      "answer_span": "The documentation says cross-Region inference can route requests to Regions that are not manually enabled in your account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Cross-Region inference can route requests to AWS Regions that are not\n  manually enabled in your AWS account.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in quote 1."
+     },
+     {
+      "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| SCP requirements | Allow all destination Regions in profile |",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Table row with header in quote 2 shows Geographic column requires allowing all destination Regions."
+     },
+     {
+      "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Allow `\"aws:RequestedRegion\": \"unspecified\"`",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Table row with header shows Global column requires this SCP allowance."
+     }
+    ],
+    "not_claims": [
+     "Note that this is about opt-in only:"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Note that this is about opt-in only",
+      "role": "peripheral",
+      "why": "Quotes do not state that SCP requirements are separate from opt-in; this is framing, though mostly harmless, and SCP claims rely on table columns mapped from header.",
+      "confidence": 12
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "the service is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 states this directly."
+     },
+     {
+      "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Follows from no longer open to new customers, with hedge 'probably'."
+     },
+     {
+      "answer_span": "Existing customers can keep using it as normal.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 2 rewords this directly."
+     },
+     {
+      "answer_span": "Probably not.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Hedged answer follows from the new-customer restriction."
+     }
+    ],
+    "not_claims": [
+     "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify, and the linked \"Clarify availability change\" page is not in the documentation snapshot I could access, so I could not check its details or any exceptions."
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+      "role": "core",
+      "why": "Quote 1 says only that it is closed to new customers; it never equates a never-used account with a new customer, though this is a close inference.",
+      "confidence": 15
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-017": {
+    "claims": [
+     {
+      "answer_span": "Member accounts don't need to submit the Anthropic use case form separately when it's submitted from the organization's management account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Inheritance from the root/management account implies member accounts need not resubmit."
+     },
+     {
+      "answer_span": "The form submission is inherited by the other accounts in the organization.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated, with root account equated to management account."
+     },
+     {
+      "answer_span": "the form is needed once per account or once per organization",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote says once per account or once at the management account."
+     },
+     {
+      "answer_span": "this requirement doesn't apply to Anthropic models accessed through the bedrock-mantle endpoint.",
+      "role": "peripheral",
+      "support": [],
+      "score": 3,
+      "why": "No quote mentions bedrock-mantle."
+     },
+     {
+      "answer_span": "the docs say access is still determined per account",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Access is determined separately for each AWS account, so accounts in the same AWS Organization can have different access.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "a member account can still get AccessDeniedException if its other prerequisites (such as AWS Marketplace permissions) aren't met.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "accounts in the same AWS Organization can have different access",
+        "problem": null
+       }
+      ],
+      "score": 25,
+      "why": "Different access is stated, but AccessDeniedException and Marketplace permissions are not in the quotes."
+     }
+    ],
+    "not_claims": [
+     "No."
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Row with header shows end of standard support Nov 7, 2027; 'still under' follows from date (current date implied)."
+     },
+     {
+      "answer_span": "Once standard support ends, the version moves to extended support",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Implies extended support after standard ends, but doesn't explicitly say it moves."
+     },
+     {
+      "answer_span": "AWS provides only critical security fixes",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12 months after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Quote says critical security fixes in extended support; 'only' is mildly inferred, contrasted with quote 3."
+     },
+     {
+      "answer_span": "extended support charges apply automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "For 7.10, the updated end of extended support is November 7, 2030.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Table row and header give the updated end date."
+     },
+     {
+      "answer_span": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 6,
+        "quote_span": "you will be charged the standard Extended Support rate of $0.0065 per Normalized Instance Hour (NIH) in US East (N. Virginia)",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Rate stated; start from Nov 2027 follows from standard support end."
+     },
+     {
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "No quote states charges are in addition to instance costs."
+     },
+     {
+      "answer_span": "AWS recommends upgrading to a supported OpenSearch version to avoid these charges.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 7,
+        "quote_span": "To avoid these charges, upgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote advises upgrading to a supported version to avoid charges."
+     }
+    ],
+    "not_claims": [
+     "Yes."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "claim": 6,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 70,
+       "not_a_claim": false,
+       "why": "Quote 1 gives Nov 7, 2027 as end of standard support and quote 5 says charges apply once no longer under standard support, so the start follows."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "why": "No quote says extended support charges are added to instance costs.",
+      "confidence": 70
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-038": {
+    "claims": [
+     {
+      "answer_span": "A single Amazon Comprehend batch (multiple-document) request can contain up to 25 documents.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "| Maximum documents per request | 25 |",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote states max documents per request is 25; batch context from quote 2."
+     },
+     {
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Maximum document size | 5 KB |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote states maximum document size is 5 KB."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "why": "The quote gives a 'Maximum document size' of 5 KB without saying which API or request type it applies to, so it may not describe batch requests.",
+      "confidence": 15
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-001": {
+    "claims": [
+     {
+      "answer_span": "Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Quote directly states it."
+     },
+     {
+      "answer_span": "you can purchase Provisioned Throughput to increase throughput for a model",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "To increase throughput for a model, you can purchase Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated in the quote."
+     },
+     {
+      "answer_span": "inference profiles currently don't support it.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated."
+     }
+    ],
+    "not_claims": [
+     "No."
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are directly stated in the quote.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can only receive asynchronous invocations",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Quote states this directly."
+     },
+     {
+      "answer_span": "so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "the endpoint can only receive asynchronous invocations",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Only asynchronous invocations implies no synchronous requests."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "core",
+      "why": "The quote states the endpoint can only receive asynchronous invocations, which supports the whole answer.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-005-p3": {
+    "claims": [
+     {
+      "answer_span": "The CloudTrail field is additionalEventData.inferenceRegion.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 names this field as identifying where requests were processed."
+     },
+     {
+      "answer_span": "CloudTrail logs cross-Region inference requests in the source Region",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "CloudTrail logs all cross-Region inference requests in your source Region.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 2 states this directly."
+     },
+     {
+      "answer_span": "you look at this field to see where each request was processed.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Rewording of quote 1."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are directly stated in the quotes.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 general purpose bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change the name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in the quote."
+     },
+     {
+      "answer_span": "To use a different name, you would need to create a new bucket with that name.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Quote doesn't state creating a new bucket, though it is a reasonable implication."
+     }
+    ],
+    "not_claims": [
+     "The documentation states that"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Header plus row establishes end of standard support date as Nov 7, 2027."
+     },
+     {
+      "answer_span": "Yes.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Still under standard support follows from the end date being in the future, though the current date isn't in the quotes."
+     },
+     {
+      "answer_span": "After that, it moves into extended support, which runs until November 7, 2030.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       }
+      ],
+      "score": 82,
+      "why": "Updated end of extended support column is Nov 7, 2030."
+     },
+     {
+      "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       },
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Critical security fixes stated; absence of bug fixes is an inference, which the answer flags."
+     },
+     {
+      "answer_span": "extended support charges apply.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "To avoid the charges, upgrade to a supported version.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "To avoid these charges,\nupgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the documentation says extended support charges apply automatically once a version is past standard support",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the page says standard support gets bug fixes and security updates, and extended support gets critical security fixes.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       },
+       {
+        "quote": 4,
+        "quote_span": "AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Both stated in quotes."
+     }
+    ],
+    "not_claims": [
+     "but it does not give the exact charge for 7.10.",
+     "The bug-fix wording is my reading:"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "7.10",
+      "context": "but it does not give the exact charge for 7.10.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "The words are a hedge that the docs don't give the exact charge; no support is needed."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "which runs until November 7, 2030",
+      "role": "core",
+      "why": "Quote 1 lists November 7, 2030 under the 'Updated End of Extended Support' column, but the 'Original End of Extended Support' is 'Not announced', so presenting it as the end is plausible; weaker is the 'Yes' since current date isn't in the quotes.",
+      "confidence": 15
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   }
+  },
+  "judge-s3": {
+   "docs-20261011-223111-702e87/docs-mix-055": {
+    "claims": [
+     {
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Requests per second per distribution",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| 250,000  [Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 72,
+      "why": "Quote 2 gives 250,000 and quote 1 names the quota; the pairing is implied but not explicit, and the quote does not say 'default'."
+     },
+     {
+      "answer_span": "This quota does not apply to distributions subscribed to CloudFront flat-rate pricing plans",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "This quota doesn't apply for distributions subscribed to CloudFront flat-rate pricing plans.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you can request a higher quota",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "[Request a higher quota]",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "The quote includes a request-higher-quota link."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+      "role": "core",
+      "why": "Quote 2 is a bare table cell with no header saying it is the default quota, and nothing in the quotes explicitly ties 250,000 to the requests-per-second quota.",
+      "confidence": 30
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change a bucket's name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "you need to create a new bucket with the name you want",
+      "role": "core",
+      "support": [],
+      "score": 30,
+      "why": "Workaround of creating a new bucket is not stated in the quotes."
+     },
+     {
+      "answer_span": "copy the objects over (for example with CopyObject or S3 Batch Replication)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Invoking CopyObject, UploadPartCopy, or replicating objects with S3 Batch Replication.",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Quote names these copy methods but not in a migration context."
+     },
+     {
+      "answer_span": "update your applications to point to the new bucket, and then empty and delete the old bucket if you no longer need it.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "No quote covers updating apps or emptying/deleting the old bucket."
+     },
+     {
+      "answer_span": "after you delete a bucket in the shared global namespace, its name may not become available again right away, or at all, so the old name may not be reusable.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "However, you aren't guaranteed to be able to reuse the name right away, or at all.",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote states no guarantee of name reuse; 'shared global namespace' wording is minor."
+     }
+    ],
+    "not_claims": [
+     "The premise is incorrect:"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002": {
+    "claims": [
+     {
+      "answer_span": "No. There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 60,
+      "why": "Standard pricing is mentioned only for the Geographic column; the inference is loosely supported."
+     },
+     {
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings",
+        "problem": null
+       }
+      ],
+      "score": 55,
+      "why": "The quote lacks column headers, so which column is Global versus Geographic is not established."
+     }
+    ],
+    "not_claims": [
+     "(Note that"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+      "role": "peripheral",
+      "why": "The quote is a bare row with no column headers, so nothing establishes that 'Approximately 10% savings' is the Global column and 'Standard pricing' is Geographic.",
+      "confidence": 75
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "Amazon SageMaker Clarify is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "an account that has never used it likely cannot start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Reasonable inference from closure to new customers, hedged."
+     },
+     {
+      "answer_span": "Existing customers can keep using the service as normal",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Rewording of quote."
+     },
+     {
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "support": [],
+      "score": 5,
+      "why": "No quote mentions security improvements or no new features."
+     },
+     {
+      "answer_span": "The documentation says this in a note on the Clarify pages, and it points to a \"Clarify availability change\" page for details.",
+      "role": "peripheral",
+      "support": [],
+      "score": 10,
+      "why": "Quotes don't mention a note location or the linked page."
+     }
+    ],
+    "not_claims": [
+     "Probably not.",
+     "That page was not in the documentation snapshot I could reach, so I could not confirm the exact date or whether any exception or alternative applies.",
+     "For a new account, check with AWS support or your account team before planning work around Clarify."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "AWS",
+      "context": "For a new account, check with AWS support or your account team before planning work around Clarify.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "\"AWS support\" is advice to contact support, not a factual claim needing support."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "AWS still makes security and availability improvements, but no new features are planned",
+      "role": "peripheral",
+      "why": "Neither quote mentions security or availability improvements or the absence of planned new features.",
+      "confidence": 90
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-002-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock does not add a routing fee for cross-Region inference.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "There's no additional routing cost for using cross-Region inference.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "The price is calculated based on the Region from which you call the inference profile",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "so you pay the standard model pricing for that calling Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The price is calculated based on the Region from which you call an inference profile.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Standard pricing",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 65,
+      "why": "Standard pricing is mentioned for geographic column; reasonable inference from calling-Region pricing."
+     },
+     {
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Cost | Standard pricing | Approximately 10% savings | Choose Global for cost optimization",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote lacks column headers, but the 'Choose Global for cost optimization' suggests Global has savings; the comparison to Geographic is implied."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Global cross-Region inference is listed as having approximately 10% savings compared with Geographic cross-Region inference.",
+      "role": "peripheral",
+      "why": "The quoted row has no column headers, so it doesn't say which column is Global or Geographic, or that the savings are relative to Geographic.",
+      "confidence": 50
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-core-002": {
+    "claims": [
+     {
+      "answer_span": "The python3.10 Lambda runtime is scheduled for deprecation on October 31, 2026.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Python 3.10 | `python3.10` | Amazon Linux 2 | Oct 31, 2026",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "The table provides the currently forecasted dates for runtime deprecation",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Quote 1 gives the date in a row, and quote 2 says the table lists deprecation dates."
+     },
+     {
+      "answer_span": "This is a projected date from Lambda's runtime deprecation policy, provided for planning and subject to change.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "The table provides the currently forecasted dates for runtime deprecation, based on our Runtime deprecation policy.",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Forecasted dates based on the policy supports projected; 'for planning and subject to change' is only loosely implied."
+     },
+     {
+      "answer_span": "function creation is blocked on July 29, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote gives a creation block date."
+     },
+     {
+      "answer_span": "function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "support": [],
+      "score": 2,
+      "why": "No quote gives an update block date."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "29",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function creation is blocked on July 29, 2027",
+      "claim": 3,
+      "core": false
+     },
+     {
+      "number": 3,
+      "kind": "number_not_quoted",
+      "token": "31",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     },
+     {
+      "number": 4,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "function updates are blocked on August 31, 2027",
+      "claim": 4,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives a July 29 creation-block date."
+      },
+      {
+       "item": 2,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions 2027 for creation blocking."
+      },
+      {
+       "item": 3,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote gives an August 31 update-block date."
+      },
+      {
+       "item": 4,
+       "score": 2,
+       "not_a_claim": false,
+       "why": "No quote mentions 2027 for update blocking."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "function creation is blocked on July 29, 2027, and function updates are blocked on August 31, 2027",
+      "role": "peripheral",
+      "why": "The quotes give only the Oct 31, 2026 deprecation date; neither block date appears.",
+      "confidence": 96
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261011-223111-702e87/docs-ai-010": {
+    "claims": [
+     {
+      "answer_span": "No. Amazon Bedrock quota increases are not granted automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Quota increases aren't granted automatically.",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Quote 1 states it directly."
+     },
+     {
+      "answer_span": "default account quotas may be updated based on regional factors, account age, usage and payment history, fraudulent usage, and/or approval of a quota increase request",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors, account age, usage history, payment history, fraudulent usage, and/or approval of a quota increase request",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Quote 2 lists these factors."
+     },
+     {
+      "answer_span": "Bedrock quotas can also be lowered",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 40,
+      "why": "Quote says 'updated', not explicitly lowered."
+     },
+     {
+      "answer_span": "so the values that apply to your account may be lower than the published defaults",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "the default quotas assigned to an account might be updated depending on regional factors",
+        "problem": null
+       }
+      ],
+      "score": 40,
+      "why": "Quote says updated; lower is not stated."
+     },
+     {
+      "answer_span": "To check your account's values, use Service Quotas.",
+      "role": "peripheral",
+      "support": [],
+      "score": 0,
+      "why": "Advice naming a tool; no factual claim beyond advice."
+     },
+     {
+      "answer_span": "The documentation page on requesting increases (which I could not open in the snapshot) describes the request process and conditions.",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "Claim about page contents not in quotes."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-035": {
+    "claims": [
+     {
+      "answer_span": "By default, your account can own 5 event buses per Region in the Custom Event Bus offering.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Event buses owned by the account. Buses shared with the account do not count | 5 | Yes",
+        "problem": null
+       }
+      ],
+      "score": 70,
+      "why": "Quote gives 5 for owned buses; the 'Custom Event Bus' offering and per-Region framing are not in the quote but plausible."
+     },
+     {
+      "answer_span": "Buses shared with your account do not count toward this.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Buses shared with the account do not count",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "This quota is adjustable through Service Quotas (the \"[EventsV2] Event Buses\" quota).",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "To raise the bus limit, for example, request an increase to `[EventsV2] Event Buses`.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Quote shows increase request for that quota; Service Quotas not named, but the Yes column in quote 1 is bare."
+     },
+     {
+      "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Event buses | Each supported Region: 100 | [Yes]",
+        "problem": null
+       }
+      ],
+      "score": 50,
+      "why": "Quote gives 100 per Region but doesn't name the Classic offering."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region",
+      "role": "peripheral",
+      "why": "Quote 3 shows only 100 per Region in a bare table row; it does not name the Classic offering or say it is a default.",
+      "confidence": 70
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-int-020": {
+    "claims": [
+     {
+      "answer_span": "Parameter Store does not charge per parameter per month like Secrets Manager.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Standard free, only advanced billed, contradicts flat per-parameter billing."
+     },
+     {
+      "answer_span": "Standard-tier parameters have no charge, and only advanced-tier parameters (and higher throughput) are billed.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "For 500 standard parameters, the parameter cost is $0",
+      "role": "core",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Standard tier free; advanced tier and higher throughput billed",
+        "problem": null
+       },
+       {
+        "quote": 1,
+        "quote_span": "No additional charge",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Follows from standard tier being free."
+     },
+     {
+      "answer_span": "that fits within the 10,000 standard-parameter limit per account and Region",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "| Maximum parameters  (per AWS account and AWS Region) | 10,000 | 100,000 |",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Standard max is 10,000 (first column implied); header of columns not quoted but plausible."
+     },
+     {
+      "answer_span": "If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Charges apply",
+        "problem": "shorter than 3 words"
+       }
+      ],
+      "score": 35,
+      "why": "Per-parameter monthly advanced rate is not stated in quotes."
+     },
+     {
+      "answer_span": "Secrets Manager, by contrast, is billed per secret per month plus per API call.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "Billed per secret per month and per API call",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     }
+    ],
+    "not_claims": [
+     "I could not find that rate in the documentation snapshot, so I cannot give a dollar figure."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "500",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     },
+     {
+      "number": 2,
+      "kind": "number_not_quoted",
+      "token": "0",
+      "context": "For 500 standard parameters, the parameter cost is $0",
+      "claim": 3,
+      "core": true
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": false,
+       "why": "500 is the user's own number from the question, not a documentation claim; it just sets up the scenario."
+      },
+      {
+       "item": 2,
+       "score": 85,
+       "not_a_claim": false,
+       "why": "$0 follows from 'Standard tier free' / 'No additional charge' applied to 500 standard parameters."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "If some need the advanced tier, multiply that count by the advanced per-parameter monthly rate on the Systems Manager pricing page",
+      "role": "peripheral",
+      "why": "No quote says advanced parameters are billed per parameter per month or that a rate is on the Systems Manager pricing page.",
+      "confidence": 55
+     }
+    },
+    "dropped_support": 1,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. Including an AsyncInferenceConfig object in the endpoint configuration means the endpoint can only receive asynchronous invocations, so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote directly states the endpoint can only receive asynchronous invocations."
+     },
+     {
+      "answer_span": "For real-time requests, you would need a separate endpoint configured for real-time inference.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Follows loosely from the restriction, but no quote mentions a separate real-time endpoint."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-003-p1": {
+    "claims": [
+     {
+      "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Manual Region enablement is not required\n  for cross-Region inference to function.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Quote 1 directly states manual enablement is not required."
+     },
+     {
+      "answer_span": "The documentation says cross-Region inference can route requests to Regions that are not manually enabled in your account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Cross-Region inference can route requests to AWS Regions that are not\n  manually enabled in your AWS account.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in quote 1."
+     },
+     {
+      "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| SCP requirements | Allow all destination Regions in profile |",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Table row with header in quote 2 maps the first column to Geographic."
+     },
+     {
+      "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Allow `\"aws:RequestedRegion\": \"unspecified\"`",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Feature | Geographic Cross-Region Inference | Global Cross-Region Inference | Recommendation |",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Table row with header maps second column to Global."
+     }
+    ],
+    "not_claims": [
+     "Note that this is about opt-in only:"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are supported by quotes 1-3.",
+      "confidence": 5
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-008": {
+    "claims": [
+     {
+      "answer_span": "the service is no longer open to new customers",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Amazon SageMaker Clarify is no longer open to new customers.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Reasonable inference that a never-used account is a new customer, hedged by 'probably'."
+     },
+     {
+      "answer_span": "Existing customers can keep using it as normal.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "Existing customers can continue to use the service as normal.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Plain rewording."
+     },
+     {
+      "answer_span": "the linked \"Clarify availability change\" page is not in the documentation snapshot I could access",
+      "role": "peripheral",
+      "support": [],
+      "score": 30,
+      "why": "Statement about page accessibility; not stated in quotes, though it is a hedge-like statement."
+     }
+    ],
+    "not_claims": [
+     "Probably not.",
+     "The docs do not say explicitly how \"new customer\" is defined for an account that has never used Clarify",
+     "so I could not check its details or any exceptions."
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-ai-017": {
+    "claims": [
+     {
+      "answer_span": "Member accounts don't need to submit the Anthropic use case form separately when it's submitted from the organization's management account.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Inheritance from root/management account implies members need not submit."
+     },
+     {
+      "answer_span": "The form submission is inherited by the other accounts in the organization.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The form submission at the root account will be inherited by other accounts in the same AWS Organization.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the form is needed once per account or once per organization",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "once per account or once at the organization's management account",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote states once per account or once at management account."
+     },
+     {
+      "answer_span": "this requirement doesn't apply to Anthropic models accessed through the bedrock-mantle endpoint.",
+      "role": "peripheral",
+      "support": [],
+      "score": 3,
+      "why": "No quote mentions bedrock-mantle."
+     },
+     {
+      "answer_span": "the docs say access is still determined per account",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "Access is determined separately for each AWS account, so accounts in the same AWS Organization can have different access.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "a member account can still get AccessDeniedException if its other prerequisites (such as AWS Marketplace permissions) aren't met.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "accounts in the same AWS Organization can have different access",
+        "problem": null
+       }
+      ],
+      "score": 25,
+      "why": "Quotes don't mention AccessDeniedException or Marketplace permissions."
+     }
+    ],
+    "not_claims": [
+     "No."
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261016-214710-02abb7/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Row with header shows end of standard support is Nov 7, 2027."
+     },
+     {
+      "answer_span": "Once standard support ends, the version moves to extended support",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       },
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12 months after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 75,
+      "why": "Implied by quotes about versions in extended support after standard support ends."
+     },
+     {
+      "answer_span": "AWS provides only critical security fixes",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12 months after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Quote says critical security fixes offered in extended support; 'only' is mild contrast with quote 3."
+     },
+     {
+      "answer_span": "extended support charges apply automatically.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "For 7.10, the updated end of extended support is November 7, 2030.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Last column with header is updated end of extended support."
+     },
+     {
+      "answer_span": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 6,
+        "quote_span": "you will be charged the standard Extended Support rate of $0.0065 per Normalized Instance Hour (NIH) in US East (N. Virginia)",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Rate stated; start timing follows from standard support end."
+     },
+     {
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "support": [],
+      "score": 15,
+      "why": "No quote says charges are in addition to instance costs."
+     },
+     {
+      "answer_span": "AWS recommends upgrading to a supported OpenSearch version to avoid these charges.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 7,
+        "quote_span": "To avoid these charges, upgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote advises upgrading to a supported version to avoid charges."
+     }
+    ],
+    "not_claims": [
+     "Yes."
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "number_not_quoted",
+      "token": "2027",
+      "context": "From November 2027, extended support is billed at $0.0065 per Normalized Instance Hour (US East (N. Virginia) rate)",
+      "claim": 6,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 75,
+       "not_a_claim": false,
+       "why": "Quote 1 gives Nov 7, 2027 as end of standard support, and quote 5 says charges apply once a version is no longer under standard support, so billing from November 2027 follows."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "on top of instance costs",
+      "role": "peripheral",
+      "why": "No quote says extended support charges are added to instance costs.",
+      "confidence": 70
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-038": {
+    "claims": [
+     {
+      "answer_span": "A single Amazon Comprehend batch (multiple-document) request can contain up to 25 documents.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "| Maximum documents per request | 25 |",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "batch operations that process multiple documents with a single API request",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Quote 1 states max 25 documents per request; quote 2 ties batch operations to multi-document requests."
+     },
+     {
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "| Maximum document size | 5 KB |",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Quote 3 gives maximum document size of 5 KB."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": true,
+      "answer_span": "Each document can be up to 5 KB.",
+      "role": "peripheral",
+      "why": "The quoted row gives a maximum document size but does not say it applies to batch requests, though it is plausibly the same limit.",
+      "confidence": 15
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-001": {
+    "claims": [
+     {
+      "answer_span": "Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Quote directly states inference profiles don't currently support Provisioned Throughput."
+     },
+     {
+      "answer_span": "you can purchase Provisioned Throughput to increase throughput for a model",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "To increase throughput for a model, you can purchase Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Directly stated in the quote."
+     },
+     {
+      "answer_span": "No.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Inference profiles currently don't support Provisioned Throughput.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "The direct answer matches the quote."
+     }
+    ],
+    "not_claims": [
+     "The docs say"
+    ],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are directly stated in the quote.",
+      "confidence": 3
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-036": {
+    "claims": [
+     {
+      "answer_span": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can only receive asynchronous invocations",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "The presence of an asynchronous inference configuration\n(`AsyncInferenceConfig`) object in the endpoint configuration implies\nthat the endpoint can only receive asynchronous invocations.",
+        "problem": null
+       }
+      ],
+      "score": 96,
+      "why": "Quote directly states the endpoint can only receive asynchronous invocations."
+     },
+     {
+      "answer_span": "so it cannot also serve synchronous real-time requests.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "the endpoint can only receive asynchronous invocations",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Only asynchronous invocations implies no synchronous real-time requests."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "core",
+      "why": "The quote states the endpoint can only receive asynchronous invocations, which supports the answer.",
+      "confidence": 4
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-ai-005-p3": {
+    "claims": [
+     {
+      "answer_span": "The CloudTrail field is additionalEventData.inferenceRegion.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Quote 1 names this field as identifying where requests were processed."
+     },
+     {
+      "answer_span": "CloudTrail logs cross-Region inference requests in the source Region",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 2,
+        "quote_span": "CloudTrail logs all cross-Region inference requests in your source Region.",
+        "problem": null
+       }
+      ],
+      "score": 95,
+      "why": "Directly stated in quote 2."
+     },
+     {
+      "answer_span": "you look at this field to see where each request was processed.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Look for the `additionalEventData.inferenceRegion` field to identify\n  where requests were processed.",
+        "problem": null
+       }
+      ],
+      "score": 90,
+      "why": "Restates quote 1."
+     }
+    ],
+    "not_claims": [],
+    "flagged": [],
+    "skeptic": {
+     "flagged": [],
+     "search": {
+      "found": false,
+      "answer_span": "",
+      "role": "peripheral",
+      "why": "All claims are stated in the quotes.",
+      "confidence": 5
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-core-011": {
+    "claims": [
+     {
+      "answer_span": "There is no API call to rename an S3 general purpose bucket.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 85,
+      "why": "Inability to change the name implies no rename API."
+     },
+     {
+      "answer_span": "after you create a general purpose bucket, you can't change its name or Region.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "After you create a general purpose bucket, you can't change its name or Region.",
+        "problem": null
+       }
+      ],
+      "score": 97,
+      "why": "Directly stated in the quote."
+     },
+     {
+      "answer_span": "To use a different name, you would need to create a new bucket with that name.",
+      "role": "peripheral",
+      "support": [],
+      "score": 40,
+      "why": "Quote doesn't state creating a new bucket as the workaround, though it's a plausible inference."
+     }
+    ],
+    "not_claims": [
+     "The documentation states that"
+    ],
+    "flagged": [],
+    "skeptic": null,
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   },
+   "docs-20261017-174739-1c0e8e/docs-chg-013": {
+    "claims": [
+     {
+      "answer_span": "Elasticsearch 7.10 is under standard support until November 7, 2027.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       }
+      ],
+      "score": 88,
+      "why": "Table row with header shows end of standard support is Nov 7, 2027."
+     },
+     {
+      "answer_span": "Yes.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       }
+      ],
+      "score": 60,
+      "why": "Yes follows only if the current date is before Nov 7, 2027, which the quotes do not establish."
+     },
+     {
+      "answer_span": "After that, it moves into extended support, which runs until November 7, 2030.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 1,
+        "quote_span": "Elasticsearch version 7.10 | November 7, 2027 | Not announced | November 7, 2030",
+        "problem": null
+       },
+       {
+        "quote": 2,
+        "quote_span": "| Software Version | End of Standard Support | Original End of Extended Support | Updated End of Extended Support |",
+        "problem": null
+       },
+       {
+        "quote": 5,
+        "quote_span": "a version that is no longer under standard support",
+        "problem": null
+       }
+      ],
+      "score": 80,
+      "why": "Updated end of extended support is Nov 7, 2030; the move into extended support is reasonably implied."
+     },
+     {
+      "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+      "role": "core",
+      "support": [
+       {
+        "quote": 4,
+        "quote_span": "For versions in extended support, AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       },
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 65,
+      "why": "The exclusion of bug fixes is an inference, which the answer itself flags as its own reading."
+     },
+     {
+      "answer_span": "and extended support charges apply.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "To avoid the charges, upgrade to a supported version.",
+      "role": "core",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "To avoid these charges,\nupgrade to a supported version.",
+        "problem": null
+       }
+      ],
+      "score": 93,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the documentation says extended support charges apply automatically once a version is past standard support",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 5,
+        "quote_span": "Extended support charges apply automatically when a domain runs a version that is no longer under standard support.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Directly stated."
+     },
+     {
+      "answer_span": "the page says standard support gets bug fixes and security updates, and extended support gets critical security fixes.",
+      "role": "peripheral",
+      "support": [
+       {
+        "quote": 3,
+        "quote_span": "AWS provides bug fixes and security updates for versions under standard support.",
+        "problem": null
+       },
+       {
+        "quote": 4,
+        "quote_span": "AWS offers critical security fixes for at least 12\nmonths after standard support ends.",
+        "problem": null
+       }
+      ],
+      "score": 92,
+      "why": "Both quotes state this."
+     }
+    ],
+    "not_claims": [
+     "but it does not give the exact charge for 7.10.",
+     "The bug-fix wording is my reading:"
+    ],
+    "flagged": [
+     {
+      "number": 1,
+      "kind": "not_claims",
+      "token": "7.10",
+      "context": "but it does not give the exact charge for 7.10.",
+      "claim": null,
+      "core": false
+     }
+    ],
+    "skeptic": {
+     "flagged": [
+      {
+       "item": 1,
+       "score": 90,
+       "not_a_claim": true,
+       "why": "The words are a hedge that the docs don't give the exact charge for 7.10, so they make no claim needing support."
+      }
+     ],
+     "search": {
+      "found": true,
+      "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+      "role": "core",
+      "why": "Quotes say extended support offers critical security fixes, but none says bug fixes and security updates are excluded during extended support.",
+      "confidence": 40
+     }
+    },
+    "dropped_support": 0,
+    "unmatched_not_claims": 0,
+    "search_span_missing": false,
+    "retries": 0,
+    "error": null
+   }
+  }
+ }
+}
