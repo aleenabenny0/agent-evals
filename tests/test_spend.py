@@ -1,7 +1,8 @@
 """The judge round's spend ledger (agent_evals.spend): only the calls the call cache did not serve
 cost money, a step whose estimate would pass the cap is refused before it starts, and a step that
-reaches the cap is stopped. Also `evals judge` and `evals judge-probe` with the claim judge, whose
-spend is the round's."""
+reaches the cap is stopped. Every paid step waits for the pilot, and none runs after a pilot that
+stopped the work. Also `evals judge` and `evals judge-probe` with the claim judge, whose spend is
+the round's."""
 
 from __future__ import annotations
 
@@ -23,15 +24,18 @@ from agent_evals.spend import (
     APPROVED_CAP_USD,
     DEFAULT_PATH,
     ESTIMATE_PER_ANSWER_USD,
+    STOP_FACTOR,
     MeteredLLM,
+    PilotRefusal,
     SpendCapError,
     SpendLedger,
-    cost_per_answer,
+    pilot_cost,
+    pilot_record,
 )
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import write_suite
 from agent_evals.types import AgentResult, Grade
-from conftest import BUCKETS_URL, ScriptedLLM, make_case, text, tool_use
+from conftest import BUCKETS_URL, ScriptedLLM, make_case, text, tool_use, write_pilot
 
 # claude-sonnet-5-5's rates as the judge configs hold them
 PRICING = Pricing(input_per_mtok=2.0, output_per_mtok=10.0, cache_read_multiplier=0.05)
@@ -172,11 +176,38 @@ def test_a_ledger_opened_with_another_cap_than_its_file_refuses(tmp_path: Path) 
         SpendLedger(path, cap_usd=100.0).check("stage-a draft", 1.0)
 
 
-def test_an_answer_is_estimated_at_the_pilots_cost_once_the_pilot_has_run(tmp_path: Path) -> None:
-    assert cost_per_answer(tmp_path) == ESTIMATE_PER_ANSWER_USD == 0.02  # the design's estimate
-    pilot = {"cost_per_answer_usd": 0.025}
-    (tmp_path / "pilot.json").write_text(json.dumps(pilot), encoding="utf-8")
-    assert cost_per_answer(tmp_path) == 0.025
+def test_a_step_waits_for_the_pilot_and_is_estimated_at_its_cost_unless_it_stopped_the_work(
+    tmp_path: Path,
+) -> None:
+    with pytest.raises(PilotRefusal, match=r"the pilot comes first: it measures the cost per"):
+        pilot_cost(tmp_path)
+    write_pilot(0.025, folder=tmp_path)
+    assert pilot_cost(tmp_path) == 0.025  # what every later step is estimated at
+    assert (ESTIMATE_PER_ANSWER_USD, STOP_FACTOR) == (0.02, 1.5)  # the design's estimate and stop
+    write_pilot(0.0301, folder=tmp_path)  # more than 1.5 times the estimate
+    with pytest.raises(
+        PilotRefusal,
+        match=r"the pilot measured \$0\.0301 per answer, more than 1\.5 times the \$0\.02 "
+        r"estimate: the work stops and the budget is revisited \(stage A step 1\)",
+    ):
+        pilot_cost(tmp_path)
+    write_pilot(0.0299, stop=False, folder=tmp_path)
+    assert pilot_cost(tmp_path) == 0.0299
+    at_the_bar = STOP_FACTOR * ESTIMATE_PER_ANSWER_USD  # exactly 1.5 times is not more than it
+    write_pilot(at_the_bar, stop=False, folder=tmp_path)
+    assert pilot_cost(tmp_path) == at_the_bar
+    # A stop the pilot recorded stands, whatever the cost is read against now.
+    write_pilot(0.025, stop=True, folder=tmp_path)
+    with pytest.raises(PilotRefusal, match=r"recorded a stop: it measured \$0\.0250 per answer"):
+        pilot_cost(tmp_path)
+    for broken in ("{}", '{"cost_per_answer_usd": "a lot"}', "[1]", "not json"):
+        (tmp_path / "pilot.json").write_text(broken, encoding="utf-8")
+        with pytest.raises(PilotRefusal, match="cannot be read as the pilot's record"):
+            pilot_cost(tmp_path)
+    for broken in ("[1]", "not json"):  # what the script reads the pilot's version from, too
+        (tmp_path / "pilot.json").write_text(broken, encoding="utf-8")
+        with pytest.raises(PilotRefusal, match="cannot be read as the pilot's record"):
+            pilot_record(tmp_path)
 
 
 # ---- evals judge and evals judge-probe with the claim judge ---------------------------------
@@ -291,6 +322,7 @@ def test_evals_judge_with_the_claim_judge_records_its_spend_in_the_rounds_ledger
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     config = judged_run(tmp_path)
+    write_pilot()
     llm = ClaimJudge()
     code, out = invoke(monkeypatch, llm, "judge", "r1", "-c", str(config))
     assert code == 0, out
@@ -314,7 +346,8 @@ def test_evals_judge_is_refused_before_any_grade_is_deleted_when_its_estimate_pa
         store.add_grades("r1", "t-1", 1, [("judge-v5", Grade(metric="judge_supported", value=1.0))])
     finally:
         store.close()
-    spent_before(59.99)  # the one answer's estimate, $0.02, would pass the $60 cap
+    spent_before(59.99)  # the one answer's estimate, at the pilot's $0.02, would pass the $60 cap
+    write_pilot(0.02)
     llm = ScriptedLLM([])
     code, out = invoke(monkeypatch, llm, "judge", "r1", "--replace", "-c", str(config))
     assert code == 2 and "past the $60.00 cap. Nothing was spent." in out
@@ -322,9 +355,44 @@ def test_evals_judge_is_refused_before_any_grade_is_deleted_when_its_estimate_pa
     assert judge_grades(tmp_path) == {("t-1", 1): {"judge_supported": 1.0}}  # as it was
 
 
+def test_evals_judge_waits_for_the_pilot_and_stops_after_a_pilot_that_stopped_the_work(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = judged_run(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.add_grades("r1", "t-1", 1, [("judge-v5", Grade(metric="judge_supported", value=1.0))])
+    finally:
+        store.close()
+    llm = ClaimJudge()
+
+    def judge() -> tuple[int, str]:
+        return invoke(monkeypatch, llm, "judge", "r1", "--replace", "-c", str(config))
+
+    code, out = judge()  # stage A's pilot comes first, as the design orders it
+    assert code == 2 and "evals judge r1: the pilot comes first" in out
+    assert "Nothing was judged." in out
+    pilot = {"cost_per_answer_usd": 0.05, "estimate_per_answer_usd": 0.02, "stop": True}
+    (spend.DEFAULT_PATH.parent / "pilot.json").write_text(json.dumps(pilot), encoding="utf-8")
+    code, out = judge()  # the pilot's record, as the script writes a stop
+    assert code == 2 and "the pilot recorded a stop: it measured $0.0500 per answer" in out
+    assert "the work stops and the budget is revisited" in out
+    write_pilot(0.0301)  # past 1.5 times the estimate, with no stop recorded
+    code, out = judge()
+    assert code == 2 and "more than 1.5 times the $0.02 estimate" in out
+    # Refused before any call, any spend and any grade deleted.
+    assert llm.requests == [] and not spend.DEFAULT_PATH.exists()
+    assert judge_grades(tmp_path) == {("t-1", 1): {"judge_supported": 1.0}}
+    write_pilot(0.0299)
+    code, out = judge()
+    assert code == 0, out
+    assert [e.step for e in round_ledger().entries()] == ["evals judge r1"]
+
+
 def test_evals_judge_refuses_a_claim_judge_without_pricing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
+    write_pilot()
     llm = ScriptedLLM([])
     code, out = invoke(monkeypatch, llm, "judge", "r1", "-c", str(judged_run(tmp_path, "{}")))
     assert code == 2 and "no pricing" in out and "nothing was judged" in out
@@ -337,6 +405,7 @@ def test_evals_judge_stopped_by_the_cap_records_what_it_spent_and_stores_no_grad
     # $0.40 a call, and $0.02 left: the estimate fits, and the first call spends what is left.
     config = judged_run(tmp_path, "{input_per_mtok: 2000.0, output_per_mtok: 10000.0}")
     spent_before(59.98)
+    write_pilot(0.02)
     llm = ClaimJudge()
     code, out = invoke(monkeypatch, llm, "judge", "r1", "-c", str(config))
     assert code == 2
@@ -373,9 +442,10 @@ def test_evals_judge_with_the_verdict_judge_is_not_the_rounds_spend(
             [tool_use("submit_verdict", {"verdict": "pass", "reason": "answers it"})],
         ]
     )
-    code, out = invoke(monkeypatch, llm, "judge", "r1", "-c", str(config))
+    code, out = invoke(monkeypatch, llm, "judge", "r1", "-c", str(config))  # with no pilot
     assert code == 0, out
     assert len(llm.requests) == 2 and not spend.DEFAULT_PATH.exists()
+    assert "claim judge's checks" not in out
 
 
 def test_evals_judge_probe_with_the_claim_judge_is_metered_and_scored_on_judge_supported(
@@ -391,6 +461,7 @@ def test_evals_judge_probe_with_the_claim_judge_is_metered_and_scored_on_judge_s
     finally:
         store.close()
     monkeypatch.chdir(tmp_path)  # the probe report is written under results/: here
+    write_pilot()
     llm = ClaimJudge()
     code, out = invoke(monkeypatch, llm, "judge-probe", "r1", "-c", str(config))
     assert code == 0, out
@@ -417,9 +488,30 @@ def test_evals_judge_probe_with_the_claim_judge_is_refused_when_its_estimate_pas
         store.add_grades("r1", "t-1", 1, [("judge-v5", Grade(metric="judge_supported", value=1.0))])
     finally:
         store.close()
-    spent_before(59.95)  # three variants at $0.02 would pass the cap
+    spent_before(59.95)  # three variants at the pilot's $0.02 would pass the cap
+    write_pilot(0.02)
     monkeypatch.chdir(tmp_path)
     llm = ScriptedLLM([text("never asked")])
     code, out = invoke(monkeypatch, llm, "judge-probe", "r1", "-c", str(config))
     assert code == 2 and "evals judge-probe r1: its estimate, $0.06" in out
     assert llm.requests == [] and not Path("results").exists()
+
+
+def test_evals_judge_probe_with_the_claim_judge_waits_for_the_pilot_and_its_stop_too(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    config = judged_run(tmp_path)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        store.add_grades("r1", "t-1", 1, [("judge-v5", Grade(metric="judge_supported", value=1.0))])
+    finally:
+        store.close()
+    monkeypatch.chdir(tmp_path)
+    llm = ScriptedLLM([text("never asked")])
+    code, out = invoke(monkeypatch, llm, "judge-probe", "r1", "-c", str(config))
+    assert code == 2 and "evals judge-probe r1: the pilot comes first" in out
+    write_pilot(0.05, stop=True)
+    code, out = invoke(monkeypatch, llm, "judge-probe", "r1", "-c", str(config))
+    assert code == 2 and "evals judge-probe r1: the pilot recorded a stop" in out
+    assert llm.requests == [] and not Path("results").exists()
+    assert not spend.DEFAULT_PATH.exists()  # nothing spent, so nothing recorded

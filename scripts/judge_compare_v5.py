@@ -12,6 +12,8 @@ stage-a  Steps 2 to 4. The 125 tuning answers once, with the claim judge as the 
          one version (the first draft or a revision), saved under LABEL. Prints the grid of t
          and s against v2's stored verdicts, the eligible cells, and the candidate order over
          every version judged so far. A version is judged once; asked again, it is read back.
+         The version the pilot judged is the first draft, so it counts among the four, and any
+         other is a revision. Once choose has made the choice, no new version is judged.
 choose   Steps 5 and 6. The two candidates of that order, each a stage-a label and a cell (s is
          off, 70 or 90), and v2, under two more salts: the frozen t and s on three-pass means,
          or the stop that ends the round.
@@ -54,11 +56,14 @@ from agent_evals.spend import (
     DEFAULT_PATH,
     ESTIMATE_PER_ANSWER_USD,
     PILOT_FILE,
+    STOP_FACTOR,
     MeteredLLM,
+    PilotRefusal,
     SpendCapError,
     SpendEntry,
     SpendLedger,
-    measured_cost_per_answer,
+    pilot_cost,
+    pilot_record,
 )
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import load_suite
@@ -123,8 +128,8 @@ PILOT_SEED = "judge-v5-pilot"
 # any other t or s. An s of None turns the skeptic's search off.
 CELLS: tuple[tuple[int, int | None], ...] = tuple((t, s) for t in T_GRID for s in S_GRID)
 S_ORDER = {None: 0, 90: 1, 70: 2}  # step 4's tie order: s off before 90 before 70
-MAX_VERSIONS = 4  # the first draft and at most three revisions (step 2)
-STOP_FACTOR = 1.5  # a pilot cost per answer above this times the estimate stops the work
+# The first draft, which the pilot judges (step 1), and at most three revisions (step 2).
+MAX_VERSIONS = 4
 LABEL = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*")  # it names files, so no dots or slashes
 CHOICE = "choice"
 CHOICE_FILE = "stage-a-choice.json"
@@ -265,36 +270,20 @@ class AnswerVerdicts(BaseModel):
 
 
 def read_verdicts(found: Assessment) -> AnswerVerdicts:
-    """An assessment's verdicts at the nine cells, as the code in place reads them. A verdict
-    fails only because of a dropped span when the answer fails at the cell, yet passes with every
-    dropped support entry put back and the rest as it was, flagged items included."""
+    """An assessment's verdicts at the nine cells, as the code in place reads them, each with
+    whether it fails only because the span check dropped a support entry: the claim judge's own
+    rule (Assessment.dropped_span_flip), which `evals judge` counts by too."""
     if found.error is not None:
         return AnswerVerdicts(judge_error=True)
-    restored = _restored(found) if found.dropped_support else None
     cells: dict[str, CellVerdict] = {}
     for t, s in CELLS:
         v = found.verdict(t, s)
-        flip = (
-            restored is not None
-            and not v.fully_supported
-            and restored.verdict(t, s).fully_supported
-        )
         cells[cell_name(t, s)] = CellVerdict(
             fully_supported=v.fully_supported,
             core_supported=v.core_supported,
-            dropped_span_flip=flip,
+            dropped_span_flip=found.dropped_span_flip(t, s),
         )
     return AnswerVerdicts(judge_error=False, cells=cells)
-
-
-def _restored(found: Assessment) -> Assessment:
-    claims = [
-        claim.model_copy(
-            update={"support": [e.model_copy(update={"problem": None}) for e in claim.support]}
-        )
-        for claim in found.claims
-    ]
-    return found.model_copy(update={"claims": claims})
 
 
 def claim_verdicts(verdicts: Mapping[str, AnswerVerdicts], t: int, s: int | None) -> Verdicts:
@@ -699,19 +688,28 @@ def load_versions(
     return {held.label: held for held in sorted(found, key=lambda held: held.judged_at)}
 
 
-def pilot_cost(out_dir: Path) -> float:
-    """The cost per answer that later steps are estimated with: the pilot's. Refused before the
-    pilot, and after one that cost more than 1.5 times the estimate (step 1)."""
-    measured = measured_cost_per_answer(out_dir)
-    if measured is None:
-        raise Refused("the pilot comes first: it measures the cost per answer (stage A step 1)")
-    if measured > STOP_FACTOR * ESTIMATE_PER_ANSWER_USD:
+def pilot_versions(out_dir: Path) -> dict[str, str] | None:
+    """The claim judge's version at each cell when the pilot judged it, or None before the pilot.
+    The pilot judges the first draft (steps 1 and 2), so its version counts among the four."""
+    held = pilot_record(out_dir)
+    if held is None:
+        return None
+    found = held.get("versions")
+    if not isinstance(found, dict) or set(found) != CELL_NAMES:
         raise Refused(
-            f"the pilot measured ${measured:.4f} per answer, more than {STOP_FACTOR} times the "
-            f"${ESTIMATE_PER_ANSWER_USD:.2f} estimate: the work stops and the budget is revisited "
-            "(stage A step 1)"
+            f"{out_dir / PILOT_FILE} does not record the version the pilot judged at each of "
+            "the nine cells"
         )
-    return measured
+    return {str(cell): str(version) for cell, version in found.items()}
+
+
+def distinct(found: Iterable[Mapping[str, str] | None]) -> list[Mapping[str, str]]:
+    """The different versions among these, in their order, a None left out."""
+    kept: list[Mapping[str, str]] = []
+    for version in found:
+        if version is not None and version not in kept:
+            kept.append(version)
+    return kept
 
 
 def check_label(label: str) -> None:
@@ -860,6 +858,9 @@ class StageAResult:
     order: list[Cell]  # step 4, over every version's eligible cells
     v2: Reading  # v2's stored verdicts
     events: Events
+    first_draft: bool | None  # it is the version the pilot judged; None with no pilot record
+    versions_counted: int  # the pilot's and every saved pass's, each different version once
+    choice: Path | None  # the choice's record, once step 5 has made it
 
 
 def stage_a(
@@ -875,10 +876,15 @@ def stage_a(
 ) -> StageAResult:
     """Steps 2 to 4 for the claim judge as the code has it now: its single pass over the tuning
     answers, judged once and read back after, its grid, and the candidate order over every
-    version judged so far, each read from its own saved verdicts."""
+    version judged so far, each read from its own saved verdicts. The pilot judged the first
+    draft, so its version counts among the four the design allows, and a version that differs
+    from it is a revision. Once the choice is made (step 5), no new version is judged; a version
+    judged before it is still read back."""
     check_label(label)
     current = versions(llm, config)
     saved = load_versions(out_dir, answers, current)
+    drafted = pilot_versions(out_dir)
+    choice = out_dir / CHOICE_FILE
     spent = None
     if label in saved:
         if saved[label].versions != current:
@@ -893,10 +899,17 @@ def stage_a(
                 f"this version was judged already, as {same[0]!r}: each version is judged once "
                 "(stage A step 2)"
             )
-        if len(saved) >= MAX_VERSIONS:
+        if choice.exists():
             raise Refused(
-                f"{len(saved)} versions are judged already, the first draft and three "
-                "revisions: another is a new proposal (stage A step 2)"
+                f"{choice} exists: the choice is made, and no version is judged after it (stage "
+                "A steps 5 and 6). A version judged before it can still be read back"
+            )
+        counted = distinct([drafted, *(held.versions for held in saved.values())])
+        if current not in counted and len(counted) >= MAX_VERSIONS:
+            raise Refused(
+                f"{len(counted)} versions are judged already, the first draft the pilot judged "
+                "counted among them, and the design allows the first draft and three revisions: "
+                "another is a new proposal (stage A step 2)"
             )
         per_answer = pilot_cost(out_dir)
         step = f"stage-a {label}"
@@ -925,6 +938,9 @@ def stage_a(
         order=candidate_order(c for cells in by_version.values() for c in cells),
         v2=read(answers, [stored_v2(answers)]),
         events=held.events,
+        first_draft=None if drafted is None else held.versions == drafted,
+        versions_counted=len(distinct([drafted, *(h.versions for h in saved.values())])),
+        choice=choice if choice.exists() else None,
     )
 
 
@@ -1268,12 +1284,31 @@ def render_pilot(result: PilotResult, ledger: SpendLedger) -> str:
     return "\n".join(lines)
 
 
+def _standing(result: StageAResult) -> str:
+    """Where the version stands among the four the design allows: the first draft, which the
+    pilot judged, or a revision of it (steps 1 and 2)."""
+    counted = (
+        f"{result.versions_counted} of the {MAX_VERSIONS} versions the design allows (the first "
+        "draft and three revisions)"
+    )
+    if result.first_draft is None:
+        return f"No pilot record says which version is the first draft. Versions so far: {counted}."
+    if result.first_draft:
+        return f"This is the first draft, the version the pilot judged. Versions so far: {counted}."
+    return (
+        "This is a revision: the pilot judged another version, the first draft, so the pilot's "
+        "cost and flip rate were measured on that one. Versions so far, the first draft "
+        f"included: {counted}."
+    )
+
+
 def render_stage_a(result: StageAResult, ledger: SpendLedger) -> str:
     e = result.events
     how = "judged now" if result.spent else f"read back; judged {result.judged_at}"
     lines = [
         f"stage A, version {result.label!r}: the claim judge once on the {e.judgings} tuning "
         f"answers, under salt {SALTS[0]} ({how}). Saved in {result.path}.",
+        _standing(result),
     ]
     if result.spent:
         lines.append(_spent(result.spent, ledger))
@@ -1316,10 +1351,16 @@ def render_stage_a(result: StageAResult, ledger: SpendLedger) -> str:
             f"  {n}. {c.name}: {_num(named.mean(named.errors_and_judge_errors))} errors on the "
             f"named, judge errors included, {_num(others.mean(others.errors))} outside them{mark}"
         )
-    lines.append(
-        "after the last revision: uv run python scripts/judge_compare_v5.py choose "
-        + " ".join(c.spec for c in result.order[:2])
-    )
+    if result.choice is not None:
+        lines.append(
+            f"the choice is made (steps 5 and 6), in {result.choice}: no version is judged after "
+            "it."
+        )
+    else:
+        lines.append(
+            "after the last revision: uv run python scripts/judge_compare_v5.py choose "
+            + " ".join(c.spec for c in result.order[:2])
+        )
     return "\n".join(lines)
 
 
@@ -1411,7 +1452,7 @@ def _ticker() -> Iterator[Callable[[], None]]:
 def _print_or_refuse(run: Callable[[], str]) -> None:
     try:
         print(run())
-    except (Refused, SpendCapError) as exc:
+    except (Refused, PilotRefusal, SpendCapError) as exc:
         print(f"REFUSED: {exc}", file=sys.stderr)
         raise typer.Exit(code=2) from exc
 

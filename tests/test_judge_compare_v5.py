@@ -31,7 +31,7 @@ from agent_evals.graders.claim_judge import (
 )
 from agent_evals.harness.llm import LLMResponse
 from agent_evals.online import ONLINE_JUDGE_VERSION
-from agent_evals.spend import SpendCapError, SpendLedger
+from agent_evals.spend import PilotRefusal, SpendCapError, SpendLedger
 from agent_evals.suites import write_suite
 from agent_evals.types import Case
 from conftest import BUCKETS_URL, ScriptedLLM, make_case, text, tool_use
@@ -295,9 +295,12 @@ def v2_config() -> JudgeConfig:
 
 
 def pilot_done(out: Path, cost: float = 0.02) -> None:
-    """A pilot's record, so later steps are estimated at this cost per answer."""
+    """A pilot's record: the cost per answer later steps are estimated at, and the version it
+    judged, which is the first draft: claim_config's."""
     out.mkdir(parents=True, exist_ok=True)
-    (out / "pilot.json").write_text(json.dumps({"cost_per_answer_usd": cost}), encoding="utf-8")
+    judged = jc.versions(ScriptedLLM([]), claim_config())
+    record = {"cost_per_answer_usd": cost, "versions": judged}
+    (out / "pilot.json").write_text(json.dumps(record), encoding="utf-8")
 
 
 def assessment(score: int, search: int | None = None, *, dropped: bool = False) -> Assessment:
@@ -777,15 +780,96 @@ def test_stage_a_waits_for_the_pilot_and_stops_after_an_expensive_one(tmp_path: 
     answers, out = tuning(), tmp_path / "judge-v5"
     llm = Judges(answers)
     ledger = SpendLedger(out / "spend.json")
-    with pytest.raises(jc.Refused, match="the pilot comes first"):
+    # The refusals are the spend ledger's (agent_evals.spend), which evals judge applies too.
+    with pytest.raises(PilotRefusal, match="the pilot comes first"):
         jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
     pilot_done(out, 0.0301)  # over 1.5 times the $0.02 estimate
-    with pytest.raises(jc.Refused, match=r"more than 1\.5 times"):
+    with pytest.raises(PilotRefusal, match=r"more than 1\.5 times"):
+        jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
+    held = json.loads((out / "pilot.json").read_text(encoding="utf-8"))
+    stopped = held | {"cost_per_answer_usd": 0.0299, "stop": True}
+    (out / "pilot.json").write_text(json.dumps(stopped), encoding="utf-8")
+    with pytest.raises(PilotRefusal, match="the pilot recorded a stop"):  # a recorded stop stands
         jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
     assert llm.requests == []
     pilot_done(out, 0.0299)
     jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
     assert [e.step for e in ledger.entries()] == ["stage-a draft"]
+    cells = {name: v for name, v in held["versions"].items() if name != "t=85 s=90"}
+    for record in ({"cost_per_answer_usd": 0.02}, held | {"versions": cells}):  # none, 8 of 9
+        (out / "pilot.json").write_text(json.dumps(record), encoding="utf-8")
+        with pytest.raises(jc.Refused, match="does not record the version the pilot judged"):
+            jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
+
+
+def test_stage_a_counts_the_pilots_version_as_the_first_draft(tmp_path: Path) -> None:
+    """The review's case: the pilot judged the first draft, then four other versions were each
+    judged on the 125, five in all, and none was refused. The pilot's version counts among the
+    four, so the fourth other version is refused, and each other version is a revision."""
+    answers, out = tuning(), tmp_path / "judge-v5"
+    llm = Judges(answers)
+    ledger = SpendLedger(out / "spend.json")
+    jc.pilot(answers, llm, claim_config(), ledger=ledger, out_dir=out)  # on the first draft
+    model = {"name": "claude-sonnet-5-5", "max_tokens": 4096, "pricing": PRICING}
+    revisions = [
+        claim_config(rubric_version="v4"),
+        claim_config(strict_tools=False),
+        claim_config(model=model),
+    ]
+    for n, revision in enumerate(revisions, 1):
+        result = jc.stage_a(f"rev{n}", answers, llm, revision, ledger=ledger, out_dir=out)
+        assert result.spent is not None
+        assert (result.first_draft, result.versions_counted) == (False, n + 1)
+        printed = jc.render_stage_a(result, ledger)
+        assert "This is a revision: the pilot judged another version, the first draft" in printed
+        assert f"Versions so far, the first draft included: {n + 1} of the 4 versions" in printed
+    asked, entries = len(llm.requests), len(ledger.entries())
+    fifth = claim_config(rubric_version="v4", strict_tools=False)
+    with pytest.raises(
+        jc.Refused,
+        match=r"4 versions are judged already, the first draft the pilot judged counted among "
+        r"them.*another is a new proposal",
+    ):
+        jc.stage_a("rev4", answers, llm, fifth, ledger=ledger, out_dir=out)
+    assert len(llm.requests) == asked and len(ledger.entries()) == entries  # no call, no spend
+    assert not (out / "stage-a-rev4.json").exists()
+    # The first draft itself may still be judged once on the 125: it is no new version.
+    draft = jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
+    assert draft.spent is not None and (draft.first_draft, draft.versions_counted) == (True, 4)
+    assert (
+        "This is the first draft, the version the pilot judged. Versions so far: 4 of the 4 "
+        "versions the design allows (the first draft and three revisions)."
+    ) in jc.render_stage_a(draft, ledger)
+    again = jc.stage_a("rev1", answers, llm, revisions[0], ledger=ledger, out_dir=out)
+    assert again.spent is None and (again.first_draft, again.versions_counted) == (False, 4)
+
+
+def test_stage_a_judges_no_new_version_once_the_choice_is_made(tmp_path: Path) -> None:
+    """The review's case: after choose froze a cell, a new version was still judged, and its pass
+    was paid for and added to the candidate order. Refused now, before any call."""
+    answers, out = tuning(), tmp_path / "judge-v5"
+    llm = Judges(answers)
+    ledger = SpendLedger(out / "spend.json")
+    jc.pilot(answers, llm, claim_config(), ledger=ledger, out_dir=out)
+    jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
+    specs = ["draft:50:off", "draft:50:90"]
+    choice = jc.choose(specs, answers, llm, claim_config(), v2_config(), ledger=ledger, out_dir=out)
+    assert choice.chosen is not None and choice.stop is None
+    asked, steps = len(llm.requests), [e.step for e in ledger.entries()]
+    assert steps == ["pilot", "stage-a draft", "choose draft:50:off draft:50:90"]
+    with pytest.raises(
+        jc.Refused, match=r"stage-a-choice\.json exists: the choice is made, and no version is"
+    ):
+        jc.stage_a(
+            "rev1", answers, llm, claim_config(rubric_version="v4"), ledger=ledger, out_dir=out
+        )
+    assert len(llm.requests) == asked and [e.step for e in ledger.entries()] == steps
+    assert not (out / "stage-a-rev1.json").exists()
+    again = jc.stage_a("draft", answers, llm, claim_config(), ledger=ledger, out_dir=out)
+    assert again.spent is None and again.choice == choice.path  # read back, as before
+    printed = jc.render_stage_a(again, ledger)
+    assert f"the choice is made (steps 5 and 6), in {choice.path}: no version is judged" in printed
+    assert "after the last revision" not in printed
 
 
 def test_stage_a_judges_each_version_once_and_orders_every_versions_cells(
@@ -1134,6 +1218,7 @@ def test_the_commands_open_the_store_read_only_and_print_what_they_find(
     assert again.exit_code == 2 and "the pilot runs once" in again.output
     stage = runner.invoke(jc.app, ["stage-a", "draft"])
     assert stage.exit_code == 0, stage.output
+    assert "This is the first draft, the version the pilot judged." in stage.output
     assert (
         "1. draft t=50 s=off: 0 errors on the named, judge errors included, 0 outside them"
         "   <- candidate"

@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 import re
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import Any
 
@@ -30,7 +33,7 @@ from agent_evals.online import ONLINE_JUDGE_VERSION
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import write_suite
 from agent_evals.types import AgentResult
-from conftest import BUCKETS_URL, ScriptedLLM, make_case, text, tool_use
+from conftest import BUCKETS_URL, ScriptedLLM, make_case, text, tool_use, write_pilot
 
 ROOT = Path(__file__).resolve().parents[1]
 # Typography a copy can change, spelled by code point so that no lookalike sits in the source.
@@ -532,6 +535,114 @@ def test_the_verdict_follows_t_s_and_the_skeptics_search() -> None:
                 assert v.core_supported or not v.fully_supported  # fully implies core
 
 
+def test_a_verdict_fails_only_because_of_a_dropped_entry_when_putting_it_back_passes_it() -> None:
+    held = CheckedSupport(quote=1, quote_span=SPAN)
+    lost = CheckedSupport(quote=1, quote_span=SPAN, problem="not in quote 1")
+    none = Search(found=False, answer_span="", role="core", why="", confidence=0)
+
+    def found(
+        *claims: tuple[int, list[CheckedSupport]], items: dict[int, int] | None = None
+    ) -> Assessment:
+        """One core claim per (score, support entries), and the skeptic's scores of flagged
+        items, each a number of the first claim that no quote span of it holds."""
+        checked = [
+            CheckedClaim(answer_span=SPAN, role="core", support=support, score=score, why="q")
+            for score, support in claims
+        ]
+        flagged = [
+            cj.FlaggedItem(number=n, kind="number_not_quoted", token="63", context=SPAN, claim=1)
+            for n in items or {}
+        ]
+        scores = [
+            cj.ItemScore(item=n, score=score, not_a_claim=False, why="w")
+            for n, score in (items or {}).items()
+        ]
+        reply = SkepticReply(flagged=scores, search=none)
+        dropped = sum(e.problem is not None for _, support in claims for e in support)
+        return Assessment(claims=checked, flagged=flagged, skeptic=reply, dropped_support=dropped)
+
+    flips = found((80, [lost]))  # with its one entry back, it passes at t = 50 and 70
+    assert [flips.dropped_span_flip(t, None) for t in cj.T_GRID] == [True, True, False]
+    assert not flips.verdict(50, None).fully_supported  # a flip is still a fail
+    assert not found((80, [held])).dropped_span_flip(70, 90)  # it passes: nothing flips
+    passes = found((80, [held, lost]))  # one entry dropped, but one holds: it passes
+    assert passes.verdict(70, 90).fully_supported and not passes.dropped_span_flip(70, 90)
+    assert not found((30, [lost])).dropped_span_flip(50, None)  # it fails with its entry back too
+    assert not found((30, [held])).dropped_span_flip(50, None)  # it fails, and nothing was dropped
+    assert not found((90, [lost]), (30, [held])).dropped_span_flip(70, None)  # another one fails
+    # The rest stays as it was, flagged items included: a low item still fails it.
+    assert not found((90, [lost]), items={1: 40}).dropped_span_flip(70, None)
+    assert found((90, [lost]), items={1: 95}).dropped_span_flip(70, None)
+    assert not Assessment(error="the claim table failed twice").dropped_span_flip(70, 90)
+
+
+def test_the_grader_counts_what_its_checks_found_in_each_answer_it_judged() -> None:
+    lost = claim(SPAN, (9, SPAN), (8, SPAN))  # no quote 9 or 8: the claim keeps no entry
+    made_up = skeptic(span="Bucket names are global", role="core", confidence=95)
+    llm = ScriptedLLM(
+        [
+            *(table(QUOTED), skeptic()),  # every claim quoted
+            *(table(lost), skeptic({1: 95, 2: 95})),  # with its entries back it passes at 70, 90
+            *([text("no table")], [text("none again")]),  # a judge error after a retry
+            # Both calls asked again, and the search names words not in the answer twice.
+            *([text("no table")], table(QUOTED), made_up, made_up),
+        ]
+    )
+    judge = grader(llm)
+    assert judge.counts == cj.JudgingCounts()
+    for _ in range(4):
+        judge.grade(make_case(), answered())
+    uncited = AgentResult(output={"answer": "63", "citations": [], "abstained": False})
+    assert judge.grade(make_case(), uncited) == []  # nothing to judge: not a judging
+    assert judge.counts == cj.JudgingCounts(
+        judgings=4,
+        retried=2,  # judgings with a reply asked again, not the replies asked again (3)
+        judge_errors=1,
+        support_entries=4,
+        dropped=2,
+        with_dropped=1,
+        search_missing=1,
+        dropped_span_flips=1,  # at the grader's own t = 70 and s = 90
+    )
+    assert judge.run_note()["counts"] == judge.counts.model_dump()
+    strict = grader(ScriptedLLM([table(lost), skeptic({1: 80, 2: 80})]), support_threshold=85)
+    strict.grade(make_case(), answered())  # the items' 80 fail it at t = 85, entries or not
+    assert (strict.counts.dropped, strict.counts.dropped_span_flips) == (2, 0)
+
+
+class Replies(ScriptedLLM):
+    """The claim judge's replies by call and case, from any thread: each salt's next one."""
+
+    def __init__(self, replies: dict[str, list[list[dict[str, Any]]]]) -> None:
+        super().__init__([])
+        self.replies = replies  # "call#case id" -> its replies, in order
+        self.lock = threading.Lock()
+
+    def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
+        _, call, case_id = salt.split("#")
+        with self.lock:
+            self.script = [self.replies[f"{call}#{case_id}"].pop(0)]
+            return super().create(request, salt=salt)
+
+
+def test_answers_judged_in_parallel_are_each_counted_once(monkeypatch: pytest.MonkeyPatch) -> None:
+    add = cj.JudgingCounts.add
+
+    def slow_add(self: cj.JudgingCounts, other: cj.JudgingCounts) -> cj.JudgingCounts:
+        time.sleep(0.002)  # a wide gap between reading the counts and writing them back
+        return add(self, other)
+
+    monkeypatch.setattr(cj.JudgingCounts, "add", slow_add)
+    cases = [make_case(id=f"t-{n}") for n in range(40)]
+    replies = {f"claims#{c.id}": [table(QUOTED)] for c in cases}
+    replies |= {f"skeptic#{c.id}": [skeptic()] for c in cases}
+    judge = grader(Replies(replies))
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(lambda case: judge.grade(case, answered()), cases))
+    assert (judge.counts.judgings, judge.counts.support_entries) == (40, 40)
+    assert judge.usage.model_calls == 80
+
+
 def test_a_flagged_item_without_a_skeptic_score_fails_and_an_error_has_no_verdict() -> None:
     found = built()
     found.flagged = [cj.FlaggedItem(number=1, kind="uncovered", token="Region", context="x")]
@@ -838,6 +949,7 @@ def test_evals_judge_runs_the_claim_judge_with_no_responsive_call(
 ) -> None:
     _run(tmp_path, "r1", online=False)
     config = _judge_config(tmp_path)
+    write_pilot()  # stage A's pilot comes first
     llm = ScriptedLLM([table(QUOTED), skeptic()])
     monkeypatch.setattr(llm_module, "AnthropicClient", lambda *args, **kwargs: llm)
     monkeypatch.setattr(cli, "load_dotenv", lambda: False)
@@ -860,6 +972,68 @@ def test_evals_judge_runs_the_claim_judge_with_no_responsive_call(
     judge = ClaimJudgeGrader(llm, load_config(config).judge)
     assert note["version"] == judge.version and note["method"] == "claims"
     assert note["retry_salts"] == ["judge#claims-retry#<case id>", "judge#skeptic-retry#<case id>"]
+    assert note["counts"] == cj.JudgingCounts(judgings=1, support_entries=1).model_dump()
+
+
+def test_evals_judge_prints_and_notes_what_the_claim_judges_checks_counted(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    suite = tmp_path / "suite.jsonl"
+    cases = [make_case(id=f"t-{n}") for n in (1, 2, 3)]
+    write_suite(suite, cases)
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        manifest = {"suite": {"path": str(suite), "sha256": file_sha256(suite)}}
+        store.start_run(
+            "r1", agent="docs", agent_version="v", suite="smoke", attempts=1, manifest=manifest
+        )
+        for case in cases:
+            store.record_attempt("r1", case.id, 1, answered(), 0.0, [])
+    finally:
+        store.close()
+    write_pilot()
+    lost = claim(SPAN, (9, SPAN))  # quote 9 does not exist: the entry is dropped
+    llm = Replies(
+        {
+            "claims#t-1": [table(QUOTED)],
+            "skeptic#t-1": [skeptic()],
+            "claims#t-2": [table(lost)],  # with its entry back it would pass at t 70 and s 90
+            "skeptic#t-2": [skeptic({1: 95, 2: 95})],
+            "claims#t-3": [[text("no table")]],
+            "claims-retry#t-3": [[text("none again")]],  # a judge error
+        }
+    )
+    monkeypatch.setattr(llm_module, "AnthropicClient", lambda *args, **kwargs: llm)
+    monkeypatch.setattr(cli, "load_dotenv", lambda: False)
+    result = CliRunner().invoke(cli.app, ["judge", "r1", "-c", str(_judge_config(tmp_path))])
+    assert result.exit_code == 0, result.output
+    out = " ".join(result.output.split())
+    assert (
+        "the claim judge's checks, of the 3 judgings: retried 1 of 3 (33%); judge errors 1 of 3 "
+        "(33%); support entries dropped by the span check 1 of 2 (50%), in 1 of 3 (33%) "
+        "judgings; a search naming words not in the answer in 0 of 3 (0%); verdicts that fail "
+        "at t=70 s=90 only because of a dropped entry: 1 of 2 (50%). The run's note records "
+        "these counts."
+    ) in out
+    store = ResultsStore(tmp_path / "evals.duckdb")
+    try:
+        note = store.run_info("r1")["manifest"]["judge-v5"]
+        grades = store.grades_for("r1", "judge-v5")
+    finally:
+        store.close()
+    assert note["counts"] == {
+        "judgings": 3,
+        "retried": 1,
+        "judge_errors": 1,
+        "support_entries": 2,
+        "dropped": 1,
+        "with_dropped": 1,
+        "search_missing": 0,
+        "dropped_span_flips": 1,
+    }
+    assert (note["support_threshold"], note["skeptic_threshold"]) == (70, 90)  # the flips' cell
+    assert grades[("t-2", 1)]["judge_supported"] == 0.0  # a flip is reported, and is still a fail
+    assert grades[("t-3", 1)] == {"judge_error": 1.0}
 
 
 def test_evals_judge_still_refuses_the_claim_judge_on_an_online_run(

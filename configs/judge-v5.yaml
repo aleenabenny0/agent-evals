@@ -2,7 +2,8 @@
 # code checks, a 0 to 100 score per claim against one threshold, and a skeptic pass. A candidate:
 # it grades under its own name, judge-v5, beside the validated judge (v2), and no gate or alert
 # reads it. Its two thresholds are placeholders until stage A sets them, and both are part of its
-# version. Judge a run with it (costs money): evals judge RUN -c configs/judge-v5.yaml
+# version. Judge a run with it (costs money), once stage A's pilot has run and has not stopped the
+# work: evals judge RUN -c configs/judge-v5.yaml
 
 paths:
   corpus_dir: data/snapshots/aws-docs

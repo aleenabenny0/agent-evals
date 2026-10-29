@@ -15,6 +15,7 @@ from rich.table import Table
 from agent_evals.config import Config, JudgeConfig, load_config
 
 if TYPE_CHECKING:
+    from agent_evals.graders.claim_judge import ClaimJudgeGrader
     from agent_evals.harness.llm import LLMClient
     from agent_evals.spend import MeteredLLM, SpendLedger
     from agent_evals.stats.core import Estimate
@@ -579,15 +580,20 @@ class _RoundSpend:
 
 
 def _round_spend(step: str, answers: int, llm: LLMClient, judge: JudgeConfig) -> _RoundSpend:
-    """The claim judge's calls are the judge round's spend: estimated at the pilot's cost per
-    answer (the design's estimate before the pilot), refused (exit 2) before any call when that
-    would take the round past its cap, and stopped during the command when the cap is reached."""
+    """The claim judge's calls are the judge round's spend. Refused (exit 2) before any call
+    until the pilot has run, since stage A's pilot comes first, and after a pilot that stopped
+    the work (spend.pilot_cost), as the script's later steps are; then estimated at the pilot's
+    cost per answer, refused when that would take the round past its cap, and stopped during the
+    command when the cap is reached."""
     from agent_evals import spend
 
     ledger = spend.SpendLedger(spend.DEFAULT_PATH)
-    estimate = answers * spend.cost_per_answer(ledger.path.parent)
     try:
+        estimate = answers * spend.pilot_cost(ledger.path.parent)
         meter = spend.MeteredLLM(llm, judge.model.pricing, ledger.check(step, estimate))
+    except spend.PilotRefusal as exc:
+        console.print(f"[red]{step}: {exc}. Nothing was judged.[/red]")
+        raise typer.Exit(code=2) from exc
     except spend.SpendCapError as exc:
         console.print(f"[red]{exc}[/red]")
         raise typer.Exit(code=2) from exc
@@ -595,6 +601,28 @@ def _round_spend(step: str, answers: int, llm: LLMClient, judge: JudgeConfig) ->
         console.print(f"[red]{exc}: nothing was judged.[/red]")
         raise typer.Exit(code=2) from exc
     return _RoundSpend(step, ledger, meter)
+
+
+def _claim_checks(grader: ClaimJudgeGrader) -> str:
+    """What the claim judge's checks counted over the answers this command judged, as the run's
+    note records them: dropped support entries, and the verdicts that fail only because of one,
+    are reported at every stage (docs/plans/judge-v5.md, part 1)."""
+    c = grader.counts
+    t, s = grader.config.support_threshold, grader.config.skeptic_threshold
+    cell = f"t={t} s={'off' if s is None else s}"
+
+    def share(n: int, of: int) -> str:
+        return f"{n} of {of} ({n / of:.0%})" if of else "0 of 0"
+
+    return (
+        f"the claim judge's checks, of the {c.judgings} judgings: retried "
+        f"{share(c.retried, c.judgings)}; judge errors {share(c.judge_errors, c.judgings)}; "
+        f"support entries dropped by the span check {share(c.dropped, c.support_entries)}, in "
+        f"{share(c.with_dropped, c.judgings)} judgings; a search naming words not in the answer "
+        f"in {share(c.search_missing, c.judgings)}; verdicts that fail at {cell} only because of "
+        f"a dropped entry: {share(c.dropped_span_flips, c.judgings - c.judge_errors)}. The run's "
+        "note records these counts."
+    )
 
 
 @app.command()
@@ -619,9 +647,11 @@ def judge(
 ) -> None:
     """Judge a run's stored answers (supported? responsive?) with the LLM judge, or their support
     alone with the claim judge when the config's judge.method is claims. Costs money. The claim
-    judge's spend is the judge round's: checked against its ledger before the first call, stopped
-    at its cap, and recorded in it. An online run is judged only by a pinned judge: its grader
-    name has a pin (online.ONLINE_JUDGE_PINS) and its version is that pin."""
+    judge's spend is the judge round's: refused before stage A's pilot and after a pilot that
+    stopped the work, checked against its ledger before the first call, stopped at its cap, and
+    recorded in it. What the claim judge's checks counted is printed and noted with the run. An
+    online run is judged only by a pinned judge: its grader name has a pin
+    (online.ONLINE_JUDGE_PINS) and its version is that pin."""
     from concurrent.futures import ThreadPoolExecutor
 
     from rich.progress import Progress
@@ -724,7 +754,7 @@ def judge(
             "rubric": cfg.judge.rubric_version,
             "salt": salt,
         }
-        if isinstance(grader, ClaimJudgeGrader):  # its thresholds, and the salts of its retries
+        if isinstance(grader, ClaimJudgeGrader):  # its thresholds, retry salts and checks' counts
             note |= grader.run_note()
         store.annotate_run(run_id, cfg.judge.grader_name, note)
         u = grader.usage
@@ -738,6 +768,8 @@ def judge(
             f"{u.model_calls} calls ({u.cached_calls} from cache), {u.input_tokens} in / "
             f"{u.output_tokens} out tokens{spent}"
         )
+        if isinstance(grader, ClaimJudgeGrader):
+            console.print(_claim_checks(grader))
         _print_summary(store, run_id, cfg.judge.grader_name)
     finally:
         store.close()
@@ -1120,8 +1152,9 @@ def judge_probe(
 ) -> None:
     """Mutation tests and bias probes for the judge, on answers it passed. Costs money. With the
     claim judge (judge.method claims), on the answers it passed on judge_supported, scored on
-    judge_supported alone, and its spend is the judge round's: checked against its ledger before
-    the first call, stopped at its cap, and recorded in it."""
+    judge_supported alone, and its spend is the judge round's: refused before stage A's pilot and
+    after a pilot that stopped the work, checked against its ledger before the first call,
+    stopped at its cap, and recorded in it."""
     import json
     from concurrent.futures import ThreadPoolExecutor
 
@@ -2388,8 +2421,11 @@ def online_run(
 
 def _online_judge_refusal(judge: JudgeConfig) -> str | None:
     """Why this judge config may not grade an online run, or None when it may: its grader name
-    is pinned and its judge's version is that pin (online.pin_refusal). Builds the judge the
-    config names, the claim judge or the verdict judge, and calls nothing."""
+    is pinned and its judge's version is that pin (online.pin_refusal). For the claim judge,
+    whose spend is the judge round's, the pilot must also have run without stopping the work
+    (spend.pilot_cost), which `evals judge` checks too, but only once the agent has run. Builds
+    the judge the config names, the claim judge or the verdict judge, and calls nothing."""
+    from agent_evals import spend
     from agent_evals.graders.claim_judge import ClaimJudgeGrader
     from agent_evals.graders.judge import JudgeGrader
     from agent_evals.harness.llm import AnthropicClient
@@ -2403,7 +2439,13 @@ def _online_judge_refusal(judge: JudgeConfig) -> str | None:
         )
     except ValueError as exc:  # a judge config no judge accepts grades nothing
         return f"The config's judge cannot be built: {exc}"
-    return pin_refusal(judge.grader_name, grader.version)
+    refusal = pin_refusal(judge.grader_name, grader.version)
+    if refusal is None and isinstance(grader, ClaimJudgeGrader):
+        try:
+            spend.pilot_cost(spend.DEFAULT_PATH.parent)
+        except spend.PilotRefusal as exc:
+            return f"The config's judge, {judge.grader_name}, cannot judge yet: {exc}"
+    return refusal
 
 
 def _online_run(*, day: int, judge_answers: bool, shadow: bool, config: Path) -> str:

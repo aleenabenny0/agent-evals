@@ -28,7 +28,7 @@ from agent_evals.simulate import TrafficQuestion
 from agent_evals.store.db import ResultsStore
 from agent_evals.suites import SuiteError, check_against_corpus, load_suite, write_suite
 from agent_evals.types import AgentResult, Case, Gold, RunContext, Step
-from conftest import LAMBDA_URL, ScriptedLLM, make_case, tool_use
+from conftest import LAMBDA_URL, ScriptedLLM, make_case, tool_use, write_pilot
 
 PREMISE = "Functions can use between 128 MB and 10,240 MB of memory."
 V21_JUDGE = "judge:\n  rubric_version: v2.1\n  grader_name: judge-v2.1\n"
@@ -359,6 +359,16 @@ def test_online_run_judges_with_a_pinned_claim_judge_and_refuses_an_unpinned_one
     assert not calls  # refused before the agent was paid for
     pinned = {"judge": ONLINE_JUDGE_VERSION, "judge-v5": _claim_judge_version()}
     monkeypatch.setattr(online, "ONLINE_JUDGE_PINS", pinned)
+    # Its spend is the judge round's, which waits for stage A's pilot: `evals judge` would refuse
+    # it after the agent has run, so it is refused before.
+    for pilot, why in ((None, "the pilot comes first"), (True, "the pilot recorded a stop")):
+        if pilot is not None:
+            write_pilot(0.05, stop=pilot)
+        result = CliRunner().invoke(cli.app, ["online-run", "1", "-c", str(config)])
+        out = " ".join(result.output.split())
+        assert result.exit_code == 2 and f"judge-v5, cannot judge yet: {why}" in out, out
+        assert "Nothing was run" in out and not calls
+    write_pilot(0.02, stop=False)
     result = CliRunner().invoke(cli.app, ["online-run", "1", "-c", str(config)])
     assert result.exit_code == 0, result.output
     assert calls["run"]["config"] == config and calls["judge"]["config"] == config

@@ -13,6 +13,9 @@ never a URL, neither a citation's nor one inside a quote's text. A reply that fa
 asked again once under a second salt; when that fails too, the answer gets a `judge_error` grade
 instead of verdicts, so a day can always be read. Like JudgeGrader, it skips errored, abstained
 and uncited answers, and every call goes through LLMClient, so it is cached, timed and counted.
+The grader also counts what its checks find in the answers it judges: retries, judge errors,
+support entries dropped by the span check, and the verdicts that fail only because of one, which
+`evals judge` reports and records.
 """
 
 from __future__ import annotations
@@ -313,10 +316,69 @@ class Assessment(BaseModel):
             reason=reason.strip(),
         )
 
+    def dropped_span_flip(self, t: int, s: int | None) -> bool:
+        """The answer fails fully supported at t and s only because the span check dropped a
+        support entry: it fails as it is, yet passes with every dropped entry put back and the
+        rest as it was, flagged items included. Dropped entries, and the verdicts that flip only
+        because of one, are reported at every stage (docs/plans/judge-v5.md, part 1). A judge
+        error has no verdict, so it never flips."""
+        if self.error is not None or self.verdict(t, s).fully_supported:
+            return False
+        if not any(entry.problem is not None for claim in self.claims for entry in claim.support):
+            return False  # nothing was dropped
+        return self._restored().verdict(t, s).fully_supported
+
+    def _restored(self) -> Assessment:
+        """This assessment with every support entry the span check dropped put back."""
+        claims = [
+            claim.model_copy(
+                update={"support": [e.model_copy(update={"problem": None}) for e in claim.support]}
+            )
+            for claim in self.claims
+        ]
+        return self.model_copy(update={"claims": claims})
+
+
+class JudgingCounts(BaseModel):
+    """What the claim judge's checks counted over some judgings, each one answer it judged (an
+    errored, abstained or uncited answer is not one). The flips are read at one t and s."""
+
+    model_config = ConfigDict(frozen=True)
+
+    judgings: int = 0
+    retried: int = 0  # judgings with a reply asked again
+    judge_errors: int = 0  # judgings whose reply failed validation twice: no verdict
+    support_entries: int = 0  # in the claim tables, before the span check
+    dropped: int = 0  # support entries the span check dropped
+    with_dropped: int = 0  # judgings that lost at least one
+    search_missing: int = 0  # searches whose words were not in the answer, even on the retry
+    dropped_span_flips: int = 0  # verdicts that fail only because of a dropped entry
+
+    @classmethod
+    def of(cls, found: Assessment, t: int, s: int | None) -> JudgingCounts:
+        """One judging's counts, its flip read at t and s."""
+        return cls(
+            judgings=1,
+            retried=int(found.retries > 0),
+            judge_errors=int(found.error is not None),
+            support_entries=sum(len(claim.support) for claim in found.claims),
+            dropped=found.dropped_support,
+            with_dropped=int(found.dropped_support > 0),
+            search_missing=int(found.search_span_missing),
+            dropped_span_flips=int(found.dropped_span_flip(t, s)),
+        )
+
+    def add(self, other: JudgingCounts) -> JudgingCounts:
+        return JudgingCounts(
+            **{name: getattr(self, name) + getattr(other, name) for name in type(self).model_fields}
+        )
+
 
 class ClaimJudgeGrader:
     """The claim judge. `assess` finds everything for one answer; `grade` reads its verdicts at
-    the configured t and s. It never grades under "judge", the validated judge's name."""
+    the configured t and s. It never grades under "judge", the validated judge's name. It counts
+    what its checks found in every answer it judges (`counts`, its flips at its own t and s), as
+    it counts the usage of its calls."""
 
     def __init__(self, llm: LLMClient, config: JudgeConfig, *, salt: str = "judge") -> None:
         if config.method != "claims":
@@ -354,7 +416,8 @@ class ClaimJudgeGrader:
         self.claims_tool = claims_tool(config.strict_tools)
         self.skeptic_tool = skeptic_tool(config.strict_tools)
         self.usage = Usage()  # every call, retries included, for the cost line
-        self._lock = threading.Lock()
+        self.counts = JudgingCounts()  # every answer judged, for the run note
+        self._lock = threading.Lock()  # for both: several threads may judge with one grader
         # Changes with the model, any word of the prompts, templates or tools, either threshold,
         # the rules' data and the rules and code versions. Not with pricing, salt or the grader
         # name.
@@ -378,8 +441,11 @@ class ClaimJudgeGrader:
         self.version = sha256_text(canonical_json(fingerprint))[:12]
 
     def run_note(self) -> dict[str, Any]:
-        """What `evals judge` records beside the version: the method, both thresholds, and the
-        salts a reply that fails validation is asked again under."""
+        """What `evals judge` records beside the version: the method, both thresholds, the salts
+        a reply that fails validation is asked again under, and what the checks counted over the
+        answers this grader judged, its dropped-span flips at those thresholds."""
+        with self._lock:
+            counts = self.counts
         return {
             "method": "claims",
             "support_threshold": self.config.support_threshold,
@@ -387,6 +453,7 @@ class ClaimJudgeGrader:
             "retry_salts": [
                 self._salt(call, "<case id>") for call in ("claims-retry", "skeptic-retry")
             ],
+            "counts": counts.model_dump(),
         }
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
@@ -405,7 +472,19 @@ class ClaimJudgeGrader:
     def assess(self, case: Case, result: AgentResult) -> Assessment | None:
         """Everything the claim judge finds in one answer, or None when there is nothing to
         judge: an errored, abstained or uncited answer. Bad model output never raises: a reply
-        that fails validation twice comes back as the assessment's error."""
+        that fails validation twice comes back as the assessment's error. Each assessment is
+        added to the grader's counts."""
+        found = self._assess(case, result)
+        if found is not None:
+            one = JudgingCounts.of(
+                found, self.config.support_threshold, self.config.skeptic_threshold
+            )
+            with self._lock:
+                self.counts = self.counts.add(one)
+        return found
+
+    def _assess(self, case: Case, result: AgentResult) -> Assessment | None:
+        """assess(), before the assessment is counted."""
         if result.error or bool(result.output.get("abstained", False)):
             return None
         raw = result.output.get("citations")

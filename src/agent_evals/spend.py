@@ -6,6 +6,11 @@ the cap leaves: the call that spends the rest is the step's last. After it, howe
 it actually spent is added. Spend is what the API bills: only the calls the local call cache did
 not serve, priced with the judge's own pricing. A cached call costs nothing, so a rerun adds calls
 to the record but no money.
+
+The pilot (stage A step 1) comes first. Every later paid step of the claim judge, the script's and
+`evals judge` and `evals judge-probe` with its config alike, is estimated at the cost per answer
+the pilot measured, and is refused before the pilot and after a pilot that stopped the work
+(pilot_cost).
 """
 
 from __future__ import annotations
@@ -27,10 +32,13 @@ from agent_evals.types import Usage
 DEFAULT_PATH = Path("results/judge-v5/spend.json")
 # The most the round may spend before any label: decision 7(a), approved 2026-10-28.
 APPROVED_CAP_USD = 60.0
-# What one answer judged by the claim judge is estimated to cost: the design's estimate, until the
-# pilot (stage A step 1, scripts/judge_compare_v5.py) has measured it. The pilot's record sits
-# beside the ledger.
+# What one answer judged by the claim judge is estimated to cost: the design's estimate. The pilot
+# (stage A step 1, scripts/judge_compare_v5.py) is checked against the cap at it and measures the
+# real cost, which every later step is estimated at. Its record sits beside the ledger.
 ESTIMATE_PER_ANSWER_USD = 0.02
+# A pilot that measures more than this times the estimate per answer stops the work, and the
+# budget is revisited (stage A step 1).
+STOP_FACTOR = 1.5
 PILOT_FILE = "pilot.json"
 
 
@@ -40,19 +48,56 @@ class SpendCapError(RuntimeError):
     the cap left (what it spent is still recorded)."""
 
 
-def measured_cost_per_answer(folder: Path) -> float | None:
-    """The pilot's cost per answer, from its record in this folder, once it has run."""
+class PilotRefusal(RuntimeError):
+    """A paid claim-judge step is refused before its first call because of the pilot (stage A
+    step 1): it has not run yet, and it comes first, or it stopped the work. Nothing was spent."""
+
+
+def pilot_record(folder: Path) -> dict[str, Any] | None:
+    """The pilot's record in this folder, as scripts/judge_compare_v5.py wrote it once, or None
+    before the pilot has run."""
     path = folder / PILOT_FILE
     if not path.is_file():
         return None
-    return float(json.loads(path.read_text(encoding="utf-8"))["cost_per_answer_usd"])
+    try:
+        held = json.loads(path.read_text(encoding="utf-8"))
+    except ValueError as exc:
+        raise PilotRefusal(f"{path} cannot be read as the pilot's record: {exc}") from exc
+    if not isinstance(held, dict):
+        raise PilotRefusal(f"{path} cannot be read as the pilot's record")
+    return held
 
 
-def cost_per_answer(folder: Path) -> float:
-    """What a step estimates one claim-judge answer at: the pilot's cost when it has run, else the
-    design's estimate."""
-    measured = measured_cost_per_answer(folder)
-    return ESTIMATE_PER_ANSWER_USD if measured is None else measured
+def pilot_cost(folder: Path) -> float:
+    """What a paid claim-judge step after the pilot estimates one answer at: the cost per answer
+    the pilot measured, from its record in this folder. Refused (PilotRefusal) before the pilot,
+    which comes first, and after a pilot that measured more than STOP_FACTOR times the estimate
+    or recorded a stop: the work stops there, and the budget is revisited (stage A step 1)."""
+    held = pilot_record(folder)
+    if held is None:
+        raise PilotRefusal(
+            "the pilot comes first: it measures the cost per answer that every later step is "
+            "estimated at (stage A step 1, scripts/judge_compare_v5.py pilot)"
+        )
+    try:
+        measured = float(held["cost_per_answer_usd"])
+        estimate = float(held.get("estimate_per_answer_usd", ESTIMATE_PER_ANSWER_USD))
+    except (KeyError, TypeError, ValueError) as exc:
+        path = folder / PILOT_FILE
+        raise PilotRefusal(f"{path} cannot be read as the pilot's record ({exc!r})") from exc
+    if held.get("stop") is True:  # a stop the pilot recorded stands, whatever the estimate is now
+        raise PilotRefusal(
+            f"the pilot recorded a stop: it measured ${measured:.4f} per answer against its "
+            f"${estimate:.2f} estimate, so the work stops and the budget is revisited (stage A "
+            "step 1)"
+        )
+    if measured > STOP_FACTOR * ESTIMATE_PER_ANSWER_USD:
+        raise PilotRefusal(
+            f"the pilot measured ${measured:.4f} per answer, more than {STOP_FACTOR} times the "
+            f"${ESTIMATE_PER_ANSWER_USD:.2f} estimate: the work stops and the budget is revisited "
+            "(stage A step 1)"
+        )
+    return measured
 
 
 class StepBudget:

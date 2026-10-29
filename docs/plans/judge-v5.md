@@ -616,6 +616,19 @@ step:
 - **The pilot's 20 answers** are drawn with a fixed seed, stratified by dev run, not taken in
   case-id order (which gave 20 answers from one service area and no named case).
 
+A second review of the build found four more, fixed the same way before any paid step:
+
+- **The pilot judges the first draft.** Its version counts among the four that stage A allows, so
+  a version judged on the 125 that differs from it is a revision, and a new version is refused
+  once four versions are counted.
+- **No version is judged after the choice.** Once step 5's choice is recorded, stage A refuses a
+  new version; a version judged before it can still be read back.
+- **Every paid claim-judge step waits for the pilot.** `evals judge` and `evals judge-probe` with
+  the claim judge's config are refused before the pilot and after a pilot that stops the work, as
+  the script's later steps are, and `online-run` checks the same before its agent runs.
+- **The grader counts dropped entries and the verdicts they flip**, by the same rule as the
+  script, so `evals judge`, which grades stage C, prints both and records them in the run's note.
+
 ## Appendix: named cases (frozen 2026-10-28)
 
 Cases this document quotes, paraphrases, or built a pattern from, by id: online-d01-085,

@@ -169,3 +169,23 @@ def _spend_ledger_in_tmp(
     path = tmp_path_factory.mktemp("judge-v5") / spend.DEFAULT_PATH.name
     monkeypatch.setattr(spend, "DEFAULT_PATH", path)
     return path
+
+
+def write_pilot(
+    cost: float = 0.02, *, stop: bool | None = None, folder: Path | None = None
+) -> Path:
+    """A pilot record with this cost per answer, and this stop when one is given, beside the judge
+    round's ledger (in the test's temporary folder, see above) or in `folder`. Every paid step of
+    the claim judge waits for one."""
+    import json
+
+    from agent_evals import spend
+
+    where = spend.DEFAULT_PATH.parent if folder is None else folder
+    record: dict[str, Any] = {"cost_per_answer_usd": cost}
+    if stop is not None:
+        record["stop"] = stop
+    where.mkdir(parents=True, exist_ok=True)
+    path = where / spend.PILOT_FILE
+    path.write_text(json.dumps(record), encoding="utf-8")
+    return path
