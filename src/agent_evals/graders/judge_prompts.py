@@ -242,10 +242,25 @@ def responsive_message(question: str, reference: str, answer: str) -> str:
 # claims that code checks; a second, skeptical call scores what code flagged and looks for a
 # claim the table missed. Neither call sees a URL (a URL is not a quote, and it is how
 # attributions were credited): not a citation's, and not one in a quote's text, which the claim
-# judge takes out before the quotes reach these templates. Neither prompt has an example beyond
-# the rubric's own, and neither mentions a threshold, so one reply serves every threshold.
-# Changing a word of the prompts, the tools or the message templates below changes the claim
-# judge's version.
+# judge takes out before the quotes reach these templates. Beyond the rubric's examples, the
+# prompts share only NO_CLAIM's, and neither mentions a threshold, so one reply serves every
+# threshold. Changing a word of the prompts, the tools or the message templates below changes the
+# claim judge's version.
+
+# What makes no claim, in the same words in both prompts. Stage A's first revision (2026-10-28)
+# added the answer's notes on its own search. The first draft listed such a note as a claim on
+# answers labeled supported, while the labels still count a source, feature, version or edition
+# that such a note names, and that no quote names, as a claim. Its examples come from dev-split
+# answers (docs-chg-008, docs-ai-003-p3 and docs-chg-022).
+NO_CLAIM = """\
+Advice, hedges and offers to help make no claim at all. Hedges include a statement that the
+documentation does not say something, and the answer's notes on its own search: what it could or
+could not open, reach, find or check, and that it covers only what it checked ("the linked page
+is not in the documentation I could reach", "this applies to X specifically; I did not check
+other services"). But what such a note says the documentation states is a claim, and so is a
+source, feature, version or edition that the note names and that neither the question nor any
+quote names ("this rests on the Trusted Advisor notice alone", when no quote mentions Trusted
+Advisor)."""
 
 
 def claims_prompt(rubric: str) -> str:
@@ -259,8 +274,7 @@ and for each one the quotes that support it and how sure you are of that support
 
 {rubric}
 
-Advice, hedges (a statement that the documentation does not say something among them) and offers
-to help make no claim at all.
+{NO_CLAIM}
 
 Give one entry per claim; a sentence that states several facts is several claims:
 - answer_span: the words of the answer that make the claim, copied exactly.
@@ -296,8 +310,7 @@ earlier check's usual mistake is to pass a claim that no quote supports.
 
 {rubric}
 
-Advice, hedges (a statement that the documentation does not say something among them) and offers
-to help make no claim at all.
+{NO_CLAIM}
 
 Do two things.
 
