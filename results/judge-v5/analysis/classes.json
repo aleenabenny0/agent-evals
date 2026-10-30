@@ -1,0 +1,4684 @@
+{
+ "about": "The blind classification of revision 1's claim reasons (the `why` the claim judge gave each claim) from the claim judge round's three revision 1 passes (results/judge-v5/stage-a-rev1.json, .judge-s2.json and .judge-s3.json). Two readers classified reasons blind to the answer key, the label and the score: the first reader all three batches below, the second reader every claim scored 50 to 85 in a judging whose weakest claim is 50 or more, which holds batch 1; only its batch 1 classes are joined here. Each reader's key map was written by a seeded shuffle and read only after the classes were saved; both maps are recomputed from the pass files here and found equal. Every answer_span, role, score, quoted flag and why below is copied from the pass files; the readers' files hold only their classes. No committed script writes this file: it was assembled once from the readers' class files, which are kept outside the repository, and the pass files. Nothing was judged anew, and no call was made. The classes describe the judge's stated reasons on saved passes; they decide nothing.",
+ "classes": {
+  "ST": "stated outright by a quote",
+  "RW": "plain rewording, arithmetic or a unit conversion of what a quote states",
+  "EXT": "an implication or extension beyond the quote",
+  "NAME": "a name or term in no quote",
+  "QUAL": "a qualifier or scope beyond the quote",
+  "OTHER": "another gap, with its kind: a headerless table cell, or a claim that depends on the current date"
+ },
+ "class_rule": {
+  "reader_1": "Blind classification of revision 1's weakest-claim why texts (scores 50 to 85), made before the key map or labels were read. ST stated outright; RW plain rewording or arithmetic; EXT mild extension or implication; NAME a name or term in no quote; QUAL a qualifier or scope beyond the quote; OTHER (hdr: a table cell read without its header; date: depends on the current date). amb: the why's own wording straddles two classes, alt is the other reading. Rule: a why that names no gap is ST (the quote states it) or RW (it follows); a why that names a gap takes the class of the gap it names first.",
+  "reader_1_batch_2": "Blind classes for batch 2: claims scored 70 to 85 that are not the weakest, in answers revision 1 passes at t = 70. Same classes and rule as batch 1.",
+  "reader_1_batch_3": "Blind classes for batch 3: claims scored above 85 in answers revision 1 passes at t = 70 whose why passed a broad reservation-word screen (the 204 screened out all read as stated or reworded). Same classes and rule.",
+  "reader_2": "Class rule, fixed before reading any why text (2026-10-29). Read the why only. A why that names\nno gap is ST or RW; a why that names a gap takes the class of the FIRST gap it names.\n\nST    the quote states it (directly, explicitly, verbatim, \"quote N says\", \"the row/header shows\"),\n      and no gap is named.\nRW    it follows by rewording, paraphrase, summary, arithmetic or a unit conversion, or \"follows\n      from\" a stated fact, and no gap is named.\nEXT   an inference, implication or extension beyond the quote (\"implies\", \"reasonable inference\",\n      \"mild extension\", \"suggests\", \"inferred\"), with no specific missing term and no qualifier\n      named as the gap.\nNAME  a specific name, term, feature, product, version, edition, API, error, unit or value that no\n      quote contains or names (\"no quote mentions X\", \"doesn't name X\", \"X is not stated\").\nQUAL  a qualifier or scope beyond the quote: only/sole/always/all/by default/never, a scope or\n      condition the quote does not tie the fact to (\"not explicitly about X\", \"not clearly the\n      sole starting point\", \"subject to change not shown\").\nOther a table cell or row quoted without its header; a fact that needs the current date; any\n      other gap not above.\n\nAmbiguous items carry an alternative class (written as CLASS|ALT)."
+ },
+ "batches": {
+  "1": "the weakest claims scored 50 to 85 over revision 1's three passes (every claim tied at the lowest score of its judging); read by both readers",
+  "2": "claims scored 70 to 85 that are not the weakest, in answers revision 1 passes at t = 70 with s off; read by the first reader",
+  "3": "claims scored above 85 in answers revision 1 passes at t = 70 with s off whose reason passed a reservation-word screen (204 such claims were screened out and read as stated or reworded); read by the first reader"
+ },
+ "summary": {
+  "by_batch": {
+   "1": {
+    "claims": 115,
+    "judgings": 106,
+    "answers": 44,
+    "reader_1_by_class": {
+     "ST": 16,
+     "RW": 6,
+     "EXT": 41,
+     "NAME": 27,
+     "QUAL": 14,
+     "OTHER": 11
+    },
+    "reader_1_by_class_and_label": {
+     "ST": {
+      "supported": 16,
+      "unsupported": 0
+     },
+     "RW": {
+      "supported": 4,
+      "unsupported": 2
+     },
+     "EXT": {
+      "supported": 17,
+      "unsupported": 24
+     },
+     "NAME": {
+      "supported": 3,
+      "unsupported": 24
+     },
+     "QUAL": {
+      "supported": 6,
+      "unsupported": 8
+     },
+     "OTHER": {
+      "supported": 0,
+      "unsupported": 11
+     }
+    },
+    "reader_1_other_kinds": [
+     {
+      "kind": "a headerless table cell",
+      "label": "unsupported",
+      "claims": 10
+     },
+     {
+      "kind": "depends on the current date",
+      "label": "unsupported",
+      "claims": 1
+     }
+    ],
+    "reader_1_with_an_alternative": 4,
+    "reader_2_classified": 115,
+    "reader_2_by_class": {
+     "ST": 18,
+     "RW": 4,
+     "EXT": 40,
+     "NAME": 26,
+     "QUAL": 14,
+     "OTHER": 13
+    }
+   },
+   "2": {
+    "claims": 25,
+    "judgings": 15,
+    "answers": 7,
+    "reader_1_by_class": {
+     "ST": 6,
+     "RW": 10,
+     "EXT": 5,
+     "NAME": 1,
+     "QUAL": 3,
+     "OTHER": 0
+    },
+    "reader_1_by_class_and_label": {
+     "ST": {
+      "supported": 3,
+      "unsupported": 3
+     },
+     "RW": {
+      "supported": 3,
+      "unsupported": 7
+     },
+     "EXT": {
+      "supported": 0,
+      "unsupported": 5
+     },
+     "NAME": {
+      "supported": 0,
+      "unsupported": 1
+     },
+     "QUAL": {
+      "supported": 0,
+      "unsupported": 3
+     },
+     "OTHER": {
+      "supported": 0,
+      "unsupported": 0
+     }
+    },
+    "reader_1_other_kinds": [],
+    "reader_1_with_an_alternative": 4,
+    "reader_2_classified": 0
+   },
+   "3": {
+    "claims": 55,
+    "judgings": 41,
+    "answers": 16,
+    "reader_1_by_class": {
+     "ST": 37,
+     "RW": 16,
+     "EXT": 2,
+     "NAME": 0,
+     "QUAL": 0,
+     "OTHER": 0
+    },
+    "reader_1_by_class_and_label": {
+     "ST": {
+      "supported": 34,
+      "unsupported": 3
+     },
+     "RW": {
+      "supported": 16,
+      "unsupported": 0
+     },
+     "EXT": {
+      "supported": 1,
+      "unsupported": 1
+     },
+     "NAME": {
+      "supported": 0,
+      "unsupported": 0
+     },
+     "QUAL": {
+      "supported": 0,
+      "unsupported": 0
+     },
+     "OTHER": {
+      "supported": 0,
+      "unsupported": 0
+     }
+    },
+    "reader_1_other_kinds": [],
+    "reader_1_with_an_alternative": 5,
+    "reader_2_classified": 0
+   }
+  },
+  "reader_agreement_batch_1": {
+   "claims_both_classified": 115,
+   "same_class": 108,
+   "same_class_or_an_alternative_of_either": 112,
+   "disagreements": [
+    {
+     "reader_1_id": "W008",
+     "reader_1": "OTHER",
+     "reader_1_alternative": null,
+     "reader_2": "EXT",
+     "reader_2_alternative": "OTHER",
+     "score": 50,
+     "label": "unsupported"
+    },
+    {
+     "reader_1_id": "W054",
+     "reader_1": "NAME",
+     "reader_1_alternative": null,
+     "reader_2": "EXT",
+     "reader_2_alternative": null,
+     "score": 50,
+     "label": "unsupported"
+    },
+    {
+     "reader_1_id": "W048",
+     "reader_1": "RW",
+     "reader_1_alternative": "EXT",
+     "reader_2": "ST",
+     "reader_2_alternative": null,
+     "score": 70,
+     "label": "unsupported"
+    },
+    {
+     "reader_1_id": "W060",
+     "reader_1": "RW",
+     "reader_1_alternative": null,
+     "reader_2": "ST",
+     "reader_2_alternative": null,
+     "score": 70,
+     "label": "unsupported"
+    },
+    {
+     "reader_1_id": "W015",
+     "reader_1": "EXT",
+     "reader_1_alternative": null,
+     "reader_2": "OTHER",
+     "reader_2_alternative": "EXT",
+     "score": 60,
+     "label": "supported"
+    },
+    {
+     "reader_1_id": "W090",
+     "reader_1": "EXT",
+     "reader_1_alternative": null,
+     "reader_2": "OTHER",
+     "reader_2_alternative": "EXT",
+     "score": 60,
+     "label": "supported"
+    },
+    {
+     "reader_1_id": "W066",
+     "reader_1": "EXT",
+     "reader_1_alternative": null,
+     "reader_2": "OTHER",
+     "reader_2_alternative": "EXT",
+     "score": 60,
+     "label": "supported"
+    }
+   ]
+  },
+  "batches_2_and_3": {
+   "claims": 80,
+   "term_in_no_quote": 1,
+   "headerless_cell": 0,
+   "keys_of_those": [
+    "docs-20261016-214710-02abb7/docs-chg-010 (judge-s2)"
+   ]
+  }
+ },
+ "claims": [
+  {
+   "batch": 1,
+   "reader_1_id": "W088",
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "so you pay the standard model pricing for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Standard pricing is implied for geographic profiles; generalization to all is a mild inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "generalization a mild inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "QUAL",
+    "id": "W197"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W011",
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "so you pay the standard model pricing for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Standard pricing is mentioned for Geographic; the inference to 'standard model pricing for calling Region' is loosely supported.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "loosely supported inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W182"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W061",
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote lacks column headers naming Geographic and Global, so the mapping is inferred.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "no column headers naming Geographic and Global"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W132"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W034",
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "the Global cross-Region inference profile is listed as having approximately 10% savings compared with Geographic profiles, which use standard pricing.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "The quote lacks column headers, so assigning Global vs Geographic is inferred.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "quote lacks column headers"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W012"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W020",
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p1",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "so you pay the standard model pricing for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Standard pricing is only loosely tied to the calling Region; it is a reasonable inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W103"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W063",
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "so you pay the standard model pricing for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Price based on calling Region is stated; 'standard model pricing' loosely supported by the Cost row.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "loosely supported"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W090"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W031",
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "so you pay the standard model pricing for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Standard pricing is mentioned for the Geographic column; 'standard model pricing for calling Region' is a mild inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "mild inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W091"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W092",
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p3",
+   "salt": "judge",
+   "claim": 4,
+   "answer_span": "the profile type affects cost",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Savings figure implies cost differences by profile type, but the quote lacks context.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implies cost differences"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "OTHER",
+    "id": "W043"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W072",
+   "key": "docs-20261011-223111-702e87/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "for global profiles they must allow \"aws:RequestedRegion\": \"unspecified\"",
+   "role": "peripheral",
+   "score": 58,
+   "quoted": true,
+   "why": "Quote gives the allow condition but doesn't mention global profiles or SCPs explicitly.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "global profiles, SCPs not mentioned"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W035"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W080",
+   "key": "docs-20261011-223111-702e87/docs-ai-004-p1",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "The Bedrock docs list the cost of Geographic inference as \"Standard pricing\" and Global inference as \"Approximately 10% savings.\"",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "The quote shows the cost row but without headers identifying which column is geographic or global.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "no headers for geographic or global"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W049"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W056",
+   "key": "docs-20261011-223111-702e87/docs-core-017",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "After that date, 1.33 moves into extended support, which runs until July 29, 2027.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Extended support follows end of standard support per quote 2, but the July 29, 2027 end date lacks a column header in the quote.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "end date lacks a column header"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W058"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W100",
+   "key": "docs-20261011-223111-702e87/docs-core-017",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "After that date, 1.33 moves into extended support, which runs until July 29, 2027.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote 2 links extended support to the end of standard support. The July 29, 2027 date has no column header in the quote.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "date has no column header"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W024"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W008",
+   "key": "docs-20261011-223111-702e87/docs-core-017",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "After that date, 1.33 moves into extended support, which runs until July 29, 2027.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Extended support following standard support is implied by quote 2, but the July 29, 2027 end date has no column header in the row.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "end date has no column header"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "OTHER",
+    "id": "W105"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W083",
+   "key": "docs-20261011-223111-702e87/docs-mix-011",
+   "salt": "judge-s3",
+   "claim": 6,
+   "answer_span": "the management account admin still needs IAM permissions to create buckets",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Partly implied since permissions must be granted by IAM, but not explicitly stated for the management account.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "partly implied; not stated for the management account"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "QUAL",
+    "id": "W008"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W018",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+   "role": "core",
+   "score": 72,
+   "quoted": true,
+   "why": "Quote 1 names the quota and quote 2 gives 250,000, but the link between them is implied by the pairing.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "link implied by the pairing"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W109"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W107",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+   "role": "core",
+   "score": 72,
+   "quoted": true,
+   "why": "Quote 1 names the quota and quote 2 gives 250,000, though the two quotes are separate fragments.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": "ST",
+    "note": "separate fragments"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "OTHER",
+    "id": "W059"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W016",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution.",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "Quote 2 gives 250,000 and quote 1 names the quota; together they link the value to the quota, though the value is in a separate quote.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": "ST",
+    "note": "value and name in separate quotes, linked"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "ST",
+    "id": "W193"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W029",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is listed as approximately 10% cheaper than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote gives 10% savings but doesn't name global vs geographic comparison.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "global vs geographic not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "OTHER",
+    "id": "W126"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W051",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is listed as approximately 10% cheaper than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote gives 10% savings but doesn't say it's global vs geographic; the comparison is inferred.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "global vs geographic not said"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "OTHER",
+    "id": "W172"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W071",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is listed as approximately 10% cheaper than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote gives 10% savings but doesn't say global vs geographic comparison.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "global vs geographic not said"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "OTHER",
+    "id": "W083"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W075",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p1",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "so you pay the standard model price for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "'Standard model price' is a mild extrapolation from pricing based on calling Region.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "mild extrapolation"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W003"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W046",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "so you pay the standard model price for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "'Standard model price' is a mild inference from the calling-Region pricing; not explicitly stated.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "mild inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W048"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W095",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "so you pay the standard model price for that calling Region.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "'Standard model price' is a mild extrapolation; quote says price is based on the calling Region.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "mild extrapolation"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W040"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W102",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is actually priced about 10% lower than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote gives ~10% savings but without context naming Global vs Geographic; comparison is inferred.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Global vs Geographic not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "OTHER",
+    "id": "W065"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W012",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is actually priced about 10% lower than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote gives ~10% savings but without context naming Global vs Geographic comparison.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Global vs Geographic not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "OTHER",
+    "id": "W018"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W087",
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "Global cross-Region inference is actually priced about 10% lower than Geographic cross-Region inference.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote gives ~10% savings but doesn't name Global vs Geographic in the quote itself.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Global vs Geographic not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W080"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W115",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Table row with header in quote 2 gives geographic column SCP requirement.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "row with quoted header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W007"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W004",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Second column of SCP row maps to Global per header in quote 2.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "column maps to Global per quoted header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W074"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W007",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Table row with header in quote 2 shows Geographic column requires allowing all destination Regions.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "row with quoted header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W078"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W097",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Header in quote 2 maps the second column to Global; quote 3 gives the SCP value.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "quoted header maps the column"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W067"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W055",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "if you use a Geographic profile, your service control policies (SCPs) must allow all destination Regions in the profile",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Table row with header in quote 2 gives Geographic column SCP requirement.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "row with quoted header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W102"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W049",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "a Global profile requires allowing \"aws:RequestedRegion\": \"unspecified\"",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Table row with header gives Global column SCP requirement.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "row with quoted header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W025"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W085",
+   "key": "docs-20261016-214710-02abb7/docs-ai-004-p1",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Geographic inference is billed at standard pricing, while global inference is listed as approximately 10% savings.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Without headers, the quote doesn't establish which column is geographic or global.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "without headers"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W138"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W028",
+   "key": "docs-20261016-214710-02abb7/docs-ai-038",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Each document in a batch request is limited to 5 KB.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote gives max document size of 5 KB, though not explicitly tied to batch requests.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not tied to batch requests"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W064"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W086",
+   "key": "docs-20261016-214710-02abb7/docs-ai-038",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "Each document in a batch request is limited to 5 KB.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote states max document size 5 KB, though not explicitly tied to batch requests.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not tied to batch requests"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W004"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W025",
+   "key": "docs-20261016-214710-02abb7/docs-ai-038",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Each document in a batch request is limited to 5 KB.",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote states max document size 5 KB.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "quote states max document size"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W023"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W039",
+   "key": "docs-20261016-214710-02abb7/docs-chg-007",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Existing customers can keep using it",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Implied by continued investment, but not explicitly stated that existing customers can keep using it.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implied, not stated"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W033"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W033",
+   "key": "docs-20261016-214710-02abb7/docs-chg-008",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "so an account that has never used Clarify should not expect to be able to start using it",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "A reasonable inference from not open to new customers, hedged with 'Probably not'.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W141"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W026",
+   "key": "docs-20261016-214710-02abb7/docs-chg-008",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "A reasonable inference from closure to new customers, hedged by the answer.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W036"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W114",
+   "key": "docs-20261016-214710-02abb7/docs-chg-008",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "an account that has never used Clarify should not expect to be able to start using it",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Reasonable inference from no longer open to new customers, hedged with 'probably'.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W187"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W101",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote says to explore AgentCore for similar capabilities; 'start with' is a mild extension.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'start with' a mild extension"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W195"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W108",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge",
+   "claim": 5,
+   "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote describes the capability but doesn't name Harness or AgentCore in the quote.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Harness not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W084"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W079",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote suggests exploring AgentCore for similar capabilities; 'start with' is a mild extension.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'start with' a mild extension"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W150"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W017",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote says explore AgentCore for similar capabilities; 'start with' is a mild extension.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'start with' a mild extension"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W162"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W024",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 5,
+   "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote describes the capability but doesn't name 'Harness' or AgentCore explicitly.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Harness not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W038"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W091",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge",
+   "claim": 4,
+   "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000).",
+   "role": "peripheral",
+   "score": 72,
+   "quoted": true,
+   "why": "Quote gives the minimum but without naming Enterprise Support explicitly; context implies it.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Enterprise Support not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W181"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W103",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s2",
+   "claim": 4,
+   "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000).",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote gives the minimum but doesn't name Enterprise Support explicitly; plausible context.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Enterprise Support not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W160"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W068",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s3",
+   "claim": 4,
+   "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000).",
+   "role": "peripheral",
+   "score": 72,
+   "quoted": true,
+   "why": "Quote states the minimum but the 'all' subject is not shown to be Enterprise Support.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "'all' not shown to be Enterprise Support"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "QUAL",
+    "id": "W095"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W111",
+   "key": "docs-20261016-214710-02abb7/docs-chg-025",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "when a PITR-enabled table is deleted, DynamoDB keeps a system backup for 35 days, which is a fixed retention period for that backup.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote says retains for 35 days but lacks context of deleted table and system backup; 'fixed' is not stated.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'fixed' not stated"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W027"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W019",
+   "key": "docs-20261016-214710-02abb7/docs-chg-025",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "when a PITR-enabled table is deleted, DynamoDB keeps a system backup for 35 days, which is a fixed retention period for that backup.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote says retains for 35 days, but lacks context of deletion and system backup; 'fixed' is inferred.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'fixed' inferred; deletion context missing"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W055"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W047",
+   "key": "docs-20261016-214710-02abb7/docs-chg-030",
+   "salt": "judge",
+   "claim": 7,
+   "answer_span": "new functions should use a supported runtime such as nodejs24.x (Node.js 24) or nodejs22.x (Node.js 22).",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Node.js 24 appears with a future deprecation date. No quote mentions nodejs22.x.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "nodejs22.x in no quote"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W039"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W109",
+   "key": "docs-20261016-214710-02abb7/docs-core-002",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "These are forecasted dates for planning and are subject to change.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote supports planning purposes but is truncated; 'subject to change' and 'forecasted' not shown.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'subject to change', 'forecasted' not shown"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": "NAME",
+    "id": "W129"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W067",
+   "key": "docs-20261016-214710-02abb7/docs-core-002",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "These are forecasted dates for planning and are subject to change.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote supports planning purposes but is truncated; 'subject to change' and 'forecasted' are not shown.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'subject to change', 'forecasted' not shown"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": "NAME",
+    "id": "W019"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W053",
+   "key": "docs-20261016-214710-02abb7/docs-core-002",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "These are forecasted dates for planning and are subject to change.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote supports planning purposes but is truncated; 'subject to change' and 'forecasted' not shown.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'subject to change', 'forecasted' not shown"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": "NAME",
+    "id": "W129"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W094",
+   "key": "docs-20261016-214710-02abb7/docs-int-035",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote shows 100 per Region for event buses, but doesn't name the Classic offering or say 'per account'.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Classic offering not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W001"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W106",
+   "key": "docs-20261016-214710-02abb7/docs-int-035",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "The quote gives 100 per Region but does not name the Classic offering or say it is a default.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Classic offering not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W088"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W089",
+   "key": "docs-20261016-214710-02abb7/docs-int-035",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote shows 100 per Region but does not name the Classic offering or 'per account'.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Classic offering not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W153"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W054",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-010",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "You request them through the request process described in the Bedrock quota documentation.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote implies requests exist but doesn't describe the process or documentation location.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "process and documentation location not in the quote (a named source)"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W079"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W104",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-038",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Each document can be up to 5 KB.",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote 3 states the maximum document size is 5 KB.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "quote states the maximum"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W097"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W014",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-038",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Each document can be up to 5 KB.",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote states maximum document size of 5 KB.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "quote states max document size"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W044"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W010",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Existing customers can keep using it",
+   "role": "peripheral",
+   "score": 65,
+   "quoted": true,
+   "why": "Implied by continued investment in availability, but not explicitly stated.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implied by continued investment"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W098"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W030",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "Existing customers can keep using it",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Continued investment implies existing customers can keep using it, though not stated explicitly.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implied, not stated"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W063"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W070",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "Existing customers can keep using it",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Continued investment implies existing customers can keep using it, though not stated explicitly.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implied, not stated"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W063"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W009",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "so an account that has never used it is unlikely to be able to start using it now",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Reasonable inference from closure to new customers, hedged.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W180"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W099",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "an account that has never used it is unlikely to be able to start using it now",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Reasonable inference from not open to new customers, hedged.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W045"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W059",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "so an account that has never used it is unlikely to be able to start using it now",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Reasonable inference from closure to new customers, hedged as 'unlikely'.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "reasonable inference, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W159"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W058",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quotes recommend first-time users read sections including the CLI get-started; 'the' only one is slightly implied.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'the' only one slightly implied"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": "EXT",
+    "id": "W028"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W021",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "start with Amazon Bedrock AgentCore instead",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote suggests exploring AgentCore as alternative; 'start with' is a mild rewording.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT",
+    "note": "'start with' a mild rewording"
+   },
+   "reader_2": {
+    "class": "RW",
+    "alternative": null,
+    "id": "W168"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W045",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quotes recommend first-time users begin with listed sections including the CLI guide; whether it is the sole recommendation is unclear.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "whether it is the sole recommendation"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W096"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W001",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide.",
+   "role": "peripheral",
+   "score": 72,
+   "quoted": true,
+   "why": "Quotes recommend first-time users begin with listed sections, one being the CLI getting started; it's not clearly the sole starting point.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not clearly the sole starting point"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W087"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W035",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+   "role": "core",
+   "score": 65,
+   "quoted": true,
+   "why": "Critical security fixes stated; absence of general bug fixes is an inference, which the answer flags.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "absence of bug fixes inferred"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W149"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W113",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "During extended support, AWS offers critical security fixes but not general bug fixes and security updates",
+   "role": "core",
+   "score": 65,
+   "quoted": true,
+   "why": "Quotes state the contrast, though the 'not' is an inference, which the answer flags.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "the 'not' is an inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W146"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W042",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Yes.",
+   "role": "core",
+   "score": 60,
+   "quoted": true,
+   "why": "Still under standard support follows only if the current date is before 2027; quotes give no current date.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "depends on the current date",
+    "note": "needs the current date"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W042"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W002",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "The quota is adjustable.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Header Adjustable with Yes in the row.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Adjustable header with Yes"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W131"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W044",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "The quota is adjustable.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "The Yes cell under the Adjustable header indicates adjustability.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Yes under the Adjustable header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W006"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W043",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "The quota is adjustable.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Header names Adjustable column and the row has Yes.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Adjustable header with Yes"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W113"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W041",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-030",
+   "salt": "judge-s2",
+   "claim": 5,
+   "answer_span": "Migrate new work to a supported runtime, such as Node.js 24 or 22.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Node.js 24 is shown with a future deprecation date; Node.js 22 is not in any quote.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Node.js 22 in no quote"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W108"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W082",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+   "salt": "judge",
+   "claim": 4,
+   "answer_span": "The limit that does exist is on the number of buckets",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Bucket count limit is stated; 'the limit that does exist' framing is mild inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "framing is mild inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "QUAL",
+    "id": "W163"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W077",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+   "salt": "judge-s2",
+   "claim": 4,
+   "answer_span": "The limit that does exist is on the number of buckets",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "A bucket-count quota is stated; that it's the limit that exists is a mild inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'the limit that exists' a mild inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "QUAL",
+    "id": "W050"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W081",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+   "salt": "judge-s3",
+   "claim": 4,
+   "answer_span": "The limit that does exist is on the number of buckets",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Bucket count limit is stated; that it is the only limit is implied.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "that it is the only limit is implied"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": "EXT",
+    "id": "W125"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W112",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-011",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "To use a different name, you would need to create a new bucket with that name.",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": false,
+   "why": "Quote does not state creating a new bucket, though it is a natural implication.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "natural implication (no quote holds)"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W111"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W050",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-018",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Its end of standard support was March 23, 2026, and its end of extended support is March 23, 2027.",
+   "role": "core",
+   "score": 65,
+   "quoted": true,
+   "why": "Row lacks column headers, but the dates are plausibly the final two columns; the quote is in the extended support table.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "row lacks column headers"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W031"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W013",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-018",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "On March 23, 2027, extended support ends.",
+   "role": "core",
+   "score": 60,
+   "quoted": true,
+   "why": "Last date in row presumed to be end of extended support; header absent.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "header absent"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W016"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W073",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-018",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Its end of standard support was March 23, 2026, and its end of extended support is March 23, 2027.",
+   "role": "core",
+   "score": 65,
+   "quoted": true,
+   "why": "Row gives the dates but headers aren't quoted; the table context in quote 1 suggests meaning, so moderately supported.",
+   "reader_1": {
+    "class": "OTHER",
+    "alternative": null,
+    "other_kind": "a headerless table cell",
+    "note": "headers not quoted"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": null,
+    "id": "W093"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W064",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-028",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "A new DynamoDB table uses on-demand capacity mode by default.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote says on-demand is the default throughput option.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "quote says on-demand is the default"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W077"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W084",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-002",
+   "salt": "judge-s2",
+   "claim": 4,
+   "answer_span": "so it isn't a substitute for the 90-day API history",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Inference from quotes 2 and 3 contrast; Express lacking API history is implied only.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implied only"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W186"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W048",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "Parameter Store does not bill per parameter like Secrets Manager does.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote 3 shows Parameter Store free for standard and billed only for advanced, versus Secrets Manager per secret.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT",
+    "note": "no gap named; a derivation by contrast"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W013"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W060",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge",
+   "claim": 4,
+   "answer_span": "take that from the Systems Manager pricing page.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote refers to pricing page for details.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "quote refers to the pricing page"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W135"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W037",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "Parameter Store does not bill per parameter like Secrets Manager does.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote 3 shows standard tier free and only advanced billed, versus Secrets Manager per secret, implying no uniform per-parameter billing.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implying no per-parameter billing"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "RW",
+    "id": "W154"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W110",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "Parameter Store does not bill per parameter like Secrets Manager does.",
+   "role": "core",
+   "score": 70,
+   "quoted": true,
+   "why": "Quote 3 shows standard is free and only advanced is billed, versus Secrets Manager per secret, implying not per-parameter generally.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "implying not per-parameter"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "RW",
+    "id": "W072"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W036",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "You need to shorten them to 8,192 bytes or less.",
+   "role": "peripheral",
+   "score": 75,
+   "quoted": true,
+   "why": "Follows from the stated maximum length.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "follows from the stated maximum"
+   },
+   "reader_2": {
+    "class": "RW",
+    "alternative": null,
+    "id": "W194"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W052",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "You need to shorten them to 8,192 bytes or less.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Follows from the limit as a consequence.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "follows from the limit"
+   },
+   "reader_2": {
+    "class": "RW",
+    "alternative": null,
+    "id": "W165"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W006",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "You need to shorten them to 8,192 bytes or less.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Follows from the stated limit.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "follows from the stated limit"
+   },
+   "reader_2": {
+    "class": "RW",
+    "alternative": null,
+    "id": "W117"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W003",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Internet access requires a public NAT gateway, which you route to the internet gateway.",
+   "role": "core",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote 2 mentions routing a NAT gateway to the IGW but doesn't say public or that internet access requires it.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "public not in the quote; requirement implied"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "QUAL",
+    "id": "W076"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W040",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "Internet access requires a public NAT gateway, which you route to the internet gateway.",
+   "role": "core",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote 2 says route NAT gateway traffic to the IGW but doesn't name public NAT gateway; the requirement is implied by quote 1.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "public NAT gateway not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W118"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W096",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "A private NAT gateway is for connecting to other VPCs or your on-premises network, through a transit gateway or virtual private gateway.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote 3 supports the transit gateway/virtual private gateway routing, but not explicitly the purpose of connecting to other VPCs or on-premises.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "purpose not explicit"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": "QUAL",
+    "id": "W010"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W005",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Internet access requires a public NAT gateway, which you route to the internet gateway.",
+   "role": "core",
+   "score": 55,
+   "quoted": true,
+   "why": "Quote 2 says route NAT gateway to IGW but doesn't name public NAT gateway; requirement is implied by contrast.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "public NAT gateway not named; requirement implied"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "EXT",
+    "id": "W000"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W069",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+   "salt": "judge",
+   "claim": 6,
+   "answer_span": "so batch translation may suit whole pages better.",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Suggestion inferred from larger limits.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "suggestion inferred"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W037"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W098",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "Whole pages will likely need to be split into smaller requests.",
+   "role": "core",
+   "score": 60,
+   "quoted": true,
+   "why": "Hedged inference from the 10,000-byte limit.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "hedged inference"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W114"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W057",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "Whole pages will likely need to be split into smaller requests.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Inference from the limit; hedged with 'likely'.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "inference from the limit, hedged"
+   },
+   "reader_2": {
+    "class": "EXT",
+    "alternative": null,
+    "id": "W070"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W032",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "because putting dependencies in a layer can increase cold start times, the opposite of what you want.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote 2 states layers can increase cold starts, though not explicitly tied to Go; plausible connection.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not tied to Go"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W041"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W038",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "putting dependencies in a layer can increase cold start times, the opposite of what you want.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote 2 says layers can increase cold start times, though it is not explicitly about Go; the 'opposite of what you want' is plain inference.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not explicitly about Go"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W173"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W074",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "putting dependencies in a layer can increase cold start times, the opposite of what you want.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote says layers can increase cold start times; not Go-specific but reasonably applies.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "not Go-specific"
+   },
+   "reader_2": {
+    "class": "QUAL",
+    "alternative": null,
+    "id": "W190"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W027",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private)",
+   "role": "peripheral",
+   "score": 50,
+   "quoted": true,
+   "why": "Quote implies Public type option but does not mention Private or specifying a type.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Private not mentioned"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": "EXT",
+    "id": "W119"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W076",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Default is supported; the Private option and the specifying step are not in the quote.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Private option not in the quote"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W167"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W065",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+   "role": "peripheral",
+   "score": 70,
+   "quoted": true,
+   "why": "Public default is supported; the Private option and that you specify the type are not stated in the quote.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Private option not stated"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W082"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W105",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "it is adjustable through Service Quotas",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Adjustable is established by the header and Yes, but Service Quotas as the mechanism is not in the quotes.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Service Quotas not in the quotes"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W174"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W023",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "it is adjustable through Service Quotas",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "The Adjustable column says Yes, but no quote mentions Service Quotas.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "no quote mentions Service Quotas"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W071"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W078",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "it is adjustable through Service Quotas",
+   "role": "peripheral",
+   "score": 55,
+   "quoted": true,
+   "why": "Adjustable 'Yes' is supported, but the Service Quotas mechanism is not named in the quotes.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Service Quotas not named"
+   },
+   "reader_2": {
+    "class": "NAME",
+    "alternative": null,
+    "id": "W179"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W022",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "This is the default quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Header shows the column is Default.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Default header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W157"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W062",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "This is the default quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Header 'Default' with the value row shows it's the default.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Default header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W089"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W093",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "This is the default quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Header gives Default column, row value in that column.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "Default header"
+   },
+   "reader_2": {
+    "class": "ST",
+    "alternative": null,
+    "id": "W127"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W015",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "This is a fixed quota per account per Region that cannot be changed.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote 2 says fixed quotas can't be changed, but it doesn't list the WCU quota among them; the link is inferred from the context of quote 1.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "link to the fixed-quota list inferred"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": "EXT",
+    "id": "W170"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W090",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "This is a fixed quota per account per Region that cannot be changed.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote 2 says fixed quotas on 'following entity settings' can't be changed, but the quotes don't show the WCU row is in that list.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "quotes do not show the row is in the list"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": "EXT",
+    "id": "W030"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 1,
+   "reader_1_id": "W066",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "This is a fixed quota per account per Region that cannot be changed.",
+   "role": "peripheral",
+   "score": 60,
+   "quoted": true,
+   "why": "Quote 2 says fixed quotas on 'following entity settings' can't be changed, but doesn't explicitly list the WCU quota among them; link is inferred.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "link to the fixed-quota list inferred"
+   },
+   "reader_2": {
+    "class": "OTHER",
+    "alternative": "EXT",
+    "id": "W145"
+   },
+   "label_supported": true,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X024",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "you can request a higher quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "The quote shows a request-a-higher-quota link for this value.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "request-higher-quota link shown"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X009",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "you can request a higher quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "The quote shows a request-higher-quota link.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "request-higher-quota link shown"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X011",
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "you can request a higher quota",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote shows a request higher quota link.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "request-higher-quota link shown"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X007",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Recommendation follows from closure to new customers.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "recommendation follows"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X002",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "It is the older product and is closed to new customers.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Closed to new customers stated; 'older product' is implied by renaming to Classic.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'older product' implied by the renaming"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X012",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Recommendation follows from the product being closed to new customers.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "recommendation follows"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X017",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "It is the older product and is closed to new customers.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Closed to new customers is stated; 'older product' is implied by 'now ... Classic'.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'older product' implied"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X021",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s2",
+   "claim": 5,
+   "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+   "role": "peripheral",
+   "score": 72,
+   "quoted": true,
+   "why": "Quote describes the capability but doesn't name 'Harness' or AgentCore in the quote.",
+   "reader_1": {
+    "class": "NAME",
+    "alternative": null,
+    "note": "Harness not named"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X006",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Follows from closed to new customers; recommendation is a judgment based on the quote.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT",
+    "note": "recommendation a judgment based on the quote"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X018",
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "It is the older product and is closed to new customers.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Closed to new customers is stated; 'older product' is implied by renaming to Classic.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'older product' implied"
+   },
+   "label_supported": false,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X014",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "No, don't plan on SageMaker Model Monitor for drift detection in a new platform.",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "Recommendation follows from it being closed to new customers.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "recommendation follows"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X023",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "start with Amazon Bedrock AgentCore instead",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "Quote suggests exploring AgentCore as the similar alternative; 'start with' is a mild paraphrase.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT",
+    "note": "'start with' a mild paraphrase"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X016",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "start with Amazon Bedrock AgentCore instead",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "Quote suggests exploring AgentCore as similar-capability alternative; 'start with' is a mild rewording.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT",
+    "note": "'start with' a mild rewording"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X022",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "Standard-tier parameters have no per-parameter charge, and only advanced-tier parameters are billed.",
+   "role": "core",
+   "score": 75,
+   "quoted": true,
+   "why": "Standard no charge, advanced charges apply; 'only' slightly overlooks higher throughput billing.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'only' overlooks throughput billing"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X005",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "If all 500 are standard, the documentation gives no parameter charge.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Standard tier has no additional charge.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "standard tier no additional charge"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X003",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "the estimate depends on which tier they use.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Cost differs by tier.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "cost differs by tier"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X015",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "Standard-tier parameters have no per-parameter charge, and only advanced-tier parameters are billed.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Standard no charge, advanced charges apply; 'only' is slightly strong given higher throughput billing also noted.",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": null,
+    "note": "'only' slightly strong"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X013",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "If all 500 are standard, the documentation gives no parameter charge.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Standard tier is free per the quotes.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "standard tier free"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X019",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "If some or all are advanced, the docs I could reach do not give the per-parameter monthly rate, so take that from the Systems Manager pricing page.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Quote refers to the pricing page for details; the rest is a hedge/advice.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "pricing page referral; rest hedge/advice"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X020",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "Standard-tier parameters have no per-parameter charge, and only advanced-tier parameters are billed.",
+   "role": "core",
+   "score": 80,
+   "quoted": true,
+   "why": "Standard no charge, advanced charges apply; 'only' mostly supported (higher throughput also billed per quote 3).",
+   "reader_1": {
+    "class": "QUAL",
+    "alternative": "RW",
+    "note": "'only' mostly supported"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X004",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "If all 500 are standard, the documentation gives no parameter charge.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Standard tier has no additional charge.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null,
+    "note": "standard tier no additional charge"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X001",
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "If some or all are advanced, the docs I could reach do not give the per-parameter monthly rate, so take that from the Systems Manager pricing page.",
+   "role": "peripheral",
+   "score": 80,
+   "quoted": true,
+   "why": "Hedge plus advice; the pricing page referral is supported by quote 1.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "pricing page referral supported; rest hedge/advice"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X025",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "A 12 KB URL (about 12,288 bytes, using 1 KB = 1,024 bytes) exceeds that limit, so your signed URLs would be too long.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "12,288 > 8,192 follows by arithmetic from the quoted limit.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null,
+    "note": "arithmetic from the quoted limit"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X008",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "For Go, include your dependencies in the deployment package alongside your compiled executable.",
+   "role": "core",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote 3 says include dependencies with the deployment package; 'compiled executable' is a minor addition.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'compiled executable' a minor addition"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 2,
+   "reader_1_id": "X010",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "For Go, include your dependencies in the deployment package alongside your compiled executable.",
+   "role": "peripheral",
+   "score": 85,
+   "quoted": true,
+   "why": "Quote supports including dependencies in the deployment package; 'compiled executable' is a minor addition.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'compiled executable' a minor addition"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y039",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote 1 states manual enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y041",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote 1 directly states manual enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y001",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled (opted in) on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote 1 directly states manual enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y051",
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+   "role": "core",
+   "score": 93,
+   "quoted": true,
+   "why": "Both quotes state routing to non-enabled Regions and that enablement isn't required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y003",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No action is required.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote 3 states no further action is required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y024",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No action is required.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote 3 states no further action is required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y028",
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No action is required.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote 3 states no further action is required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y043",
+   "key": "docs-20261016-214710-02abb7/docs-core-017",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "Amazon EKS standard support for Kubernetes 1.33 ends on July 29, 2026.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Row value in the End of standard support column (header in quote 2) is July 29, 2026.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y023",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Quote directly states inference profiles don't support Provisioned Throughput.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y006",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote directly states inference profiles currently don't support Provisioned Throughput.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y036",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. Amazon Bedrock inference profiles do not support Provisioned Throughput.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Quote directly states inference profiles don't support Provisioned Throughput.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y017",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+   "role": "core",
+   "score": 97,
+   "quoted": true,
+   "why": "Quote directly states no additional routing cost.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y050",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+   "role": "core",
+   "score": 97,
+   "quoted": true,
+   "why": "Quote directly states no additional routing cost.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y008",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. There is no additional routing charge for using cross-Region inference in Amazon Bedrock.",
+   "role": "core",
+   "score": 97,
+   "quoted": true,
+   "why": "Quote directly states no additional routing cost.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y022",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. There is no additional routing fee for cross-Region inference.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote states no additional routing cost; 'fee' and 'cost' are equivalent.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y014",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No. There is no additional routing fee for cross-Region inference.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote states no additional routing cost; fee/cost is plain rewording.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y021",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. There is no additional routing fee for cross-Region inference.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote states no additional routing cost; fee and cost are equivalent.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y013",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote directly states manual Region enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y047",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Quote directly states manual enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y029",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. Destination Regions do not need to be manually enabled on your account for Bedrock cross-Region inference to work.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Quote directly states manual enablement is not required.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y053",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can only receive asynchronous invocations",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Quote directly states the endpoint can only receive asynchronous invocations.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y037",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "so it cannot also serve synchronous real-time requests",
+   "role": "core",
+   "score": 92,
+   "quoted": true,
+   "why": "Only asynchronous invocations implies no synchronous real-time requests.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y005",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s2",
+   "claim": 1,
+   "answer_span": "No.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Only asynchronous invocations implies no synchronous real-time serving.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y027",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "so it cannot also serve synchronous real-time requests.",
+   "role": "core",
+   "score": 93,
+   "quoted": true,
+   "why": "Follows plainly from 'can only receive asynchronous invocations'.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y038",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No. If an endpoint configuration includes an AsyncInferenceConfig object, the endpoint can only receive asynchronous invocations",
+   "role": "core",
+   "score": 97,
+   "quoted": true,
+   "why": "Quote directly states the endpoint can only receive asynchronous invocations.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y015",
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s3",
+   "claim": 1,
+   "answer_span": "so it cannot also serve synchronous real-time requests",
+   "role": "core",
+   "score": 93,
+   "quoted": true,
+   "why": "Follows directly from 'only' asynchronous invocations.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y049",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "No.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote shows 25 in some Regions and 100 in others, so not uniform.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y035",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "No.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote shows 25 in some Regions and 100 in others, so not the same everywhere.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y002",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "No.",
+   "role": "core",
+   "score": 90,
+   "quoted": true,
+   "why": "Quote shows 25 in some Regions and 100 elsewhere, so not the same everywhere.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y004",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "The DynamoDB PITR recovery period is configurable, not fixed at 35 days.",
+   "role": "core",
+   "score": 92,
+   "quoted": true,
+   "why": "Settable between 1 and 35 days means it is not fixed at 35.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y010",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "The 35-day figure is the maximum.",
+   "role": "core",
+   "score": 88,
+   "quoted": true,
+   "why": "Range upper bound of 35 implies maximum.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y030",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "The DynamoDB PITR recovery period is configurable, not fixed at 35 days.",
+   "role": "core",
+   "score": 92,
+   "quoted": true,
+   "why": "Settable between 1 and 35 days means it is not fixed.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y009",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "The 35-day figure is the maximum.",
+   "role": "core",
+   "score": 88,
+   "quoted": true,
+   "why": "Range upper bound of 35 implies maximum.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y011",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "The DynamoDB PITR recovery period is configurable, not fixed at 35 days.",
+   "role": "core",
+   "score": 92,
+   "quoted": true,
+   "why": "Settable between 1 and 35 days implies configurable, not fixed.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y019",
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "The 35-day figure is the maximum.",
+   "role": "core",
+   "score": 88,
+   "quoted": true,
+   "why": "Range upper bound of 35 implies maximum.",
+   "reader_1": {
+    "class": "RW",
+    "alternative": "EXT"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y033",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "The python3.10 Lambda runtime has a projected deprecation date of Oct 31, 2026.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Header and row together show deprecation date Oct 31, 2026; quote 3 says forecasted.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y042",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "Block function create is Jul 29, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Column header and row value match.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y052",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "block function update is Aug 31, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Column header and row value match.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y018",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "The python3.10 Lambda runtime has a projected deprecation date of Oct 31, 2026.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Header and row together give the deprecation date Oct 31, 2026, described as forecasted.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y040",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "Block function create is Jul 29, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Column header and row value match.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y054",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "block function update is Aug 31, 2027.",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Column header and row value match.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y025",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "The python3.10 Lambda runtime has a projected deprecation date of Oct 31, 2026.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Header plus row gives Oct 31, 2026 as deprecation date; quote 3 says forecasted.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y046",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "Block function create is Jul 29, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Header and row column align.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y055",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "block function update is Aug 31, 2027.",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Header and row column align.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y034",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge",
+   "claim": 0,
+   "answer_span": "Amazon EKS standard support for Kubernetes 1.33 ends on July 29, 2026",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Header and row together show the end of standard support for 1.33 is July 29, 2026.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y048",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge",
+   "claim": 3,
+   "answer_span": "which runs until July 29, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Header and row give end of extended support as July 29, 2027.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y031",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "Amazon EKS standard support for Kubernetes 1.33 ends on July 29, 2026",
+   "role": "core",
+   "score": 96,
+   "quoted": true,
+   "why": "Header and row together show 1.33 end of standard support is July 29, 2026.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y007",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge-s3",
+   "claim": 0,
+   "answer_span": "Amazon EKS standard support for Kubernetes 1.33 ends on July 29, 2026",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Header and row together show end of standard support for 1.33 is July 29, 2026.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y016",
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge-s3",
+   "claim": 3,
+   "answer_span": "which runs until July 29, 2027",
+   "role": "peripheral",
+   "score": 93,
+   "quoted": true,
+   "why": "Header and row show end of extended support July 29, 2027.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y026",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-011",
+   "salt": "judge",
+   "claim": 1,
+   "answer_span": "The management account's administrator is not restricted by this SCP, because SCPs don't affect users or roles in the management account.",
+   "role": "core",
+   "score": 95,
+   "quoted": true,
+   "why": "Quote directly states SCPs don't affect management account users or roles.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y032",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-011",
+   "salt": "judge-s2",
+   "claim": 0,
+   "answer_span": "The member-account IAM user cannot create the bucket: an SCP that denies S3 blocks that permission even if the account administrator attaches AdministratorAccess.",
+   "role": "core",
+   "score": 88,
+   "quoted": true,
+   "why": "Quote states a blocked permission cannot be used even with AdministratorAccess; applying to S3 deny and bucket creation is a straightforward inference.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": "RW",
+    "note": "a straightforward inference"
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y044",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s2",
+   "claim": 3,
+   "answer_span": "For Go, include your dependencies in the deployment package alongside your compiled executable.",
+   "role": "core",
+   "score": 88,
+   "quoted": true,
+   "why": "Quote 3 recommends including dependencies with the deployment package; 'compiled executable' is a mild extension.",
+   "reader_1": {
+    "class": "EXT",
+    "alternative": null,
+    "note": "'compiled executable' a mild extension"
+   },
+   "label_supported": false,
+   "named_v5": true,
+   "named_v6": true
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y012",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge",
+   "claim": 2,
+   "answer_span": "it is adjustable (but not through self-service, so you must contact Support to increase it)",
+   "role": "peripheral",
+   "score": 88,
+   "quoted": true,
+   "why": "Header plus Yes/No and the support quote establish this.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y045",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s2",
+   "claim": 2,
+   "answer_span": "it is adjustable (but not through self-service, so you must contact Support to increase it)",
+   "role": "peripheral",
+   "score": 88,
+   "quoted": true,
+   "why": "Yes under Adjustable, No under Self-service, and contact Support guidance.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  },
+  {
+   "batch": 3,
+   "reader_1_id": "Y020",
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s3",
+   "claim": 2,
+   "answer_span": "it is adjustable (but not through self-service, so you must contact Support to increase it)",
+   "role": "peripheral",
+   "score": 88,
+   "quoted": true,
+   "why": "Header plus Yes/No and the contact-support quote support this.",
+   "reader_1": {
+    "class": "ST",
+    "alternative": null
+   },
+   "label_supported": true,
+   "named_v5": false,
+   "named_v6": false
+  }
+ ]
+}

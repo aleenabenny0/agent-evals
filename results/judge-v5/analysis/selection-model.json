@@ -1,0 +1,111 @@
+{
+ "about": "A model of selection on the exploration passes, fitted to revision 1's three saved passes at t = 70 with s off, by scripts/judge_v5_selection_model.py (its docstring states the model in full). An illustration, not a measurement: nothing was judged, and no call was made.",
+ "model": {
+  "judge": "revision 1 at t = 70, s off",
+  "answers_with_an_error_rate": [
+   {
+    "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "label_supported": true,
+    "errors_over_three_passes": 2,
+    "rate": 0.6667,
+    "kind": "false fail"
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "label_supported": false,
+    "errors_over_three_passes": 3,
+    "rate": 1.0,
+    "kind": "false pass"
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+    "label_supported": false,
+    "errors_over_three_passes": 1,
+    "rate": 0.3333,
+    "kind": "false pass"
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+    "label_supported": true,
+    "errors_over_three_passes": 3,
+    "rate": 1.0,
+    "kind": "false fail"
+   }
+  ],
+  "every_other_answer": "never errs",
+  "versions": "K independent copies with the same rates",
+  "seed": 20261029,
+  "rounds": {
+   "per_pass_count": 200000,
+   "per_n_and_k": 50000
+  }
+ },
+ "true_means_per_pass": {
+  "errors": 3.0,
+  "false_fails": 1.6667
+ },
+ "caps_per_pass": {
+  "errors": 2.6666666666666665,
+  "false_fails": 1.3333333333333333,
+  "v2_means": {
+   "errors": 0.6666666666666666,
+   "false_fails": 0.3333333333333333
+  }
+ },
+ "p_one_version_looks_eligible_by_passes": {
+  "1": 0.2228,
+  "2": 0.0995,
+  "3": 0.1996,
+  "6": 0.0722
+ },
+ "choice_among_k_versions": [
+  {
+   "exploration_passes": 1,
+   "versions": 1,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.2209,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.043,
+   "best_looking_errors_minus_true_mean": 0.0025
+  },
+  {
+   "exploration_passes": 1,
+   "versions": 2,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.3951,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.0791,
+   "best_looking_errors_minus_true_mean": -0.3466
+  },
+  {
+   "exploration_passes": 1,
+   "versions": 4,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.6313,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.1255,
+   "best_looking_errors_minus_true_mean": -0.6287
+  },
+  {
+   "exploration_passes": 3,
+   "versions": 1,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.2007,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.0415,
+   "best_looking_errors_minus_true_mean": 0.0013
+  },
+  {
+   "exploration_passes": 3,
+   "versions": 2,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.362,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.0728,
+   "best_looking_errors_minus_true_mean": -0.2121
+  },
+  {
+   "exploration_passes": 3,
+   "versions": 4,
+   "rounds": 50000,
+   "p_any_looks_eligible": 0.5899,
+   "p_chosen_still_eligible_on_3_fresh_passes": 0.1185,
+   "best_looking_errors_minus_true_mean": -0.3856
+  }
+ ]
+}

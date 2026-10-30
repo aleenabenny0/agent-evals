@@ -1,0 +1,1511 @@
+{
+ "about": "v2's two extra passes of the claim judge round's choice step (docs/plans/judge-v5.md, stage A step 5), replayed from the call cache by scripts/judge_v6_figures.py: the request JudgeGrader makes from configs/default.yaml with the responsive question off, under the salts below, answered by the cached reply alone. No call was sent. judge_supported is the verdict the choice step counted; judge_core_supported is recorded where the reply held one.",
+ "judge_version": "2cf75fa03e09",
+ "salts": [
+  "judge-s2",
+  "judge-s3"
+ ],
+ "answers": 125,
+ "verdicts": [
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-001",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p3",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-003-p3",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p3",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-004-p1",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-004-p1",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-005",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-005",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-005",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-005-p3",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-005-p3",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-005-p3",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-010",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-010",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-010",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-017",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-017",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-036",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-036",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-038",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-038",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-038",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-001",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-001",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-001",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-007",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-008",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-008",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-010",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-013",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-013",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-016",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-016",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-022",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-022",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-025",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-025",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-030",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-030",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-030",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-009",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-009",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-011",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-011",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-011",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-017",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-017",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-018",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-018",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-018",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-028",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-028",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-028",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-002",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-020",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-020",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-030",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-030",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-030",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-032",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-032",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-034",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-034",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-034",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-035",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-035",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-011",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-011",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-012",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-016",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-018",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-022",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-023",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-023",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-024",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-042",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-043",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-043",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-049",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-049",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-055",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-056",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-056",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-058",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-077",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s2",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-086",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-090",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+   "salt": "judge-s2",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-001",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-002-p3",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-003-p3",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-003-p3",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-004-p1",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-004-p1",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-005",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-005",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-005",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-005-p3",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-005-p3",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-005-p3",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-010",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-010",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-010",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-017",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-017",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-036",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-036",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-036",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-ai-038",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-ai-038",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-ai-038",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-001",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-001",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-001",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-007",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-008",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-008",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-010",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-010",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-013",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-013",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-016",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-016",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-016",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-022",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-022",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-022",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-025",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-025",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-025",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-chg-030",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-chg-030",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-chg-030",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-009",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-009",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-011",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-011",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-011",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-017",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-017",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-017",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-018",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-018",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-018",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-core-028",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-core-028",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-core-028",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-002",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-020",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-020",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-030",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-030",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-030",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-032",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-032",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-034",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-034",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-int-034",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-int-035",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261016-214710-02abb7/docs-int-035",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-011",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-011",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-012",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": false
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-016",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-016",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-018",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-022",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-023",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-023",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-024",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-042",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-043",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-043",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-049",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-049",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-055",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-055",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-056",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-056",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-058",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-077",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-077",
+   "salt": "judge-s3",
+   "judge_supported": true,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-086",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261011-223111-702e87/docs-mix-090",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  },
+  {
+   "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+   "salt": "judge-s3",
+   "judge_supported": false,
+   "judge_core_supported": true
+  }
+ ]
+}

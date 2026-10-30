@@ -1,0 +1,3984 @@
+{
+ "about": "The figures docs/plans/judge-v6.md cites, recomputed from the records of the claim judge's first round by scripts/judge_v6_figures.py. Nothing was judged anew: every figure re-reads the round's saved replies with the claim judge's own code, and v2's two extra passes are replayed from the call cache with no call to the API.",
+ "inputs_sha256": {
+  "results/judge-v5/pilot.json": "e0309d34259a7943984c7abd99ec3c04962021c95317db7b58be73ba1a9235b3",
+  "results/judge-v5/stage-a-draft.json": "73e6321beadc1d4e79abe56ac66efc1bf7cfd9e4000bac5a4363e05f4c43a2a7",
+  "results/judge-v5/stage-a-rev1.json": "7c8e448213fec7a932f9b60d35141114ae30f7e09b7d869aadf1e886119af6c2",
+  "results/judge-v5/stage-a-rev1.judge-s2.json": "c0b390bc5731cc7e65f18969c1254a90a6e9b1d31c43632b6442ff6261e1835c",
+  "results/judge-v5/stage-a-rev1.judge-s3.json": "45eecc2972b406bc95a8dd3f2c5b7641ae6ec4b6ed5d538b549ae14efb51a56d",
+  "results/judge-v5/stage-a-choice.json": "459d1fcaafe4380128013a2de5c0405a4b8f4b05ef00352d3bb67c1bd16627a7",
+  "results/judge-v5/spend.json": "408b2ae8a338ec1f228980b39ef5d57099e879bbab0e6d8d7c6eb931af6f3016",
+  "configs/judge-v5.yaml": "1543c2468259bcd7afb637661ae6070d1858d2a3df378d1bae7a87480dce000a",
+  "configs/default.yaml": "6beba596249c11637fc533a8cf9ac91f0522fb0a1afa21a991f2e3ea946cb82d"
+ },
+ "grid_under_test": {
+  "t": [
+   64,
+   69,
+   74
+  ],
+  "s": [
+   "off",
+   49,
+   59
+  ],
+  "continuity_cell": "t=70 s=off"
+ },
+ "a_tuning_set_split": {
+  "scope": "The 125 tuning answers as the pass files record them, under v5's named list and v6's (v5's plus the five added cases). The kept set is the named answers labeled supported that v2's stored verdict passes; for each, how many of revision 1's three passes pass it at each cell of the grid under test and at t = 70 with s off.",
+  "named_cases": {
+   "v5": [
+    "docs-ai-001-p2",
+    "docs-ai-004-p3",
+    "docs-ai-007",
+    "docs-chg-004",
+    "docs-chg-007",
+    "docs-chg-008",
+    "docs-chg-022",
+    "docs-core-025",
+    "docs-core-034",
+    "docs-int-014",
+    "docs-int-020",
+    "docs-int-029",
+    "docs-mix-022",
+    "docs-mix-024",
+    "docs-mix-049",
+    "docs-mix-050",
+    "docs-mix-057",
+    "docs-mix-078",
+    "docs-mix-090",
+    "online-d01-085",
+    "online-d02-071",
+    "online-d03-068",
+    "online-d04-030",
+    "online-d04-032",
+    "online-d04-072"
+   ],
+   "added_for_v6": [
+    "docs-ai-003-p1",
+    "docs-ai-003-p3",
+    "docs-chg-010",
+    "docs-mix-042",
+    "docs-mix-058"
+   ],
+   "v6": [
+    "docs-ai-001-p2",
+    "docs-ai-003-p1",
+    "docs-ai-003-p3",
+    "docs-ai-004-p3",
+    "docs-ai-007",
+    "docs-chg-004",
+    "docs-chg-007",
+    "docs-chg-008",
+    "docs-chg-010",
+    "docs-chg-022",
+    "docs-core-025",
+    "docs-core-034",
+    "docs-int-014",
+    "docs-int-020",
+    "docs-int-029",
+    "docs-mix-022",
+    "docs-mix-024",
+    "docs-mix-042",
+    "docs-mix-049",
+    "docs-mix-050",
+    "docs-mix-057",
+    "docs-mix-058",
+    "docs-mix-078",
+    "docs-mix-090",
+    "online-d01-085",
+    "online-d02-071",
+    "online-d03-068",
+    "online-d04-030",
+    "online-d04-032",
+    "online-d04-072"
+   ]
+  },
+  "answers_moved": {
+   "count": 13,
+   "keys": [
+    "docs-20261011-223111-702e87/docs-ai-003-p1",
+    "docs-20261011-223111-702e87/docs-ai-003-p3",
+    "docs-20261011-223111-702e87/docs-chg-010",
+    "docs-20261011-223111-702e87/docs-mix-042",
+    "docs-20261011-223111-702e87/docs-mix-058",
+    "docs-20261016-214710-02abb7/docs-ai-003-p1",
+    "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "docs-20261016-214710-02abb7/docs-chg-010",
+    "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+    "docs-20261017-174739-1c0e8e/docs-ai-003-p3",
+    "docs-20261017-174739-1c0e8e/docs-chg-010",
+    "docs-20261017-174739-1c0e8e/docs-mix-042",
+    "docs-20261017-174739-1c0e8e/docs-mix-058"
+   ]
+  },
+  "splits": {
+   "v5": {
+    "outside_named": {
+     "answers": 106,
+     "labeled_supported": 30,
+     "v2_stored_false_passes": 0,
+     "v2_stored_false_fails": 0
+    },
+    "named": {
+     "answers": 19,
+     "labeled_supported": 4,
+     "v2_stored_false_passes": 6,
+     "v2_stored_false_fails": 3
+    },
+    "kept": {
+     "answers": 1,
+     "keys": [
+      "docs-20261017-174739-1c0e8e/docs-chg-008"
+     ],
+     "rev1_passes_of_three": {
+      "docs-20261017-174739-1c0e8e/docs-chg-008": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 3,
+       "t=74 s=49": 3,
+       "t=74 s=59": 3,
+       "t=70 s=off": 3
+      }
+     }
+    }
+   },
+   "v6": {
+    "outside_named": {
+     "answers": 93,
+     "labeled_supported": 24,
+     "v2_stored_false_passes": 0,
+     "v2_stored_false_fails": 0
+    },
+    "named": {
+     "answers": 32,
+     "labeled_supported": 10,
+     "v2_stored_false_passes": 6,
+     "v2_stored_false_fails": 3
+    },
+    "kept": {
+     "answers": 7,
+     "keys": [
+      "docs-20261016-214710-02abb7/docs-ai-003-p1",
+      "docs-20261017-174739-1c0e8e/docs-ai-003-p1",
+      "docs-20261016-214710-02abb7/docs-ai-003-p3",
+      "docs-20261017-174739-1c0e8e/docs-ai-003-p3",
+      "docs-20261017-174739-1c0e8e/docs-chg-008",
+      "docs-20261017-174739-1c0e8e/docs-chg-010",
+      "docs-20261017-174739-1c0e8e/docs-mix-058"
+     ],
+     "rev1_passes_of_three": {
+      "docs-20261016-214710-02abb7/docs-ai-003-p1": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 3,
+       "t=74 s=49": 3,
+       "t=74 s=59": 3,
+       "t=70 s=off": 3
+      },
+      "docs-20261017-174739-1c0e8e/docs-ai-003-p1": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 3,
+       "t=74 s=49": 3,
+       "t=74 s=59": 3,
+       "t=70 s=off": 3
+      },
+      "docs-20261016-214710-02abb7/docs-ai-003-p3": {
+       "t=64 s=off": 1,
+       "t=64 s=49": 1,
+       "t=64 s=59": 1,
+       "t=69 s=off": 1,
+       "t=69 s=49": 1,
+       "t=69 s=59": 1,
+       "t=74 s=off": 1,
+       "t=74 s=49": 1,
+       "t=74 s=59": 1,
+       "t=70 s=off": 1
+      },
+      "docs-20261017-174739-1c0e8e/docs-ai-003-p3": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 3,
+       "t=74 s=49": 3,
+       "t=74 s=59": 3,
+       "t=70 s=off": 3
+      },
+      "docs-20261017-174739-1c0e8e/docs-chg-008": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 3,
+       "t=74 s=49": 3,
+       "t=74 s=59": 3,
+       "t=70 s=off": 3
+      },
+      "docs-20261017-174739-1c0e8e/docs-chg-010": {
+       "t=64 s=off": 3,
+       "t=64 s=49": 3,
+       "t=64 s=59": 3,
+       "t=69 s=off": 3,
+       "t=69 s=49": 3,
+       "t=69 s=59": 3,
+       "t=74 s=off": 0,
+       "t=74 s=49": 0,
+       "t=74 s=59": 0,
+       "t=70 s=off": 3
+      },
+      "docs-20261017-174739-1c0e8e/docs-mix-058": {
+       "t=64 s=off": 0,
+       "t=64 s=49": 0,
+       "t=64 s=59": 0,
+       "t=69 s=off": 0,
+       "t=69 s=49": 0,
+       "t=69 s=59": 0,
+       "t=74 s=off": 0,
+       "t=74 s=49": 0,
+       "t=74 s=59": 0,
+       "t=70 s=off": 0
+      }
+     }
+    }
+   }
+  }
+ },
+ "b_v2_three_passes": {
+  "scope": "v2's three passes on the 125 tuning answers: its stored verdicts (salt judge, from the pass files' v2_passed) and its two extra passes of the choice step (salts judge-s2 and judge-s3), replayed from the call cache. Errors per pass and summed on both splits. The totals on v5's split are asserted equal to stage-a-choice.json's v2 entry.",
+  "judge_version": "2cf75fa03e09",
+  "replayed_from_cache": {
+   "salts": [
+    "judge-s2",
+    "judge-s3"
+   ],
+   "calls": 250,
+   "replies_without_a_verdict": 0,
+   "stored_salt_check": {
+    "salt": "judge",
+    "replies_in_cache": 125,
+    "misses": 0
+   }
+  },
+  "errors_in_extra_passes": {
+   "judge-s2": [
+    "docs-20261016-214710-02abb7/docs-ai-038",
+    "docs-20261016-214710-02abb7/docs-chg-008",
+    "docs-20261017-174739-1c0e8e/docs-chg-007",
+    "docs-20261017-174739-1c0e8e/docs-chg-008",
+    "docs-20261017-174739-1c0e8e/docs-chg-022",
+    "docs-20261017-174739-1c0e8e/docs-mix-022",
+    "docs-20261017-174739-1c0e8e/docs-mix-049",
+    "docs-20261017-174739-1c0e8e/docs-mix-090"
+   ],
+   "judge-s3": [
+    "docs-20261016-214710-02abb7/docs-ai-002-p1",
+    "docs-20261016-214710-02abb7/docs-chg-008",
+    "docs-20261017-174739-1c0e8e/docs-chg-007",
+    "docs-20261017-174739-1c0e8e/docs-chg-008",
+    "docs-20261017-174739-1c0e8e/docs-chg-022",
+    "docs-20261017-174739-1c0e8e/docs-mix-049",
+    "docs-20261017-174739-1c0e8e/docs-mix-090"
+   ]
+  },
+  "readings": {
+   "v5_outside_named": {
+    "answers": 106,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 0,
+      "false_fails": 1,
+      "errors": 1
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 1,
+      "false_fails": 0,
+      "errors": 1
+     }
+    ],
+    "totals": {
+     "false_passes": 1,
+     "false_fails": 1,
+     "errors": 2
+    },
+    "means": {
+     "false_passes": 0.3333,
+     "false_fails": 0.3333,
+     "errors": 0.6667
+    }
+   },
+   "v5_named": {
+    "answers": 19,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 6,
+      "false_fails": 3,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 3,
+      "false_fails": 4,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 3,
+      "false_fails": 3,
+      "errors": 6
+     }
+    ],
+    "totals": {
+     "false_passes": 12,
+     "false_fails": 10,
+     "errors": 22
+    },
+    "means": {
+     "false_passes": 4.0,
+     "false_fails": 3.3333,
+     "errors": 7.3333
+    }
+   },
+   "v6_outside_named": {
+    "answers": 93,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 0,
+      "false_fails": 1,
+      "errors": 1
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 1,
+      "false_fails": 0,
+      "errors": 1
+     }
+    ],
+    "totals": {
+     "false_passes": 1,
+     "false_fails": 1,
+     "errors": 2
+    },
+    "means": {
+     "false_passes": 0.3333,
+     "false_fails": 0.3333,
+     "errors": 0.6667
+    }
+   },
+   "v6_named": {
+    "answers": 32,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 6,
+      "false_fails": 3,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 3,
+      "false_fails": 4,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 3,
+      "false_fails": 3,
+      "errors": 6
+     }
+    ],
+    "totals": {
+     "false_passes": 12,
+     "false_fails": 10,
+     "errors": 22
+    },
+    "means": {
+     "false_passes": 4.0,
+     "false_fails": 3.3333,
+     "errors": 7.3333
+    }
+   }
+  },
+  "matches_choice_record": true
+ },
+ "c_rev1_errors": {
+  "scope": "Revision 1's three passes. Per pass and summed: false passes and false fails on the 93 and the 32 at every cell of the grid under test and at t = 70 with s off, where the 106 and the 19 are read too. The four answers behind v5's stop: their verdict at t = 70 with s off and their weakest claim under each salt. The own-name check: the verdicts at t = 70 with s off that move when a flag on the name Bedrock inside words of no claim is ignored, on docs-ai-003-p3 (the champion's run) and on any of the 375 judgings.",
+  "errors_by_cell": {
+   "t=64 s=off": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 2,
+      "false_fails": 0,
+      "errors": 2
+     },
+     "means": {
+      "false_passes": 0.6667,
+      "false_fails": 0.0,
+      "errors": 0.6667
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 5,
+       "false_fails": 3,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 6,
+       "false_fails": 4,
+       "errors": 10
+      }
+     ],
+     "totals": {
+      "false_passes": 15,
+      "false_fails": 11,
+      "errors": 26
+     },
+     "means": {
+      "false_passes": 5.0,
+      "false_fails": 3.6667,
+      "errors": 8.6667
+     }
+    }
+   },
+   "t=64 s=49": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 2,
+      "false_fails": 0,
+      "errors": 2
+     },
+     "means": {
+      "false_passes": 0.6667,
+      "false_fails": 0.0,
+      "errors": 0.6667
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 4,
+       "false_fails": 3,
+       "errors": 7
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 2,
+       "false_fails": 4,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      }
+     ],
+     "totals": {
+      "false_passes": 10,
+      "false_fails": 11,
+      "errors": 21
+     },
+     "means": {
+      "false_passes": 3.3333,
+      "false_fails": 3.6667,
+      "errors": 7.0
+     }
+    }
+   },
+   "t=64 s=59": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 0,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 2,
+      "false_fails": 0,
+      "errors": 2
+     },
+     "means": {
+      "false_passes": 0.6667,
+      "false_fails": 0.0,
+      "errors": 0.6667
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 5,
+       "false_fails": 3,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 5,
+       "false_fails": 4,
+       "errors": 9
+      }
+     ],
+     "totals": {
+      "false_passes": 14,
+      "false_fails": 11,
+      "errors": 25
+     },
+     "means": {
+      "false_passes": 4.6667,
+      "false_fails": 3.6667,
+      "errors": 8.3333
+     }
+    }
+   },
+   "t=69 s=off": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 0.0,
+      "errors": 0.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 4,
+       "false_fails": 3,
+       "errors": 7
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 6,
+       "false_fails": 4,
+       "errors": 10
+      }
+     ],
+     "totals": {
+      "false_passes": 14,
+      "false_fails": 11,
+      "errors": 25
+     },
+     "means": {
+      "false_passes": 4.6667,
+      "false_fails": 3.6667,
+      "errors": 8.3333
+     }
+    }
+   },
+   "t=69 s=49": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 0.0,
+      "errors": 0.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 3,
+       "false_fails": 3,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 2,
+       "false_fails": 4,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      }
+     ],
+     "totals": {
+      "false_passes": 9,
+      "false_fails": 11,
+      "errors": 20
+     },
+     "means": {
+      "false_passes": 3.0,
+      "false_fails": 3.6667,
+      "errors": 6.6667
+     }
+    }
+   },
+   "t=69 s=59": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 0.0,
+      "errors": 0.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 4,
+       "false_fails": 3,
+       "errors": 7
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 5,
+       "false_fails": 4,
+       "errors": 9
+      }
+     ],
+     "totals": {
+      "false_passes": 13,
+      "false_fails": 11,
+      "errors": 24
+     },
+     "means": {
+      "false_passes": 4.3333,
+      "false_fails": 3.6667,
+      "errors": 8.0
+     }
+    }
+   },
+   "t=74 s=off": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 3,
+      "errors": 3
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 1.0,
+      "errors": 1.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 4,
+       "errors": 5
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      }
+     ],
+     "totals": {
+      "false_passes": 3,
+      "false_fails": 14,
+      "errors": 17
+     },
+     "means": {
+      "false_passes": 1.0,
+      "false_fails": 4.6667,
+      "errors": 5.6667
+     }
+    }
+   },
+   "t=74 s=49": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 3,
+      "errors": 3
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 1.0,
+      "errors": 1.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 4,
+       "errors": 5
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      }
+     ],
+     "totals": {
+      "false_passes": 3,
+      "false_fails": 14,
+      "errors": 17
+     },
+     "means": {
+      "false_passes": 1.0,
+      "false_fails": 4.6667,
+      "errors": 5.6667
+     }
+    }
+   },
+   "t=74 s=59": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 1,
+       "errors": 1
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 3,
+      "errors": 3
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 1.0,
+      "errors": 1.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 4,
+       "errors": 5
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 1,
+       "false_fails": 5,
+       "errors": 6
+      }
+     ],
+     "totals": {
+      "false_passes": 3,
+      "false_fails": 14,
+      "errors": 17
+     },
+     "means": {
+      "false_passes": 1.0,
+      "false_fails": 4.6667,
+      "errors": 5.6667
+     }
+    }
+   },
+   "t=70 s=off": {
+    "v6_outside_named": {
+     "answers": 93,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      }
+     ],
+     "totals": {
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0
+     },
+     "means": {
+      "false_passes": 0.0,
+      "false_fails": 0.0,
+      "errors": 0.0
+     }
+    },
+    "v6_named": {
+     "answers": 32,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 4,
+       "false_fails": 3,
+       "errors": 7
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 4,
+       "false_fails": 4,
+       "errors": 8
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 6,
+       "false_fails": 4,
+       "errors": 10
+      }
+     ],
+     "totals": {
+      "false_passes": 14,
+      "false_fails": 11,
+      "errors": 25
+     },
+     "means": {
+      "false_passes": 4.6667,
+      "false_fails": 3.6667,
+      "errors": 8.3333
+     }
+    },
+    "v5_outside_named": {
+     "answers": 106,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 1,
+       "false_fails": 1,
+       "errors": 2
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 1,
+       "false_fails": 2,
+       "errors": 3
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 2,
+       "false_fails": 2,
+       "errors": 4
+      }
+     ],
+     "totals": {
+      "false_passes": 4,
+      "false_fails": 5,
+      "errors": 9
+     },
+     "means": {
+      "false_passes": 1.3333,
+      "false_fails": 1.6667,
+      "errors": 3.0
+     }
+    },
+    "v5_named": {
+     "answers": 19,
+     "passes": 3,
+     "per_pass": [
+      {
+       "salt": "judge",
+       "false_passes": 3,
+       "false_fails": 2,
+       "errors": 5
+      },
+      {
+       "salt": "judge-s2",
+       "false_passes": 3,
+       "false_fails": 2,
+       "errors": 5
+      },
+      {
+       "salt": "judge-s3",
+       "false_passes": 4,
+       "false_fails": 2,
+       "errors": 6
+      }
+     ],
+     "totals": {
+      "false_passes": 10,
+      "false_fails": 6,
+      "errors": 16
+     },
+     "means": {
+      "false_passes": 3.3333,
+      "false_fails": 2.0,
+      "errors": 5.3333
+     }
+    }
+   }
+  },
+  "four_answers": {
+   "docs-20261016-214710-02abb7/docs-chg-010": {
+    "label_supported": false,
+    "per_salt": [
+     {
+      "salt": "judge",
+      "fully_supported": true,
+      "weakest_claim_score": 70,
+      "weakest_claim": "Start with Amazon Bedrock AgentCore instead.",
+      "weakest_claim_why": "Quote says to explore AgentCore for similar capabilities; 'start with' is a mild extension.",
+      "claims": [
+       {
+        "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+        "score": 80,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the older product and is closed to new customers.",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+        "score": 70,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the platform AWS points to for capabilities similar to Bedrock Agents Classic.",
+        "score": 90,
+        "quoted": true
+       },
+       {
+        "answer_span": "AgentCore works with open-source frameworks such as Strands Agents and LangGraph",
+        "score": 93,
+        "quoted": true
+       },
+       {
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+        "score": 70,
+        "quoted": true
+       },
+       {
+        "answer_span": "Existing Bedrock Agents customers can keep using the service.",
+        "score": 92,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s2",
+      "fully_supported": true,
+      "weakest_claim_score": 70,
+      "weakest_claim": "Start with Amazon Bedrock AgentCore instead.",
+      "weakest_claim_why": "Quote suggests exploring AgentCore for similar capabilities; 'start with' is a mild extension.",
+      "claims": [
+       {
+        "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+        "score": 80,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the older product and is closed to new customers.",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+        "score": 70,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the platform AWS points to for capabilities similar to Bedrock Agents Classic.",
+        "score": 92,
+        "quoted": true
+       },
+       {
+        "answer_span": "AgentCore works with open-source frameworks such as Strands Agents and LangGraph",
+        "score": 93,
+        "quoted": true
+       },
+       {
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+        "score": 72,
+        "quoted": true
+       },
+       {
+        "answer_span": "Existing Bedrock Agents customers can keep using the service.",
+        "score": 92,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s3",
+      "fully_supported": true,
+      "weakest_claim_score": 70,
+      "weakest_claim": "Start with Amazon Bedrock AgentCore instead.",
+      "weakest_claim_why": "Quote says explore AgentCore for similar capabilities; 'start with' is a mild extension.",
+      "claims": [
+       {
+        "answer_span": "No, I wouldn't start with Amazon Bedrock Agents.",
+        "score": 80,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the older product and is closed to new customers.",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "Start with Amazon Bedrock AgentCore instead.",
+        "score": 70,
+        "quoted": true
+       },
+       {
+        "answer_span": "It is the platform AWS points to for capabilities similar to Bedrock Agents Classic.",
+        "score": 92,
+        "quoted": true
+       },
+       {
+        "answer_span": "AgentCore works with open-source frameworks such as Strands Agents and LangGraph",
+        "score": 93,
+        "quoted": true
+       },
+       {
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+        "score": 70,
+        "quoted": true
+       },
+       {
+        "answer_span": "Existing Bedrock Agents customers can keep using the service.",
+        "score": 90,
+        "quoted": true
+       }
+      ]
+     }
+    ]
+   },
+   "docs-20261017-174739-1c0e8e/docs-mix-042": {
+    "label_supported": false,
+    "per_salt": [
+     {
+      "salt": "judge",
+      "fully_supported": false,
+      "weakest_claim_score": 50,
+      "weakest_claim": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private)",
+      "weakest_claim_why": "Quote implies Public type option but does not mention Private or specifying a type.",
+      "claims": [
+       {
+        "answer_span": "The default connectivity type is Public.",
+        "score": 95,
+        "quoted": true
+       },
+       {
+        "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private)",
+        "score": 50,
+        "quoted": true
+       },
+       {
+        "answer_span": "Public is the default.",
+        "score": 95,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s2",
+      "fully_supported": false,
+      "weakest_claim_score": 60,
+      "weakest_claim": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+      "weakest_claim_why": "Default is supported; the Private option and the specifying step are not in the quote.",
+      "claims": [
+       {
+        "answer_span": "The default connectivity type is Public.",
+        "score": 95,
+        "quoted": true
+       },
+       {
+        "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+        "score": 60,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s3",
+      "fully_supported": true,
+      "weakest_claim_score": 70,
+      "weakest_claim": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+      "weakest_claim_why": "Public default is supported; the Private option and that you specify the type are not stated in the quote.",
+      "claims": [
+       {
+        "answer_span": "The default connectivity type is Public.",
+        "score": 95,
+        "quoted": true
+       },
+       {
+        "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default.",
+        "score": 70,
+        "quoted": true
+       }
+      ]
+     }
+    ]
+   },
+   "docs-20261016-214710-02abb7/docs-ai-003-p3": {
+    "label_supported": true,
+    "per_salt": [
+     {
+      "salt": "judge",
+      "fully_supported": true,
+      "weakest_claim_score": 93,
+      "weakest_claim": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+      "weakest_claim_why": "Both quotes state routing to non-enabled Regions and that enablement isn't required.",
+      "claims": [
+       {
+        "answer_span": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+        "score": 93,
+        "quoted": true
+       },
+       {
+        "answer_span": "The docs state that cross-Region inference can route requests to Regions that aren't manually enabled",
+        "score": 95,
+        "quoted": true
+       },
+       {
+        "answer_span": "manual Region enablement isn't required for it to work",
+        "score": 95,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s2",
+      "fully_supported": false,
+      "weakest_claim_score": 92,
+      "weakest_claim": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+      "weakest_claim_why": "Both quotes directly state that manual enablement isn't required and routing can reach non-enabled Regions.",
+      "claims": [
+       {
+        "answer_span": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+        "score": 92,
+        "quoted": true
+       },
+       {
+        "answer_span": "The docs state that cross-Region inference can route requests to Regions that aren't manually enabled, and that manual Region enablement isn't required for it to work.",
+        "score": 95,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s3",
+      "fully_supported": false,
+      "weakest_claim_score": 90,
+      "weakest_claim": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+      "weakest_claim_why": "Both quotes state that manual enablement isn't needed; Bedrock attribution is from the question context.",
+      "claims": [
+       {
+        "answer_span": "Yes. For Amazon Bedrock cross-Region inference, the destination Region does not need to be manually enabled in your account.",
+        "score": 90,
+        "quoted": true
+       },
+       {
+        "answer_span": "The docs state that cross-Region inference can route requests to Regions that aren't manually enabled",
+        "score": 95,
+        "quoted": true
+       },
+       {
+        "answer_span": "and that manual Region enablement isn't required for it to work.",
+        "score": 95,
+        "quoted": true
+       }
+      ]
+     }
+    ]
+   },
+   "docs-20261017-174739-1c0e8e/docs-mix-058": {
+    "label_supported": true,
+    "per_salt": [
+     {
+      "salt": "judge",
+      "fully_supported": false,
+      "weakest_claim_score": 60,
+      "weakest_claim": "it is adjustable through Service Quotas",
+      "weakest_claim_why": "Adjustable is established by the header and Yes, but Service Quotas as the mechanism is not in the quotes.",
+      "claims": [
+       {
+        "answer_span": "An ALB target group can hold 1,000 targets per Region when the targets are instances or IP addresses.",
+        "score": 88,
+        "quoted": true
+       },
+       {
+        "answer_span": "This is the default quota",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "it is adjustable through Service Quotas",
+        "score": 60,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s2",
+      "fully_supported": false,
+      "weakest_claim_score": 60,
+      "weakest_claim": "it is adjustable through Service Quotas",
+      "weakest_claim_why": "The Adjustable column says Yes, but no quote mentions Service Quotas.",
+      "claims": [
+       {
+        "answer_span": "An ALB target group can hold 1,000 targets per Region when the targets are instances or IP addresses.",
+        "score": 88,
+        "quoted": true
+       },
+       {
+        "answer_span": "This is the default quota",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "it is adjustable through Service Quotas",
+        "score": 60,
+        "quoted": true
+       }
+      ]
+     },
+     {
+      "salt": "judge-s3",
+      "fully_supported": false,
+      "weakest_claim_score": 55,
+      "weakest_claim": "it is adjustable through Service Quotas",
+      "weakest_claim_why": "Adjustable 'Yes' is supported, but the Service Quotas mechanism is not named in the quotes.",
+      "claims": [
+       {
+        "answer_span": "An ALB target group can hold 1,000 targets per Region when the targets are instances or IP addresses.",
+        "score": 88,
+        "quoted": true
+       },
+       {
+        "answer_span": "This is the default quota",
+        "score": 85,
+        "quoted": true
+       },
+       {
+        "answer_span": "it is adjustable through Service Quotas",
+        "score": 55,
+        "quoted": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "own_name_ignored": {
+   "name": "Bedrock",
+   "cell": "t=70 s=off",
+   "judgings": 375,
+   "moved_on_docs_ai_003_p3": [
+    {
+     "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+     "salt": "judge-s2",
+     "from": false,
+     "to": true
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+     "salt": "judge-s3",
+     "from": false,
+     "to": true
+    }
+   ],
+   "moved_on_any_judging": [
+    {
+     "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+     "salt": "judge-s2",
+     "from": false,
+     "to": true
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+     "salt": "judge-s3",
+     "from": false,
+     "to": true
+    }
+   ]
+  }
+ },
+ "d_scores": {
+  "scope": "Revision 1's 375 judgings (125 answers under three salts). Claim scores: every claim's score in the band 50 to 85, the share of them that are multiples of 5, and the off-level values. Weakest claims: judgings whose lowest claim score is 65, 70, 72 or 75, and at 70 by label outside each named list. The sweep: totals over the three passes of false passes and false fails at every whole t from 50 to 90 with s off, on the 106 and on the 93.",
+  "claim_scores_in_band": {
+   "band": [
+    50,
+    85
+   ],
+   "claims": 548,
+   "multiples_of_5": 523,
+   "off_level_values": {
+    "58": 2,
+    "62": 1,
+    "68": 2,
+    "72": 16,
+    "78": 1,
+    "82": 3
+   }
+  },
+  "weakest_claim": {
+   "judgings_at": {
+    "65": 5,
+    "70": 12,
+    "72": 5,
+    "75": 3
+   },
+   "judgings_in_65_to_75": 25,
+   "at_70_by_label": {
+    "v5_outside_named": {
+     "unsupported": 4,
+     "supported": 3
+    },
+    "v6_outside_named": {
+     "supported": 1
+    }
+   }
+  },
+  "t_sweep": {
+   "v5_outside_named": {
+    "answers": 106,
+    "s": "off",
+    "rows": [
+     {
+      "t": 50,
+      "false_passes": 45,
+      "false_fails": 1
+     },
+     {
+      "t": 51,
+      "false_passes": 32,
+      "false_fails": 1
+     },
+     {
+      "t": 52,
+      "false_passes": 32,
+      "false_fails": 1
+     },
+     {
+      "t": 53,
+      "false_passes": 32,
+      "false_fails": 1
+     },
+     {
+      "t": 54,
+      "false_passes": 32,
+      "false_fails": 1
+     },
+     {
+      "t": 55,
+      "false_passes": 32,
+      "false_fails": 1
+     },
+     {
+      "t": 56,
+      "false_passes": 19,
+      "false_fails": 3
+     },
+     {
+      "t": 57,
+      "false_passes": 19,
+      "false_fails": 3
+     },
+     {
+      "t": 58,
+      "false_passes": 19,
+      "false_fails": 3
+     },
+     {
+      "t": 59,
+      "false_passes": 19,
+      "false_fails": 3
+     },
+     {
+      "t": 60,
+      "false_passes": 19,
+      "false_fails": 3
+     },
+     {
+      "t": 61,
+      "false_passes": 6,
+      "false_fails": 5
+     },
+     {
+      "t": 62,
+      "false_passes": 6,
+      "false_fails": 5
+     },
+     {
+      "t": 63,
+      "false_passes": 6,
+      "false_fails": 5
+     },
+     {
+      "t": 64,
+      "false_passes": 6,
+      "false_fails": 5
+     },
+     {
+      "t": 65,
+      "false_passes": 6,
+      "false_fails": 5
+     },
+     {
+      "t": 66,
+      "false_passes": 4,
+      "false_fails": 5
+     },
+     {
+      "t": 67,
+      "false_passes": 4,
+      "false_fails": 5
+     },
+     {
+      "t": 68,
+      "false_passes": 4,
+      "false_fails": 5
+     },
+     {
+      "t": 69,
+      "false_passes": 4,
+      "false_fails": 5
+     },
+     {
+      "t": 70,
+      "false_passes": 4,
+      "false_fails": 5
+     },
+     {
+      "t": 71,
+      "false_passes": 0,
+      "false_fails": 8
+     },
+     {
+      "t": 72,
+      "false_passes": 0,
+      "false_fails": 8
+     },
+     {
+      "t": 73,
+      "false_passes": 0,
+      "false_fails": 11
+     },
+     {
+      "t": 74,
+      "false_passes": 0,
+      "false_fails": 11
+     },
+     {
+      "t": 75,
+      "false_passes": 0,
+      "false_fails": 11
+     },
+     {
+      "t": 76,
+      "false_passes": 0,
+      "false_fails": 13
+     },
+     {
+      "t": 77,
+      "false_passes": 0,
+      "false_fails": 13
+     },
+     {
+      "t": 78,
+      "false_passes": 0,
+      "false_fails": 13
+     },
+     {
+      "t": 79,
+      "false_passes": 0,
+      "false_fails": 13
+     },
+     {
+      "t": 80,
+      "false_passes": 0,
+      "false_fails": 13
+     },
+     {
+      "t": 81,
+      "false_passes": 0,
+      "false_fails": 22
+     },
+     {
+      "t": 82,
+      "false_passes": 0,
+      "false_fails": 22
+     },
+     {
+      "t": 83,
+      "false_passes": 0,
+      "false_fails": 22
+     },
+     {
+      "t": 84,
+      "false_passes": 0,
+      "false_fails": 22
+     },
+     {
+      "t": 85,
+      "false_passes": 0,
+      "false_fails": 22
+     },
+     {
+      "t": 86,
+      "false_passes": 0,
+      "false_fails": 32
+     },
+     {
+      "t": 87,
+      "false_passes": 0,
+      "false_fails": 32
+     },
+     {
+      "t": 88,
+      "false_passes": 0,
+      "false_fails": 32
+     },
+     {
+      "t": 89,
+      "false_passes": 0,
+      "false_fails": 46
+     },
+     {
+      "t": 90,
+      "false_passes": 0,
+      "false_fails": 46
+     }
+    ]
+   },
+   "v6_outside_named": {
+    "answers": 93,
+    "s": "off",
+    "rows": [
+     {
+      "t": 50,
+      "false_passes": 39,
+      "false_fails": 0
+     },
+     {
+      "t": 51,
+      "false_passes": 27,
+      "false_fails": 0
+     },
+     {
+      "t": 52,
+      "false_passes": 27,
+      "false_fails": 0
+     },
+     {
+      "t": 53,
+      "false_passes": 27,
+      "false_fails": 0
+     },
+     {
+      "t": 54,
+      "false_passes": 27,
+      "false_fails": 0
+     },
+     {
+      "t": 55,
+      "false_passes": 27,
+      "false_fails": 0
+     },
+     {
+      "t": 56,
+      "false_passes": 14,
+      "false_fails": 0
+     },
+     {
+      "t": 57,
+      "false_passes": 14,
+      "false_fails": 0
+     },
+     {
+      "t": 58,
+      "false_passes": 14,
+      "false_fails": 0
+     },
+     {
+      "t": 59,
+      "false_passes": 14,
+      "false_fails": 0
+     },
+     {
+      "t": 60,
+      "false_passes": 14,
+      "false_fails": 0
+     },
+     {
+      "t": 61,
+      "false_passes": 2,
+      "false_fails": 0
+     },
+     {
+      "t": 62,
+      "false_passes": 2,
+      "false_fails": 0
+     },
+     {
+      "t": 63,
+      "false_passes": 2,
+      "false_fails": 0
+     },
+     {
+      "t": 64,
+      "false_passes": 2,
+      "false_fails": 0
+     },
+     {
+      "t": 65,
+      "false_passes": 2,
+      "false_fails": 0
+     },
+     {
+      "t": 66,
+      "false_passes": 0,
+      "false_fails": 0
+     },
+     {
+      "t": 67,
+      "false_passes": 0,
+      "false_fails": 0
+     },
+     {
+      "t": 68,
+      "false_passes": 0,
+      "false_fails": 0
+     },
+     {
+      "t": 69,
+      "false_passes": 0,
+      "false_fails": 0
+     },
+     {
+      "t": 70,
+      "false_passes": 0,
+      "false_fails": 0
+     },
+     {
+      "t": 71,
+      "false_passes": 0,
+      "false_fails": 1
+     },
+     {
+      "t": 72,
+      "false_passes": 0,
+      "false_fails": 1
+     },
+     {
+      "t": 73,
+      "false_passes": 0,
+      "false_fails": 3
+     },
+     {
+      "t": 74,
+      "false_passes": 0,
+      "false_fails": 3
+     },
+     {
+      "t": 75,
+      "false_passes": 0,
+      "false_fails": 3
+     },
+     {
+      "t": 76,
+      "false_passes": 0,
+      "false_fails": 5
+     },
+     {
+      "t": 77,
+      "false_passes": 0,
+      "false_fails": 5
+     },
+     {
+      "t": 78,
+      "false_passes": 0,
+      "false_fails": 5
+     },
+     {
+      "t": 79,
+      "false_passes": 0,
+      "false_fails": 5
+     },
+     {
+      "t": 80,
+      "false_passes": 0,
+      "false_fails": 5
+     },
+     {
+      "t": 81,
+      "false_passes": 0,
+      "false_fails": 14
+     },
+     {
+      "t": 82,
+      "false_passes": 0,
+      "false_fails": 14
+     },
+     {
+      "t": 83,
+      "false_passes": 0,
+      "false_fails": 14
+     },
+     {
+      "t": 84,
+      "false_passes": 0,
+      "false_fails": 14
+     },
+     {
+      "t": 85,
+      "false_passes": 0,
+      "false_fails": 14
+     },
+     {
+      "t": 86,
+      "false_passes": 0,
+      "false_fails": 21
+     },
+     {
+      "t": 87,
+      "false_passes": 0,
+      "false_fails": 21
+     },
+     {
+      "t": 88,
+      "false_passes": 0,
+      "false_fails": 21
+     },
+     {
+      "t": 89,
+      "false_passes": 0,
+      "false_fails": 35
+     },
+     {
+      "t": 90,
+      "false_passes": 0,
+      "false_fails": 35
+     }
+    ]
+   }
+  }
+ },
+ "e_skeptic": {
+  "scope": "Revision 1's 375 judgings. The search's confidence on every false pass at t = 70 with s off outside v5's named cases; the highest confidence on a judging of an answer labeled supported that passes at t = 70 with s off, over all 125 answers and outside each named list. The s sweep at t = 70 on the 106 and the 93: totals over the three passes, with the false passes removed and the false fails added against s off. Verdicts that s = 70 and s = 90 change against s off, over the 375 judgings, at t = 70 and at t = 50.",
+  "false_passes_at_t70_v5_outside_named": [
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "salt": "judge",
+    "search_found": true,
+    "confidence": 50,
+    "search_span": "its Harness service lets you define and invoke an agent with a single API call"
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "salt": "judge-s2",
+    "search_found": true,
+    "confidence": 55,
+    "search_span": "its Harness service lets you define and invoke an agent with a single API call"
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "salt": "judge-s3",
+    "search_found": true,
+    "confidence": 55,
+    "search_span": "its Harness service lets you define and invoke an agent with a single API call"
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+    "salt": "judge-s3",
+    "search_found": true,
+    "confidence": 60,
+    "search_span": "you specify one of the connectivity types (Public or Private)"
+   }
+  ],
+  "highest_confidence_on_supported_pass_at_t70": {
+   "all_125": {
+    "confidence": 45,
+    "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+    "salt": "judge-s3"
+   },
+   "v5_outside_named": {
+    "confidence": 45,
+    "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+    "salt": "judge-s3"
+   },
+   "v6_outside_named": {
+    "confidence": 30,
+    "key": "docs-20261016-214710-02abb7/docs-ai-038",
+    "salt": "judge"
+   }
+  },
+  "s_sweep": {
+   "v5_outside_named": {
+    "answers": 106,
+    "t": 70,
+    "s_off": {
+     "false_passes": 4,
+     "false_fails": 5
+    },
+    "rows": [
+     {
+      "s": 30,
+      "false_passes": 0,
+      "false_fails": 13,
+      "false_passes_removed": 4,
+      "false_fails_added": 8
+     },
+     {
+      "s": 35,
+      "false_passes": 0,
+      "false_fails": 8,
+      "false_passes_removed": 4,
+      "false_fails_added": 3
+     },
+     {
+      "s": 40,
+      "false_passes": 0,
+      "false_fails": 8,
+      "false_passes_removed": 4,
+      "false_fails_added": 3
+     },
+     {
+      "s": 45,
+      "false_passes": 0,
+      "false_fails": 6,
+      "false_passes_removed": 4,
+      "false_fails_added": 1
+     },
+     {
+      "s": 49,
+      "false_passes": 0,
+      "false_fails": 5,
+      "false_passes_removed": 4,
+      "false_fails_added": 0
+     },
+     {
+      "s": 50,
+      "false_passes": 0,
+      "false_fails": 5,
+      "false_passes_removed": 4,
+      "false_fails_added": 0
+     },
+     {
+      "s": 55,
+      "false_passes": 1,
+      "false_fails": 5,
+      "false_passes_removed": 3,
+      "false_fails_added": 0
+     },
+     {
+      "s": 59,
+      "false_passes": 3,
+      "false_fails": 5,
+      "false_passes_removed": 1,
+      "false_fails_added": 0
+     },
+     {
+      "s": 60,
+      "false_passes": 3,
+      "false_fails": 5,
+      "false_passes_removed": 1,
+      "false_fails_added": 0
+     },
+     {
+      "s": 65,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 70,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 75,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 80,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 85,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 90,
+      "false_passes": 4,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     }
+    ]
+   },
+   "v6_outside_named": {
+    "answers": 93,
+    "t": 70,
+    "s_off": {
+     "false_passes": 0,
+     "false_fails": 0
+    },
+    "rows": [
+     {
+      "s": 30,
+      "false_passes": 0,
+      "false_fails": 5,
+      "false_passes_removed": 0,
+      "false_fails_added": 5
+     },
+     {
+      "s": 35,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 40,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 45,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 49,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 50,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 55,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 59,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 60,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 65,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 70,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 75,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 80,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 85,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     },
+     {
+      "s": 90,
+      "false_passes": 0,
+      "false_fails": 0,
+      "false_passes_removed": 0,
+      "false_fails_added": 0
+     }
+    ]
+   }
+  },
+  "verdicts_changed_by_s": {
+   "t=70 s=70": 0,
+   "t=70 s=90": 0,
+   "t=50 s=70": 15,
+   "t=50 s=90": 0
+  }
+ },
+ "f_links": {
+  "scope": "The 125 tuning answers' cited quotes as stored (the text the claim judge takes the links out of with without_links), read from the results database: every markdown link or image found by the grader's _LINK pattern and every bare URL found by _URL after the links are removed, by the kind of its target, with whether the link's own text is still in the quote the judge is shown. Then every page of the docs snapshot: the links whose target is the AWS console, and how many of them are a cell reading Yes (the quota tables' adjustable column).",
+  "in_quotes": {
+   "links": 19,
+   "quotes_with_a_link": 18,
+   "answers_with_a_link": 18,
+   "by_kind": {
+    "AWS console": 1,
+    "documentation page": 17,
+    "pricing page": 1
+   },
+   "text_kept_in_quote_shown": 19,
+   "links_found": [
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-ai-001",
+     "quote": 1,
+     "form": "markdown link",
+     "text": "Provisioned Throughput",
+     "target": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-ai-010",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "quota increase request",
+     "target": "https://docs.aws.amazon.com/bedrock/latest/userguide/quotas-increase.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+     "quote": 4,
+     "form": "markdown link",
+     "text": "Get started with the AgentCore CLI",
+     "target": "https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/runtime-get-started-cli.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-core-002",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Runtime deprecation policy",
+     "target": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-core-002",
+     "quote": 3,
+     "form": "markdown link",
+     "text": "Runtime deprecation policy",
+     "target": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html#runtime-support-policy",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-core-011",
+     "quote": 3,
+     "form": "markdown link",
+     "text": "CopyObject",
+     "target": "https://docs.aws.amazon.com/AmazonS3/latest/API/API_CopyObject.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-core-011",
+     "quote": 3,
+     "form": "markdown link",
+     "text": "UploadPartCopy",
+     "target": "https://docs.aws.amazon.com/AmazonS3/latest/API/API_UploadPartCopy.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-int-002",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Step Functions API",
+     "target": "https://docs.aws.amazon.com/step-functions/latest/apireference",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-int-002",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Step Functions API",
+     "target": "https://docs.aws.amazon.com/step-functions/latest/apireference",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-int-002",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Step Functions API",
+     "target": "https://docs.aws.amazon.com/step-functions/latest/apireference",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+     "quote": 1,
+     "form": "markdown link",
+     "text": "AWS Systems Manager Pricing for Parameter Store",
+     "target": "https://aws.amazon.com/systems-manager/pricing/#Parameter_Store",
+     "kind": "pricing page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-int-034",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "CreateRestApi",
+     "target": "https://docs.aws.amazon.com/apigateway/latest/api/API_CreateRestApi.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-int-034",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "CreateRestApi",
+     "target": "https://docs.aws.amazon.com/apigateway/latest/api/API_CreateRestApi.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-int-034",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "CreateRestApi",
+     "target": "https://docs.aws.amazon.com/apigateway/latest/api/API_CreateRestApi.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-mix-016",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Use field-level encryption to help protect sensitive data",
+     "target": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/field-level-encryption.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-055",
+     "quote": 1,
+     "form": "markdown link",
+     "text": "CloudFront flat-rate pricing plans",
+     "target": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/flat-rate-pricing-plan.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-mix-056",
+     "quote": 1,
+     "form": "markdown link",
+     "text": "Use custom URLs by adding alternate domain names (CNAMEs)",
+     "target": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-056",
+     "quote": 1,
+     "form": "markdown link",
+     "text": "Use custom URLs by adding alternate domain names (CNAMEs)",
+     "target": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html",
+     "kind": "documentation page",
+     "text_kept_in_quote_shown": true
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+     "quote": 2,
+     "form": "markdown link",
+     "text": "Yes",
+     "target": "https://console.aws.amazon.com/servicequotas/home/services/elasticloadbalancing/quotas/L-A0D0B863",
+     "kind": "AWS console",
+     "text_kept_in_quote_shown": true
+    }
+   ]
+  },
+  "in_snapshot": {
+   "pages": 334,
+   "pages_with_a_console_link": 65,
+   "console_links": 3570,
+   "yes_cells": 3389,
+   "no_cells": 0,
+   "targets_under_servicequotas": 3469
+  }
+ },
+ "g_events_and_cost": {
+  "scope": "Every distinct judging of the round: the pilot's 60 (20 answers under three salts), the first draft's 125 (its salt judge repeats the pilot's on those 20, the same cached replies) and revision 1's 375. Retries, judge errors, dropped support entries with the span check's reasons, searches naming words not in the answer, and the verdicts that fail only because of a dropped entry, at every cell of v5's grid and of the grid under test. Cost per answer and the output-token share per pass, from the pass files' usage at configs/judge-v5.yaml's pricing; v2's cost per answer from the ledger's choice entry less revision 1's two extra passes, and from its replayed replies' usage at configs/default.yaml's pricing.",
+  "judgings": {
+   "pilot": 60,
+   "draft": 125,
+   "rev1": 375,
+   "distinct": 540
+  },
+  "events": {
+   "retried": 0,
+   "judge_errors": 0,
+   "support_entries": 2393,
+   "dropped_support_entries": 31,
+   "judgings_with_a_dropped_entry": 31,
+   "dropped_for": {
+    "shorter than 3 words": 31
+   },
+   "search_span_missing": 0,
+   "dropped_span_flips_by_cell": {
+    "t=64 s=off": 0,
+    "t=64 s=49": 0,
+    "t=64 s=59": 0,
+    "t=69 s=off": 0,
+    "t=69 s=49": 0,
+    "t=69 s=59": 0,
+    "t=74 s=off": 0,
+    "t=74 s=49": 0,
+    "t=74 s=59": 0,
+    "t=70 s=off": 0,
+    "t=50 s=off": 0,
+    "t=50 s=70": 0,
+    "t=50 s=90": 0,
+    "t=70 s=70": 0,
+    "t=70 s=90": 0,
+    "t=85 s=off": 0,
+    "t=85 s=70": 0,
+    "t=85 s=90": 0
+   }
+  },
+  "cost": {
+   "claim_judge_pricing": {
+    "input_per_mtok": 2.0,
+    "output_per_mtok": 10.0,
+    "cache_write_multiplier": 1.25,
+    "cache_read_multiplier": 0.05
+   },
+   "per_pass": {
+    "pilot": {
+     "judgings": 60,
+     "cost_per_answer_usd": 0.010469,
+     "output_token_share": null,
+     "note": "the pilot's record holds its cost per answer, not its token usage"
+    },
+    "draft judge": {
+     "judgings": 125,
+     "calls": 206,
+     "calls_from_cache": 33,
+     "cost_usd": 1.323549,
+     "cost_per_answer_usd": 0.010588,
+     "output_token_share": 0.7263
+    },
+    "rev1 judge": {
+     "judgings": 125,
+     "calls": 217,
+     "calls_from_cache": 0,
+     "cost_usd": 1.384773,
+     "cost_per_answer_usd": 0.011078,
+     "output_token_share": 0.7146
+    },
+    "rev1 judge-s2": {
+     "judgings": 125,
+     "calls": 211,
+     "calls_from_cache": 0,
+     "cost_usd": 1.315815,
+     "cost_per_answer_usd": 0.010527,
+     "output_token_share": 0.7406
+    },
+    "rev1 judge-s3": {
+     "judgings": 125,
+     "calls": 210,
+     "calls_from_cache": 0,
+     "cost_usd": 1.325725,
+     "cost_per_answer_usd": 0.010606,
+     "output_token_share": 0.7427
+    }
+   },
+   "v2": {
+    "ledger_choice_entry": {
+     "step": "choose rev1:70:off rev1:70:90",
+     "calls": 671,
+     "usd": 3.844295
+    },
+    "claim_judge_calls_in_it": 421,
+    "claim_judge_usd_in_it": 2.64154,
+    "v2_calls": 250,
+    "v2_usd": 1.202755,
+    "cost_per_answer_usd_from_ledger": 0.004811,
+    "cost_per_answer_usd_from_cached_replies": 0.004811
+   }
+  }
+ },
+ "h_fail_rates": {
+  "scope": "The 125 tuning answers: the answers v2's stored verdict passes and its fail rate; revision 1's passes and fail rate under each salt at each grid t, and at t = 70, with s off and with s = 49.",
+  "answers": 125,
+  "v2_stored": {
+   "passes": 37,
+   "fail_rate": 0.704
+  },
+  "rev1": {
+   "t=64 s=off": [
+    {
+     "salt": "judge",
+     "passes": 37,
+     "fail_rate": 0.704
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 35,
+     "fail_rate": 0.72
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 36,
+     "fail_rate": 0.712
+    }
+   ],
+   "t=64 s=49": [
+    {
+     "salt": "judge",
+     "passes": 36,
+     "fail_rate": 0.712
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 33,
+     "fail_rate": 0.736
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 34,
+     "fail_rate": 0.728
+    }
+   ],
+   "t=69 s=off": [
+    {
+     "salt": "judge",
+     "passes": 35,
+     "fail_rate": 0.72
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 34,
+     "fail_rate": 0.728
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 36,
+     "fail_rate": 0.712
+    }
+   ],
+   "t=69 s=49": [
+    {
+     "salt": "judge",
+     "passes": 34,
+     "fail_rate": 0.728
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 32,
+     "fail_rate": 0.744
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 34,
+     "fail_rate": 0.728
+    }
+   ],
+   "t=74 s=off": [
+    {
+     "salt": "judge",
+     "passes": 30,
+     "fail_rate": 0.76
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 29,
+     "fail_rate": 0.768
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 29,
+     "fail_rate": 0.768
+    }
+   ],
+   "t=74 s=49": [
+    {
+     "salt": "judge",
+     "passes": 30,
+     "fail_rate": 0.76
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 29,
+     "fail_rate": 0.768
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 29,
+     "fail_rate": 0.768
+    }
+   ],
+   "t=70 s=off": [
+    {
+     "salt": "judge",
+     "passes": 35,
+     "fail_rate": 0.72
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 34,
+     "fail_rate": 0.728
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 36,
+     "fail_rate": 0.712
+    }
+   ],
+   "t=70 s=49": [
+    {
+     "salt": "judge",
+     "passes": 34,
+     "fail_rate": 0.728
+    },
+    {
+     "salt": "judge-s2",
+     "passes": 32,
+     "fail_rate": 0.744
+    },
+    {
+     "salt": "judge-s3",
+     "passes": 34,
+     "fail_rate": 0.728
+    }
+   ]
+  }
+ },
+ "i_build_check_fitted": {
+  "scope": "The 32 named answers under v6's list, over three passes at t = 70 with s off. Revision 1's errors (judge errors would count, there are none), the errors the proposal's changes would remove on the answers they were written from, and the difference, labeled fitted: a projection on the passes the changes were fitted to, not evidence. Beside it, v2's errors on the same 32 over its stored pass and its two replayed passes.",
+  "label": "fitted",
+  "rev1": {
+   "errors_on_32": 25,
+   "on_v5_named_19": 16,
+   "on_moved_13": 9,
+   "per_pass": [
+    {
+     "salt": "judge",
+     "false_passes": 4,
+     "false_fails": 3,
+     "errors": 7
+    },
+    {
+     "salt": "judge-s2",
+     "false_passes": 4,
+     "false_fails": 4,
+     "errors": 8
+    },
+    {
+     "salt": "judge-s3",
+     "false_passes": 6,
+     "false_fails": 4,
+     "errors": 10
+    }
+   ]
+  },
+  "fixes_claimed": {
+   "per_answer": {
+    "docs-20261016-214710-02abb7/docs-chg-010": {
+     "rev1_errors_over_three_passes": 3,
+     "claimed_fixed": 3
+    },
+    "docs-20261017-174739-1c0e8e/docs-mix-042": {
+     "rev1_errors_over_three_passes": 1,
+     "claimed_fixed": 1
+    },
+    "docs-20261016-214710-02abb7/docs-ai-003-p3": {
+     "rev1_errors_over_three_passes": 2,
+     "claimed_fixed": 2
+    }
+   },
+   "total": 6
+  },
+  "projected_errors_on_32_fitted": 19,
+  "v2": {
+   "errors_on_32": 22,
+   "per_pass": [
+    {
+     "salt": "judge",
+     "false_passes": 6,
+     "false_fails": 3,
+     "errors": 9
+    },
+    {
+     "salt": "judge-s2",
+     "false_passes": 3,
+     "false_fails": 4,
+     "errors": 7
+    },
+    {
+     "salt": "judge-s3",
+     "false_passes": 3,
+     "false_fails": 3,
+     "errors": 6
+    }
+   ]
+  }
+ },
+ "j_reason_rules": {
+  "scope": "Revision 1's 375 judgings at t=70 s=off, with the first reader's classes of the judge's reasons from classes.json (the second reader's classes on batch 1 are not read). Each rule is a verdict per judging, built from the saved scores, the base verdict and the saved classes, nothing judged anew. Per pass and summed: false passes and false fails on the 106 outside v5's named cases, the 93 outside v6's, the 19 v5 names and the 32 v6 names, beside revision 1's totals at the same cell, with every judging whose verdict a rule moves against revision 1's and the classified claims it turned on (claim: the index in the judging's claim table, from 0, as classes.json numbers it). Then the claims of batches 2 and 3 by class, checked against the file's own summary.",
+  "cell": "t=70 s=off",
+  "classes_file": "results/judge-v5/analysis/classes.json",
+  "classes_sha256": "3161fd79a24e2b94dd87763c5e22cd9e2027c9f7da58ff4b9a5531d7001831a0",
+  "reader": "reader_1",
+  "class_legend": {
+   "ST": "stated outright by a quote",
+   "RW": "plain rewording, arithmetic or a unit conversion of what a quote states",
+   "EXT": "an implication or extension beyond the quote",
+   "NAME": "a name or term in no quote",
+   "QUAL": "a qualifier or scope beyond the quote",
+   "OTHER": "another gap, with its kind: a headerless table cell, or a claim that depends on the current date"
+  },
+  "classified_claims": 195,
+  "rev1_totals": {
+   "v5_outside_named": {
+    "answers": 106,
+    "false_passes": 4,
+    "false_fails": 5
+   },
+   "v6_outside_named": {
+    "answers": 93,
+    "false_passes": 0,
+    "false_fails": 0
+   },
+   "v5_named": {
+    "answers": 19,
+    "false_passes": 10,
+    "false_fails": 6
+   },
+   "v6_named": {
+    "answers": 32,
+    "false_passes": 14,
+    "false_fails": 11
+   }
+  },
+  "rules": {
+   "two_type_rule": {
+    "rule": "At t=70 s=off, a judging fails when revision 1 fails it (Assessment.verdict at that cell, the base verdict, flagged items included), or when any classified claim of that judging, in any of the three batches, has the first reader's class NAME (a name or term in no quote) or OTHER of the kind 'a headerless table cell'. Every other judging passes; a claim that was not classified is read as the base verdict reads it.",
+    "readings": {
+     "v5_outside_named": {
+      "answers": 106,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 0,
+        "false_fails": 1,
+        "errors": 1
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 2,
+        "errors": 2
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 2,
+        "errors": 2
+       }
+      ],
+      "totals": {
+       "false_passes": 0,
+       "false_fails": 5,
+       "errors": 5
+      },
+      "means": {
+       "false_passes": 0.0,
+       "false_fails": 1.6667,
+       "errors": 1.6667
+      }
+     },
+     "v6_outside_named": {
+      "answers": 93,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 0,
+        "false_fails": 0,
+        "errors": 0
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 0,
+        "errors": 0
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 0,
+        "errors": 0
+       }
+      ],
+      "totals": {
+       "false_passes": 0,
+       "false_fails": 0,
+       "errors": 0
+      },
+      "means": {
+       "false_passes": 0.0,
+       "false_fails": 0.0,
+       "errors": 0.0
+      }
+     },
+     "v5_named": {
+      "answers": 19,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 2,
+        "false_fails": 2,
+        "errors": 4
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 2,
+        "false_fails": 2,
+        "errors": 4
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 3,
+        "false_fails": 2,
+        "errors": 5
+       }
+      ],
+      "totals": {
+       "false_passes": 7,
+       "false_fails": 6,
+       "errors": 13
+      },
+      "means": {
+       "false_passes": 2.3333,
+       "false_fails": 2.0,
+       "errors": 4.3333
+      }
+     },
+     "v6_named": {
+      "answers": 32,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 2,
+        "false_fails": 3,
+        "errors": 5
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 2,
+        "false_fails": 4,
+        "errors": 6
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 3,
+        "false_fails": 4,
+        "errors": 7
+       }
+      ],
+      "totals": {
+       "false_passes": 7,
+       "false_fails": 11,
+       "errors": 18
+      },
+      "means": {
+       "false_passes": 2.3333,
+       "false_fails": 3.6667,
+       "errors": 6.0
+      }
+     }
+    },
+    "judgings_moved_against_rev1": [
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 5,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 72,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 5,
+        "batch": 2,
+        "score": 72,
+        "class": "NAME",
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 5,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 72,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default."
+       }
+      ]
+     }
+    ]
+   },
+   "categories_only": {
+    "rule": "At t=70 s=off, the classes alone decide: a judging passes only when every claim tied at its lowest score has the first reader's class ST or RW (stated outright, or a plain rewording, arithmetic or a unit conversion of what a quote states); any other class at the lowest score fails it. A judging whose lowest score is above 85 counts as passing and one whose lowest score is below 50 as failing, since those claims were not classified. The base verdict's other parts (flagged items, the search, dropped support entries) are not read.",
+    "readings": {
+     "v5_outside_named": {
+      "answers": 106,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 0,
+        "false_fails": 5,
+        "errors": 5
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 5,
+        "errors": 5
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 4,
+        "errors": 4
+       }
+      ],
+      "totals": {
+       "false_passes": 0,
+       "false_fails": 14,
+       "errors": 14
+      },
+      "means": {
+       "false_passes": 0.0,
+       "false_fails": 4.6667,
+       "errors": 4.6667
+      }
+     },
+     "v6_outside_named": {
+      "answers": 93,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 0,
+        "false_fails": 3,
+        "errors": 3
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 3,
+        "errors": 3
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 2,
+        "errors": 2
+       }
+      ],
+      "totals": {
+       "false_passes": 0,
+       "false_fails": 8,
+       "errors": 8
+      },
+      "means": {
+       "false_passes": 0.0,
+       "false_fails": 2.6667,
+       "errors": 2.6667
+      }
+     },
+     "v5_named": {
+      "answers": 19,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 2,
+        "false_fails": 4,
+        "errors": 6
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 4,
+        "errors": 4
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 4,
+        "errors": 4
+       }
+      ],
+      "totals": {
+       "false_passes": 2,
+       "false_fails": 12,
+       "errors": 14
+      },
+      "means": {
+       "false_passes": 0.6667,
+       "false_fails": 4.0,
+       "errors": 4.6667
+      }
+     },
+     "v6_named": {
+      "answers": 32,
+      "passes": 3,
+      "per_pass": [
+       {
+        "salt": "judge",
+        "false_passes": 2,
+        "false_fails": 6,
+        "errors": 8
+       },
+       {
+        "salt": "judge-s2",
+        "false_passes": 0,
+        "false_fails": 6,
+        "errors": 6
+       },
+       {
+        "salt": "judge-s3",
+        "false_passes": 0,
+        "false_fails": 6,
+        "errors": 6
+       }
+      ],
+      "totals": {
+       "false_passes": 2,
+       "false_fails": 18,
+       "errors": 20
+      },
+      "means": {
+       "false_passes": 0.6667,
+       "false_fails": 6.0,
+       "errors": 6.6667
+      }
+     }
+    },
+    "judgings_moved_against_rev1": [
+     {
+      "key": "docs-20261016-214710-02abb7/docs-ai-038",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "QUAL",
+        "answer_span": "Each document in a batch request is limited to 5 KB."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-008",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "so an account that has never used Clarify should not expect to be able to start using it"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "so an account that has never used it is unlikely to be able to start using it now"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Start with Amazon Bedrock AgentCore instead."
+       },
+       {
+        "claim": 5,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "QUAL",
+        "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 72,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-022",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": false,
+      "rule": true,
+      "weakest_score": 90,
+      "deciding_claims": []
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "The limit that does exist is on the number of buckets"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+      "salt": "judge",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 80,
+        "class": "QUAL",
+        "answer_span": "because putting dependencies in a layer can increase cold start times, the opposite of what you want."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261011-223111-702e87/docs-mix-055",
+      "salt": "judge",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 0,
+        "batch": 1,
+        "score": 72,
+        "class": "EXT",
+        "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": false,
+      "rule": true,
+      "weakest_score": 92,
+      "deciding_claims": []
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-ai-038",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "QUAL",
+        "answer_span": "Each document in a batch request is limited to 5 KB."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-008",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 75,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 75,
+        "class": "EXT",
+        "answer_span": "an account that has never used Clarify should not expect to be able to start using it"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "an account that has never used it is unlikely to be able to start using it now"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Start with Amazon Bedrock AgentCore instead."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 70,
+        "class": "RW",
+        "answer_span": "start with Amazon Bedrock AgentCore instead"
+       },
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "QUAL",
+        "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "The limit that does exist is on the number of buckets"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 0,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Parameter Store does not bill per parameter like Secrets Manager does."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+      "salt": "judge-s2",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 80,
+        "class": "QUAL",
+        "answer_span": "putting dependencies in a layer can increase cold start times, the opposite of what you want."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261011-223111-702e87/docs-mix-055",
+      "salt": "judge-s2",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 0,
+        "batch": 1,
+        "score": 72,
+        "class": "EXT",
+        "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": false,
+      "rule": true,
+      "weakest_score": 90,
+      "deciding_claims": []
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Existing customers can keep using it"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-008",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 80,
+        "class": "EXT",
+        "answer_span": "an account that has never used Clarify should not expect to be able to start using it"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-008",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 85,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 85,
+        "class": "EXT",
+        "answer_span": "so an account that has never used it is unlikely to be able to start using it now"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-010",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Start with Amazon Bedrock AgentCore instead."
+       },
+       {
+        "claim": 5,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 72,
+        "class": "QUAL",
+        "answer_span": "AgentCore's docs recommend first-time users begin with the AgentCore CLI getting-started guide."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261016-214710-02abb7/docs-chg-022",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 72,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 72,
+        "class": "NAME",
+        "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000)."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-core-009",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 4,
+        "batch": 1,
+        "score": 70,
+        "class": "QUAL",
+        "answer_span": "The limit that does exist is on the number of buckets"
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 0,
+        "batch": 1,
+        "score": 70,
+        "class": "EXT",
+        "answer_span": "Parameter Store does not bill per parameter like Secrets Manager does."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": true,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 80,
+      "deciding_claims": [
+       {
+        "claim": 2,
+        "batch": 1,
+        "score": 80,
+        "class": "QUAL",
+        "answer_span": "putting dependencies in a layer can increase cold start times, the opposite of what you want."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+      "salt": "judge-s3",
+      "label_supported": false,
+      "named_v5": false,
+      "named_v6": true,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 70,
+      "deciding_claims": [
+       {
+        "claim": 1,
+        "batch": 1,
+        "score": 70,
+        "class": "NAME",
+        "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private), and Public is the default."
+       }
+      ]
+     },
+     {
+      "key": "docs-20261011-223111-702e87/docs-mix-055",
+      "salt": "judge-s3",
+      "label_supported": true,
+      "named_v5": false,
+      "named_v6": false,
+      "rev1": true,
+      "rule": false,
+      "weakest_score": 75,
+      "deciding_claims": [
+       {
+        "claim": 0,
+        "batch": 1,
+        "score": 75,
+        "class": "EXT",
+        "answer_span": "The default quota is 250,000 requests per second per CloudFront distribution."
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "batches_2_and_3": {
+   "claims": 80,
+   "by_class": {
+    "ST": 43,
+    "RW": 26,
+    "EXT": 7,
+    "NAME": 1,
+    "QUAL": 3,
+    "OTHER": 0
+   },
+   "by_batch_and_class": {
+    "2": {
+     "EXT": 5,
+     "NAME": 1,
+     "QUAL": 3,
+     "RW": 10,
+     "ST": 6
+    },
+    "3": {
+     "EXT": 2,
+     "RW": 16,
+     "ST": 37
+    }
+   },
+   "term_in_no_quote": [
+    {
+     "claim": 5,
+     "batch": 2,
+     "score": 72,
+     "class": "NAME",
+     "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+     "key": "docs-20261016-214710-02abb7/docs-chg-010",
+     "salt": "judge-s2"
+    }
+   ],
+   "headerless_cell": [],
+   "matches_classes_summary": true
+  }
+ }
+}
