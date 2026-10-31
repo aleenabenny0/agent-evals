@@ -47,7 +47,7 @@ from pydantic import BaseModel, Field, ValidationError
 from rich.progress import BarColumn, Progress, TextColumn
 
 from agent_evals.config import Config, JudgeConfig, load_config
-from agent_evals.graders.claim_judge import S_GRID, T_GRID, Assessment, ClaimJudgeGrader
+from agent_evals.graders.claim_judge import Assessment, ClaimJudgeGrader
 from agent_evals.graders.judge import JudgeGrader
 from agent_evals.harness.cache import CallCache, sha256_text
 from agent_evals.harness.llm import AnthropicClient, LLMClient
@@ -124,8 +124,12 @@ SALTS = ("judge", "judge-s2", "judge-s3")  # a pass each; the first is the store
 PILOT_PER_RUN = (7, 7, 6)
 PILOT_ANSWERS = sum(PILOT_PER_RUN)  # 20
 PILOT_SEED = "judge-v5-pilot"
-# The grid (step 2), in its order; T_GRID and S_GRID are the claim judge's own, which refuses
-# any other t or s. An s of None turns the skeptic's search off.
+# The grid (step 2), in its order: the v5 round's own, frozen here when judge v6 moved the claim
+# judge's grid (graders/claim_judge.py, 2026-10-31), so that the round's saved passes read as they
+# were judged. The round is over: the claim judge now refuses these cells, so this script's paid
+# commands refuse too, and it is kept to read its records. An s of None turns the search off.
+T_GRID = (50, 70, 85)
+S_GRID: tuple[int | None, ...] = (None, 70, 90)
 CELLS: tuple[tuple[int, int | None], ...] = tuple((t, s) for t in T_GRID for s in S_GRID)
 S_ORDER = {None: 0, 90: 1, 70: 2}  # step 4's tie order: s off before 90 before 70
 # The first draft, which the pilot judges (step 1), and at most three revisions (step 2).

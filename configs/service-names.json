@@ -1,0 +1,1388 @@
+{
+ "about": "The cited services' names for judge v6 (docs/plans/judge-v6.md, change 2), by the URL path segment of the guide that documents them, and by page path for the General Reference; each name with its source (title, abbreviation, short, hand). Built by scripts/service_names.py from the docs snapshot's page titles; the judge never sees a URL, and the grader reads this file by a citation's URL path. Its hash is part of the judge's version.",
+ "snapshot": "data/snapshots/aws-docs/pages.jsonl",
+ "snapshot_sha256": "667ac5c3d627bbc2bc4d77378eb017c5a6697186706796eb11ae0dc4a8e1f144",
+ "pages_in_snapshot": 334,
+ "publisher": [
+  "AWS",
+  "Amazon"
+ ],
+ "segments": {
+  "AWSCloudFormation": [
+   {
+    "name": "AWS CloudFormation",
+    "source": "title"
+   },
+   {
+    "name": "CloudFormation",
+    "source": "short"
+   }
+  ],
+  "AWSEC2": [
+   {
+    "name": "Amazon Elastic Compute Cloud",
+    "source": "title"
+   },
+   {
+    "name": "Elastic Compute Cloud",
+    "source": "short"
+   },
+   {
+    "name": "Amazon EC2",
+    "source": "hand"
+   },
+   {
+    "name": "EC2",
+    "source": "short"
+   }
+  ],
+  "AWSSimpleQueueService": [
+   {
+    "name": "Amazon Simple Queue Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Queue Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon SQS",
+    "source": "hand"
+   },
+   {
+    "name": "SQS",
+    "source": "short"
+   }
+  ],
+  "AmazonCloudFront": [
+   {
+    "name": "Amazon CloudFront",
+    "source": "title"
+   },
+   {
+    "name": "CloudFront",
+    "source": "short"
+   }
+  ],
+  "AmazonCloudWatch": [
+   {
+    "name": "Amazon CloudWatch",
+    "source": "title"
+   },
+   {
+    "name": "CloudWatch",
+    "source": "short"
+   },
+   {
+    "name": "Amazon CloudWatch Logs",
+    "source": "title"
+   },
+   {
+    "name": "CloudWatch Logs",
+    "source": "short"
+   }
+  ],
+  "AmazonECR": [
+   {
+    "name": "Amazon ECR",
+    "source": "title"
+   },
+   {
+    "name": "ECR",
+    "source": "short"
+   }
+  ],
+  "AmazonECS": [
+   {
+    "name": "Amazon Elastic Container Service",
+    "source": "title"
+   },
+   {
+    "name": "Elastic Container Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon ECS",
+    "source": "hand"
+   },
+   {
+    "name": "ECS",
+    "source": "short"
+   }
+  ],
+  "AmazonElastiCache": [
+   {
+    "name": "Amazon ElastiCache",
+    "source": "title"
+   },
+   {
+    "name": "ElastiCache",
+    "source": "short"
+   }
+  ],
+  "AmazonRDS": [
+   {
+    "name": "Amazon Relational Database Service",
+    "source": "title"
+   },
+   {
+    "name": "Relational Database Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon Aurora",
+    "source": "title"
+   },
+   {
+    "name": "Aurora",
+    "source": "short"
+   },
+   {
+    "name": "Amazon RDS",
+    "source": "abbreviation"
+   },
+   {
+    "name": "RDS",
+    "source": "short"
+   }
+  ],
+  "AmazonS3": [
+   {
+    "name": "Amazon Simple Storage Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Storage Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon S3",
+    "source": "hand"
+   },
+   {
+    "name": "S3",
+    "source": "short"
+   }
+  ],
+  "IAM": [
+   {
+    "name": "AWS Identity and Access Management",
+    "source": "title"
+   },
+   {
+    "name": "Identity and Access Management",
+    "source": "short"
+   },
+   {
+    "name": "IAM",
+    "source": "hand"
+   }
+  ],
+  "Route53": [
+   {
+    "name": "Amazon Route 53",
+    "source": "title"
+   },
+   {
+    "name": "Route 53",
+    "source": "short"
+   }
+  ],
+  "STS": [
+   {
+    "name": "AWS Security Token Service",
+    "source": "title"
+   },
+   {
+    "name": "Security Token Service",
+    "source": "short"
+   },
+   {
+    "name": "AWS STS",
+    "source": "hand"
+   },
+   {
+    "name": "STS",
+    "source": "short"
+   }
+  ],
+  "acm": [
+   {
+    "name": "AWS Certificate Manager",
+    "source": "title"
+   },
+   {
+    "name": "Certificate Manager",
+    "source": "short"
+   },
+   {
+    "name": "ACM",
+    "source": "hand"
+   }
+  ],
+  "amazon-mq": [
+   {
+    "name": "Amazon MQ",
+    "source": "title"
+   },
+   {
+    "name": "MQ",
+    "source": "short"
+   }
+  ],
+  "amazondynamodb": [
+   {
+    "name": "Amazon DynamoDB",
+    "source": "title"
+   },
+   {
+    "name": "DynamoDB",
+    "source": "short"
+   }
+  ],
+  "amazonglacier": [
+   {
+    "name": "Amazon Glacier",
+    "source": "title"
+   },
+   {
+    "name": "Glacier",
+    "source": "short"
+   },
+   {
+    "name": "S3 Glacier",
+    "source": "hand"
+   }
+  ],
+  "amazonq": [
+   {
+    "name": "Amazon Q Developer",
+    "source": "title"
+   },
+   {
+    "name": "Q Developer",
+    "source": "short"
+   },
+   {
+    "name": "Amazon Q Business",
+    "source": "title"
+   },
+   {
+    "name": "Q Business",
+    "source": "short"
+   }
+  ],
+  "amplify": [
+   {
+    "name": "AWS Amplify Hosting",
+    "source": "title"
+   },
+   {
+    "name": "Amplify Hosting",
+    "source": "short"
+   }
+  ],
+  "apigateway": [
+   {
+    "name": "Amazon API Gateway",
+    "source": "title"
+   },
+   {
+    "name": "API Gateway",
+    "source": "short"
+   }
+  ],
+  "apprunner": [
+   {
+    "name": "AWS App Runner",
+    "source": "title"
+   },
+   {
+    "name": "App Runner",
+    "source": "short"
+   }
+  ],
+  "appsync": [
+   {
+    "name": "AWS AppSync GraphQL",
+    "source": "title"
+   },
+   {
+    "name": "AppSync GraphQL",
+    "source": "short"
+   }
+  ],
+  "athena": [
+   {
+    "name": "Amazon Athena",
+    "source": "title"
+   },
+   {
+    "name": "Athena",
+    "source": "short"
+   }
+  ],
+  "autoscaling": [
+   {
+    "name": "Amazon EC2 Auto Scaling",
+    "source": "title"
+   },
+   {
+    "name": "EC2 Auto Scaling",
+    "source": "short"
+   }
+  ],
+  "aws-backup": [
+   {
+    "name": "AWS Backup",
+    "source": "title"
+   },
+   {
+    "name": "Backup",
+    "source": "short"
+   }
+  ],
+  "awscloudtrail": [
+   {
+    "name": "AWS CloudTrail",
+    "source": "title"
+   },
+   {
+    "name": "CloudTrail",
+    "source": "short"
+   }
+  ],
+  "awssupport": [
+   {
+    "name": "AWS Support",
+    "source": "title"
+   },
+   {
+    "name": "Support",
+    "source": "short"
+   }
+  ],
+  "batch": [
+   {
+    "name": "AWS Batch",
+    "source": "title"
+   },
+   {
+    "name": "Batch",
+    "source": "short"
+   }
+  ],
+  "bedrock": [
+   {
+    "name": "Amazon Bedrock",
+    "source": "title"
+   },
+   {
+    "name": "Bedrock",
+    "source": "short"
+   }
+  ],
+  "bedrock-agentcore": [
+   {
+    "name": "Amazon Bedrock AgentCore",
+    "source": "title"
+   },
+   {
+    "name": "Bedrock AgentCore",
+    "source": "short"
+   },
+   {
+    "name": "AgentCore",
+    "source": "hand"
+   }
+  ],
+  "cdk": [
+   {
+    "name": "AWS Cloud Development Kit",
+    "source": "title"
+   },
+   {
+    "name": "Cloud Development Kit",
+    "source": "short"
+   },
+   {
+    "name": "AWS CDK",
+    "source": "abbreviation"
+   },
+   {
+    "name": "CDK",
+    "source": "short"
+   }
+  ],
+  "cloud9": [
+   {
+    "name": "AWS Cloud9",
+    "source": "title"
+   },
+   {
+    "name": "Cloud9",
+    "source": "short"
+   }
+  ],
+  "codebuild": [
+   {
+    "name": "AWS CodeBuild",
+    "source": "title"
+   },
+   {
+    "name": "CodeBuild",
+    "source": "short"
+   }
+  ],
+  "codecommit": [
+   {
+    "name": "AWS CodeCommit",
+    "source": "title"
+   },
+   {
+    "name": "CodeCommit",
+    "source": "short"
+   }
+  ],
+  "codedeploy": [
+   {
+    "name": "AWS CodeDeploy",
+    "source": "title"
+   },
+   {
+    "name": "CodeDeploy",
+    "source": "short"
+   }
+  ],
+  "codepipeline": [
+   {
+    "name": "AWS CodePipeline",
+    "source": "title"
+   },
+   {
+    "name": "CodePipeline",
+    "source": "short"
+   }
+  ],
+  "cognito": [
+   {
+    "name": "Amazon Cognito",
+    "source": "title"
+   },
+   {
+    "name": "Cognito",
+    "source": "short"
+   }
+  ],
+  "comprehend": [
+   {
+    "name": "Amazon Comprehend",
+    "source": "title"
+   },
+   {
+    "name": "Comprehend",
+    "source": "short"
+   }
+  ],
+  "config": [
+   {
+    "name": "AWS Config",
+    "source": "title"
+   },
+   {
+    "name": "Config",
+    "source": "short"
+   }
+  ],
+  "controltower": [
+   {
+    "name": "AWS Control Tower",
+    "source": "title"
+   },
+   {
+    "name": "Control Tower",
+    "source": "short"
+   }
+  ],
+  "cost-management": [
+   {
+    "name": "AWS Cost Management",
+    "source": "title"
+   },
+   {
+    "name": "Cost Management",
+    "source": "short"
+   },
+   {
+    "name": "Cost Explorer",
+    "source": "hand"
+   }
+  ],
+  "datasync": [
+   {
+    "name": "AWS DataSync",
+    "source": "title"
+   },
+   {
+    "name": "DataSync",
+    "source": "short"
+   }
+  ],
+  "directconnect": [
+   {
+    "name": "AWS Direct Connect",
+    "source": "title"
+   },
+   {
+    "name": "Direct Connect",
+    "source": "short"
+   }
+  ],
+  "dlami": [
+   {
+    "name": "AWS Deep Learning AMIs",
+    "source": "title"
+   },
+   {
+    "name": "Deep Learning AMIs",
+    "source": "short"
+   }
+  ],
+  "dms": [
+   {
+    "name": "AWS Database Migration Service",
+    "source": "title"
+   },
+   {
+    "name": "Database Migration Service",
+    "source": "short"
+   },
+   {
+    "name": "AWS DMS",
+    "source": "hand"
+   },
+   {
+    "name": "DMS",
+    "source": "short"
+   }
+  ],
+  "documentdb": [
+   {
+    "name": "Amazon DocumentDB",
+    "source": "title"
+   },
+   {
+    "name": "DocumentDB",
+    "source": "short"
+   }
+  ],
+  "ebs": [
+   {
+    "name": "Amazon EBS",
+    "source": "title"
+   },
+   {
+    "name": "EBS",
+    "source": "short"
+   }
+  ],
+  "ec2": [
+   {
+    "name": "Amazon EC2",
+    "source": "title"
+   },
+   {
+    "name": "EC2",
+    "source": "short"
+   }
+  ],
+  "efs": [
+   {
+    "name": "Amazon Elastic File System",
+    "source": "title"
+   },
+   {
+    "name": "Elastic File System",
+    "source": "short"
+   },
+   {
+    "name": "Amazon EFS",
+    "source": "hand"
+   },
+   {
+    "name": "EFS",
+    "source": "short"
+   }
+  ],
+  "eks": [
+   {
+    "name": "Amazon EKS",
+    "source": "title"
+   },
+   {
+    "name": "EKS",
+    "source": "short"
+   }
+  ],
+  "elasticbeanstalk": [
+   {
+    "name": "AWS Elastic Beanstalk",
+    "source": "title"
+   },
+   {
+    "name": "Elastic Beanstalk",
+    "source": "short"
+   }
+  ],
+  "elasticloadbalancing": [
+   {
+    "name": "Elastic Load Balancing",
+    "source": "title"
+   },
+   {
+    "name": "ELB",
+    "source": "hand"
+   }
+  ],
+  "emr": [
+   {
+    "name": "Amazon EMR",
+    "source": "title"
+   },
+   {
+    "name": "EMR",
+    "source": "short"
+   }
+  ],
+  "eventbridge": [
+   {
+    "name": "Amazon EventBridge",
+    "source": "title"
+   },
+   {
+    "name": "EventBridge",
+    "source": "short"
+   }
+  ],
+  "filegateway": [
+   {
+    "name": "AWS Storage Gateway",
+    "source": "title"
+   },
+   {
+    "name": "Storage Gateway",
+    "source": "short"
+   }
+  ],
+  "firehose": [
+   {
+    "name": "Amazon Data Firehose",
+    "source": "title"
+   },
+   {
+    "name": "Data Firehose",
+    "source": "short"
+   },
+   {
+    "name": "Firehose",
+    "source": "hand"
+   }
+  ],
+  "fsx": [
+   {
+    "name": "FSx for Lustre",
+    "source": "title"
+   },
+   {
+    "name": "Amazon FSx for Windows File Server",
+    "source": "title"
+   },
+   {
+    "name": "FSx for Windows File Server",
+    "source": "short"
+   },
+   {
+    "name": "Amazon FSx",
+    "source": "hand"
+   },
+   {
+    "name": "FSx",
+    "source": "short"
+   }
+  ],
+  "global-accelerator": [
+   {
+    "name": "AWS Global Accelerator",
+    "source": "title"
+   },
+   {
+    "name": "Global Accelerator",
+    "source": "short"
+   }
+  ],
+  "glue": [
+   {
+    "name": "AWS Glue",
+    "source": "title"
+   },
+   {
+    "name": "Glue",
+    "source": "short"
+   }
+  ],
+  "guardduty": [
+   {
+    "name": "Amazon GuardDuty",
+    "source": "title"
+   },
+   {
+    "name": "GuardDuty",
+    "source": "short"
+   }
+  ],
+  "inspector": [
+   {
+    "name": "Amazon Inspector",
+    "source": "title"
+   },
+   {
+    "name": "Inspector",
+    "source": "short"
+   }
+  ],
+  "kendra": [
+   {
+    "name": "Amazon Kendra",
+    "source": "title"
+   },
+   {
+    "name": "Kendra",
+    "source": "short"
+   }
+  ],
+  "keyspaces": [
+   {
+    "name": "Amazon Keyspaces",
+    "source": "title"
+   },
+   {
+    "name": "Keyspaces",
+    "source": "short"
+   }
+  ],
+  "kms": [
+   {
+    "name": "AWS Key Management Service",
+    "source": "title"
+   },
+   {
+    "name": "Key Management Service",
+    "source": "short"
+   },
+   {
+    "name": "AWS KMS",
+    "source": "hand"
+   },
+   {
+    "name": "KMS",
+    "source": "short"
+   }
+  ],
+  "lake-formation": [
+   {
+    "name": "AWS Lake Formation",
+    "source": "title"
+   },
+   {
+    "name": "Lake Formation",
+    "source": "short"
+   }
+  ],
+  "lambda": [
+   {
+    "name": "AWS Lambda",
+    "source": "title"
+   },
+   {
+    "name": "Lambda",
+    "source": "short"
+   }
+  ],
+  "lexv2": [
+   {
+    "name": "Amazon Lex",
+    "source": "title"
+   },
+   {
+    "name": "Lex",
+    "source": "short"
+   }
+  ],
+  "lightsail": [
+   {
+    "name": "Amazon Lightsail",
+    "source": "title"
+   },
+   {
+    "name": "Lightsail",
+    "source": "short"
+   }
+  ],
+  "macie": [
+   {
+    "name": "Amazon Macie",
+    "source": "title"
+   },
+   {
+    "name": "Macie",
+    "source": "short"
+   }
+  ],
+  "memorydb": [
+   {
+    "name": "Amazon MemoryDB",
+    "source": "title"
+   },
+   {
+    "name": "MemoryDB",
+    "source": "short"
+   }
+  ],
+  "mgn": [
+   {
+    "name": "AWS Transform MGN",
+    "source": "title"
+   },
+   {
+    "name": "Transform MGN",
+    "source": "short"
+   }
+  ],
+  "msk": [
+   {
+    "name": "Amazon Managed Streaming for Apache Kafka",
+    "source": "title"
+   },
+   {
+    "name": "Managed Streaming for Apache Kafka",
+    "source": "short"
+   },
+   {
+    "name": "Amazon MSK",
+    "source": "hand"
+   },
+   {
+    "name": "MSK",
+    "source": "short"
+   }
+  ],
+  "neptune": [
+   {
+    "name": "Amazon Neptune",
+    "source": "title"
+   },
+   {
+    "name": "Neptune",
+    "source": "short"
+   }
+  ],
+  "nova": [
+   {
+    "name": "Amazon Nova",
+    "source": "title"
+   },
+   {
+    "name": "Nova",
+    "source": "short"
+   }
+  ],
+  "opensearch-service": [
+   {
+    "name": "Amazon OpenSearch Service",
+    "source": "title"
+   },
+   {
+    "name": "OpenSearch Service",
+    "source": "short"
+   },
+   {
+    "name": "OpenSearch",
+    "source": "hand"
+   }
+  ],
+  "organizations": [
+   {
+    "name": "AWS Organizations",
+    "source": "title"
+   },
+   {
+    "name": "Organizations",
+    "source": "short"
+   }
+  ],
+  "personalize": [
+   {
+    "name": "Amazon Personalize",
+    "source": "title"
+   },
+   {
+    "name": "Personalize",
+    "source": "short"
+   }
+  ],
+  "polly": [
+   {
+    "name": "Amazon Polly",
+    "source": "title"
+   },
+   {
+    "name": "Polly",
+    "source": "short"
+   }
+  ],
+  "quick": [
+   {
+    "name": "Amazon Quick",
+    "source": "title"
+   },
+   {
+    "name": "Quick",
+    "source": "short"
+   }
+  ],
+  "redshift": [
+   {
+    "name": "Amazon Redshift",
+    "source": "title"
+   },
+   {
+    "name": "Redshift",
+    "source": "short"
+   }
+  ],
+  "rekognition": [
+   {
+    "name": "Amazon Rekognition",
+    "source": "title"
+   },
+   {
+    "name": "Rekognition",
+    "source": "short"
+   }
+  ],
+  "sagemaker": [
+   {
+    "name": "Amazon SageMaker AI",
+    "source": "title"
+   },
+   {
+    "name": "SageMaker AI",
+    "source": "short"
+   },
+   {
+    "name": "Amazon SageMaker",
+    "source": "hand"
+   },
+   {
+    "name": "SageMaker",
+    "source": "short"
+   }
+  ],
+  "secretsmanager": [
+   {
+    "name": "AWS Secrets Manager",
+    "source": "title"
+   },
+   {
+    "name": "Secrets Manager",
+    "source": "short"
+   }
+  ],
+  "securityhub": [
+   {
+    "name": "AWS Security Hub",
+    "source": "title"
+   },
+   {
+    "name": "Security Hub",
+    "source": "short"
+   }
+  ],
+  "serverless-application-model": [
+   {
+    "name": "AWS Serverless Application Model",
+    "source": "title"
+   },
+   {
+    "name": "Serverless Application Model",
+    "source": "short"
+   },
+   {
+    "name": "AWS SAM",
+    "source": "abbreviation"
+   },
+   {
+    "name": "SAM",
+    "source": "short"
+   }
+  ],
+  "ses": [
+   {
+    "name": "Amazon Simple Email Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Email Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon SES",
+    "source": "hand"
+   },
+   {
+    "name": "SES",
+    "source": "short"
+   }
+  ],
+  "singlesignon": [
+   {
+    "name": "AWS IAM Identity Center",
+    "source": "title"
+   },
+   {
+    "name": "IAM Identity Center",
+    "source": "short"
+   }
+  ],
+  "sns": [
+   {
+    "name": "Amazon Simple Notification Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Notification Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon SNS",
+    "source": "hand"
+   },
+   {
+    "name": "SNS",
+    "source": "short"
+   }
+  ],
+  "step-functions": [
+   {
+    "name": "AWS Step Functions",
+    "source": "title"
+   },
+   {
+    "name": "Step Functions",
+    "source": "short"
+   }
+  ],
+  "storagegateway": [
+   {
+    "name": "AWS Storage Gateway",
+    "source": "title"
+   },
+   {
+    "name": "Storage Gateway",
+    "source": "short"
+   }
+  ],
+  "streams": [
+   {
+    "name": "Amazon Kinesis Data Streams",
+    "source": "title"
+   },
+   {
+    "name": "Kinesis Data Streams",
+    "source": "short"
+   },
+   {
+    "name": "Kinesis",
+    "source": "hand"
+   }
+  ],
+  "systems-manager": [
+   {
+    "name": "AWS Systems Manager",
+    "source": "title"
+   },
+   {
+    "name": "Systems Manager",
+    "source": "short"
+   }
+  ],
+  "tag-editor": [
+   {
+    "name": "Tagging AWS Resources and Tag Editor",
+    "source": "title"
+   },
+   {
+    "name": "Tag Editor",
+    "source": "hand"
+   }
+  ],
+  "textract": [
+   {
+    "name": "Amazon Textract",
+    "source": "title"
+   },
+   {
+    "name": "Textract",
+    "source": "short"
+   }
+  ],
+  "timestream": [
+   {
+    "name": "Amazon Timestream",
+    "source": "title"
+   },
+   {
+    "name": "Timestream",
+    "source": "short"
+   }
+  ],
+  "transcribe": [
+   {
+    "name": "Amazon Transcribe",
+    "source": "title"
+   },
+   {
+    "name": "Transcribe",
+    "source": "short"
+   }
+  ],
+  "translate": [
+   {
+    "name": "Amazon Translate",
+    "source": "title"
+   },
+   {
+    "name": "Translate",
+    "source": "short"
+   }
+  ],
+  "vpc": [
+   {
+    "name": "Amazon Virtual Private Cloud",
+    "source": "title"
+   },
+   {
+    "name": "Virtual Private Cloud",
+    "source": "short"
+   },
+   {
+    "name": "Amazon VPC",
+    "source": "title"
+   },
+   {
+    "name": "VPC",
+    "source": "short"
+   }
+  ],
+  "vpn": [
+   {
+    "name": "AWS Site-to-Site VPN",
+    "source": "title"
+   },
+   {
+    "name": "Site-to-Site VPN",
+    "source": "short"
+   }
+  ],
+  "waf": [
+   {
+    "name": "AWS WAF",
+    "source": "title"
+   },
+   {
+    "name": "WAF",
+    "source": "short"
+   },
+   {
+    "name": "AWS Firewall Manager",
+    "source": "title"
+   },
+   {
+    "name": "Firewall Manager",
+    "source": "short"
+   },
+   {
+    "name": "AWS Shield Advanced",
+    "source": "title"
+   },
+   {
+    "name": "Shield Advanced",
+    "source": "short"
+   },
+   {
+    "name": "AWS Shield network security director",
+    "source": "title"
+   },
+   {
+    "name": "Shield network security director",
+    "source": "short"
+   },
+   {
+    "name": "Shield",
+    "source": "hand"
+   }
+  ],
+  "wellarchitected": [
+   {
+    "name": "AWS Well-Architected Framework",
+    "source": "title"
+   },
+   {
+    "name": "Well-Architected Framework",
+    "source": "short"
+   }
+  ],
+  "xray": [
+   {
+    "name": "AWS X-Ray",
+    "source": "title"
+   },
+   {
+    "name": "X-Ray",
+    "source": "short"
+   }
+  ]
+ },
+ "pages": {
+  "/general/latest/gr/apigateway.html": [
+   {
+    "name": "Amazon API Gateway",
+    "source": "title"
+   },
+   {
+    "name": "API Gateway",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/bedrock.html": [
+   {
+    "name": "Amazon Bedrock",
+    "source": "title"
+   },
+   {
+    "name": "Bedrock",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/ddb.html": [
+   {
+    "name": "Amazon DynamoDB",
+    "source": "title"
+   },
+   {
+    "name": "DynamoDB",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/ec2-service.html": [
+   {
+    "name": "Amazon EC2",
+    "source": "title"
+   },
+   {
+    "name": "EC2",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/ecs-service.html": [
+   {
+    "name": "Amazon ECS",
+    "source": "title"
+   },
+   {
+    "name": "ECS",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/eks.html": [
+   {
+    "name": "Amazon Elastic Kubernetes Service",
+    "source": "title"
+   },
+   {
+    "name": "Elastic Kubernetes Service",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/glue.html": [
+   {
+    "name": "AWS Glue",
+    "source": "title"
+   },
+   {
+    "name": "Glue",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/kms.html": [
+   {
+    "name": "AWS Key Management Service",
+    "source": "title"
+   },
+   {
+    "name": "Key Management Service",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/lambda-service.html": [
+   {
+    "name": "AWS Lambda",
+    "source": "title"
+   },
+   {
+    "name": "Lambda",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/s3.html": [
+   {
+    "name": "Amazon Simple Storage Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Storage Service",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/sagemaker.html": [
+   {
+    "name": "Amazon SageMaker AI",
+    "source": "title"
+   },
+   {
+    "name": "SageMaker AI",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/sns.html": [
+   {
+    "name": "Amazon Simple Notification Service",
+    "source": "title"
+   },
+   {
+    "name": "Simple Notification Service",
+    "source": "short"
+   }
+  ],
+  "/general/latest/gr/transcribe.html": [
+   {
+    "name": "Amazon Transcribe",
+    "source": "title"
+   },
+   {
+    "name": "Transcribe",
+    "source": "short"
+   }
+  ]
+ }
+}

@@ -561,9 +561,9 @@ def test_a_verdict_fails_only_because_of_a_dropped_entry_when_putting_it_back_pa
         dropped = sum(e.problem is not None for _, support in claims for e in support)
         return Assessment(claims=checked, flagged=flagged, skeptic=reply, dropped_support=dropped)
 
-    flips = found((80, [lost]))  # with its one entry back, it passes at t = 50 and 70
+    flips = found((70, [lost]))  # with its one entry back, it passes at t = 64 and 69
     assert [flips.dropped_span_flip(t, None) for t in cj.T_GRID] == [True, True, False]
-    assert not flips.verdict(50, None).fully_supported  # a flip is still a fail
+    assert not flips.verdict(64, None).fully_supported  # a flip is still a fail
     assert not found((80, [held])).dropped_span_flip(70, 90)  # it passes: nothing flips
     passes = found((80, [held, lost]))  # one entry dropped, but one holds: it passes
     assert passes.verdict(70, 90).fully_supported and not passes.dropped_span_flip(70, 90)
@@ -602,11 +602,11 @@ def test_the_grader_counts_what_its_checks_found_in_each_answer_it_judged() -> N
         dropped=2,
         with_dropped=1,
         search_missing=1,
-        dropped_span_flips=1,  # at the grader's own t = 70 and s = 90
+        dropped_span_flips=1,  # at the grader's own t = 69 and s off
     )
     assert judge.run_note()["counts"] == judge.counts.model_dump()
-    strict = grader(ScriptedLLM([table(lost), skeptic({1: 80, 2: 80})]), support_threshold=85)
-    strict.grade(make_case(), answered())  # the items' 80 fail it at t = 85, entries or not
+    strict = grader(ScriptedLLM([table(lost), skeptic({1: 70, 2: 70})]), support_threshold=74)
+    strict.grade(make_case(), answered())  # the items' 70 fail it at t = 74, entries or not
     assert (strict.counts.dropped, strict.counts.dropped_span_flips) == (2, 0)
 
 
@@ -699,18 +699,18 @@ def test_the_skeptic_scores_support_only_and_no_claim_clears_names_alone() -> No
 
 
 def test_the_skeptic_is_asked_at_the_grids_lowest_t_whatever_t_is_configured() -> None:
-    sixty = claim(SPAN, (1, SPAN), score=60)
+    sixty = claim(SPAN, (1, SPAN), score=65)  # passes at the gate (64), not at 74
     search = skeptic(span="Bucket names must be", role="core", confidence=80)
     llm = ScriptedLLM([table(sixty), search])
-    found = assessed(llm, support_threshold=85)
-    assert found.flagged == [] and llm.salts[-1] == "judge#skeptic#t-1"  # it passes at t = 50
-    assert found.verdict(50, None).fully_supported and not found.verdict(85, None).fully_supported
-    v = found.verdict(50, 70)
+    found = assessed(llm, support_threshold=74)
+    assert found.flagged == [] and llm.salts[-1] == "judge#skeptic#t-1"  # it passes at t = 64
+    assert found.verdict(64, None).fully_supported and not found.verdict(74, None).fully_supported
+    v = found.verdict(64, 49)
     assert not v.fully_supported and not v.core_supported  # the search, at confidence 80
-    at_gate = ScriptedLLM([table(claim(SPAN, (1, SPAN), score=50)), skeptic()])
-    assert assessed(at_gate, support_threshold=85).skeptic is not None
-    below = ScriptedLLM([table(claim(SPAN, (1, SPAN), score=49))])
-    assert assessed(below, support_threshold=50).skeptic is None and len(below.requests) == 1
+    at_gate = ScriptedLLM([table(claim(SPAN, (1, SPAN), score=64)), skeptic()])
+    assert assessed(at_gate, support_threshold=74).skeptic is not None
+    below = ScriptedLLM([table(claim(SPAN, (1, SPAN), score=63))])
+    assert assessed(below, support_threshold=64).skeptic is None and len(below.requests) == 1
 
 
 def test_a_failed_claim_table_is_asked_again_under_its_own_salt() -> None:
@@ -776,7 +776,7 @@ def test_a_search_span_not_in_the_answer_is_retried_then_read_as_none_found() ->
 
 def test_the_skeptics_request_is_the_same_for_every_t_and_s() -> None:
     requests = []
-    for t, s in ((50, None), (85, 70), (70, 90)):
+    for t, s in ((64, None), (74, 49), (69, 59)):
         llm = ScriptedLLM(
             [table(QUOTED, not_claims=(NO_CLAIM,)), skeptic({1: 80, 2: 90, 3: 5, 4: 5})]
         )
@@ -797,9 +797,9 @@ def test_the_version_moves_with_t_s_the_prompts_and_templates_but_not_salt_or_na
 ) -> None:
     base = grader().version
     for changed in (
-        {"support_threshold": 85},
-        {"skeptic_threshold": None},
-        {"skeptic_threshold": 70},
+        {"support_threshold": 74},
+        {"skeptic_threshold": 49},
+        {"skeptic_threshold": 59},
         {"rubric_version": "v4"},  # other prompts
         {"model": {"name": "claude-sonnet-5-5", "max_tokens": 4096}},
         {"strict_tools": False},  # other tool schemas
@@ -846,14 +846,14 @@ def test_the_claim_judge_refuses_a_t_or_s_off_the_grid() -> None:
         with pytest.raises(ValueError, match="skeptic_threshold is"):
             grader(skeptic_threshold=s)
     unchecked = v5().model_copy(update={"skeptic_threshold": 80})  # as a script's copy makes one
-    with pytest.raises(ValueError, match="one of null, 70, 90"):
+    with pytest.raises(ValueError, match="one of null, 49, 59"):
         ClaimJudgeGrader(ScriptedLLM([]), unchecked)
     cells = {
         grader(support_threshold=t, skeptic_threshold=s).version
         for t in cj.T_GRID
         for s in cj.S_GRID
     }
-    assert len(cells) == 9 and cj.SKEPTIC_GATE == min(cj.T_GRID) == 50
+    assert len(cells) == 9 and cj.SKEPTIC_GATE == min(cj.T_GRID) == 64
 
 
 def test_judge_v2s_version_ignores_the_new_settings() -> None:
@@ -900,13 +900,19 @@ def test_rubric_v5_is_v4_plus_the_designs_two_paragraphs_word_for_word() -> None
         assert v5_text in prompt and "does not say something" in prompt
 
 
-def test_the_judge_v5_config_builds_the_claim_judge() -> None:
-    judge = load_config(ROOT / "configs" / "judge-v5.yaml").judge
-    assert (judge.method, judge.grader_name, judge.rubric_version) == ("claims", "judge-v5", "v5")
+def test_the_judge_v6_config_builds_the_claim_judge_and_v5s_is_off_the_grid() -> None:
+    judge = load_config(ROOT / "configs" / "judge-v6.yaml").judge
+    assert (judge.method, judge.grader_name, judge.rubric_version) == ("claims", "judge-v6", "v5")
     assert (judge.model.name, judge.model.max_tokens) == ("claude-sonnet-5-5", 8192)
     assert judge.model.pricing == load_config(ROOT / "configs" / "default.yaml").judge.model.pricing
-    assert (judge.support_threshold, judge.skeptic_threshold, judge.responsive) == (70, 90, False)
-    assert ClaimJudgeGrader(ScriptedLLM([]), judge).name == "judge-v5"
+    assert (judge.support_threshold, judge.skeptic_threshold, judge.responsive) == (69, None, False)
+    assert judge.gap_types is False  # the first draft: v5's prompts, v6's code
+    assert ClaimJudgeGrader(ScriptedLLM([]), judge).name == "judge-v6"
+    # The v5 round's config is kept for its records; its cells are not on judge v6's grid.
+    v5_judge = load_config(ROOT / "configs" / "judge-v5.yaml").judge
+    assert (v5_judge.grader_name, v5_judge.support_threshold) == ("judge-v5", 70)
+    with pytest.raises(ValueError, match="support_threshold is 70"):
+        ClaimJudgeGrader(ScriptedLLM([]), v5_judge)
 
 
 def _judge_config(tmp_path: Path) -> Path:
@@ -997,7 +1003,7 @@ def test_evals_judge_prints_and_notes_what_the_claim_judges_checks_counted(
         {
             "claims#t-1": [table(QUOTED)],
             "skeptic#t-1": [skeptic()],
-            "claims#t-2": [table(lost)],  # with its entry back it would pass at t 70 and s 90
+            "claims#t-2": [table(lost)],  # with its entry back it would pass at t 69, s off
             "skeptic#t-2": [skeptic({1: 95, 2: 95})],
             "claims#t-3": [[text("no table")]],
             "claims-retry#t-3": [[text("none again")]],  # a judge error
@@ -1012,7 +1018,7 @@ def test_evals_judge_prints_and_notes_what_the_claim_judges_checks_counted(
         "the claim judge's checks, of the 3 judgings: retried 1 of 3 (33%); judge errors 1 of 3 "
         "(33%); support entries dropped by the span check 1 of 2 (50%), in 1 of 3 (33%) "
         "judgings; a search naming words not in the answer in 0 of 3 (0%); verdicts that fail "
-        "at t=70 s=90 only because of a dropped entry: 1 of 2 (50%). The run's note records "
+        "at t=69 s=off only because of a dropped entry: 1 of 2 (50%). The run's note records "
         "these counts."
     ) in out
     store = ResultsStore(tmp_path / "evals.duckdb")
@@ -1021,17 +1027,20 @@ def test_evals_judge_prints_and_notes_what_the_claim_judges_checks_counted(
         grades = store.grades_for("r1", "judge-v5")
     finally:
         store.close()
-    assert note["counts"] == {
-        "judgings": 3,
-        "retried": 1,
-        "judge_errors": 1,
-        "support_entries": 2,
-        "dropped": 1,
-        "with_dropped": 1,
-        "search_missing": 0,
-        "dropped_span_flips": 1,
-    }
-    assert (note["support_threshold"], note["skeptic_threshold"]) == (70, 90)  # the flips' cell
+    assert (
+        note["counts"]
+        == cj.JudgingCounts(
+            judgings=3,
+            retried=1,
+            judge_errors=1,
+            support_entries=2,
+            dropped=1,
+            with_dropped=1,
+            search_missing=0,
+            dropped_span_flips=1,
+        ).model_dump()
+    )
+    assert (note["support_threshold"], note["skeptic_threshold"]) == (69, None)  # the flips' cell
     assert grades[("t-2", 1)]["judge_supported"] == 0.0  # a flip is reported, and is still a fail
     assert grades[("t-3", 1)] == {"judge_error": 1.0}
 

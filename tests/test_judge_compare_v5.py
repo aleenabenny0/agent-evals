@@ -21,6 +21,7 @@ import pytest
 from typer.testing import CliRunner
 
 from agent_evals.config import JudgeConfig
+from agent_evals.graders import claim_judge as cj
 from agent_evals.graders.claim_judge import (
     Assessment,
     CheckedClaim,
@@ -51,6 +52,17 @@ def _script() -> ModuleType:
 
 
 jc = _script()
+
+
+@pytest.fixture(autouse=True)
+def _v5_grid(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The v5 round's grid. Judge v6 moved the claim judge's grid (2026-10-31), and the round is
+    over, so the script keeps its own cells to read its records; these tests still exercise its
+    judging commands, with the grader accepting the round's cells as it did then."""
+    monkeypatch.setattr(cj, "T_GRID", jc.T_GRID)
+    monkeypatch.setattr(cj, "S_GRID", jc.S_GRID)
+    monkeypatch.setattr(cj, "SKEPTIC_GATE", min(jc.T_GRID))
+
 
 QUOTE = "Bucket names must be between 3 and 63 characters long."
 SPAN = "between 3 and 63 characters long"
@@ -282,6 +294,8 @@ def claim_config(**overrides: Any) -> JudgeConfig:
         "grader_name": "judge-v5",
         "rubric_version": "v5",
         "responsive": False,
+        "support_threshold": 70,  # the round's placeholders, on its own grid (_v5_grid)
+        "skeptic_threshold": 90,
         "model": {"name": "claude-sonnet-5-5", "max_tokens": 8192, "pricing": PRICING},
     }
     return JudgeConfig.model_validate(base | overrides)
@@ -1187,7 +1201,8 @@ def test_the_commands_open_the_store_read_only_and_print_what_they_find(
     claim_yaml.write_text(
         paths
         + "judge:\n  method: claims\n  grader_name: judge-v5\n  rubric_version: v5\n"
-        + "  responsive: false\n  model:\n    name: claude-sonnet-5-5\n    max_tokens: 8192\n"
+        + "  responsive: false\n  support_threshold: 70\n  skeptic_threshold: 90\n"
+        + "  model:\n    name: claude-sonnet-5-5\n    max_tokens: 8192\n"
         + priced,
         encoding="utf-8",
     )

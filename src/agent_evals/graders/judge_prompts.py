@@ -262,9 +262,38 @@ source, feature, version or edition that the note names and that neither the que
 quote names ("this rests on the Trusted Advisor notice alone", when no quote mentions Trusted
 Advisor)."""
 
+# The gap types (judge v6, docs/plans/judge-v6.md, change 1): one field per claim, in the same
+# words in both prompts when the config asks for gap types. Two of the types fail the claim at
+# every threshold in code (claim_judge.CheckedClaim.supported); the others leave it scored. The
+# prompt tells the judge only what needs no knowledge beyond its input: the publisher is never a
+# term, and a word in another form is in the quote. The cited service's own name is handled in
+# code, since the judge is never told which service the quotes come from.
+GAP_TYPES = """\
+Each claim carries gap, the gap between the claim and the quotes, one of:
+- "none": a quote states the claim, or it follows by simple arithmetic, a unit conversion or plain
+  rewording;
+- "implication": the claim follows from the quotes only by an inference;
+- "scope": the claim strengthens or widens what a quote says: a qualifier, a scope, a default;
+- "term": the claim names a feature, product, API, parameter, version, edition, Region, pricing
+  model or other term that neither the quotes nor the question uses, in any form; copy that term,
+  as the answer writes it, into term;
+- "cell": the claim reads a table cell as a default, maximum, limit, date or the like, and no
+  quoted header names that column;
+- "other": any other gap.
+The publisher (AWS, Amazon, or the "we" of a quote) is never such a term. A word is in a quote when
+the quote has it in another form: a plural, an abbreviation a quote defines, a different case. term
+is empty unless gap is "term"."""
 
-def claims_prompt(rubric: str) -> str:
-    """The claim-table prompt built around one rubric text."""
+GAP_FIELDS = """\
+- gap and term: as defined above.
+"""
+
+
+def claims_prompt(rubric: str, gap_types: bool = False) -> str:
+    """The claim-table prompt built around one rubric text. With gap_types, each claim also
+    carries its gap type and term (GAP_TYPES); without, the text is judge v5's."""
+    gaps = f"\n{GAP_TYPES}\n" if gap_types else ""
+    fields = GAP_FIELDS if gap_types else ""
     return f"""\
 You are checking whether an answer is supported by the evidence it cites.
 
@@ -275,7 +304,7 @@ and for each one the quotes that support it and how sure you are of that support
 {rubric}
 
 {NO_CLAIM}
-
+{gaps}
 Give one entry per claim; a sentence that states several facts is several claims:
 - answer_span: the words of the answer that make the claim, copied exactly.
 - role: "core" or "peripheral", as defined above.
@@ -287,7 +316,7 @@ Give one entry per claim; a sentence that states several facts is several claims
   simple arithmetic, a unit conversion or plain rewording. The score says how sure you are of
   that, not whether the claim is true.
 - why: one short sentence.
-
+{fields}
 Copy the words of the answer that make no claim into not_claims. Every number in the answer, and
 every capitalized name that the question does not use, must fall inside a claim's answer_span or
 a not_claims entry.
@@ -297,8 +326,16 @@ Do not judge whether the answer is correct, complete or helpful. That is someone
 Call submit_claims with the table."""
 
 
-def skeptic_prompt(rubric: str) -> str:
-    """The skeptic's prompt built around the same rubric text."""
+SEARCH_GAP = (
+    " When you do find one, name its gap and, for a term, copy the term too, as defined above."
+)
+
+
+def skeptic_prompt(rubric: str, gap_types: bool = False) -> str:
+    """The skeptic's prompt built around the same rubric text. With gap_types, the search names
+    the gap type of the claim it finds (GAP_TYPES); without, the text is judge v5's."""
+    gaps = f"\n{GAP_TYPES}\n" if gap_types else ""
+    search_gap = SEARCH_GAP if gap_types else ""
     return f"""\
 You are checking an answer for claims that the evidence it cites does not support.
 
@@ -311,7 +348,7 @@ earlier check's usual mistake is to pass a claim that no quote supports.
 {rubric}
 
 {NO_CLAIM}
-
+{gaps}
 Do two things.
 
 1. For each flagged item, give a score from 0 to 100: how sure you are that the cited quotes
@@ -328,7 +365,7 @@ Do two things.
    a default or a maximum when no quoted header says so. Give the claim's words from the answer,
    copied exactly, its role ("core" or "peripheral", as defined above), why no quote states it in
    one short sentence, and from 0 to 100 how sure you are that it is unsupported. If you find no
-   claim that may be unsupported, set found to false and leave answer_span empty.
+   claim that may be unsupported, set found to false and leave answer_span empty.{search_gap}
 
 Do not judge whether the answer is correct, complete or helpful. That is someone else's job.
 
@@ -336,12 +373,29 @@ Call submit_skeptic with a result for every flagged item, by its number, and the
 
 
 _ROLE = {"type": "string", "enum": ["core", "peripheral"]}
+GAPS = ("none", "implication", "scope", "term", "cell", "other")
+_GAP = {
+    "type": "string",
+    "enum": list(GAPS),
+    "description": "The gap between the claim and the quotes, as defined in the instructions.",
+}
+_TERM = {
+    "type": "string",
+    "description": 'When gap is "term", that term, copied as the answer writes it; else empty.',
+}
 
 
-def claims_tool(strict: bool) -> dict[str, Any]:
+def _with_gap(spec: dict[str, Any]) -> dict[str, Any]:
+    """An object schema with the gap and term fields added, both required."""
+    properties = {**spec["properties"], "gap": _GAP, "term": _TERM}
+    return {**spec, "properties": properties, "required": [*spec["required"], "gap", "term"]}
+
+
+def claims_tool(strict: bool, gap_types: bool = False) -> dict[str, Any]:
     """The claim table: each claim with its role, the quote spans that support it and a 0 to 100
     score, and the words of the answer that make no claim. Code checks the scores' range, since
-    a strict schema cannot carry a minimum or a maximum."""
+    a strict schema cannot carry a minimum or a maximum. With gap_types, each claim also carries
+    its gap and term; without, the schema is judge v5's."""
     support = {
         "type": "object",
         "properties": {
@@ -372,6 +426,8 @@ def claims_tool(strict: bool) -> dict[str, Any]:
         "required": ["answer_span", "role", "support", "score", "why"],
         "additionalProperties": False,
     }
+    if gap_types:
+        claim = _with_gap(claim)
     spec: dict[str, Any] = {
         "name": "submit_claims",
         "description": "Record the answer's claims and the words of it that make no claim.",
@@ -394,9 +450,10 @@ def claims_tool(strict: bool) -> dict[str, Any]:
     return spec
 
 
-def skeptic_tool(strict: bool) -> dict[str, Any]:
+def skeptic_tool(strict: bool, gap_types: bool = False) -> dict[str, Any]:
     """The skeptic's reply: a 0 to 100 support score for every flagged item, keyed by the item's
-    number, and the one claim most likely unsupported, or none."""
+    number, and the one claim most likely unsupported, or none. With gap_types, the search also
+    names that claim's gap and term; without, the schema is judge v5's."""
     item = {
         "type": "object",
         "properties": {
@@ -435,6 +492,8 @@ def skeptic_tool(strict: bool) -> dict[str, Any]:
         "required": ["found", "answer_span", "role", "why", "confidence"],
         "additionalProperties": False,
     }
+    if gap_types:
+        search = _with_gap(search)
     spec: dict[str, Any] = {
         "name": "submit_skeptic",
         "description": "Record each flagged item's score and the claim most likely unsupported.",

@@ -11,6 +11,11 @@ The pilot (stage A step 1) comes first. Every later paid step of the claim judge
 `evals judge` and `evals judge-probe` with its config alike, is estimated at the cost per answer
 the pilot measured, and is refused before the pilot and after a pilot that stopped the work
 (pilot_cost).
+
+Each approved round has its own ledger, cap, estimate per answer and pilot stop (Round): judge
+v5's (docs/plans/judge-v5.md, decision 7(a), results/judge-v5/) and judge v6's
+(docs/plans/judge-v6.md, decision 10, results/judge-v6/). A claim-judge command finds its round by
+the grader name its config sets (round_for); a grader name no round approves is refused.
 """
 
 from __future__ import annotations
@@ -19,6 +24,7 @@ import json
 import os
 import tempfile
 import threading
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -29,6 +35,8 @@ from agent_evals.config import Pricing
 from agent_evals.harness.llm import LLMClient, LLMResponse, usage_from
 from agent_evals.types import Usage
 
+# Judge v5's round (docs/plans/judge-v5.md, decision 7(a), approved 2026-10-28; stopped at stage A
+# on 2026-10-29 with $6.95 spent). Its names are kept, since its script and records read them.
 DEFAULT_PATH = Path("results/judge-v5/spend.json")
 # The most the round may spend before any label: decision 7(a), approved 2026-10-28.
 APPROVED_CAP_USD = 60.0
@@ -40,6 +48,51 @@ ESTIMATE_PER_ANSWER_USD = 0.02
 # budget is revisited (stage A step 1).
 STOP_FACTOR = 1.5
 PILOT_FILE = "pilot.json"
+# Judge v6's round (docs/plans/judge-v6.md, decision 10, approved 2026-10-30): a new ledger capped
+# at $60 before any label, the estimate the budget assumes per claim-judge answer, and the pilot's
+# stop at 1.3 times it (at 1.5 the planned judgings could pass the cap).
+V6_PATH = Path("results/judge-v6/spend.json")
+V6_CAP_USD = 60.0
+V6_ESTIMATE_PER_ANSWER_USD = 0.012
+V6_STOP_FACTOR = 1.3
+
+
+@dataclass(frozen=True)
+class Round:
+    """One approved judge round's spend rules: the grader name whose spend it is, its ledger, its
+    cap, the estimate per answer its pilot is checked against, and the pilot's stop factor."""
+
+    grader: str
+    path: Path
+    cap_usd: float
+    estimate_per_answer_usd: float
+    stop_factor: float
+
+    @property
+    def folder(self) -> Path:
+        """Where the pilot's record sits, beside the ledger."""
+        return self.path.parent
+
+    def ledger(self) -> SpendLedger:
+        return SpendLedger(self.path, self.cap_usd)
+
+    def pilot_cost(self) -> float:
+        """What a paid step of this round estimates one answer at (pilot_cost)."""
+        return pilot_cost(self.folder, self.estimate_per_answer_usd, self.stop_factor)
+
+
+def round_for(grader: str) -> Round:
+    """The approved round a claim-judge grader name belongs to. Read when a command runs, so a
+    test can point either ledger elsewhere. Any other name is refused: its spend has no approved
+    cap to be checked against."""
+    if grader == "judge-v5":
+        return Round(grader, DEFAULT_PATH, APPROVED_CAP_USD, ESTIMATE_PER_ANSWER_USD, STOP_FACTOR)
+    if grader == "judge-v6":
+        return Round(grader, V6_PATH, V6_CAP_USD, V6_ESTIMATE_PER_ANSWER_USD, V6_STOP_FACTOR)
+    raise ValueError(
+        f"the claim judge's grader name {grader!r} belongs to no approved judge round (judge-v5, "
+        "judge-v6), so its spend has no cap to be checked against"
+    )
 
 
 class SpendCapError(RuntimeError):
@@ -68,36 +121,47 @@ def pilot_record(folder: Path) -> dict[str, Any] | None:
     return held
 
 
-def pilot_cost(folder: Path) -> float:
+def pilot_cost(
+    folder: Path,
+    estimate_per_answer_usd: float = ESTIMATE_PER_ANSWER_USD,
+    stop_factor: float = STOP_FACTOR,
+) -> float:
     """What a paid claim-judge step after the pilot estimates one answer at: the cost per answer
     the pilot measured, from its record in this folder. Refused (PilotRefusal) before the pilot,
-    which comes first, and after a pilot that measured more than STOP_FACTOR times the estimate
-    or recorded a stop: the work stops there, and the budget is revisited (stage A step 1)."""
+    which comes first, and after a pilot that measured more than the round's stop factor times
+    its estimate or recorded a stop: the work stops there, and the budget is revisited (stage A
+    step 1). The defaults are judge v5's round; Round.pilot_cost passes a round's own."""
     held = pilot_record(folder)
     if held is None:
         raise PilotRefusal(
             "the pilot comes first: it measures the cost per answer that every later step is "
-            "estimated at (stage A step 1, scripts/judge_compare_v5.py pilot)"
+            "estimated at (stage A step 1 of the round's script)"
         )
     try:
         measured = float(held["cost_per_answer_usd"])
-        estimate = float(held.get("estimate_per_answer_usd", ESTIMATE_PER_ANSWER_USD))
+        estimate = float(held.get("estimate_per_answer_usd", estimate_per_answer_usd))
     except (KeyError, TypeError, ValueError) as exc:
         path = folder / PILOT_FILE
         raise PilotRefusal(f"{path} cannot be read as the pilot's record ({exc!r})") from exc
     if held.get("stop") is True:  # a stop the pilot recorded stands, whatever the estimate is now
         raise PilotRefusal(
             f"the pilot recorded a stop: it measured ${measured:.4f} per answer against its "
-            f"${estimate:.2f} estimate, so the work stops and the budget is revisited (stage A "
+            f"${_usd(estimate)} estimate, so the work stops and the budget is revisited (stage A "
             "step 1)"
         )
-    if measured > STOP_FACTOR * ESTIMATE_PER_ANSWER_USD:
+    if measured > stop_factor * estimate_per_answer_usd:
         raise PilotRefusal(
-            f"the pilot measured ${measured:.4f} per answer, more than {STOP_FACTOR} times the "
-            f"${ESTIMATE_PER_ANSWER_USD:.2f} estimate: the work stops and the budget is revisited "
-            "(stage A step 1)"
+            f"the pilot measured ${measured:.4f} per answer, more than {stop_factor} times the "
+            f"${_usd(estimate_per_answer_usd)} estimate: the work stops and the budget is "
+            "revisited (stage A step 1)"
         )
     return measured
+
+
+def _usd(amount: float) -> str:
+    """An estimate per answer as the designs write it: $0.02 (judge v5) or $0.012 (judge v6)."""
+    text = f"{amount:.3f}"
+    return text[:-1] if text.endswith("0") else text
 
 
 class StepBudget:

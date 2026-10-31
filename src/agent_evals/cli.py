@@ -587,9 +587,10 @@ def _round_spend(step: str, answers: int, llm: LLMClient, judge: JudgeConfig) ->
     command when the cap is reached."""
     from agent_evals import spend
 
-    ledger = spend.SpendLedger(spend.DEFAULT_PATH)
     try:
-        estimate = answers * spend.pilot_cost(ledger.path.parent)
+        judge_round = spend.round_for(judge.grader_name)  # judge-v5's ledger or judge-v6's
+        ledger = judge_round.ledger()
+        estimate = answers * judge_round.pilot_cost()
         meter = spend.MeteredLLM(llm, judge.model.pricing, ledger.check(step, estimate))
     except spend.PilotRefusal as exc:
         console.print(f"[red]{step}: {exc}. Nothing was judged.[/red]")
@@ -2442,8 +2443,8 @@ def _online_judge_refusal(judge: JudgeConfig) -> str | None:
     refusal = pin_refusal(judge.grader_name, grader.version)
     if refusal is None and isinstance(grader, ClaimJudgeGrader):
         try:
-            spend.pilot_cost(spend.DEFAULT_PATH.parent)
-        except spend.PilotRefusal as exc:
+            spend.round_for(judge.grader_name).pilot_cost()
+        except (spend.PilotRefusal, ValueError) as exc:
             return f"The config's judge, {judge.grader_name}, cannot judge yet: {exc}"
     return refusal
 

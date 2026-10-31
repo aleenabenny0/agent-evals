@@ -86,10 +86,14 @@ class JudgeConfig(_Strict):
     # The claim judge's two thresholds, both part of its version: a claim is supported at this
     # score or above (t), and the skeptic's search for a missed claim fails the answer at this
     # confidence or above (s; null turns that search off). The claim judge refuses any value off
-    # stage A's grid (t 50, 70 or 85; s null, 70 or 90: T_GRID and S_GRID in
+    # stage A's grid (judge v6: t 64, 69 or 74; s null, 49 or 59: T_GRID and S_GRID in
     # graders/claim_judge.py). The verdict judge reads neither.
-    support_threshold: int = Field(default=70, ge=0, le=100)
-    skeptic_threshold: int | None = Field(default=90, ge=0, le=100)
+    support_threshold: int = Field(default=69, ge=0, le=100)
+    skeptic_threshold: int | None = Field(default=None, ge=0, le=100)
+    # Judge v6 (docs/plans/judge-v6.md, change 1): the claim judge asks for a gap type and a term
+    # per claim, and two of the types fail a claim at every t. Off, its prompts and tools are
+    # judge v5's. Part of the version. The verdict judge reads it not at all.
+    gap_types: bool = False
     # Whether the verdict judge also asks if the answer responds to the question, which needs a
     # gold answer. The claim judge never asks it, so its config says false.
     responsive: bool = True
