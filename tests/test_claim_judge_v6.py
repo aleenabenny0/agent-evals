@@ -454,3 +454,17 @@ def test_the_committed_service_name_file_covers_every_guide_and_reads_by_url() -
     ]
     assert ServiceNames.load().sha256 == held.sha256  # the default path is the repository's file
     assert normalize("Bedrock") == "bedrock"
+
+
+def test_evals_judge_prints_judge_v6s_counts_and_nothing_new_for_judge_v5() -> None:
+    from agent_evals import cli
+
+    judge = grader()
+    judge.counts = cj.JudgingCounts(judgings=2, gaps_term=2, rule_fails=1, downgrades=1)
+    out = cli._claim_checks(judge)
+    assert "term 2, cell 0" in out and "failed by the gap rule 1" in out
+    assert "downgraded as a cited service's own name 1" in out
+    earlier = ClaimJudgeGrader(
+        ScriptedLLM([]), config(grader_name="judge-v5"), service_names=names()
+    )
+    assert "Gap types" not in cli._claim_checks(earlier)

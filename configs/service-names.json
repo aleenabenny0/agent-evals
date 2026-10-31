@@ -103,7 +103,7 @@
    },
    {
     "name": "Amazon ECS",
-    "source": "hand"
+    "source": "abbreviation"
    },
    {
     "name": "ECS",
@@ -175,7 +175,7 @@
    },
    {
     "name": "IAM",
-    "source": "hand"
+    "source": "abbreviation"
    }
   ],
   "Route53": [
@@ -217,7 +217,7 @@
    },
    {
     "name": "ACM",
-    "source": "hand"
+    "source": "abbreviation"
    }
   ],
   "amazon-mq": [
@@ -512,10 +512,6 @@
    {
     "name": "Cost Management",
     "source": "short"
-   },
-   {
-    "name": "Cost Explorer",
-    "source": "hand"
    }
   ],
   "datasync": [
@@ -546,6 +542,10 @@
    {
     "name": "Deep Learning AMIs",
     "source": "short"
+   },
+   {
+    "name": "DLAMI",
+    "source": "abbreviation"
    }
   ],
   "dms": [
@@ -559,7 +559,7 @@
    },
    {
     "name": "AWS DMS",
-    "source": "hand"
+    "source": "abbreviation"
    },
    {
     "name": "DMS",
@@ -607,7 +607,7 @@
    },
    {
     "name": "Amazon EFS",
-    "source": "hand"
+    "source": "abbreviation"
    },
    {
     "name": "EFS",
@@ -781,7 +781,7 @@
    },
    {
     "name": "AWS KMS",
-    "source": "hand"
+    "source": "abbreviation"
    },
    {
     "name": "KMS",
@@ -856,6 +856,10 @@
    {
     "name": "Transform MGN",
     "source": "short"
+   },
+   {
+    "name": "MGN",
+    "source": "abbreviation"
    }
   ],
   "msk": [
@@ -869,7 +873,7 @@
    },
    {
     "name": "Amazon MSK",
-    "source": "hand"
+    "source": "abbreviation"
    },
    {
     "name": "MSK",
@@ -1036,12 +1040,8 @@
     "source": "short"
    },
    {
-    "name": "Amazon SES",
-    "source": "hand"
-   },
-   {
     "name": "SES",
-    "source": "short"
+    "source": "abbreviation"
    }
   ],
   "singlesignon": [
@@ -1332,6 +1332,14 @@
    {
     "name": "Key Management Service",
     "source": "short"
+   },
+   {
+    "name": "AWS KMS",
+    "source": "abbreviation"
+   },
+   {
+    "name": "KMS",
+    "source": "short"
    }
   ],
   "/general/latest/gr/lambda-service.html": [
@@ -1352,6 +1360,14 @@
    {
     "name": "Simple Storage Service",
     "source": "short"
+   },
+   {
+    "name": "Amazon S3",
+    "source": "hand"
+   },
+   {
+    "name": "S3",
+    "source": "short"
    }
   ],
   "/general/latest/gr/sagemaker.html": [
@@ -1362,6 +1378,14 @@
    {
     "name": "SageMaker AI",
     "source": "short"
+   },
+   {
+    "name": "Amazon SageMaker",
+    "source": "hand"
+   },
+   {
+    "name": "SageMaker",
+    "source": "short"
    }
   ],
   "/general/latest/gr/sns.html": [
@@ -1371,6 +1395,14 @@
    },
    {
     "name": "Simple Notification Service",
+    "source": "short"
+   },
+   {
+    "name": "Amazon SNS",
+    "source": "hand"
+   },
+   {
+    "name": "SNS",
     "source": "short"
    }
   ],

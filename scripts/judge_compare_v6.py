@@ -40,6 +40,7 @@ from __future__ import annotations
 import json
 import re
 import sys
+from collections import Counter
 from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
@@ -114,6 +115,11 @@ PILOT_PER_RUN = v5.PILOT_PER_RUN
 PILOT_FILE = spend.PILOT_FILE
 REPLAY_FILE = "replay-check.json"
 CHOICE_FILE = "stage-a-choice.json"
+COST_STOP_FILE = "cost-stop.json"  # a version the pilot did not measure that cost too much
+# The projection the build check is reported against, at the continuity cell: fitted, not
+# evidence (docs/plans/judge-v6.md, "How this reads"). v2 makes 7.33 per pass on the 32.
+PROJECTION_CELL: tuple[int, int | None] = (69, None)
+PROJECTED_ON_32 = Fraction(19, 3)
 
 # The figures the replay check must reproduce (docs/plans/judge-v6.md, "The versions, as
 # planned"): over revision 1's three saved passes, read by the code in place with the cited
@@ -267,11 +273,9 @@ class Reading:
 
     @property
     def total_errors(self) -> Fraction:
-        """The total gate's figure: errors on the 93 (judge errors aside) plus errors and judge
-        errors on the 32, per pass."""
-        return self.capped.mean(self.capped.errors) + self.named.mean(
-            self.named.errors_and_judge_errors
-        )
+        """The total gate's figure, per pass: errors on the 125, each judge error counted as one
+        (step 3), since an answer a judge cannot judge is not one it gets right."""
+        return self.total.mean(self.total.errors_and_judge_errors)
 
     def keeps(self, answers: Sequence[v5.Answer]) -> bool:
         """Every kept answer but the known miss is passed on at least two of three passes (or on
@@ -337,8 +341,8 @@ def build_check(judge: Reading, v2: Reading) -> bool:
 def step4_key(
     reading: Reading, t: int, s: int | None, version_order: int
 ) -> tuple[Fraction, Fraction, int, int, int]:
-    """Step 4's order: fewest errors on the 125 (judge errors counted on the named cases), then
-    fewest on the 93, then lower t, then s off before 59 before 49, then the version judged
+    """Step 4's order: fewest errors on the 125, each judge error counted as one, then fewest on
+    the 93, then lower t, then s off before 59 before 49, then the version judged
     first."""
     return (
         reading.total_errors,
@@ -842,6 +846,8 @@ class Cell:
     dropped_span_flips: int
     fail_rates: list[float]  # the share of the 125 failed, per pass
     judge_errors_by_pass: list[int]
+    errors_by_pass: list[int]  # on the 125, judge errors counted
+    flips: int  # answers whose verdict differs between the passes
 
     @property
     def name(self) -> str:
@@ -860,6 +866,8 @@ def grid(
     v2: Reading,
 ) -> list[Cell]:
     cells = []
+    by_key = {a.key: a for a in answers}
+    keys = list(by_key)
     judge_errors = [sum(v.judge_error for v in p.values()) for p in passes]
     for t, s in CELLS:
         per_pass = [claim_verdicts(p, t, s) for p in passes]
@@ -879,6 +887,8 @@ def grid(
                     for verdicts in per_pass
                 ],
                 judge_errors_by_pass=judge_errors,
+                errors_by_pass=[count(keys, [v], by_key).errors_and_judge_errors for v in per_pass],
+                flips=sum(len({v[key] for v in per_pass} - {None}) > 1 for key in keys),
             )
         )
     return cells
@@ -905,6 +915,85 @@ class StageAResult:
     counts: JudgingCounts  # over the three passes
     versions_counted: int
     choice: Path | None
+    costs: list[float]  # the cost per answer of each pass, every call priced
+    cleared: list[dict[str, Any]]  # every span cleared by code, with the skeptic's score on it
+    search_gaps: dict[str, int]  # the gap types the skeptic's search gave
+    report: Path
+
+
+def cost_per_answer(usage: Usage, config: JudgeConfig, answers: int) -> float:
+    """A pass's cost per answer, every call priced whether or not the call cache served it."""
+    nominal = usage.cost_usd(config.model.pricing)
+    assert nominal is not None  # the meter refused a config without pricing
+    return nominal / answers
+
+
+def v5_split(judge: Reading, v2: Reading) -> dict[str, bool]:
+    """Stage A's split gates read on v5's split (106 and 19), for continuity: such a figure can
+    neither stop the round nor rescue a stop."""
+    mine, theirs = judge.v5_others, v2.v5_others
+    named, named_v2 = judge.v5_named, v2.v5_named
+    return {
+        "caps_on_106": (
+            mine.mean(mine.errors) <= theirs.mean(theirs.errors) + 2
+            and mine.mean(mine.false_fails) <= theirs.mean(theirs.false_fails) + 1
+        ),
+        "build_check_on_19": (
+            named.mean(named.errors_and_judge_errors)
+            < named_v2.mean(named_v2.errors_and_judge_errors)
+        ),
+    }
+
+
+def cleared_spans(
+    passes: Sequence[PassFile], answers: Mapping[str, v5.Answer]
+) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Every name code cleared inside words of no claim, with the skeptic's score on it, so that
+    what the rule gave up can be read (decision 4); and the gap types the search gave."""
+    rows: list[dict[str, Any]] = []
+    gaps: Counter[str] = Counter()
+    for held in passes:
+        for key, raw in held.assessments.items():
+            found = Assessment.model_validate(raw)
+            if found.error is not None:
+                continue
+            search = found.skeptic.search if found.skeptic else None
+            if search is not None and search.found and search.gap is not None:
+                gaps[search.gap] += 1
+            scored = {r.item: r for r in found.skeptic.flagged} if found.skeptic else {}
+            for item in found.cleared_names():
+                result = scored.get(item.number)
+                names = None if search is None or not search.found else search.answer_span
+                rows.append(
+                    {
+                        "key": key,
+                        "salt": held.salt,
+                        "supported": answers[key].supported,
+                        "token": item.token,
+                        "span": item.context,
+                        "skeptic_score": None if result is None else result.score,
+                        "skeptic_not_a_claim": None if result is None else result.not_a_claim,
+                        "search_names": names,
+                    }
+                )
+    return rows, dict(sorted(gaps.items()))
+
+
+def _cell_report(c: Cell, v2: Reading, answers: Sequence[v5.Answer]) -> dict[str, Any]:
+    return {
+        "t": c.t,
+        "s": c.s,
+        **_reading_json(c.reading, answers),
+        "gates": asdict(c.gates),
+        "eligible": c.gates.eligible,
+        "build_check": c.build_check,
+        "errors_by_pass_on_125": c.errors_by_pass,
+        "judge_errors_by_pass": c.judge_errors_by_pass,
+        "flips": c.flips,
+        "fail_rates": c.fail_rates,
+        "dropped_span_flips": c.dropped_span_flips,
+        "v5_split": v5_split(c.reading, v2),
+    }
 
 
 def stage_a(
@@ -940,10 +1029,19 @@ def stage_a(
             raise Refused(f"this version was judged already, as {same[0]!r}: one label per version")
         if choice.exists():
             raise Refused(f"{choice} exists: the choice is made, and no version is judged after it")
-        if label not in saved and len(saved) >= MAX_VERSIONS:
+        if (out_dir / COST_STOP_FILE).exists():
             raise Refused(
-                f"{len(saved)} versions are judged already, and the design allows the first draft "
-                "and three revisions: another is a new proposal (stage A step 2)"
+                f"{out_dir / COST_STOP_FILE} records a version over the stop: the work stops and "
+                "the budget is revisited (stage A step 1)"
+            )
+        piloted = (spend.pilot_record(out_dir) or {}).get("versions")
+        counted = [held[0].versions for held in saved.values()]
+        if piloted is not None and piloted not in counted:
+            counted.append(piloted)  # a draft changed after the pilot is a revision
+        if current not in counted and len(counted) >= MAX_VERSIONS:
+            raise Refused(
+                f"{len(counted)} versions are judged already, and the design allows the first "
+                "draft and three revisions: another is a new proposal (stage A step 2)"
             )
         require_replay(out_dir, names, first_version=not saved)
         if spend.pilot_record(out_dir) is None:
@@ -976,6 +1074,20 @@ def stage_a(
                 )
                 save_pass(out_dir, label, n, judged, current, gap_types, answers)
                 done += 1
+                piloted = (spend.pilot_record(out_dir) or {}).get("versions")
+                if n == 1 and piloted != current:  # step 1: the same stop, after its first pass
+                    cost = cost_per_answer(judged.usage, config, len(answers))
+                    bar = judge_round.stop_factor * judge_round.estimate_per_answer_usd
+                    if cost > bar:
+                        record = {"label": label, "cost_per_answer_usd": cost, "bar_usd": bar}
+                        (out_dir / COST_STOP_FILE).write_text(
+                            json.dumps(record, indent=1) + "\n", encoding="utf-8"
+                        )
+                        raise Refused(
+                            f"{label}'s first pass cost ${cost:.4f} per answer, more than "
+                            f"{judge_round.stop_factor} times the estimate: the work stops and "
+                            "the budget is revisited (stage A step 1)"
+                        )
         finally:
             spent.append(
                 ledger.record(step if done == PASSES else f"{step} (stopped early)", meter)
@@ -990,6 +1102,21 @@ def stage_a(
     counts = JudgingCounts()
     for p in passes:
         counts = counts.add(JudgingCounts.model_validate(p.counts))
+    costs = [cost_per_answer(p.usage, config, len(answers)) for p in passes]
+    cleared, search_gaps = cleared_spans(passes, {a.key: a for a in answers})
+    report = out_dir / f"stage-a-{label}.report.json"
+    held_report = {
+        "label": label,
+        "gap_types": gap_types,
+        "salts": [p.salt for p in passes],
+        "costs_per_answer_usd": costs,
+        "counts": counts.model_dump(),
+        "search_gaps": search_gaps,
+        "cleared_spans": cleared,
+        "v2": _reading_json(v2, answers),
+        "cells": {cell_name(c.t, c.s): _cell_report(c, v2, answers) for c in by_version[label]},
+    }
+    report.write_text(json.dumps(held_report, indent=1) + "\n", encoding="utf-8")
     return StageAResult(
         label=label,
         gap_types=gap_types,
@@ -1003,6 +1130,10 @@ def stage_a(
         counts=counts,
         versions_counted=len(saved),
         choice=choice if choice.exists() else None,
+        costs=costs,
+        cleared=cleared,
+        search_gaps=search_gaps,
+        report=report,
     )
 
 
@@ -1164,8 +1295,9 @@ def choose(
         raise Refused(
             "the choice step's calls were not all sent to the API; its ledger entry says so"
         )
-    candidates = []
-    for label, t, s in wanted:
+    candidates = []  # in step 4's order on the exploration passes, all they give the choice
+    for cell in expected:
+        label, t, s = cell.label, cell.t, cell.s
         fresh = [
             PassFile.model_validate_json(choice_path(out_dir, label, n).read_text(encoding="utf-8"))
             for n in range(1, PASSES + 1)
@@ -1190,7 +1322,7 @@ def choose(
                 dropped_span_flips=sum(dropped_span_flips(p.verdicts, t, s) for p in fresh),
             )
         )
-    ordered = sorted(candidates, key=lambda c: step4_key(c.reading, c.t, c.s, c.version_order))
+    ordered = candidates
     chosen = next((c for c in ordered if c.gates.eligible), None)
     stop = (
         None
@@ -1297,22 +1429,21 @@ def _row(name: str, r: Reading, extra: Sequence[str]) -> str:
             f"{_num(counts.mean(counts.false_passes)):>6}{_num(counts.mean(counts.false_fails)):>6}"
             f"{_num(counts.mean(counts.judge_errors)):>5}{_num(counts.mean(errors)):>7}"
         )
-    parts.append(f"{_num(r.total_errors):>7}")
     return "  ".join(parts) + "".join(f"  {e}" for e in extra)
 
 
 def _header(extra: Sequence[str]) -> list[str]:
     head = f"{'FP':>6}{'FF':>6}{'JE':>5}{'errors':>7}"
     return [
-        f"  {'':<22}  {'capped (93)':>24}  {'named (32)':>24}  {'all (125)':>24}  {'total':>7}",
-        f"  {'':<22}  {head}  {head}  {head}  {'gate':>7}" + "".join(f"  {e}" for e in extra),
+        f"  {'':<22}  {'capped (93)':>24}  {'named (32)':>24}  {'all (125)':>24}",
+        f"  {'':<22}  {head}  {head}  {head}" + "".join(f"  {e}" for e in extra),
     ]
 
 
 COLUMNS = (
     "FP, FF: false passes and false fails per pass; JE: judge errors (no verdict). errors: on the "
-    "capped count (the 93) FP and FF; on the named and on all 125, FP, FF and JE. total gate: "
-    "errors on the 93 plus errors and JE on the 32, per pass, which must be fewer than v2's."
+    "capped count (the 93) FP and FF; on the named and on all 125, FP, FF and JE. The total "
+    "gate: errors on all 125, which must be fewer than v2's."
 )
 
 
@@ -1379,6 +1510,35 @@ def render_stage_a(result: StageAResult, ledger: SpendLedger) -> str:
         "JE cap: judge errors at most 2% of the 125 in every pass. eligible: the total gate, the "
         "caps, keeps and the JE cap. build check (reported, a prediction): fewer errors than v2 on "
         "the 32. fail rates: the share of the 125 failed, per pass (v2's stored pass: 70.4%)."
+    )
+    lines.append("")
+    lines.append(
+        "per cell: errors on the 125 per pass; verdicts that flip between salts; dropped-span "
+        "flips; v5's split, read only (caps on the 106, build check on the 19):"
+    )
+    for c in result.cells:
+        split = v5_split(c.reading, result.v2)
+        per_pass = "/".join(str(n) for n in c.errors_by_pass)
+        lines.append(
+            f"  {cell_name(c.t, c.s)}: {per_pass}; flips {c.flips}; dropped "
+            f"{c.dropped_span_flips}; caps {_yes(split['caps_on_106'])}, build check "
+            f"{_yes(split['build_check_on_19'])}"
+        )
+    at = next(c for c in result.cells if (c.t, c.s) == PROJECTION_CELL)
+    lines.append(
+        f"build check at {cell_name(*PROJECTION_CELL)}: "
+        f"{_num(at.reading.named.mean(at.reading.named.errors_and_judge_errors))} errors per pass "
+        f"on the 32 against the fitted projection's {_num(PROJECTED_ON_32)} and v2's "
+        f"{_num(result.v2.named.mean(result.v2.named.errors_and_judge_errors))}."
+    )
+    cost = ", ".join(f"${c:.4f}" for c in result.costs)
+    lines.append(f"cost per answer, per pass: {cost}.")
+    lines.append(f"the skeptic's search, gap types given: {result.search_gaps or 'none'}.")
+    low = sum(r["skeptic_score"] is not None and r["skeptic_score"] < at.t for r in result.cleared)
+    wrong = sum(not r["supported"] for r in result.cleared)
+    lines.append(
+        f"spans cleared by code: {len(result.cleared)}, {low} of them scored under t = {at.t} by "
+        f"the skeptic, {wrong} on answers labeled unsupported. All in {result.report}."
     )
     known = [k for k in result.cells[0].reading.kept_passes if k.endswith(KNOWN_MISS)]
     for key in known:

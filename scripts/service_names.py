@@ -12,11 +12,13 @@ path segment that holds a guide (103 of them), each name marked by its source:
   guide that names several services ("AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and ...")
   is split on its commas; a version suffix such as " v2" and a parenthetical that is not an
   abbreviation ("(for Apache Cassandra)") are dropped.
-- abbreviation: one a guide's pages define in parentheses right after the full name ("Amazon
-  Relational Database Service (Amazon RDS)", "AWS Cloud Development Kit (AWS CDK)").
+- abbreviation: one a guide's pages, title or text, define in parentheses right after a full name
+  ("Amazon Relational Database Service (Amazon RDS)", "AWS Cloud Development Kit (AWS CDK)").
 - short: the name without its leading "Amazon " or "AWS ".
-- hand: short forms the pages never define (ELB, OpenSearch, EC2, S3), listed in HAND below.
+- hand: short forms the pages never define (ELB, OpenSearch, EC2, S3), listed in HAND below. A
+  hand name that the rest already gives is refused, so the list stays what the pages lack.
 
+A General Reference page takes the names of the guide whose title is its service's full name.
 Every segment of the snapshot must get at least one name, or the build refuses. The snapshot is
 not in the repository; the file is, with the sha256 of the snapshot it was built from, and --check
 rebuilds it and fails if the committed file differs. The judge never sees a URL: the grader reads a
@@ -41,33 +43,24 @@ PUBLISHER = ("AWS", "Amazon")
 GENERAL = "general"
 GENERAL_SUFFIX = " endpoints and quotas"
 PREFIXES = ("Amazon ", "AWS ")
-# Short forms the pages never define, by segment. Each is a service's own name as answers write it.
+# Short forms the pages never define, by segment: a service's own name as answers write it, and
+# never a feature of the service. The short form without "Amazon " or "AWS " follows by itself.
 HAND: dict[str, tuple[str, ...]] = {
-    "AWSEC2": ("Amazon EC2", "EC2"),
-    "AmazonS3": ("Amazon S3", "S3"),
-    "AWSSimpleQueueService": ("Amazon SQS", "SQS"),
-    "sns": ("Amazon SNS", "SNS"),
-    "AmazonECS": ("Amazon ECS", "ECS"),
-    "efs": ("Amazon EFS", "EFS"),
-    "IAM": ("IAM",),
-    "kms": ("AWS KMS", "KMS"),
-    "STS": ("AWS STS", "STS"),
-    "acm": ("ACM",),
-    "dms": ("AWS DMS", "DMS"),
-    "msk": ("Amazon MSK", "MSK"),
-    "ses": ("Amazon SES", "SES"),
-    "vpc": ("VPC",),
-    "elasticloadbalancing": ("ELB",),
-    "opensearch-service": ("OpenSearch",),
-    "sagemaker": ("Amazon SageMaker", "SageMaker"),
+    "AWSEC2": ("Amazon EC2",),
+    "AWSSimpleQueueService": ("Amazon SQS",),
+    "AmazonS3": ("Amazon S3",),
+    "STS": ("AWS STS",),
+    "amazonglacier": ("S3 Glacier",),
     "bedrock-agentcore": ("AgentCore",),
-    "streams": ("Kinesis",),
+    "elasticloadbalancing": ("ELB",),
     "firehose": ("Firehose",),
-    "waf": ("Shield",),
-    "cost-management": ("Cost Explorer",),
-    "amazonglacier": ("S3 Glacier", "Glacier"),
+    "fsx": ("Amazon FSx",),
+    "opensearch-service": ("OpenSearch",),
+    "sagemaker": ("Amazon SageMaker",),
+    "sns": ("Amazon SNS",),
+    "streams": ("Kinesis",),
     "tag-editor": ("Tag Editor",),
-    "fsx": ("Amazon FSx", "FSx"),
+    "waf": ("Shield",),
 }
 _VERSION_SUFFIX = re.compile(r"\s+v\d+$")
 _PARENS = re.compile(r"\s*\(([^()]*)\)")
@@ -131,7 +124,7 @@ def build(snapshot: Path = SNAPSHOT) -> dict[str, Any]:
     rows = [json.loads(line) for line in snapshot.read_text(encoding="utf-8").splitlines() if line]
     segments: dict[str, Names] = defaultdict(Names)
     pages: dict[str, Names] = {}
-    heads: dict[str, list[str]] = defaultdict(list)
+    heads: dict[str, list[str]] = defaultdict(list)  # each page's title head and its text
     for row in rows:
         path = urlparse(str(row["url"])).path
         segment = next((part for part in path.split("/") if part), "")
@@ -155,7 +148,7 @@ def build(snapshot: Path = SNAPSHOT) -> dict[str, Any]:
             names.add(full, "title")
             for found in abbreviations:
                 names.add(found, "abbreviation")
-        heads[segment].append(head)
+        heads[segment] += [head, str(row["text"])]
     # Abbreviations a guide's pages define right after one of the guide's full names.
     for segment, held in heads.items():
         names = segments[segment]
@@ -168,7 +161,15 @@ def build(snapshot: Path = SNAPSHOT) -> dict[str, Any]:
         if segment not in segments:
             raise Refused(f"HAND names {segment!r}, which is no segment of the snapshot")
         for name in hand:
+            if name in segments[segment].entries:
+                raise Refused(f"HAND repeats {name!r}, which {segment!r} already has")
             segments[segment].add(name, "hand")
+    for held_names in pages.values():  # the guide whose title is its service's full name
+        full = next(iter(held_names.entries))
+        for held in segments.values():
+            if held.entries.get(full) == "title":
+                for name, source in held.entries.items():
+                    held_names.entries.setdefault(name, source)
     uncovered = sorted(s for s, n in segments.items() if not n.entries and s != GENERAL)
     if uncovered:
         raise Refused(f"segments with no name: {uncovered}")

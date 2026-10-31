@@ -623,6 +623,23 @@ def _claim_checks(grader: ClaimJudgeGrader) -> str:
         f"in {share(c.search_missing, c.judgings)}; verdicts that fail at {cell} only because of "
         f"a dropped entry: {share(c.dropped_span_flips, c.judgings - c.judge_errors)}. The run's "
         "note records these counts."
+    ) + _claim_checks_v6(grader)
+
+
+def _claim_checks_v6(grader: ClaimJudgeGrader) -> str:
+    """What judge v6's rules counted over the same judgings (docs/plans/judge-v6.md, "What the
+    grader records"); nothing for judge v5, which has none of them."""
+    if grader.config.grader_name == "judge-v5":
+        return ""
+    c = grader.counts
+    return (
+        f" Gap types: none {c.gaps_none}, implication {c.gaps_implication}, scope {c.gaps_scope}, "
+        f"term {c.gaps_term}, cell {c.gaps_cell}, other {c.gaps_other}; failed by the gap rule "
+        f"{c.rule_fails}; downgraded as a cited service's own name {c.downgrades}; terms in a "
+        f"quote or the question {c.terms_quoted}, in none {c.terms_unquoted}. Own names cleared by "
+        f"code {c.names_cleared}, {c.names_cleared_skeptic_low} of them scored under t by the "
+        f"skeptic. Names in claims that no quote states: {c.names_unquoted}, in "
+        f"{c.claims_with_names_unquoted} claims."
     )
 
 

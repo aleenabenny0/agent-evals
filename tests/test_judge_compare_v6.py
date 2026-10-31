@@ -666,3 +666,97 @@ def test_choose_stops_before_any_call_when_no_cell_is_eligible(records: Path) ->
     with pytest.raises(jc.Refused, match="no cell of any version is eligible"):
         choose(["draft:64:off"], fresh, records, answers)
     assert fresh.requests == []
+
+
+def test_the_total_gate_counts_every_judge_error_on_the_125_and_the_caps_none_on_the_93() -> None:
+    answers = tuning()
+    truth: dict[str, bool | None] = {a.key: a.supported for a in answers}
+    capped = next(a.key for a in answers if not jc.named(a))
+    named = next(a.key for a in answers if jc.named(a))
+    reading = jc.read(answers, [truth | {capped: None, named: None}])
+    assert reading.capped.errors == 0 and reading.capped.judge_errors == 1
+    assert reading.named.errors_and_judge_errors == 1
+    assert reading.total_errors == Fraction(2)  # both count on the 125
+
+
+def test_the_order_between_the_candidates_comes_from_the_exploration_passes(records: Path) -> None:
+    """On the fresh passes the second candidate is the better one; the first is still eligible,
+    so it is frozen: nothing from the exploration passes enters the choice except the order."""
+    answers = tuning()
+    replay_passed(records)
+    judge = Judges(answers)
+    run_stage_a("draft", Cached(judge), records, answers=answers)
+    # Under the choice salts, scored 66: passes at t = 64 and fails at t = 69, so t = 64 makes
+    # two errors per pass on these unsupported named answers and t = 69 none.
+    wrong = [a for a in answers if jc.named(a) and not a.supported][:2]
+    judge.scores |= {(f"judge-v6-choice-{n}", a.key): 66 for n in (1, 2, 3) for a in wrong}
+    result = choose(["draft:64:off", "draft:69:off"], Cached(judge), records, answers)
+    assert [(c.t, c.s) for c in result.ordered] == [(64, None), (69, None)]
+    assert result.ordered[1].reading.total_errors < result.ordered[0].reading.total_errors
+    assert result.chosen is result.ordered[0] and result.ordered[0].gates.eligible
+
+
+class Costly:
+    """A model whose every reply costs this many input tokens."""
+
+    def __init__(self, llm: Any, tokens: int) -> None:
+        self.llm = llm
+        self.tokens = tokens
+
+    def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
+        resp: LLMResponse = self.llm.create(request, salt=salt)
+        usage = {"input_tokens": self.tokens, "output_tokens": 20}
+        return resp.model_copy(update={"usage": usage})
+
+
+def test_a_revision_that_costs_too_much_stops_after_its_first_pass(records: Path) -> None:
+    answers = tuning()
+    replay_passed(records)
+    run_stage_a("draft", Cached(Judges(answers)), records, answers=answers)
+    costly = Costly(Cached(Judges(answers)), 10_000)  # $0.02 a call, over 1.3 times $0.012
+    with pytest.raises(jc.Refused, match="first pass cost"):
+        run_stage_a("rev1", costly, records, answers=answers, gap_types=True)
+    assert (records / "stage-a-rev1.pass1.json").is_file()
+    assert not (records / "stage-a-rev1.pass2.json").exists()
+    assert json.loads((records / jc.COST_STOP_FILE).read_text(encoding="utf-8"))["label"] == "rev1"
+    entries = spend.round_for("judge-v6").ledger().entries()
+    assert entries[-1].step == "stage-a rev1 (stopped early)"
+    with pytest.raises(jc.Refused, match="the budget is revisited"):
+        run_stage_a("rev1", Cached(Judges(answers)), records, answers=answers, gap_types=True)
+
+
+def test_a_draft_changed_after_the_pilot_counts_as_a_version(records: Path) -> None:
+    answers = tuning()
+    replay_passed(records)
+    held = jc.versions(ScriptedLLM([]), claim_config(), NAMES)
+    records.mkdir(parents=True, exist_ok=True)
+    pilot = {"cost_per_answer_usd": 0.0105, "versions": {k: f"old-{v}" for k, v in held.items()}}
+    (records / jc.PILOT_FILE).write_text(json.dumps(pilot), encoding="utf-8")
+    result = run_stage_a("draft", Cached(Judges(answers)), records, answers=answers)
+    assert result.pilot is None and result.versions_counted == 1
+    # Three more would make five with the pilot's: the fourth version here is refused.
+    for label, gaps in (("rev1", True),):
+        run_stage_a(label, Cached(Judges(answers)), records, answers=answers, gap_types=gaps)
+    assert len(jc.load_versions(records, answers, held)) == 2
+
+
+def test_every_stage_a_step_reports_per_pass_errors_flips_v5s_split_and_cleared_spans(
+    records: Path,
+) -> None:
+    answers = tuning()
+    replay_passed(records)
+    flip = next(a for a in answers if not jc.named(a) and not a.supported)
+    judge = Judges(answers, scores={("judge-v6-draft-2", flip.key): 95})
+    result = run_stage_a("draft", Cached(judge), records, answers=answers)
+    cell = result.cells[0]
+    assert cell.errors_by_pass == [0, 1, 0] and cell.flips == 1
+    assert len(result.costs) == 3 and result.cleared == [] and result.search_gaps == {}
+    held = json.loads(result.report.read_text(encoding="utf-8"))
+    at = held["cells"]["t=69 s=off"]
+    assert at["errors_by_pass_on_125"] == [0, 1, 0] and at["flips"] == 1
+    assert at["v5_split"] == {"caps_on_106": True, "build_check_on_19": True}
+    assert held["salts"] == ["judge-v6-draft-1", "judge-v6-draft-2", "judge-v6-draft-3"]
+    rendered = jc.render_stage_a(result, spend.round_for("judge-v6").ledger())
+    assert "per cell: errors on the 125 per pass" in rendered
+    assert "against the fitted projection's 6.33" in rendered and "cost per answer" in rendered
+    assert "spans cleared by code: 0" in rendered
