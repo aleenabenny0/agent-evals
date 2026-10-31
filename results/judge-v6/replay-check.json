@@ -1,0 +1,225 @@
+{
+ "checked_at": "2026-10-31T05:54:54.945037+00:00",
+ "grading_code_version": 3,
+ "rules_version": 2,
+ "service_names_sha256": "39bccc4a4bb194be52ac62d0b3f696fa6bb8b180369ad3359d5cf8864c0ce29d",
+ "code_sha256": "d8269e11002b3a4bb2863a5eb6e01b102aafe7ee74a096e9f6c41e2d7c64581f",
+ "passes_read": [
+  "results/judge-v5/stage-a-rev1.json",
+  "results/judge-v5/stage-a-rev1.judge-s2.json",
+  "results/judge-v5/stage-a-rev1.judge-s3.json"
+ ],
+ "v2_errors_on_125": 24,
+ "moved_answer": {
+  "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+  "cells_passed_per_salt": [
+   9,
+   9,
+   9
+  ]
+ },
+ "figures": {
+  "cells": {
+   "t=64 s=off": {
+    "capped_93": {
+     "false_passes": 2,
+     "false_fails": 0
+    },
+    "total_125": 26,
+    "named_32": 24,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 6,
+     "right": 3,
+     "wrong": 3
+    }
+   },
+   "t=64 s=49": {
+    "capped_93": {
+     "false_passes": 2,
+     "false_fails": 0
+    },
+    "total_125": 21,
+    "named_32": 19,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 3,
+     "right": 0,
+     "wrong": 3
+    }
+   },
+   "t=64 s=59": {
+    "capped_93": {
+     "false_passes": 2,
+     "false_fails": 0
+    },
+    "total_125": 25,
+    "named_32": 23,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 6,
+     "right": 3,
+     "wrong": 3
+    }
+   },
+   "t=69 s=off": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 0
+    },
+    "total_125": 23,
+    "named_32": 23,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 6,
+     "right": 3,
+     "wrong": 3
+    }
+   },
+   "t=69 s=49": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 0
+    },
+    "total_125": 18,
+    "named_32": 18,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 3,
+     "right": 0,
+     "wrong": 3
+    }
+   },
+   "t=69 s=59": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 0
+    },
+    "total_125": 22,
+    "named_32": 22,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 3,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 6,
+     "right": 3,
+     "wrong": 3
+    }
+   },
+   "t=74 s=off": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 3
+    },
+    "total_125": 18,
+    "named_32": 15,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 0,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 3,
+     "right": 0,
+     "wrong": 3
+    }
+   },
+   "t=74 s=49": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 3
+    },
+    "total_125": 18,
+    "named_32": 15,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 0,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 3,
+     "right": 0,
+     "wrong": 3
+    }
+   },
+   "t=74 s=59": {
+    "capped_93": {
+     "false_passes": 0,
+     "false_fails": 3
+    },
+    "total_125": 18,
+    "named_32": 15,
+    "kept_passes": {
+     "docs-20261016-214710-02abb7/docs-ai-003-p1": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p1": 3,
+     "docs-20261016-214710-02abb7/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-ai-003-p3": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-008": 3,
+     "docs-20261017-174739-1c0e8e/docs-chg-010": 0,
+     "docs-20261017-174739-1c0e8e/docs-mix-058": 0
+    },
+    "names_count_as_a_rule": {
+     "passes_moved_to_fail": 3,
+     "right": 0,
+     "wrong": 3
+    }
+   }
+  }
+ },
+ "problems": [],
+ "passed": true
+}

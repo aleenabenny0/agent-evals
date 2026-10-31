@@ -21,8 +21,8 @@ improve them only through changes that are proven on held-out data.**
   the LLM judge could see was pre-registered as a miss, and was one.
 - **Every number has an interval, and every failure stays on the record.** Bootstrap intervals,
   paired comparisons, exact tests, pre-registered predictions, and the rounds that failed, all
-  in the docs below. The latest, a judge redesign, stopped at its first pre-registered check
-  after $6.95 of a $60 budget.
+  in the docs below. The latest two, judge redesigns, each stopped at their first pre-registered
+  check, after $6.95 and $16.04 of $60 budgets.
 - **Engineering:** Python 3.12, mypy strict, over 400 offline tests, a DuckDB results store, a
   content-addressed call cache that makes re-runs free and identical, and CI on every push to
   main and every pull request.
@@ -38,9 +38,10 @@ The platform evaluates two agents that engineers use every day:
 > agent.** The harness, graders, statistics, results store, an LLM judge validated against a
 > human on dev answers, four gated improvement iterations (one shipped), and an online alert
 > tested on simulated days, three of them blind, work end to end; the charts and tables below
-> summarize them. A judge improvement round, meant to let the judge's score join the online
-> alert, stopped at its first pre-registered check on 2026-10-29, so the validated judge stays
-> and its score stays out of the alert. Next: LLM Ops, model routing and the code agent (see
+> summarize them. Two judge improvement rounds, meant to let the judge's score join the online
+> alert, each stopped at their first pre-registered check, the second on 2026-10-31, so the
+> validated judge stays and its score stays out of the alert. Next: LLM Ops, model routing and the
+> code agent (see
 > [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
@@ -305,7 +306,11 @@ Done:
    against a cap of 2.67 set by the validated judge, so the round ended there, after $6.95 of
    a $60 budget. Checked afterwards, no other threshold would have met the bar either, and the
    fresh answers kept for its blind test are still unread
-   ([docs/plans/judge-v5.md](docs/plans/judge-v5.md)).
+   ([docs/plans/judge-v5.md](docs/plans/judge-v5.md)). A second round *(stopped at stage A,
+   2026-10-31)* asked the judge to name the gap behind each claim and judged every version on fresh
+   samples. Both candidates beat the validated judge on total errors on fresh passes, 7.33 and 7.67
+   against 8.00, but one answer that had to keep passing passed 1 pass in 3, so that round ended too,
+   after $16.04 of a $60 budget ([docs/plans/judge-v6.md](docs/plans/judge-v6.md)).
 
 Next, in order:
 

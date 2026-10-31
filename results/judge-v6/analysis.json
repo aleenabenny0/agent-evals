@@ -1,0 +1,1481 @@
+{
+ "about": "Judge v6's result, recomputed from its records by scripts/judge_v6_result.py. Nothing was judged and no call was made. The stop is stage-a-choice.json's. Every other cell here is post hoc: it decides nothing.",
+ "stop": "no candidate is eligible on its fresh means: the total gate, the caps on the 93, the kept rule and the judge-error cap (stage A step 6)",
+ "frozen": null,
+ "spend": {
+  "total_usd": 16.037511,
+  "cap_usd": 60.0
+ },
+ "v2": {
+  "all_125": {
+   "per_pass": [
+    9,
+    8,
+    7
+   ],
+   "false_passes": 13,
+   "false_fails": 11,
+   "judge_errors": 0,
+   "errors": 24,
+   "per_pass_mean": 8.0
+  },
+  "capped_93": {
+   "per_pass": [
+    0,
+    1,
+    1
+   ],
+   "false_passes": 1,
+   "false_fails": 1,
+   "judge_errors": 0,
+   "errors": 2,
+   "per_pass_mean": 0.6667
+  },
+  "named_32": {
+   "per_pass": [
+    9,
+    7,
+    6
+   ],
+   "false_passes": 12,
+   "false_fails": 10,
+   "judge_errors": 0,
+   "errors": 22,
+   "per_pass_mean": 7.3333
+  },
+  "kept_short": [
+   "docs-20261017-174739-1c0e8e/docs-chg-008"
+  ],
+  "passes": [
+   37,
+   32,
+   35
+  ],
+  "fail_rates": [
+   0.704,
+   0.744,
+   0.72
+  ],
+  "false_pass_share_of_passes": 0.125
+ },
+ "versions": {
+  "draft": {
+   "candidate_cell": "t=64 s=49",
+   "exploration": {
+    "all_125": {
+     "per_pass": [
+      7,
+      7,
+      7
+     ],
+     "false_passes": 11,
+     "false_fails": 10,
+     "judge_errors": 0,
+     "errors": 21,
+     "per_pass_mean": 7.0
+    },
+    "capped_93": {
+     "per_pass": [
+      1,
+      1,
+      0
+     ],
+     "false_passes": 2,
+     "false_fails": 0,
+     "judge_errors": 0,
+     "errors": 2,
+     "per_pass_mean": 0.6667
+    },
+    "named_32": {
+     "per_pass": [
+      6,
+      6,
+      7
+     ],
+     "false_passes": 9,
+     "false_fails": 10,
+     "judge_errors": 0,
+     "errors": 19,
+     "per_pass_mean": 6.3333
+    },
+    "kept_short": [],
+    "passes": [
+     35,
+     35,
+     33
+    ],
+    "fail_rates": [
+     0.72,
+     0.72,
+     0.736
+    ],
+    "false_pass_share_of_passes": 0.1068
+   },
+   "fresh": {
+    "all_125": {
+     "per_pass": [
+      7,
+      8,
+      8
+     ],
+     "false_passes": 11,
+     "false_fails": 12,
+     "judge_errors": 0,
+     "errors": 23,
+     "per_pass_mean": 7.6667
+    },
+    "capped_93": {
+     "per_pass": [
+      1,
+      1,
+      1
+     ],
+     "false_passes": 3,
+     "false_fails": 0,
+     "judge_errors": 0,
+     "errors": 3,
+     "per_pass_mean": 1.0
+    },
+    "named_32": {
+     "per_pass": [
+      6,
+      7,
+      7
+     ],
+     "false_passes": 8,
+     "false_fails": 12,
+     "judge_errors": 0,
+     "errors": 20,
+     "per_pass_mean": 6.6667
+    },
+    "kept_short": [
+     "docs-20261017-174739-1c0e8e/docs-chg-010"
+    ],
+    "passes": [
+     33,
+     34,
+     34
+    ],
+    "fail_rates": [
+     0.736,
+     0.728,
+     0.728
+    ],
+    "false_pass_share_of_passes": 0.1089
+   },
+   "fresh_errors_by_answer": [
+    {
+     "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 1
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 2
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-chg-013",
+     "kind": "false pass",
+     "named": false,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-chg-022",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 2
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    }
+   ],
+   "fresh_every_cell_post_hoc": {
+    "t=64 s=off": {
+     "all_125": {
+      "per_pass": [
+       9,
+       10,
+       10
+      ],
+      "false_passes": 20,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 29,
+      "per_pass_mean": 9.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       2,
+       2,
+       3
+      ],
+      "false_passes": 7,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 7,
+      "per_pass_mean": 2.3333
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       8,
+       7
+      ],
+      "false_passes": 13,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 22,
+      "per_pass_mean": 7.3333
+     },
+     "kept_short": [],
+     "passes": [
+      37,
+      38,
+      38
+     ],
+     "fail_rates": [
+      0.704,
+      0.696,
+      0.696
+     ],
+     "false_pass_share_of_passes": 0.177
+    },
+    "t=64 s=49": {
+     "all_125": {
+      "per_pass": [
+       7,
+       8,
+       8
+      ],
+      "false_passes": 11,
+      "false_fails": 12,
+      "judge_errors": 0,
+      "errors": 23,
+      "per_pass_mean": 7.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 8,
+      "false_fails": 12,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      33,
+      34,
+      34
+     ],
+     "fail_rates": [
+      0.736,
+      0.728,
+      0.728
+     ],
+     "false_pass_share_of_passes": 0.1089
+    },
+    "t=64 s=59": {
+     "all_125": {
+      "per_pass": [
+       8,
+       9,
+       9
+      ],
+      "false_passes": 17,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 26,
+      "per_pass_mean": 8.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       2
+      ],
+      "false_passes": 4,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 4,
+      "per_pass_mean": 1.3333
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       8,
+       7
+      ],
+      "false_passes": 13,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 22,
+      "per_pass_mean": 7.3333
+     },
+     "kept_short": [],
+     "passes": [
+      36,
+      37,
+      37
+     ],
+     "fail_rates": [
+      0.712,
+      0.704,
+      0.704
+     ],
+     "false_pass_share_of_passes": 0.1545
+    },
+    "t=69 s=off": {
+     "all_125": {
+      "per_pass": [
+       8,
+       7,
+       8
+      ],
+      "false_passes": 14,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 23,
+      "per_pass_mean": 7.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       6,
+       7
+      ],
+      "false_passes": 11,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [],
+     "passes": [
+      36,
+      35,
+      36
+     ],
+     "fail_rates": [
+      0.712,
+      0.72,
+      0.712
+     ],
+     "false_pass_share_of_passes": 0.1308
+    },
+    "t=69 s=49": {
+     "all_125": {
+      "per_pass": [
+       7,
+       8,
+       8
+      ],
+      "false_passes": 11,
+      "false_fails": 12,
+      "judge_errors": 0,
+      "errors": 23,
+      "per_pass_mean": 7.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 8,
+      "false_fails": 12,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      33,
+      34,
+      34
+     ],
+     "fail_rates": [
+      0.736,
+      0.728,
+      0.728
+     ],
+     "false_pass_share_of_passes": 0.1089
+    },
+    "t=69 s=59": {
+     "all_125": {
+      "per_pass": [
+       8,
+       7,
+       8
+      ],
+      "false_passes": 14,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 23,
+      "per_pass_mean": 7.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 0,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       6,
+       7
+      ],
+      "false_passes": 11,
+      "false_fails": 9,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [],
+     "passes": [
+      36,
+      35,
+      36
+     ],
+     "fail_rates": [
+      0.712,
+      0.72,
+      0.712
+     ],
+     "false_pass_share_of_passes": 0.1308
+    },
+    "t=74 s=off": {
+     "all_125": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 3,
+      "false_fails": 13,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       0,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 2,
+      "judge_errors": 0,
+      "errors": 2,
+      "per_pass_mean": 0.6667
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       5,
+       4
+      ],
+      "false_passes": 3,
+      "false_fails": 11,
+      "judge_errors": 0,
+      "errors": 14,
+      "per_pass_mean": 4.6667
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      31,
+      30,
+      31
+     ],
+     "fail_rates": [
+      0.752,
+      0.76,
+      0.752
+     ],
+     "false_pass_share_of_passes": 0.0326
+    },
+    "t=74 s=49": {
+     "all_125": {
+      "per_pass": [
+       5,
+       7,
+       6
+      ],
+      "false_passes": 3,
+      "false_fails": 15,
+      "judge_errors": 0,
+      "errors": 18,
+      "per_pass_mean": 6.0
+     },
+     "capped_93": {
+      "per_pass": [
+       0,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 2,
+      "judge_errors": 0,
+      "errors": 2,
+      "per_pass_mean": 0.6667
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 3,
+      "false_fails": 13,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      31,
+      29,
+      30
+     ],
+     "fail_rates": [
+      0.752,
+      0.768,
+      0.76
+     ],
+     "false_pass_share_of_passes": 0.0333
+    },
+    "t=74 s=59": {
+     "all_125": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 3,
+      "false_fails": 13,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       0,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 2,
+      "judge_errors": 0,
+      "errors": 2,
+      "per_pass_mean": 0.6667
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       5,
+       4
+      ],
+      "false_passes": 3,
+      "false_fails": 11,
+      "judge_errors": 0,
+      "errors": 14,
+      "per_pass_mean": 4.6667
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      31,
+      30,
+      31
+     ],
+     "fail_rates": [
+      0.752,
+      0.76,
+      0.752
+     ],
+     "false_pass_share_of_passes": 0.0326
+    }
+   },
+   "borderline_answer": {
+    "exploration": [
+     {
+      "salt": "judge-v6-draft-1",
+      "weakest_claim_score": 68,
+      "weakest_claim_gap": null,
+      "search_confidence": 40,
+      "passes_at_the_cell": true
+     },
+     {
+      "salt": "judge-v6-draft-2",
+      "weakest_claim_score": 75,
+      "weakest_claim_gap": null,
+      "search_confidence": 40,
+      "passes_at_the_cell": true
+     },
+     {
+      "salt": "judge-v6-draft-3",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": null,
+      "search_confidence": 50,
+      "passes_at_the_cell": false
+     }
+    ],
+    "fresh": [
+     {
+      "salt": "judge-v6-choice-1",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": null,
+      "search_confidence": 50,
+      "passes_at_the_cell": false
+     },
+     {
+      "salt": "judge-v6-choice-2",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": null,
+      "search_confidence": 45,
+      "passes_at_the_cell": true
+     },
+     {
+      "salt": "judge-v6-choice-3",
+      "weakest_claim_score": 75,
+      "weakest_claim_gap": null,
+      "search_confidence": 50,
+      "passes_at_the_cell": false
+     }
+    ]
+   }
+  },
+  "rev1": {
+   "candidate_cell": "t=69 s=off",
+   "exploration": {
+    "all_125": {
+     "per_pass": [
+      7,
+      6,
+      8
+     ],
+     "false_passes": 7,
+     "false_fails": 13,
+     "judge_errors": 1,
+     "errors": 21,
+     "per_pass_mean": 7.0
+    },
+    "capped_93": {
+     "per_pass": [
+      1,
+      1,
+      2
+     ],
+     "false_passes": 0,
+     "false_fails": 3,
+     "judge_errors": 1,
+     "errors": 4,
+     "per_pass_mean": 1.3333
+    },
+    "named_32": {
+     "per_pass": [
+      6,
+      5,
+      6
+     ],
+     "false_passes": 7,
+     "false_fails": 10,
+     "judge_errors": 0,
+     "errors": 17,
+     "per_pass_mean": 5.6667
+    },
+    "kept_short": [],
+    "passes": [
+     33,
+     32,
+     31
+    ],
+    "fail_rates": [
+     0.736,
+     0.744,
+     0.752
+    ],
+    "false_pass_share_of_passes": 0.0729
+   },
+   "fresh": {
+    "all_125": {
+     "per_pass": [
+      9,
+      7,
+      6
+     ],
+     "false_passes": 8,
+     "false_fails": 14,
+     "judge_errors": 0,
+     "errors": 22,
+     "per_pass_mean": 7.3333
+    },
+    "capped_93": {
+     "per_pass": [
+      1,
+      1,
+      1
+     ],
+     "false_passes": 0,
+     "false_fails": 3,
+     "judge_errors": 0,
+     "errors": 3,
+     "per_pass_mean": 1.0
+    },
+    "named_32": {
+     "per_pass": [
+      8,
+      6,
+      5
+     ],
+     "false_passes": 8,
+     "false_fails": 11,
+     "judge_errors": 0,
+     "errors": 19,
+     "per_pass_mean": 6.3333
+    },
+    "kept_short": [
+     "docs-20261017-174739-1c0e8e/docs-chg-010"
+    ],
+    "passes": [
+     33,
+     31,
+     32
+    ],
+    "fail_rates": [
+     0.736,
+     0.752,
+     0.744
+    ],
+    "false_pass_share_of_passes": 0.0833
+   },
+   "fresh_errors_by_answer": [
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-chg-007",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 1
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-chg-010",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 2
+    },
+    {
+     "key": "docs-20261016-214710-02abb7/docs-chg-022",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 1
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-int-020",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-022",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-024",
+     "kind": "false pass",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261011-223111-702e87/docs-mix-055",
+     "kind": "false fail",
+     "named": false,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    },
+    {
+     "key": "docs-20261017-174739-1c0e8e/docs-mix-090",
+     "kind": "false fail",
+     "named": true,
+     "of_three": 3
+    }
+   ],
+   "fresh_every_cell_post_hoc": {
+    "t=64 s=off": {
+     "all_125": {
+      "per_pass": [
+       10,
+       9,
+       7
+      ],
+      "false_passes": 13,
+      "false_fails": 13,
+      "judge_errors": 0,
+      "errors": 26,
+      "per_pass_mean": 8.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       3,
+       2,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 6,
+      "per_pass_mean": 2.0
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       7,
+       6
+      ],
+      "false_passes": 10,
+      "false_fails": 10,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [],
+     "passes": [
+      36,
+      33,
+      33
+     ],
+     "fail_rates": [
+      0.712,
+      0.736,
+      0.736
+     ],
+     "false_pass_share_of_passes": 0.1275
+    },
+    "t=64 s=49": {
+     "all_125": {
+      "per_pass": [
+       8,
+       9,
+       8
+      ],
+      "false_passes": 11,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 25,
+      "per_pass_mean": 8.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       2,
+       2,
+       1
+      ],
+      "false_passes": 2,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 5,
+      "per_pass_mean": 1.6667
+     },
+     "named_32": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 9,
+      "false_fails": 11,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      34,
+      33,
+      32
+     ],
+     "fail_rates": [
+      0.728,
+      0.736,
+      0.744
+     ],
+     "false_pass_share_of_passes": 0.1111
+    },
+    "t=64 s=59": {
+     "all_125": {
+      "per_pass": [
+       10,
+       9,
+       7
+      ],
+      "false_passes": 13,
+      "false_fails": 13,
+      "judge_errors": 0,
+      "errors": 26,
+      "per_pass_mean": 8.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       3,
+       2,
+       1
+      ],
+      "false_passes": 3,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 6,
+      "per_pass_mean": 2.0
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       7,
+       6
+      ],
+      "false_passes": 10,
+      "false_fails": 10,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "kept_short": [],
+     "passes": [
+      36,
+      33,
+      33
+     ],
+     "fail_rates": [
+      0.712,
+      0.736,
+      0.736
+     ],
+     "false_pass_share_of_passes": 0.1275
+    },
+    "t=69 s=off": {
+     "all_125": {
+      "per_pass": [
+       9,
+       7,
+       6
+      ],
+      "false_passes": 8,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 22,
+      "per_pass_mean": 7.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       8,
+       6,
+       5
+      ],
+      "false_passes": 8,
+      "false_fails": 11,
+      "judge_errors": 0,
+      "errors": 19,
+      "per_pass_mean": 6.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      33,
+      31,
+      32
+     ],
+     "fail_rates": [
+      0.736,
+      0.752,
+      0.744
+     ],
+     "false_pass_share_of_passes": 0.0833
+    },
+    "t=69 s=49": {
+     "all_125": {
+      "per_pass": [
+       8,
+       7,
+       7
+      ],
+      "false_passes": 7,
+      "false_fails": 15,
+      "judge_errors": 0,
+      "errors": 22,
+      "per_pass_mean": 7.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       7,
+       6,
+       6
+      ],
+      "false_passes": 7,
+      "false_fails": 12,
+      "judge_errors": 0,
+      "errors": 19,
+      "per_pass_mean": 6.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      32,
+      31,
+      31
+     ],
+     "fail_rates": [
+      0.744,
+      0.752,
+      0.752
+     ],
+     "false_pass_share_of_passes": 0.0745
+    },
+    "t=69 s=59": {
+     "all_125": {
+      "per_pass": [
+       9,
+       7,
+       6
+      ],
+      "false_passes": 8,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 22,
+      "per_pass_mean": 7.3333
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       1
+      ],
+      "false_passes": 0,
+      "false_fails": 3,
+      "judge_errors": 0,
+      "errors": 3,
+      "per_pass_mean": 1.0
+     },
+     "named_32": {
+      "per_pass": [
+       8,
+       6,
+       5
+      ],
+      "false_passes": 8,
+      "false_fails": 11,
+      "judge_errors": 0,
+      "errors": 19,
+      "per_pass_mean": 6.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      33,
+      31,
+      32
+     ],
+     "fail_rates": [
+      0.736,
+      0.752,
+      0.744
+     ],
+     "false_pass_share_of_passes": 0.0833
+    },
+    "t=74 s=off": {
+     "all_125": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 2,
+      "false_fails": 18,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       2
+      ],
+      "false_passes": 0,
+      "false_fails": 4,
+      "judge_errors": 0,
+      "errors": 4,
+      "per_pass_mean": 1.3333
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 2,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      30,
+      29,
+      27
+     ],
+     "fail_rates": [
+      0.76,
+      0.768,
+      0.784
+     ],
+     "false_pass_share_of_passes": 0.0233
+    },
+    "t=74 s=49": {
+     "all_125": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 2,
+      "false_fails": 18,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       2
+      ],
+      "false_passes": 0,
+      "false_fails": 4,
+      "judge_errors": 0,
+      "errors": 4,
+      "per_pass_mean": 1.3333
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 2,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      30,
+      29,
+      27
+     ],
+     "fail_rates": [
+      0.76,
+      0.768,
+      0.784
+     ],
+     "false_pass_share_of_passes": 0.0233
+    },
+    "t=74 s=59": {
+     "all_125": {
+      "per_pass": [
+       6,
+       7,
+       7
+      ],
+      "false_passes": 2,
+      "false_fails": 18,
+      "judge_errors": 0,
+      "errors": 20,
+      "per_pass_mean": 6.6667
+     },
+     "capped_93": {
+      "per_pass": [
+       1,
+       1,
+       2
+      ],
+      "false_passes": 0,
+      "false_fails": 4,
+      "judge_errors": 0,
+      "errors": 4,
+      "per_pass_mean": 1.3333
+     },
+     "named_32": {
+      "per_pass": [
+       5,
+       6,
+       5
+      ],
+      "false_passes": 2,
+      "false_fails": 14,
+      "judge_errors": 0,
+      "errors": 16,
+      "per_pass_mean": 5.3333
+     },
+     "kept_short": [
+      "docs-20261017-174739-1c0e8e/docs-chg-010"
+     ],
+     "passes": [
+      30,
+      29,
+      27
+     ],
+     "fail_rates": [
+      0.76,
+      0.768,
+      0.784
+     ],
+     "false_pass_share_of_passes": 0.0233
+    }
+   },
+   "borderline_answer": {
+    "exploration": [
+     {
+      "salt": "judge-v6-rev1-1",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": "implication",
+      "search_confidence": 50,
+      "passes_at_the_cell": true
+     },
+     {
+      "salt": "judge-v6-rev1-2",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": "implication",
+      "search_confidence": 45,
+      "passes_at_the_cell": true
+     },
+     {
+      "salt": "judge-v6-rev1-3",
+      "weakest_claim_score": 68,
+      "weakest_claim_gap": "scope",
+      "search_confidence": 55,
+      "passes_at_the_cell": false
+     }
+    ],
+    "fresh": [
+     {
+      "salt": "judge-v6-choice-1",
+      "weakest_claim_score": 65,
+      "weakest_claim_gap": "implication",
+      "search_confidence": 45,
+      "passes_at_the_cell": false
+     },
+     {
+      "salt": "judge-v6-choice-2",
+      "weakest_claim_score": 60,
+      "weakest_claim_gap": "scope",
+      "search_confidence": null,
+      "passes_at_the_cell": false
+     },
+     {
+      "salt": "judge-v6-choice-3",
+      "weakest_claim_score": 70,
+      "weakest_claim_gap": "implication",
+      "search_confidence": 50,
+      "passes_at_the_cell": true
+     }
+    ]
+   }
+  }
+ },
+ "gap_rule": {
+  "judgings": 750,
+  "moved_pass_to_fail": {
+   "supported": 6
+  },
+  "answers_rightly_failed": 0,
+  "answers_wrongly_failed": [
+   "docs-20261011-223111-702e87/docs-mix-055"
+  ],
+  "claims_by_gap_and_label": {
+   "cell supported": 6,
+   "cell unsupported": 204,
+   "implication supported": 57,
+   "implication unsupported": 503,
+   "none supported": 547,
+   "none unsupported": 1298,
+   "other supported": 1,
+   "other unsupported": 306,
+   "scope supported": 12,
+   "scope unsupported": 226,
+   "term supported": 6,
+   "term unsupported": 215
+  }
+ },
+ "clearing": {
+  "flags_cleared": {
+   "docs-20261016-214710-02abb7/docs-ai-003-p3 Bedrock: Note that this applies to Bedrock cross-Region inference specifically; I did not check other AWS services.": 12,
+   "docs-20261011-223111-702e87/docs-chg-008 AWS: For a new account, check with AWS support or your account team before planning work around Clarify.": 12,
+   "docs-20261011-223111-702e87/docs-chg-010 AgentCore: For a first agent, start with Amazon Bedrock AgentCore.": 2
+  },
+  "verdicts_moved": [
+   {
+    "version": "draft",
+    "salt": "judge-v6-draft-1",
+    "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "to_pass": true,
+    "right": true
+   },
+   {
+    "version": "draft",
+    "salt": "judge-v6-draft-3",
+    "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "to_pass": true,
+    "right": true
+   },
+   {
+    "version": "draft",
+    "salt": "judge-v6-choice-1",
+    "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "to_pass": true,
+    "right": true
+   },
+   {
+    "version": "rev1",
+    "salt": "judge-v6-rev1-3",
+    "key": "docs-20261016-214710-02abb7/docs-ai-003-p3",
+    "to_pass": true,
+    "right": true
+   }
+  ]
+ },
+ "v2_on_rev1s_exploration_errors": {
+  "docs-20261017-174739-1c0e8e/docs-chg-010": 0,
+  "docs-20261016-214710-02abb7/docs-chg-022": 0,
+  "docs-20261017-174739-1c0e8e/docs-core-018": 0,
+  "docs-20261017-174739-1c0e8e/docs-int-020": 1,
+  "docs-20261017-174739-1c0e8e/docs-mix-022": 2,
+  "docs-20261017-174739-1c0e8e/docs-mix-024": 1,
+  "docs-20261011-223111-702e87/docs-mix-055": 0,
+  "docs-20261017-174739-1c0e8e/docs-mix-058": 0,
+  "docs-20261017-174739-1c0e8e/docs-mix-090": 3
+ }
+}

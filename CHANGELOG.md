@@ -171,6 +171,18 @@ Format:
 
 ## Unreleased
 
+- 2026-10-31: the second judge improvement round stopped at stage A (`docs/plans/judge-v6.md`,
+  approved 2026-10-30). Built: a gap type per claim, the cited service's own name cleared in code,
+  the threshold grid read as the judge's score levels, a names count, a service-name file built from
+  the docs snapshot, a ledger per round, and stage A tools with a no-call replay check that had to
+  reproduce the pre-registered figures before any paid pass. Each version was judged under three
+  fresh salts, and the two candidates under three more. On those fresh passes both beat v2 on all
+  125 tuning answers (7.67 and 7.33 errors per pass against 8.00) and met the caps, but one kept
+  answer, docs-chg-010 on iteration 4's run, passed 1 of 3 passes where 2 are needed, so the round
+  stopped under its pre-registered rule. The gap rule itself moved 6 of 750 verdicts, all on one
+  answer labeled supported; the lower false-pass count came from asking for the gap. v2 stays the
+  judge, and `judge_supported` stays out of the alert. The round spent $16.04 of its $60 cap
+  (`results/judge-v6/`), and the 376 fresh answers are still unread.
 - 2026-10-29: the judge improvement round stopped at stage A (`docs/plans/judge-v5.md`,
   approved 2026-10-28). The claim judge was built: a claim table that code checks, a 0 to 100
   score per claim with one tuned threshold, and a skeptic pass. So were the stage A tools, the

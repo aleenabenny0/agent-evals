@@ -1,0 +1,38 @@
+[
+ {
+  "label": "draft",
+  "pass": 1,
+  "number": 1,
+  "salt": "judge-v6-choice-1"
+ },
+ {
+  "label": "draft",
+  "pass": 2,
+  "number": 2,
+  "salt": "judge-v6-choice-2"
+ },
+ {
+  "label": "draft",
+  "pass": 3,
+  "number": 3,
+  "salt": "judge-v6-choice-3"
+ },
+ {
+  "label": "rev1",
+  "pass": 1,
+  "number": 1,
+  "salt": "judge-v6-choice-1"
+ },
+ {
+  "label": "rev1",
+  "pass": 2,
+  "number": 2,
+  "salt": "judge-v6-choice-2"
+ },
+ {
+  "label": "rev1",
+  "pass": 3,
+  "number": 3,
+  "salt": "judge-v6-choice-3"
+ }
+]

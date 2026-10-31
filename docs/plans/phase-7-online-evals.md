@@ -797,8 +797,9 @@ so its approach is written up and approved before any code, and it needs 30 fres
 to validate.
 
 Outcome: the design (`docs/plans/judge-v5.md`) was approved on 2026-10-28 and stopped at its
-stage A on 2026-10-29, before any fresh label was drawn. v2 stays the judge, and
-`judge_supported` stays out of the alert family.
+stage A on 2026-10-29, before any fresh label was drawn. A second design
+(`docs/plans/judge-v6.md`), approved on 2026-10-30, stopped at its stage A on 2026-10-31, also
+before any fresh label. v2 stays the judge, and `judge_supported` stays out of the alert family.
 
 ## Check of decisions 5 and 6 (2026-10-20)
 

@@ -4,6 +4,8 @@
 # its own name, judge-v6, beside the validated judge (v2), and no gate or alert reads it until
 # stage C passes. Its thresholds and gap_types are placeholders until stage A freezes a version:
 # the first draft is code only (gap_types: false, v5's prompts); revision 1 adds the gap types.
+# The round stopped at stage A on 2026-10-31 with no version frozen, so they were never set, and no
+# online run uses this judge.
 # Judging a run with it costs money and is the v6 round's spend: evals judge RUN -c configs/judge-v6.yaml
 
 paths:

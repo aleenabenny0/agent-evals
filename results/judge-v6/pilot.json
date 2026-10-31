@@ -1,0 +1,93 @@
+{
+ "judged_at": "2026-10-31T05:56:34.950814+00:00",
+ "label": "draft",
+ "draw": {
+  "seed": "judge-v6-pilot",
+  "per_run": {
+   "docs-20261011-223111-702e87": 7,
+   "docs-20261016-214710-02abb7": 7,
+   "docs-20261017-174739-1c0e8e": 6
+  }
+ },
+ "answers": [
+  "docs-20261011-223111-702e87/docs-ai-002",
+  "docs-20261011-223111-702e87/docs-chg-030",
+  "docs-20261011-223111-702e87/docs-mix-024",
+  "docs-20261011-223111-702e87/docs-int-035",
+  "docs-20261011-223111-702e87/docs-int-030",
+  "docs-20261011-223111-702e87/docs-mix-012",
+  "docs-20261011-223111-702e87/docs-mix-023",
+  "docs-20261016-214710-02abb7/docs-core-002",
+  "docs-20261016-214710-02abb7/docs-ai-038",
+  "docs-20261016-214710-02abb7/docs-int-032",
+  "docs-20261016-214710-02abb7/docs-ai-002-p3",
+  "docs-20261016-214710-02abb7/docs-ai-010",
+  "docs-20261016-214710-02abb7/docs-chg-013",
+  "docs-20261016-214710-02abb7/docs-chg-008",
+  "docs-20261017-174739-1c0e8e/docs-mix-011",
+  "docs-20261017-174739-1c0e8e/docs-core-011",
+  "docs-20261017-174739-1c0e8e/docs-ai-038",
+  "docs-20261017-174739-1c0e8e/docs-ai-002-p1",
+  "docs-20261017-174739-1c0e8e/docs-mix-058",
+  "docs-20261017-174739-1c0e8e/docs-int-002"
+ ],
+ "salts": [
+  "judge-v6-draft-1",
+  "judge-v6-draft-2",
+  "judge-v6-draft-3"
+ ],
+ "versions": {
+  "t=64 s=off": "5ed5a1eebea6",
+  "t=64 s=49": "a9e507d2cf48",
+  "t=64 s=59": "e40c97ad6304",
+  "t=69 s=off": "45c0a14bf69b",
+  "t=69 s=49": "e7cfef9c3af4",
+  "t=69 s=59": "b9dae1349992",
+  "t=74 s=off": "325ef62afdc6",
+  "t=74 s=49": "28e8d2344f80",
+  "t=74 s=59": "edb2c45362ab"
+ },
+ "cost_per_answer_usd": 0.009287093333333333,
+ "estimate_per_answer_usd": 0.012,
+ "stop_factor": 1.3,
+ "stop": false,
+ "flips": {
+  "t=64 s=off": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=64 s=49": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=64 s=59": {
+   "flipped": 1,
+   "of": 20
+  },
+  "t=69 s=off": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=69 s=49": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=69 s=59": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=74 s=off": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=74 s=49": {
+   "flipped": 0,
+   "of": 20
+  },
+  "t=74 s=59": {
+   "flipped": 0,
+   "of": 20
+  }
+ },
+ "spent_usd": 0.557226
+}

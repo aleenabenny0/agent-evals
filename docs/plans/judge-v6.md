@@ -20,8 +20,9 @@ tuning data, so none of it is evidence; the validation rules are fixed here, bef
 step, and only the fresh blind labels of stage C count. Estimated cost about $44 before any
 label, capped at $60; then 120 blind labels. **Status: approved 2026-10-30, after an external
 review of the 2026-10-29 text whose points are taken in below (decisions 2 to 5 and 7 added,
-decision 6 changed); two independent rechecks of the revised text taken in on 2026-10-31; the
-build follows.**
+decision 6 changed); two independent rechecks of the revised text taken in on 2026-10-31. Stopped
+at stage A on 2026-10-31, on one kept answer, after $16.04 of the $60 cap: see the result below.
+v2 stays the judge.**
 
 The design and every number below come from the records of the v5 round (`results/judge-v5/`
 and the result section of `docs/plans/judge-v5.md`). Nothing was judged for this proposal: no
@@ -46,6 +47,108 @@ answers labeled supported which v2 passes must still be passed. The **capped cou
 answers outside the named cases, whose errors stage A caps at v2's plus 2 (false fails plus 1);
 the total gate reads all 125, named answers included, so no placement of the named line can
 soften it.
+
+## Result: stopped at stage A (2026-10-31)
+
+Stage A ran once, as planned, and stopped at step 6: neither candidate was eligible on its fresh
+means. Both met every gate but one. A single kept answer, docs-chg-010 on iteration 4's run, passed
+1 of the 3 fresh passes under each candidate, and the kept rule needs 2. Under the rules fixed in
+advance, the round ends there:
+
+- `judge_supported` stays out of the alert family, and v2 stays the judge everywhere.
+- Stages B and C did not run and were not built, and no further revision is made in this round.
+- No version was frozen, so `judge-v6` was never pinned, and no online run uses it.
+- No fresh label was drawn. The 376 fresh answers on the reference days are still unread, so a
+  later round can still test on them blind.
+
+Spend was $16.04 of the $60 cap (`results/judge-v6/spend.json`). Every record is in
+`results/judge-v6/`, and every figure below is recomputed from them by
+`scripts/judge_v6_result.py` into `results/judge-v6/analysis.json`, with no call to the API.
+
+| Step | What ran | Result | Spend |
+|---|---|---|---|
+| Replay check | the code over v5's saved passes, no call | every pre-registered figure reproduced, at every cell | $0 |
+| 1. Pilot | 20 tuning answers, three salts | $0.0093 per answer against the $0.012 estimate, so no stop | $0.56 |
+| 2. First draft (v5's prompts, v6's code) | the 125, three salts | eligible at three cells, best t = 64, s = 49 | $3.29 |
+| 2. Revision 1 (gap types) | the 125, three salts | eligible at two cells, best t = 69, s off or 59 | $4.18 |
+| 5 and 6. Choice | the two candidates, three fresh salts each | stop: the kept rule, on one answer | $8.01 |
+
+No further revision was made. Revision 1's errors at t = 69, s off, fell on seven named answers, on
+one answer outside them whose label the gap rule disagrees with (docs-mix-055), and on one judge
+error, and v2 also errs on four of those eight answers. Another revision would have fitted the same
+125 answers harder, and the design allows one but does not require it.
+
+**Errors on the 125, over three passes** (false passes, false fails, judge errors; v2 is its stored
+pass and its two replayed passes):
+
+| | FP | FF | JE | Errors | Per pass | On the 93 | On the 32 | Kept rule |
+|---|---|---|---|---|---|---|---|---|
+| v2 | 13 | 11 | 0 | 24 | 9, 8, 7 | 2 | 22 | |
+| Draft, t = 64, s = 49, exploration | 11 | 10 | 0 | 21 | 7, 7, 7 | 2 | 19 | held |
+| Draft, t = 64, s = 49, **fresh** | 11 | 12 | 0 | 23 | 7, 8, 8 | 3 | 20 | **missed** |
+| Revision 1, t = 69, s off, exploration | 7 | 13 | 1 | 21 | 7, 6, 8 | 3, and the judge error | 17 | held |
+| Revision 1, t = 69, s off, **fresh** | 8 | 14 | 0 | 22 | 9, 7, 6 | 3 | 19 | **missed** |
+
+On the fresh passes the total gate held (7.67 and 7.33 errors per pass against v2's 8.00), and so
+did the caps on the 93 and the judge-error cap. The build check, reported as a prediction, held
+too: revision 1 made 19 errors on the 32, exactly the 19 the fitted projection gave, against v2's
+22. The explored means moved up on the fresh passes by 0.67 and 0.33 errors per pass, the optimism
+the fresh salts were there to remove.
+
+**Why it stopped.** docs-chg-010 on iteration 4's run is labeled supported and v2 passes it. Its
+weakest claim, that the docs recommend first-time users begin with the CLI getting-started guide,
+sits at the levels where the verdict turns:
+
+| Candidate | What decides it | Exploration | Fresh |
+|---|---|---|---|
+| Draft, t = 64, s = 49 | the search's confidence against 49 | 40, 40, 50 | 50, 45, 50 |
+| Revision 1, t = 69, s off | the weakest claim's score against 69 | 70, 70, 68 | 65, 60, 70 |
+
+Over its six passes it passes 3 of 6 under each candidate, so each draw of three was about a coin
+toss, and both fell short. The review of the first text named this answer as the likeliest false
+fail. The kept rule was fixed before any pass, so the stop stands.
+
+**What the gap types did.** Over revision 1's 750 judgings the judge typed 221 claims as a term in
+no quote and 210 as a headerless cell, and few were on supported answers (6 each). But the rule
+that fails those claims at every threshold decided almost nothing: read with the scores alone, the
+same replies differ at t = 69 on 6 verdicts, all docs-mix-055 on the first dev run, labeled
+supported, and on no unsupported answer. The judge had already scored such claims low, or failed
+the answer on another claim. The change came from asking for the gap, not from the rule: at
+t = 69, s off, on the fresh passes, the draft made 14 false passes and 9 false fails, and revision
+1 made 8 and 14. The term record never mattered (no term was in a quote), and no term was downgraded
+as a service's own name.
+
+**How far this goes.** Revision 1's fewer false passes against v2 (8 and 13) are a real shift on
+the tuning set, paid for in false fails (14 and 11). The totals, 22 and 24, are inside the spread of
+a single judge's passes (v2's run from 7 to 9, revision 1's from 6 to 9). These are the tuning
+answers, the fixes were fitted to them, and stage C never ran, so none of this is evidence of an
+improvement.
+
+**Read afterwards, deciding nothing.** On the fresh passes the draft's cells at t = 69 with s off
+or 59 met every gate (14 false passes, 9 false fails, 7.67 errors per pass, kept rule held). They
+were fourth and fifth in step 4's order, so they were no candidates, and the choice reads only the
+cells it names. Reading the grid after the stop to find a cell that passes is what the fresh salts
+exist to prevent, so no such cell can be frozen. No cell of revision 1 met every gate.
+
+**The own-name clearing worked as written.** docs-ai-003-p3 on the champion's run, which v5 passed 1
+time in 3, passed 3 of 3 on revision 1's fresh passes and 2 of 3 on the draft's. Over the twelve
+passes code cleared 26 flags: that hedge 12 times, "AWS support" inside advice 12 times, and twice
+"AgentCore" in "For a first agent, start with Amazon Bedrock AgentCore", a recommendation the table
+listed as no claim, the kind of span change 2 gives up a second look at. At the candidates' cells
+the clearing moved 4 verdicts, all on that hedge, all from fail to pass, and all right.
+
+**Lessons for any later round.**
+
+- Two rounds have now stopped on one answer each. A gate that reads a single answer on 2 of 3
+  passes is a coin toss when that answer sits at a level, whatever else the judge does. The rule
+  is sound as a guard against a judge that loses a kept answer outright, and weak against one
+  that sometimes does. A later round should decide that before any pass, not after one.
+- A rule that a judge's reasons suggest may do nothing once the judge is asked for those reasons.
+  The field changed the scores, so a simulation on saved replies could not predict it.
+- Reading the build against the design before the first paid pass, and one independent review,
+  found faults that passing tests had not, among them a gate that miscounted and a choice that
+  re-sorted its candidates. None reached a paid pass.
+- Stage B and C tools were not built until stage A passed, so the stop wasted no build.
 
 ## In short
 
