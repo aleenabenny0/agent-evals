@@ -5121,11 +5121,11 @@
     "false_passes_allowed": 2,
     "share_allowed": 0.1333,
     "admitted_by_true_rate": {
-     "5%": 0.964,
-     "10%": 0.816,
-     "15%": 0.604,
+     "5%": 0.9638,
+     "10%": 0.8159,
+     "15%": 0.6042,
      "20%": 0.398,
-     "27%": 0.186
+     "27%": 0.1863
     }
    },
    "60": {
@@ -5133,11 +5133,11 @@
     "false_passes_allowed": 4,
     "share_allowed": 0.1333,
     "admitted_by_true_rate": {
-     "5%": 0.984,
-     "10%": 0.825,
-     "15%": 0.524,
-     "20%": 0.255,
-     "27%": 0.063
+     "5%": 0.9844,
+     "10%": 0.8245,
+     "15%": 0.5245,
+     "20%": 0.2552,
+     "27%": 0.0627
     }
    },
    "120": {
@@ -5145,13 +5145,49 @@
     "false_passes_allowed": 7,
     "share_allowed": 0.1167,
     "admitted_by_true_rate": {
-     "5%": 0.99,
-     "10%": 0.752,
-     "15%": 0.305,
+     "5%": 0.9902,
+     "10%": 0.7516,
+     "15%": 0.3047,
      "20%": 0.067,
-     "27%": 0.003
+     "27%": 0.0034
     }
    }
+  }
+ },
+ "p_cited_guides": {
+  "scope": "The 125 tuning answers' citations, read from the results database: how many, their hosts, and the URL path segments (one guide each, the General Reference as one) they fall in, with how many citations each holds.",
+  "citations": 330,
+  "hosts": {
+   "docs.aws.amazon.com": 330
+  },
+  "segments": 26,
+  "by_segment": {
+   "AWSSimpleQueueService": 6,
+   "AmazonCloudFront": 11,
+   "AmazonECR": 1,
+   "AmazonRDS": 7,
+   "AmazonS3": 26,
+   "amazondynamodb": 12,
+   "apigateway": 10,
+   "awssupport": 10,
+   "bedrock": 64,
+   "bedrock-agentcore": 6,
+   "comprehend": 6,
+   "eks": 30,
+   "elasticloadbalancing": 3,
+   "eventbridge": 10,
+   "general": 8,
+   "kendra": 2,
+   "lambda": 40,
+   "lexv2": 4,
+   "opensearch-service": 17,
+   "organizations": 5,
+   "sagemaker": 13,
+   "step-functions": 9,
+   "systems-manager": 11,
+   "translate": 8,
+   "vpc": 7,
+   "waf": 4
   }
  }
 }

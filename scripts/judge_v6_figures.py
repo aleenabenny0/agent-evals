@@ -30,7 +30,8 @@ Five figures were added on 2026-10-30 for the external review of the proposal: t
 the whole tuning set (k), a majority of the three passes as the verdict (l), the grader's normalized
 match of the terms the judge's term-class reasons name (m: the terms are read by hand from the
 reasons, a reading marked as such), the two readers' agreement on the classes the gap rule reads
-(n), and stage C's power table for 120 labels beside 60 and 30 (o).
+(n), stage C's power table for 120 labels beside 60 and 30 (o), and the guides the tuning
+answers cite (p).
 """
 
 from __future__ import annotations
@@ -60,7 +61,6 @@ from agent_evals.graders.claim_judge import (
     normalize,
     without_links,
 )
-from agent_evals.graders.claim_judge import S_GRID as V5_S_GRID
 from agent_evals.graders.judge import JudgeGrader
 from agent_evals.harness.cache import CallCache
 from agent_evals.harness.llm import LLMResponse
@@ -765,7 +765,7 @@ def figure_e(notes: Mapping[str, Note], rev1: Rev1) -> dict[str, Any]:
         }
     changed = {}
     for at in (70, 50):
-        for s in V5_S_GRID[1:]:
+        for s in v5.S_GRID[1:]:
             moved = sum(
                 rev1.verdicts(salt, at, s)[key] != rev1.verdicts(salt, at, None)[key]
                 for salt in rev1.salts
@@ -1649,12 +1649,41 @@ def figure_o() -> dict[str, Any]:
                 "false_passes_allowed": allowed,
                 "share_allowed": round(allowed / drawn, 4),
                 "admitted_by_true_rate": {
-                    f"{round(rate * 100)}%": round(admitted(drawn, allowed, rate), 3)
+                    f"{round(rate * 100)}%": round(admitted(drawn, allowed, rate), 4)
                     for rate in POWER_RATES
                 },
             }
             for labels, (drawn, allowed) in STAGE_C_BARS.items()
         },
+    }
+
+
+def figure_p(outputs: Mapping[str, dict[str, Any]]) -> dict[str, Any]:
+    """The guides the 125 tuning answers cite: their citations' URL path segments (the General
+    Reference's pages counted once, under their segment), which bound how far the service-name
+    file rests on more than titles."""
+    segments: Counter[str] = Counter()
+    hosts: Counter[str] = Counter()
+    citations = 0
+    for output in outputs.values():
+        raw = output.get("citations")
+        for citation in raw if isinstance(raw, list) else []:
+            if not isinstance(citation, dict) or not isinstance(citation.get("url"), str):
+                continue
+            citations += 1
+            parsed = urlparse(citation["url"])
+            hosts[parsed.netloc] += 1
+            segments[next((p for p in parsed.path.split("/") if p), "")] += 1
+    return {
+        "scope": (
+            "The 125 tuning answers' citations, read from the results database: how many, their "
+            "hosts, and the URL path segments (one guide each, the General Reference as one) they "
+            "fall in, with how many citations each holds."
+        ),
+        "citations": citations,
+        "hosts": dict(hosts),
+        "segments": len(segments),
+        "by_segment": dict(sorted(segments.items())),
     }
 
 
@@ -1714,6 +1743,7 @@ def compute() -> tuple[dict[str, Any], V2Replay]:
         "m_term_lexical_match": figure_m(notes, classed, outputs, cases),
         "n_deciding_class_agreement": figure_n(raw_classes),
         "o_stage_c_power": figure_o(),
+        "p_cited_guides": figure_p(outputs),
     }
     return figures, replay
 
@@ -1891,6 +1921,11 @@ def _print(figures: Mapping[str, Any]) -> None:
         f"only reader 1 {n['only_reader_1']}, only reader 2 {n['only_reader_2']}, neither "
         f"{n['neither']}; same class on {n['same_class']} of {n['either_read_by_the_rule']} "
         f"({n['same_class_with_alternatives']} with alternatives)"
+    )
+    guides = figures["p_cited_guides"]
+    lines.append(
+        f"p. the tuning answers' {guides['citations']} citations fall in {guides['segments']} path "
+        f"segments on {sorted(guides['hosts'])}"
     )
     for labels, row in figures["o_stage_c_power"]["by_labels"].items():
         lines.append(
