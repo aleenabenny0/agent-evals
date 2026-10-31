@@ -15,6 +15,16 @@ fitted, and two rules on the blind classes of the judge's reasons (`classes.json
 revision 1's three passes at t = 70 with s off, with the batch 2 and 3 claims by class. Written by
 `scripts/judge_v6_figures.py`, which also records the sha256 of every input.
 
+Five figures were added on 2026-10-30 for an external review of the proposal, all in
+`figures.json`: the gates read on the whole tuning set, with the fitted projection beside the
+build check's and the edge of the split gates (`k_total_gate`); a majority of the three passes as
+the verdict, for revision 1 at every cell and for v2 (`l_majority_of_three`); whether the grader's
+normalized match finds, in a quote or the question, the term each term-class reason names
+(`m_term_lexical_match`: the terms are read by hand from the reasons and listed in the script as
+`TERMS_READ`, a reading, marked as such in the figure); the two readers' agreement on the classes
+the gap rule reads (`n_deciding_class_agreement`); and stage C's power table for 30, 60 and 120
+labels (`o_stage_c_power`, exact binomial, no record read). The earlier figures are unchanged.
+
 `v2-extra-passes.json` holds v2's verdicts on each of the 125 answers under the salts `judge-s2` and
 `judge-s3`, the two extra passes of the choice step. They are replayed from the call cache by
 `scripts/judge_v6_figures.py`: the exact request the validated judge makes is built again and

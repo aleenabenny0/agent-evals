@@ -3980,5 +3980,1178 @@
    "headerless_cell": [],
    "matches_classes_summary": true
   }
+ },
+ "k_total_gate": {
+  "scope": "The 125 tuning answers as one set. v2's errors over its three passes (stored, judge-s2, judge-s3) and revision 1's at every cell of the grid under test and at t = 70 with s off, per pass and summed. The fitted projection of the proposal's fixes read on the 125 beside the build check's on the 32, with each margin under its bar over three passes: a projection on the passes the changes were fitted to, not evidence. The edge of the split gates: the most whole errors per pass the 93's cap admits plus the most the 32's bar admits, against v2's mean on the 125.",
+  "v2_on_125": {
+   "answers": 125,
+   "passes": 3,
+   "per_pass": [
+    {
+     "salt": "judge",
+     "false_passes": 6,
+     "false_fails": 3,
+     "errors": 9
+    },
+    {
+     "salt": "judge-s2",
+     "false_passes": 3,
+     "false_fails": 5,
+     "errors": 8
+    },
+    {
+     "salt": "judge-s3",
+     "false_passes": 4,
+     "false_fails": 3,
+     "errors": 7
+    }
+   ],
+   "totals": {
+    "false_passes": 13,
+    "false_fails": 11,
+    "errors": 24
+   },
+   "means": {
+    "false_passes": 4.3333,
+    "false_fails": 3.6667,
+    "errors": 8.0
+   }
+  },
+  "rev1_on_125_by_cell": {
+   "t=64 s=off": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 6,
+      "false_fails": 3,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 6,
+      "false_fails": 4,
+      "errors": 10
+     }
+    ],
+    "totals": {
+     "false_passes": 17,
+     "false_fails": 11,
+     "errors": 28
+    },
+    "means": {
+     "false_passes": 5.6667,
+     "false_fails": 3.6667,
+     "errors": 9.3333
+    }
+   },
+   "t=64 s=49": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 5,
+      "false_fails": 3,
+      "errors": 8
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 3,
+      "false_fails": 4,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8
+     }
+    ],
+    "totals": {
+     "false_passes": 12,
+     "false_fails": 11,
+     "errors": 23
+    },
+    "means": {
+     "false_passes": 4.0,
+     "false_fails": 3.6667,
+     "errors": 7.6667
+    }
+   },
+   "t=64 s=59": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 6,
+      "false_fails": 3,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9
+     }
+    ],
+    "totals": {
+     "false_passes": 16,
+     "false_fails": 11,
+     "errors": 27
+    },
+    "means": {
+     "false_passes": 5.3333,
+     "false_fails": 3.6667,
+     "errors": 9.0
+    }
+   },
+   "t=69 s=off": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 4,
+      "false_fails": 3,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 6,
+      "false_fails": 4,
+      "errors": 10
+     }
+    ],
+    "totals": {
+     "false_passes": 14,
+     "false_fails": 11,
+     "errors": 25
+    },
+    "means": {
+     "false_passes": 4.6667,
+     "false_fails": 3.6667,
+     "errors": 8.3333
+    }
+   },
+   "t=69 s=49": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 3,
+      "false_fails": 3,
+      "errors": 6
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 2,
+      "false_fails": 4,
+      "errors": 6
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8
+     }
+    ],
+    "totals": {
+     "false_passes": 9,
+     "false_fails": 11,
+     "errors": 20
+    },
+    "means": {
+     "false_passes": 3.0,
+     "false_fails": 3.6667,
+     "errors": 6.6667
+    }
+   },
+   "t=69 s=59": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 4,
+      "false_fails": 3,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9
+     }
+    ],
+    "totals": {
+     "false_passes": 13,
+     "false_fails": 11,
+     "errors": 24
+    },
+    "means": {
+     "false_passes": 4.3333,
+     "false_fails": 3.6667,
+     "errors": 8.0
+    }
+   },
+   "t=74 s=off": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     }
+    ],
+    "totals": {
+     "false_passes": 3,
+     "false_fails": 17,
+     "errors": 20
+    },
+    "means": {
+     "false_passes": 1.0,
+     "false_fails": 5.6667,
+     "errors": 6.6667
+    }
+   },
+   "t=74 s=49": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     }
+    ],
+    "totals": {
+     "false_passes": 3,
+     "false_fails": 17,
+     "errors": 20
+    },
+    "means": {
+     "false_passes": 1.0,
+     "false_fails": 5.6667,
+     "errors": 6.6667
+    }
+   },
+   "t=74 s=59": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7
+     }
+    ],
+    "totals": {
+     "false_passes": 3,
+     "false_fails": 17,
+     "errors": 20
+    },
+    "means": {
+     "false_passes": 1.0,
+     "false_fails": 5.6667,
+     "errors": 6.6667
+    }
+   },
+   "t=70 s=off": {
+    "answers": 125,
+    "passes": 3,
+    "per_pass": [
+     {
+      "salt": "judge",
+      "false_passes": 4,
+      "false_fails": 3,
+      "errors": 7
+     },
+     {
+      "salt": "judge-s2",
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8
+     },
+     {
+      "salt": "judge-s3",
+      "false_passes": 6,
+      "false_fails": 4,
+      "errors": 10
+     }
+    ],
+    "totals": {
+     "false_passes": 14,
+     "false_fails": 11,
+     "errors": 25
+    },
+    "means": {
+     "false_passes": 4.6667,
+     "false_fails": 3.6667,
+     "errors": 8.3333
+    }
+   }
+  },
+  "fitted_projection": {
+   "label": "fitted",
+   "on_125": {
+    "rev1_errors": 25,
+    "fixes_claimed": 6,
+    "projected": 19,
+    "v2_errors": 24,
+    "margin_under_v2": 5,
+    "per_pass_means": {
+     "rev1": 8.3333,
+     "projected": 6.3333,
+     "v2": 8.0
+    }
+   },
+   "on_32": {
+    "rev1_errors": 25,
+    "projected": 19,
+    "v2_errors": 22,
+    "margin_under_v2": 3
+   }
+  },
+  "split_gates_edge": {
+   "cap_on_93_errors_per_pass": 2.6667,
+   "bar_on_32_errors_per_pass": 7.3333,
+   "most_whole_errors_per_pass_admitted": {
+    "on_93": 2,
+    "on_32": 7,
+    "total": 9
+   },
+   "v2_errors_per_pass_on_125": 8.0,
+   "admitted_yet_worse_than_v2_overall": true
+  }
+ },
+ "l_majority_of_three": {
+  "scope": "The verdict taken as the majority of the three passes on each answer, for revision 1 at every cell of the grid under test and at t = 70 with s off, and for v2 over its stored pass and its two replayed passes. Errors of the majority verdict on the 93, the 32 and the 125, with the answers whose three passes disagree, beside the errors of each single pass on the 125.",
+  "rev1": {
+   "t=64 s=off": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 1,
+      "false_fails": 0,
+      "errors": 1,
+      "answers_with_split_votes": 1
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9,
+      "answers_with_split_votes": 3
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 6,
+      "false_fails": 4,
+      "errors": 10,
+      "answers_with_split_votes": 4
+     }
+    },
+    "per_pass_errors_on_125": [
+     9,
+     9,
+     10
+    ]
+   },
+   "t=64 s=49": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 1,
+      "false_fails": 0,
+      "errors": 1,
+      "answers_with_split_votes": 1
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 3
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9,
+      "answers_with_split_votes": 4
+     }
+    },
+    "per_pass_errors_on_125": [
+     8,
+     7,
+     8
+    ]
+   },
+   "t=64 s=59": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 1,
+      "false_fails": 0,
+      "errors": 1,
+      "answers_with_split_votes": 1
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 5,
+      "false_fails": 4,
+      "errors": 9,
+      "answers_with_split_votes": 2
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 6,
+      "false_fails": 4,
+      "errors": 10,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     9,
+     9,
+     9
+    ]
+   },
+   "t=69 s=off": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0,
+      "answers_with_split_votes": 0
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 3
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     7,
+     8,
+     10
+    ]
+   },
+   "t=69 s=49": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0,
+      "answers_with_split_votes": 0
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 3,
+      "false_fails": 4,
+      "errors": 7,
+      "answers_with_split_votes": 3
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 3,
+      "false_fails": 4,
+      "errors": 7,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     6,
+     6,
+     8
+    ]
+   },
+   "t=69 s=59": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0,
+      "answers_with_split_votes": 0
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 2
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 2
+     }
+    },
+    "per_pass_errors_on_125": [
+     7,
+     8,
+     9
+    ]
+   },
+   "t=74 s=off": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 1,
+      "errors": 1,
+      "answers_with_split_votes": 2
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6,
+      "answers_with_split_votes": 1
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     6,
+     7,
+     7
+    ]
+   },
+   "t=74 s=49": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 1,
+      "errors": 1,
+      "answers_with_split_votes": 2
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6,
+      "answers_with_split_votes": 1
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     6,
+     7,
+     7
+    ]
+   },
+   "t=74 s=59": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 1,
+      "errors": 1,
+      "answers_with_split_votes": 2
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 1,
+      "false_fails": 5,
+      "errors": 6,
+      "answers_with_split_votes": 1
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 1,
+      "false_fails": 6,
+      "errors": 7,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     6,
+     7,
+     7
+    ]
+   },
+   "t=70 s=off": {
+    "majority": {
+     "v6_outside_named": {
+      "answers": 93,
+      "false_passes": 0,
+      "false_fails": 0,
+      "errors": 0,
+      "answers_with_split_votes": 0
+     },
+     "v6_named": {
+      "answers": 32,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 3
+     },
+     "all_125": {
+      "answers": 125,
+      "false_passes": 4,
+      "false_fails": 4,
+      "errors": 8,
+      "answers_with_split_votes": 3
+     }
+    },
+    "per_pass_errors_on_125": [
+     7,
+     8,
+     10
+    ]
+   }
+  },
+  "v2": {
+   "majority": {
+    "v6_outside_named": {
+     "answers": 93,
+     "false_passes": 0,
+     "false_fails": 0,
+     "errors": 0,
+     "answers_with_split_votes": 2
+    },
+    "v6_named": {
+     "answers": 32,
+     "false_passes": 3,
+     "false_fails": 4,
+     "errors": 7,
+     "answers_with_split_votes": 5
+    },
+    "all_125": {
+     "answers": 125,
+     "false_passes": 3,
+     "false_fails": 4,
+     "errors": 7,
+     "answers_with_split_votes": 7
+    }
+   },
+   "per_pass_errors_on_125": [
+    9,
+    8,
+    7
+   ]
+  }
+ },
+ "m_term_lexical_match": {
+  "scope": "Every distinct batch 1 claim the first reader classed as a name or term in no quote (by answer and claim index; the same claim under several salts counts once), with the terms its reason names, read by hand (TERMS_READ, a reading), and whether each occurs whole, by the grader's normalized match, in a quote of the answer with its links removed or in the question. A lexical downgrade of the term type would spare the claims found; the labels say which of those it would be right to spare.",
+  "label": "reading",
+  "claims": 12,
+  "on_supported_answers": 1,
+  "with_a_term_found": 3,
+  "found_on_supported_answers": 0,
+  "found": [
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "claim": 5
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-022",
+    "claim": 4
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+    "claim": 1
+   }
+  ],
+  "rows": [
+   {
+    "key": "docs-20261011-223111-702e87/docs-ai-003-p1",
+    "claim": 3,
+    "label_supported": false,
+    "named_v6": true,
+    "salts_classed_term": [
+     "judge-s2"
+    ],
+    "answer_span": "for global profiles they must allow \"aws:RequestedRegion\": \"unspecified\"",
+    "quotes": 3,
+    "terms": [
+     {
+      "term": "global profiles",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "global",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "SCPs",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "SCP",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-ai-002",
+    "claim": 2,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "Global cross-Region inference is listed as approximately 10% cheaper than Geographic cross-Region inference.",
+    "quotes": 2,
+    "terms": [
+     {
+      "term": "Global",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "Geographic",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-ai-002-p3",
+    "claim": 2,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "Global cross-Region inference is actually priced about 10% lower than Geographic cross-Region inference.",
+    "quotes": 2,
+    "terms": [
+     {
+      "term": "Global",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "Geographic",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-010",
+    "claim": 5,
+    "label_supported": false,
+    "named_v6": true,
+    "salts_classed_term": [
+     "judge",
+     "judge-s3"
+    ],
+    "answer_span": "its Harness service lets you define and invoke an agent with a single API call by specifying a model, system prompt, and tools.",
+    "quotes": 5,
+    "terms": [
+     {
+      "term": "Harness",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "AgentCore",
+      "in_quotes": [
+       2,
+       4
+      ],
+      "in_question": false
+     }
+    ],
+    "any_term_found": true
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-022",
+    "claim": 4,
+    "label_supported": false,
+    "named_v6": true,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "Enterprise Support has a $5,000 minimum (reduced from $15,000).",
+    "quotes": 4,
+    "terms": [
+     {
+      "term": "Enterprise Support",
+      "in_quotes": [
+       2
+      ],
+      "in_question": false
+     }
+    ],
+    "any_term_found": true
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-chg-030",
+    "claim": 7,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge"
+    ],
+    "answer_span": "new functions should use a supported runtime such as nodejs24.x (Node.js 24) or nodejs22.x (Node.js 22).",
+    "quotes": 7,
+    "terms": [
+     {
+      "term": "nodejs22.x",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "Node.js 22",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261016-214710-02abb7/docs-int-035",
+    "claim": 3,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "Note that the separate Custom Event Bus - Classic offering has a different default of 100 event buses per account per Region.",
+    "quotes": 3,
+    "terms": [
+     {
+      "term": "Classic",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "per account",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-ai-010",
+    "claim": 1,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge"
+    ],
+    "answer_span": "You request them through the request process described in the Bedrock quota documentation.",
+    "quotes": 2,
+    "terms": [
+     {
+      "term": "request process",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "quota documentation",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-chg-030",
+    "claim": 5,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge-s2"
+    ],
+    "answer_span": "Migrate new work to a supported runtime, such as Node.js 24 or 22.",
+    "quotes": 7,
+    "terms": [
+     {
+      "term": "Node.js 22",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "22",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-018",
+    "claim": 1,
+    "label_supported": false,
+    "named_v6": false,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "Internet access requires a public NAT gateway, which you route to the internet gateway.",
+    "quotes": 3,
+    "terms": [
+     {
+      "term": "public NAT gateway",
+      "in_quotes": [],
+      "in_question": false
+     },
+     {
+      "term": "public",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-042",
+    "claim": 1,
+    "label_supported": false,
+    "named_v6": true,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "When you create a NAT gateway, you specify one of the connectivity types (Public or Private)",
+    "quotes": 1,
+    "terms": [
+     {
+      "term": "Private",
+      "in_quotes": [
+       1
+      ],
+      "in_question": false
+     }
+    ],
+    "any_term_found": true
+   },
+   {
+    "key": "docs-20261017-174739-1c0e8e/docs-mix-058",
+    "claim": 2,
+    "label_supported": true,
+    "named_v6": true,
+    "salts_classed_term": [
+     "judge",
+     "judge-s2",
+     "judge-s3"
+    ],
+    "answer_span": "it is adjustable through Service Quotas",
+    "quotes": 2,
+    "terms": [
+     {
+      "term": "Service Quotas",
+      "in_quotes": [],
+      "in_question": false
+     }
+    ],
+    "any_term_found": false
+   }
+  ]
+ },
+ "n_deciding_class_agreement": {
+  "scope": "Batch 1 (both readers): for each claim, whether each reader's class is one the gap rule reads, NAME or OTHER; the four counts; and among the claims either reader put under such a class, how many have the same class from both, the same when either reader's alternative counts, and the disagreements.",
+  "rule_classes": [
+   "NAME",
+   "OTHER"
+  ],
+  "claims": 115,
+  "both_read_by_the_rule": 36,
+  "only_reader_1": 2,
+  "only_reader_2": 3,
+  "neither": 74,
+  "either_read_by_the_rule": 41,
+  "same_class": 36,
+  "same_class_with_alternatives": 40,
+  "disagreements": [
+   {
+    "reader_1_id": "W008",
+    "reader_1": "OTHER",
+    "reader_1_alternative": null,
+    "reader_2": "EXT",
+    "reader_2_alternative": "OTHER",
+    "label_supported": false
+   },
+   {
+    "reader_1_id": "W054",
+    "reader_1": "NAME",
+    "reader_1_alternative": null,
+    "reader_2": "EXT",
+    "reader_2_alternative": null,
+    "label_supported": false
+   },
+   {
+    "reader_1_id": "W015",
+    "reader_1": "EXT",
+    "reader_1_alternative": null,
+    "reader_2": "OTHER",
+    "reader_2_alternative": "EXT",
+    "label_supported": true
+   },
+   {
+    "reader_1_id": "W090",
+    "reader_1": "EXT",
+    "reader_1_alternative": null,
+    "reader_2": "OTHER",
+    "reader_2_alternative": "EXT",
+    "label_supported": true
+   },
+   {
+    "reader_1_id": "W066",
+    "reader_1": "EXT",
+    "reader_1_alternative": null,
+    "reader_2": "OTHER",
+    "reader_2_alternative": "EXT",
+    "label_supported": true
+   }
+  ]
+ },
+ "o_stage_c_power": {
+  "scope": "The chance that stage C's false-pass bar admits a judge, by its true false-pass rate among the answers it passes: exact binomial over the passes drawn, as if they were one sample, for each number of labels with its bar.",
+  "by_labels": {
+   "30": {
+    "passes_drawn": 15,
+    "false_passes_allowed": 2,
+    "share_allowed": 0.1333,
+    "admitted_by_true_rate": {
+     "5%": 0.964,
+     "10%": 0.816,
+     "15%": 0.604,
+     "20%": 0.398,
+     "27%": 0.186
+    }
+   },
+   "60": {
+    "passes_drawn": 30,
+    "false_passes_allowed": 4,
+    "share_allowed": 0.1333,
+    "admitted_by_true_rate": {
+     "5%": 0.984,
+     "10%": 0.825,
+     "15%": 0.524,
+     "20%": 0.255,
+     "27%": 0.063
+    }
+   },
+   "120": {
+    "passes_drawn": 60,
+    "false_passes_allowed": 7,
+    "share_allowed": 0.1167,
+    "admitted_by_true_rate": {
+     "5%": 0.99,
+     "10%": 0.752,
+     "15%": 0.305,
+     "20%": 0.067,
+     "27%": 0.003
+    }
+   }
+  }
  }
 }

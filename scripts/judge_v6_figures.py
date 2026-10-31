@@ -25,6 +25,12 @@ proposal was written from; both splits of the tuning set are reported, v5's (106
 the named cases, 19 named) and v6's (93 and 32). The grid under test is t in {64, 69, 74} with s
 in {off, 49, 59}; t = 70 with s off, revision 1's candidate cell, is reported beside it for
 continuity. Run from the repository root.
+
+Five figures were added on 2026-10-30 for the external review of the proposal: the gates read on
+the whole tuning set (k), a majority of the three passes as the verdict (l), the grader's normalized
+match of the terms the judge's term-class reasons name (m: the terms are read by hand from the
+reasons, a reading marked as such), the two readers' agreement on the classes the gap rule reads
+(n), and stage C's power table for 120 labels beside 60 and 30 (o).
 """
 
 from __future__ import annotations
@@ -37,6 +43,7 @@ from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from fractions import Fraction
+from math import comb
 from pathlib import Path
 from typing import Any
 from urllib.parse import urljoin, urlparse
@@ -111,6 +118,30 @@ OTHER = "OTHER"
 HEADERLESS_CELL = "a headerless table cell"  # the OTHER kind the two-type rule fails
 PASSING_CLASSES = frozenset({"ST", "RW"})
 BATCH_1 = 1  # the weakest claims scored 50 to 85, every claim tied at its judging's lowest score
+# The terms the judge's reasons name, read by hand from the `why` of every batch 1 claim the first
+# reader classed as a name or term in no quote, keyed by the answer and the claim's index in its
+# table: a reading, not a recomputation (figure m). Each term is matched whole, by the grader's
+# normalized match, against the answer's quotes with their links removed and against the question.
+FIRST_RUN = v5.RUNS[0]
+TERMS_READ: dict[tuple[str, int], tuple[str, ...]] = {
+    (f"{FIRST_RUN}/docs-ai-003-p1", 3): ("global profiles", "global", "SCPs", "SCP"),
+    (f"{CHAMPION}/docs-ai-002", 2): ("Global", "Geographic"),
+    (f"{CHAMPION}/docs-ai-002-p3", 2): ("Global", "Geographic"),
+    (f"{CHAMPION}/docs-chg-010", 5): ("Harness", "AgentCore"),
+    (f"{CHAMPION}/docs-chg-022", 4): ("Enterprise Support",),
+    (f"{CHAMPION}/docs-chg-030", 7): ("nodejs22.x", "Node.js 22"),
+    (f"{CHAMPION}/docs-int-035", 3): ("Classic", "per account"),
+    (f"{ITERATION4}/docs-ai-010", 1): ("request process", "quota documentation"),
+    (f"{ITERATION4}/docs-chg-030", 5): ("Node.js 22", "22"),
+    (f"{ITERATION4}/docs-mix-018", 1): ("public NAT gateway", "public"),
+    (f"{ITERATION4}/docs-mix-042", 1): ("Private",),
+    (f"{ITERATION4}/docs-mix-058", 2): ("Service Quotas",),
+}
+# Stage C's bar by the number of labels: the passes drawn and the false passes allowed among them
+# (v5's 30 and 60, and v6's 120), and the true false-pass rates the power table reads (figure o).
+STAGE_C_BARS: dict[int, tuple[int, int]] = {30: (15, 2), 60: (30, 4), 120: (60, 7)}
+POWER_RATES = (0.05, 0.10, 0.15, 0.20, 0.27)
+RULE_CLASSES = frozenset({TERM_IN_NO_QUOTE, OTHER})  # the classes the gap rule reads (figure n)
 
 Verdicts = dict[str, bool]
 
@@ -1312,6 +1343,321 @@ def figure_j(
     }
 
 
+# ---- the external review's figures (2026-10-30) ---------------------------------------------
+
+
+def v2_passes(
+    notes: Mapping[str, Note], replay: V2Replay
+) -> list[tuple[str, Mapping[str, bool | None]]]:
+    """v2's three passes: its stored verdicts under the salt judge and the two replayed."""
+    stored: dict[str, bool | None] = {key: note.v2_passed for key, note in notes.items()}
+    passes: list[tuple[str, Mapping[str, bool | None]]] = [(REV1_SALTS[0], stored)]
+    passes += [(salt, replay.verdicts[salt]) for salt in V2_EXTRA_SALTS]
+    return passes
+
+
+def figure_k(notes: Mapping[str, Note], rev1: Rev1, replay: V2Replay) -> dict[str, Any]:
+    """The gates read on the whole tuning set: v2's and revision 1's errors on all 125 at every
+    cell, the fitted projection beside the build check's, and the review's example of a version
+    that the split gates admit although it makes more errors than v2 overall."""
+    everything = list(notes)
+    v2_all = reading(v2_passes(notes, replay), notes, everything)
+    by_cell = {cell(t, s): reading(rev1.all_passes(t, s), notes, everything) for t, s in CELLS}
+    t, s = CONTINUITY
+    rev1_errors = int(by_cell[cell(t, s)]["totals"]["errors"])
+    v2_errors = int(v2_all["totals"]["errors"])
+    fixes = sum(FITTED_FIXES.values())
+    passes = len(REV1_SALTS)
+    named = side(notes, "v6", True)
+    v2_outside = reading(v2_passes(notes, replay), notes, side(notes, "v6", False))["totals"]
+    v2_named = reading(v2_passes(notes, replay), notes, named)["totals"]
+    rev1_named = int(reading(rev1.all_passes(t, s), notes, named)["totals"]["errors"])
+    # The split gates: on the 93, mean errors at most v2's plus 2; on the 32, fewer than v2's.
+    # Their edge: the most whole errors per pass each side admits, and what they add up to.
+    cap_outside = Fraction(int(v2_outside["errors"]), passes) + 2
+    bar_named = Fraction(int(v2_named["errors"]), passes)
+    edge_outside = cap_outside.numerator // cap_outside.denominator
+    edge_named = -((-bar_named.numerator) // bar_named.denominator) - 1  # the largest whole < bar
+    return {
+        "scope": (
+            "The 125 tuning answers as one set. v2's errors over its three passes (stored, "
+            "judge-s2, judge-s3) and revision 1's at every cell of the grid under test and at "
+            "t = 70 with s off, per pass and summed. The fitted projection of the proposal's "
+            "fixes read on the 125 beside the build check's on the 32, with each margin under its "
+            "bar over three passes: a projection on the passes the changes were fitted to, not "
+            "evidence. The edge of the split gates: the most whole errors per pass the 93's cap "
+            "admits plus the most the 32's bar admits, against v2's mean on the 125."
+        ),
+        "v2_on_125": v2_all,
+        "rev1_on_125_by_cell": by_cell,
+        "fitted_projection": {
+            "label": "fitted",
+            "on_125": {
+                "rev1_errors": rev1_errors,
+                "fixes_claimed": fixes,
+                "projected": rev1_errors - fixes,
+                "v2_errors": v2_errors,
+                "margin_under_v2": v2_errors - (rev1_errors - fixes),
+                "per_pass_means": {
+                    "rev1": _mean(rev1_errors, passes),
+                    "projected": _mean(rev1_errors - fixes, passes),
+                    "v2": _mean(v2_errors, passes),
+                },
+            },
+            "on_32": {
+                "rev1_errors": rev1_named,
+                "projected": rev1_named - fixes,
+                "v2_errors": int(v2_named["errors"]),
+                "margin_under_v2": int(v2_named["errors"]) - (rev1_named - fixes),
+            },
+        },
+        "split_gates_edge": {
+            "cap_on_93_errors_per_pass": round(float(cap_outside), 4),
+            "bar_on_32_errors_per_pass": round(float(bar_named), 4),
+            "most_whole_errors_per_pass_admitted": {
+                "on_93": edge_outside,
+                "on_32": edge_named,
+                "total": edge_outside + edge_named,
+            },
+            "v2_errors_per_pass_on_125": float(v2_all["means"]["errors"]),
+            "admitted_yet_worse_than_v2_overall": (
+                edge_outside + edge_named > Fraction(v2_errors, passes)
+            ),
+        },
+    }
+
+
+def _majority(votes: Sequence[bool | None], where: str) -> bool:
+    if any(v is None for v in votes):
+        raise Refused(f"{where}: a pass without a verdict, so the majority is not defined")
+    return sum(bool(v) for v in votes) * 2 > len(votes)
+
+
+Votes = dict[str, list[bool | None]]  # key -> one verdict per pass
+
+
+def _majority_readings(
+    notes: Mapping[str, Note],
+    scopes: Mapping[str, Sequence[str]],
+    verdicts: Mapping[str, bool | None],
+    votes: Votes,
+) -> dict[str, Any]:
+    found: dict[str, Any] = {}
+    for name, keys in scopes.items():
+        held = reading([("majority", verdicts)], notes, keys)
+        found[name] = {
+            "answers": held["answers"],
+            "false_passes": held["totals"]["false_passes"],
+            "false_fails": held["totals"]["false_fails"],
+            "errors": held["totals"]["errors"],
+            "answers_with_split_votes": sum(len(set(votes[k])) > 1 for k in keys),
+        }
+    return found
+
+
+def figure_l(notes: Mapping[str, Note], rev1: Rev1, replay: V2Replay) -> dict[str, Any]:
+    """A majority of the three passes as the verdict, for revision 1 at every cell and for v2."""
+    scopes: dict[str, Sequence[str]] = {
+        "v6_outside_named": side(notes, "v6", False),
+        "v6_named": side(notes, "v6", True),
+        "all_125": list(notes),
+    }
+    everything = list(notes)
+    v2_votes: Votes = {key: [p[1][key] for p in v2_passes(notes, replay)] for key in notes}
+    v2_majority: dict[str, bool | None] = {
+        key: _majority(held, f"v2 on {key}") for key, held in v2_votes.items()
+    }
+    rev1_by_cell: dict[str, Any] = {}
+    for t, s in CELLS:
+        votes: Votes = {
+            key: [rev1.verdicts(salt, t, s)[key] for salt in rev1.salts] for key in notes
+        }
+        verdicts: dict[str, bool | None] = {
+            key: _majority(held, f"revision 1 on {key}") for key, held in votes.items()
+        }
+        rev1_by_cell[cell(t, s)] = {
+            "majority": _majority_readings(notes, scopes, verdicts, votes),
+            "per_pass_errors_on_125": [
+                p["errors"] for p in reading(rev1.all_passes(t, s), notes, everything)["per_pass"]
+            ],
+        }
+    return {
+        "scope": (
+            "The verdict taken as the majority of the three passes on each answer, for revision 1 "
+            "at every cell of the grid under test and at t = 70 with s off, and for v2 over its "
+            "stored pass and its two replayed passes. Errors of the majority verdict on the 93, "
+            "the 32 and the 125, with the answers whose three passes disagree, beside the errors "
+            "of each single pass on the 125."
+        ),
+        "rev1": rev1_by_cell,
+        "v2": {
+            "majority": _majority_readings(notes, scopes, v2_majority, v2_votes),
+            "per_pass_errors_on_125": [
+                p["errors"]
+                for p in reading(v2_passes(notes, replay), notes, everything)["per_pass"]
+            ],
+        },
+    }
+
+
+def figure_m(
+    notes: Mapping[str, Note],
+    classed: Classed,
+    outputs: Mapping[str, dict[str, Any]],
+    cases: Mapping[str, Case],
+) -> dict[str, Any]:
+    """Whether the grader's normalized match finds the term a term-class reason names in a quote
+    or the question, for every distinct batch 1 claim the first reader classed as a name or term
+    in no quote. The terms are TERMS_READ, read by hand: a reading."""
+    distinct: dict[tuple[str, int], list[ClassedClaim]] = {}
+    for held in classed.values():
+        for claim in held:
+            if claim.batch == BATCH_1 and claim.cls == TERM_IN_NO_QUOTE:
+                distinct.setdefault((claim.key, claim.index), []).append(claim)
+    if set(distinct) != set(TERMS_READ):
+        raise Refused(
+            "TERMS_READ does not name exactly the batch 1 claims classed a term in no quote: "
+            f"{sorted(set(distinct) ^ set(TERMS_READ))}"
+        )
+    rows: list[dict[str, Any]] = []
+    for (key, index), held in sorted(distinct.items()):
+        raw = outputs[key].get("citations")
+        quotes = [
+            normalize(without_links(str(c["quote"])))
+            for c in (raw if isinstance(raw, list) else [])
+            if isinstance(c, dict) and isinstance(c.get("quote"), str)
+        ]
+        question = normalize(cases[notes[key].case_id].question)
+        terms = [
+            {
+                "term": term,
+                "in_quotes": [n for n, quote in enumerate(quotes, 1) if _occurs(term, quote)],
+                "in_question": _occurs(term, question),
+            }
+            for term in TERMS_READ[(key, index)]
+        ]
+        rows.append(
+            {
+                "key": key,
+                "claim": index,
+                "label_supported": notes[key].supported,
+                "named_v6": notes[key].named_v6,
+                "salts_classed_term": sorted(c.salt for c in held),
+                "answer_span": held[0].answer_span,
+                "quotes": len(quotes),
+                "terms": terms,
+                "any_term_found": any(t["in_quotes"] or t["in_question"] for t in terms),
+            }
+        )
+    found = [r for r in rows if r["any_term_found"]]
+    return {
+        "scope": (
+            "Every distinct batch 1 claim the first reader classed as a name or term in no quote "
+            "(by answer and claim index; the same claim under several salts counts once), with "
+            "the terms its reason names, read by hand (TERMS_READ, a reading), and whether each "
+            "occurs whole, by the grader's normalized match, in a quote of the answer with its "
+            "links removed or in the question. A lexical downgrade of the term type would spare "
+            "the claims found; the labels say which of those it would be right to spare."
+        ),
+        "label": "reading",
+        "claims": len(rows),
+        "on_supported_answers": sum(bool(r["label_supported"]) for r in rows),
+        "with_a_term_found": len(found),
+        "found_on_supported_answers": sum(bool(r["label_supported"]) for r in found),
+        "found": [{"key": r["key"], "claim": r["claim"]} for r in found],
+        "rows": rows,
+    }
+
+
+def figure_n(raw: Mapping[str, Any]) -> dict[str, Any]:
+    """The two readers' agreement on batch 1, read for the gap rule: whether each reader's class
+    is one the rule reads (a name or term in no quote, or another gap, which holds the headerless
+    cell), and the classes themselves where either reader's is."""
+    rows = [
+        e for e in raw["claims"] if int(e["batch"]) == BATCH_1 and e.get("reader_2") is not None
+    ]
+    both = neither = only_first = only_second = 0
+    same_class = same_with_alternatives = 0
+    disagreements: list[dict[str, Any]] = []
+    for entry in rows:
+        first, second = entry["reader_1"], entry["reader_2"]
+        reads_1 = first["class"] in RULE_CLASSES
+        reads_2 = second["class"] in RULE_CLASSES
+        if reads_1 and reads_2:
+            both += 1
+        elif reads_1:
+            only_first += 1
+        elif reads_2:
+            only_second += 1
+        else:
+            neither += 1
+        if reads_1 or reads_2:
+            if first["class"] == second["class"]:
+                same_class += 1
+                same_with_alternatives += 1
+            else:
+                mine = {first["class"], first.get("alternative")} - {None}
+                theirs = {second["class"], second.get("alternative")} - {None}
+                if mine & theirs:
+                    same_with_alternatives += 1
+                disagreements.append(
+                    {
+                        "reader_1_id": entry["reader_1_id"],
+                        "reader_1": first["class"],
+                        "reader_1_alternative": first.get("alternative"),
+                        "reader_2": second["class"],
+                        "reader_2_alternative": second.get("alternative"),
+                        "label_supported": entry["label_supported"],
+                    }
+                )
+    return {
+        "scope": (
+            "Batch 1 (both readers): for each claim, whether each reader's class is one the gap "
+            "rule reads, NAME or OTHER; the four counts; and among the claims either reader put "
+            "under such a class, how many have the same class from both, the same when either "
+            "reader's alternative counts, and the disagreements."
+        ),
+        "rule_classes": sorted(RULE_CLASSES),
+        "claims": len(rows),
+        "both_read_by_the_rule": both,
+        "only_reader_1": only_first,
+        "only_reader_2": only_second,
+        "neither": neither,
+        "either_read_by_the_rule": both + only_first + only_second,
+        "same_class": same_class,
+        "same_class_with_alternatives": same_with_alternatives,
+        "disagreements": disagreements,
+    }
+
+
+def figure_o() -> dict[str, Any]:
+    """Stage C's bar: how often it admits a judge, by its true false-pass rate among the answers it
+    passes, for 30, 60 and 120 labels (exact binomial, as if the passes drawn were one sample)."""
+
+    def admitted(drawn: int, allowed: int, rate: float) -> float:
+        return sum(comb(drawn, k) * rate**k * (1 - rate) ** (drawn - k) for k in range(allowed + 1))
+
+    return {
+        "scope": (
+            "The chance that stage C's false-pass bar admits a judge, by its true false-pass rate "
+            "among the answers it passes: exact binomial over the passes drawn, as if they were "
+            "one sample, for each number of labels with its bar."
+        ),
+        "by_labels": {
+            str(labels): {
+                "passes_drawn": drawn,
+                "false_passes_allowed": allowed,
+                "share_allowed": round(allowed / drawn, 4),
+                "admitted_by_true_rate": {
+                    f"{round(rate * 100)}%": round(admitted(drawn, allowed, rate), 3)
+                    for rate in POWER_RATES
+                },
+            }
+            for labels, (drawn, allowed) in STAGE_C_BARS.items()
+        },
+    }
+
+
 # ---- the run --------------------------------------------------------------------------------
 
 
@@ -1363,6 +1709,11 @@ def compute() -> tuple[dict[str, Any], V2Replay]:
         "h_fail_rates": figure_h(notes, rev1),
         "i_build_check_fitted": figure_i(notes, rev1, replay),
         "j_reason_rules": figure_j(notes, rev1, raw_classes, classed),
+        "k_total_gate": figure_k(notes, rev1, replay),
+        "l_majority_of_three": figure_l(notes, rev1, replay),
+        "m_term_lexical_match": figure_m(notes, classed, outputs, cases),
+        "n_deciding_class_agreement": figure_n(raw_classes),
+        "o_stage_c_power": figure_o(),
     }
     return figures, replay
 
@@ -1505,6 +1856,47 @@ def _print(figures: Mapping[str, Any]) -> None:
         f"   batches 2 and 3 ({later['claims']} claims) by class: {later['by_class']}; term in no "
         f"quote: {terms or 'none'}; headerless cells: {len(later['headerless_cell'])}"
     )
+    k, m = figures["k_total_gate"], figures["m_term_lexical_match"]
+    n, maj = figures["n_deciding_class_agreement"], figures["l_majority_of_three"]
+    fit, edge = k["fitted_projection"], k["split_gates_edge"]
+    at = cell(*CONTINUITY)
+    lines.append(
+        f"k. on all 125: v2 {_errors(k['v2_on_125'])}; revision 1 at {at} "
+        f"{_errors(k['rev1_on_125_by_cell'][at])}; fitted projection "
+        f"{fit['on_125']['projected']} against v2's {fit['on_125']['v2_errors']} (margin "
+        f"{fit['on_125']['margin_under_v2']}); on the 32, {fit['on_32']['projected']} against "
+        f"{fit['on_32']['v2_errors']} (margin {fit['on_32']['margin_under_v2']}); split gates' "
+        f"edge {edge['most_whole_errors_per_pass_admitted']} vs v2's "
+        f"{edge['v2_errors_per_pass_on_125']} per pass"
+    )
+    for name, found in (("revision 1", maj["rev1"][at]), ("v2", maj["v2"])):
+        parts = [
+            f"{scope}: {r['false_passes']}/{r['false_fails']} (split votes "
+            f"{r['answers_with_split_votes']})"
+            for scope, r in found["majority"].items()
+        ]
+        lines.append(
+            f"l. majority of three, {name}: "
+            + "; ".join(parts)
+            + f"; per pass on the 125 {found['per_pass_errors_on_125']}"
+        )
+    where = ", ".join(f"{f['key']} claim {f['claim']}" for f in m["found"]) or "none"
+    lines.append(
+        f"m. term-class claims (reading): {m['claims']} distinct, {m['on_supported_answers']} on "
+        f"supported answers; a term found in a quote or the question for {m['with_a_term_found']} "
+        f"({m['found_on_supported_answers']} on supported answers): {where}"
+    )
+    lines.append(
+        f"n. classes the rule reads, batch 1 ({n['claims']}): both {n['both_read_by_the_rule']}, "
+        f"only reader 1 {n['only_reader_1']}, only reader 2 {n['only_reader_2']}, neither "
+        f"{n['neither']}; same class on {n['same_class']} of {n['either_read_by_the_rule']} "
+        f"({n['same_class_with_alternatives']} with alternatives)"
+    )
+    for labels, row in figures["o_stage_c_power"]["by_labels"].items():
+        lines.append(
+            f"o. {labels} labels, at most {row['false_passes_allowed']} of {row['passes_drawn']}: "
+            f"admitted {row['admitted_by_true_rate']}"
+        )
     print("\n".join(lines))
 
 

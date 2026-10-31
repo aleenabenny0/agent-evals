@@ -7,15 +7,19 @@ name no quote states passed on a round score at the threshold, a type name score
 threshold between samples, a hedge that named the service failed because two calls had to agree,
 and support carried only by a link target the judge is not shown. This proposal keeps v5's
 architecture (a claim table that code checks, a confidence score per claim, a skeptic pass) and
-changes two things in the judge and two in the process. In the judge: each claim gets a gap type,
-two of which fail the claim whatever its score, and code clears the cited service's own name
-inside a hedge. In the process: every version is judged under three fresh samples and the choice
-is made on three more, and the four answers the fixes were written from, with one case that names
-their risk, leave the count that decides eligibility. The fourth mechanism, the link target, is
+changes two things in the judge and three in the process. In the judge: each claim gets a gap
+type, two of which fail the claim whatever its score, and code clears the cited service's own
+name inside a hedge. In the process: every version is judged under three fresh samples and the
+choice is made on three more; the four answers the fixes were written from, with one case that
+names their risk, leave the count that decides eligibility; and one gate reads the whole tuning
+set, which that exclusion cannot soften: the frozen version must make fewer errors than v2 on all
+125 answers. The fourth mechanism, the link target, is
 not fixed; that answer is pre-registered as a known miss. Every change was written from v5's
 tuning data, so none of it is evidence; the validation rules are fixed here, before any paid
 step, and only the fresh blind labels of stage C count. Estimated cost about $44 before any
-label, capped at $60. **Status: proposed 2026-10-29, awaiting approval.**
+label, capped at $60; then 120 blind labels. **Status: approved 2026-10-30, after an external
+review of the 2026-10-29 text whose points are taken in below (decisions 2 to 7); the build
+follows.**
 
 The design and every number below come from the records of the v5 round (`results/judge-v5/`
 and the result section of `docs/plans/judge-v5.md`). Nothing was judged for this proposal: no
@@ -34,8 +38,9 @@ changed judge would reply differently.
 versions. Where this document says "v5" it means the claim judge as frozen at the end of its
 round (revision 1, commit 7a0231a); "v2" is the validated judge that grades every run today. The
 **build check** is v5's stage A rule that the frozen version must make fewer errors than v2 on
-the named cases; the **kept rule** is its rule that named answers labeled supported which v2
-passes must still be passed.
+the named cases, which v6 reports as a prediction; the **total gate** is v6's rule that it must
+make fewer errors than v2 on all 125 tuning answers; the **kept rule** is v5's rule that named
+answers labeled supported which v2 passes must still be passed.
 
 ## In short
 
@@ -49,14 +54,18 @@ passes must still be passed.
   fresh salts, and admission is decided on those, so a version cannot be admitted on the passes
   that made it look good; the order between the two candidates still comes from the exploration
   passes. v5's salt names are never reused: under a reused name the call cache replays the old
-  reply, and the pass is not a new sample.
+  reply, and the pass is not a new sample. One gate reads the whole tuning set: the frozen
+  version must make fewer errors than v2 on all 125 answers on its fresh passes, and candidates
+  are ranked by that total first (decision 2), so where the line between named and other answers
+  sits cannot admit a judge that is worse than v2 overall.
 - **What changes in the count.** v6 freezes its own list of the cases this document quotes, as v5
   did for its text. The four answers the fixes were written from and the one case that names
   their risk join v5's 25 cases, by case id, which moves 13 answers: 93 answers decide eligibility
   (v5: 106) and 32 are named (v5: 19). On the 93, v2 makes 2 errors over its three passes (its
   stored pass none), so the caps are 2.67 errors and 1.33 false fails per pass, as in v5. The
-  build check becomes the gate that bites: on v5's saved passes revision 1 makes no error on the
-  93 and 8.33 errors per pass on the 32, against v2's 7.33. The kept set grows from one answer to
+  total gate is the one that bites: on v5's saved passes revision 1 makes no error on the 93 and
+  8.33 errors per pass on the 32, so 8.33 on the 125 against v2's 8.00 (on the 32 alone, 8.33
+  against 7.33: the build check, reported as a prediction). The kept set grows from one answer to
   seven, one of them pre-registered as a known miss. Every gate is also reported on v5's split,
   for continuity; such a figure decides nothing.
 - **What changes in the judge.** (1) Each claim carries a gap type: none, implication, scope, a
@@ -78,8 +87,8 @@ passes must still be passed.
   in v5.
 - **Cost.** $39 to $41 at the measured $0.0105 to $0.0111 per answer, about $44 at the $0.012 the
   budget assumes (the gap field adds a little output), capped at $60 in a new ledger; $60 is the
-  cap, not the estimate. Then 60 blind labels, about 55 minutes. v5's round spent $6.95 of its own
-  $60.
+  cap, not the estimate. Then 120 blind labels, about 1 hour 50 minutes. v5's round spent $6.95 of
+  its own $60.
 
 ## What v5's records show
 
@@ -113,7 +122,11 @@ revision 1's 375 judgings (125 answers under three salts, named cases included):
   qualifier or scope beyond the quote (14: 6 supported, 8 not), a headerless table cell (10, all
   unsupported), and a claim that depends on the current date (1, unsupported). A second reader,
   also blind, gave the same class on 108 of the 115 (112 when either reader's alternative reading
-  counts). The other claims of the judgings revision 1 passes at the 70 level were read too: 80
+  counts). On the classes the rule below reads, a term in no quote and another gap (which holds
+  the headerless cell), either reader put 41 claims; both did on 36, with the same class on 36
+  and on 40 when alternatives count, and on 5 one reader's class would fire the rule and the
+  other's would not (`n_deciding_class_agreement`). The other claims of the judgings revision 1
+  passes at the 70 level were read too: 80
   classified blind and 204 screened as stated or reworded; of the 80, one was a term in no quote
   (the Harness claim, under the salt where another claim of its answer scored lower) and none a
   headerless cell.
@@ -149,6 +162,12 @@ revision 1's 375 judgings (125 answers under three salts, named cases included):
   each and the choice reads those passes, 59% on three passes each, and 12% when the chosen one
   is re-judged on three fresh passes. The model describes v5's count: on the 93 revision 1 flips
   no verdict at the 70 level.
+- **A majority of the three passes gains little.** At the 70 level, the majority verdict over
+  revision 1's three passes makes 8 errors on the 125 (its passes: 7, 8, 10) and v2's makes 7
+  (9, 8, 7), all on the 32; revision 1's passes disagree on 3 answers, v2's on 7. Three judgings
+  per answer in production would raise v2's bar more than it helps v6, at three times the cost
+  per answer; it is not adopted, and flips between salts are reported at every stage
+  (decision 7; `l_majority_of_three`).
 - **The rest of the records.** Over the 540 distinct judgings of the round: no retries, no judge
   errors, 31 support entries dropped, every one for being under three words, none flipping a
   verdict; the skeptic's span was always in the answer. Cost $0.0105 to $0.0111 per answer, 71% to
@@ -162,7 +181,7 @@ Everything in v5's "What stays the same", parts 1 to 3 and "Judge errors" holds,
 changes below. The model, the input (question, answer, numbered quotes without URLs or link
 targets), the span and coverage checks, the number cross-check, the skeptic's flagged items and
 search, the retries, the `judge_error` grade and the three grades are unchanged. Rubric v5's text
-is unchanged (decision 3). The version fingerprint gains the gap rule's code version, the
+is unchanged (decision 9). The version fingerprint gains the gap rule's code version, the
 source-word list, the generic-word list and the service-name file's hash. The judge runs under its
 own grader name, `judge-v6`, never under "judge"; v2 stays the validated judge everywhere unless
 stage C passes.
@@ -191,10 +210,17 @@ answer cites, or of the publisher, is downgraded to `other` and scored as v5 wou
 downgrades are counted and reported.
 
 Code also records, for every `term`, whether the copied term occurs in a quote or the question by
-the grader's normalized match. That record never decides, in either direction: a lexical hit can
-be another sense (docs-mix-042's NAT gateway type "Private" against "private subnets" in a quote),
-and a purely lexical rule on v5's passes gives 1 false pass and 18 false fails, from names written
-another way. Stage C reports how often the rule was right on fresh labels. The skeptic's search
+the grader's normalized match. That record never decides, in either direction. A lexical hit can
+be another sense (docs-mix-042's NAT gateway type "Private" against "private subnets" in a quote)
+or another quote than the one the claim rests on: of the 12 distinct claims whose reasons the
+first reader classed as a term in no quote, the match finds a term in a quote for 3, all on
+answers labeled unsupported (docs-mix-042's "Private"; docs-chg-022's "Enterprise Support", in a
+quote the judge did not tie the claim to; docs-chg-010's "AgentCore", beside "Harness", which no
+quote holds), and for none of the claims on a supported answer, so a downgrade on a lexical hit
+would have spared nothing it should and three claims it should not (`m_term_lexical_match`; the
+terms are read by hand from the reasons, a reading). And a purely lexical rule on v5's passes
+gives 1 false pass and 18 false fails, from names written another way. Stage C reports how often
+the rule was right on fresh labels. The skeptic's search
 carries the same field, recorded and reported, and still decides only by its confidence against
 *s*.
 
@@ -219,6 +245,14 @@ The flag stays in the skeptic's request and the skeptic still scores it; code ig
 when the rule applies and records it beside the cleared flag. So the skeptic's request, and its
 cache key, never change because of this rule, and the no-call check below is exact.
 
+What the rule gives up: in v5 the skeptic's score on that flag was also a second look at whether
+the span made a claim at all. A claim mis-sorted into `not_claims` whose only capitalized word is
+the cited service's name ("Bedrock also supports this in one more Region") is now cleared by code
+and caught only by the skeptic's search, which decides by its confidence against *s*, so with *s*
+off it is not caught. Every cleared span is reported with the skeptic's score on it, at every
+stage and beside each fresh label in stage C, so how often the skeptic would have failed a span
+the code cleared is known at the end (decision 4).
+
 The service names come from the docs snapshot (every page title ends in " - " and the guide's
 name; the 13 pages under `general/` name the service before "endpoints and quotas"; a title that
 names several services is split on commas and "and"; a suffix such as "(AWS CDK) v2" is dropped;
@@ -242,7 +276,8 @@ from any eligible cell (on the single first pass, t = 50 gave 14 false passes fo
 16 for revision 1, and t = 85 gave 7 false fails for both, on the 106), and its 70 and 90 for *s*
 never changed a verdict at t = 70. The 75-level cell is live for fresh data only: on the saved
 passes it fails the kept rule through docs-chg-010 on iteration 4's run, whose weakest claim
-scored 70, 70 and 72.
+scored 70, 70 and 72 (the reasons of its claims at those scores are classed a qualifier or scope
+under all three salts, and a plain rewording, so the gap rule leaves them scored).
 
 ### Change 4: names inside claims, counted only
 
@@ -272,7 +307,11 @@ list now, before any v6 pass: v5's 25 cases plus the four answers' cases, docs-a
 docs-chg-010, docs-mix-042 and docs-mix-058, and docs-ai-003-p1, whose quote has an acronym's
 singular where the answer has its plural, the `term` rule's named risk. This re-places
 docs-ai-003-p3, which v5's revision 1 quoted but left in the 106 under v5's later-revision rule.
-A case a later v6 revision quotes stays in whichever count it is in today and is listed as added.
+The list is then frozen for the round: a case a later v6 revision quotes stays in whichever count
+it is in today and is listed as added, the rule v5 applied to docs-ai-003-p3. Naming every case a
+round quotes is a ratchet (v5 named 25, v6 names 30, and a later round could name its misses in
+turn); what makes the rule safe to keep is the total gate, which no placement of the line can
+soften (decision 3).
 
 On the tuning set (the 125 judge-dev labels with citations on the three dev runs), this moves 13
 answers, since a named case moves every run's answer on it:
@@ -284,6 +323,7 @@ answers, since a named case moves every run's answer on it:
 | The caps per pass (v2's mean plus 2 errors, plus 1 false fail) | 2.67 and 1.33 | **2.67 and 1.33** |
 | Named answers | 19 | **32** |
 | v2's errors there over its three passes | 9, 7, 6 (7.33 per pass) | 9, 7, 6 (7.33 per pass) |
+| v2's errors on all 125 over its three passes (the total gate's bar) | 9, 8, 7 (8.00 per pass) | 9, 8, 7 (8.00 per pass) |
 | Kept set (named, labeled supported, passed by v2's stored verdict) | 1 | **7**, one pre-registered as a known miss |
 
 v2's two extra passes, replayed from the call cache with no API call
@@ -293,7 +333,7 @@ match the choice record (1 and 1 on the 106; 12 false passes and 10 false fails 
 
 The kept set: docs-chg-008 on iteration 4's run (v5's), docs-ai-003-p1 on the champion's and
 iteration 4's runs, docs-ai-003-p3 on both, docs-chg-010 on iteration 4's run, and docs-mix-058
-on iteration 4's run. **docs-mix-058 is pre-registered as a known miss** (decision 2): its
+on iteration 4's run. **docs-mix-058 is pre-registered as a known miss** (decision 8): its
 support is carried by a link target that the design withholds from the judge, so passing it would
 mean showing URLs, which the v2 lesson rules out. It is reported at every stage and exempt from
 the kept rule; the other six must each pass on at least two of three passes.
@@ -304,15 +344,20 @@ kept), 142 others (55 labeled supported; v2: 2 false fails, no false pass).
 
 **How this reads.** The four answers behind v5's stop leave the eligibility count right after
 that stop, and on v5's saved passes revision 1 makes no error on the 93 by construction. The gate
-that then bites is the build check: on those passes revision 1 makes 25 errors on the 32 over
-three passes, 8.33 per pass, against v2's 22, 7.33 per pass, so v5's stopped version fails v6's
-stage A too, by one error per pass. With changes 1 and 2 fixing the answers they came from, the
-projected figure is 19 (6.33 per pass), one error per pass under the bar, one of which
-docs-mix-058 costs by design; the figure is fitted, and a v6 judge replies afresh. What keeps the
-gate honest: the rule predates the result; the list is frozen before any v6 pass; the moved
-answers stay in the build check and six of them join the kept rule; every gate is also reported on
-v5's split (106 and 19), where a figure can neither stop the round nor rescue a stop (on that
-split revision 1 passes the build check, 5.33 against 7.33); and stage C is the only evidence.
+that then bites is the total gate: on those passes revision 1 makes 25 errors on the 125 over
+three passes, all of them on the 32, 8.33 per pass, against v2's 24, 8.00 per pass, so v5's
+stopped version fails v6's stage A too. With changes 1 and 2 fixing the answers they came from,
+the projected figure is 19 (6.33 per pass), five judgings under v2's 24 over three passes, three
+of which docs-mix-058 costs by design; the figure is fitted, and a v6 judge replies afresh. The
+build check on the 32 reads 25 against v2's 22 today and 19 projected, a margin of three
+judgings; it is reported as the pre-registered prediction it is, and does not stop the round. The
+split gates alone would not do: a version at the edge of both, 2 errors per pass on the 93 (cap
+2.67) and 7 on the 32 (bar 7.33), makes 9 per pass against v2's 8.00 on the same answers
+(`k_total_gate`). What keeps the gates honest: the rules predate the result; the list is frozen
+before any v6 pass; the moved answers stay in the total and six of them join the kept rule; every
+gate is also reported on v5's split (106 and 19), where a figure can neither stop the round nor
+rescue a stop (on that split revision 1 passes the build check, 5.33 against 7.33, and the total
+gate reads the same, since the 125 are the same); and stage C is the only evidence.
 
 ### Stage A: tune on fresh samples (no new labels)
 
@@ -320,7 +365,8 @@ split revision 1 passes the build check, 5.33 against 7.33); and stage C is the 
 to `-3` for a version's three passes, `judge-v6-choice-1` to `-3` for the choice. v5's script
 rules carry over: one label per version fingerprint, a second label for the same fingerprint
 refused (so a version cannot be re-drawn under a new name); a version is judged once under each of
-its salts; no version is judged after the choice; the choice is made once. The choice step refuses
+its salts; no version is judged on the tuning set after the choice; the choice is made once. The
+choice step refuses
 to proceed if any claim-judge call under a choice salt is served by the cache, and its ledger
 entry must show uncached calls equal to calls, so no choice pass can be read before the choice.
 v2's three passes are its stored verdicts and the two replayed passes above, read by a client that
@@ -341,13 +387,16 @@ replaces the replayed one.
    the grading code, the service-name file or the word lists counts as a revision, and each is
    made from the tuning labels only. The grid is read from the three passes, as means (exact
    fractions), against v2's three passes on the same answers.
-3. **Eligible cells:** on the 93, mean errors at most v2's mean plus 2, of which mean false fails
-   at most v2's plus 1; each of the six kept answers passes on at least two of the three passes;
-   and judge errors are at most 2% of the 125 in every pass. A judge error is no verdict and is
+3. **Eligible cells:** on the 125, mean errors fewer than v2's (24 over its three passes, 8.00
+   per pass), false passes and false fails reported separately; on the 93, mean errors at most
+   v2's mean plus 2, of which mean false fails at most v2's plus 1; each of the six kept answers
+   passes on at least two of the three passes; and judge errors are at most 2% of the 125 in
+   every pass. A judge error is no verdict and is
    neither kind of error here; on the named cases it counts as an error, as in v5.
 4. **Candidates:** among the eligible cells of all versions, the two best by fewest errors on the
-   32 named (judge errors included; the build working, not evidence), then fewer errors on the
-   93, then lower *t*, then *s* off before 59 before 49. The second candidate is the first cell
+   125 (judge errors included), then fewer errors on the 93, then lower *t*, then *s* off before
+   59 before 49. The errors on the 32 are reported beside the order and do not rank: they are the
+   build working, not evidence. The second candidate is the first cell
    after the first in that order that differs from it in version or in *t*; if none does, the
    choice runs with one candidate. v5's two candidates differed only in *s* and gave the same
    verdict on all 375 judgings. On the saved passes the 75-level cells fail the kept rule, so the
@@ -357,11 +406,15 @@ replaces the replayed one.
    the first in step 4's order that is eligible on the fresh means, kept rule and judge-error cap
    included. Nothing from the exploration passes enters the choice except the order.
 6. **Stops:** the round stops, with the miss recorded, if no cell of any version is eligible
-   after the last revision, if neither candidate is eligible on its fresh means, or if the frozen
-   version does not make fewer errors than v2 on the 32 named cases on its fresh means.
+   after the last revision, or if neither candidate is eligible on its fresh means (the total gate
+   included, so a frozen version makes fewer errors than v2 on the 125 on its fresh means). The
+   build check, fewer errors than v2 on the 32 named cases on the fresh means, is the
+   pre-registered prediction (6.33 per pass projected against 7.33) and is reported with its
+   deviation, not gated.
 
 Reported at every step, gated or not: per-pass errors beside the means (v5's single pass hid a fix
-that held on one salt of three); the same gates read on v5's split; each cell's fail rate on the
+that held on one salt of three); the same gates read on v5's split; the build check on the 32
+against its projection; each cell's fail rate on the
 125 beside v2's 70.4%, read before stage B is paid for (v6 adds only mechanisms that fail more
 answers, and stage C caps the fail rate at v2's plus 5 points: on the saved passes revision 1
 fails 71% to 73% at the 70 level and 76% to 77% at the 75 level); flips between salts; the gap
@@ -377,7 +430,9 @@ run over v5's saved passes with no API call, and must reproduce these figures: a
 any *s*, 0 errors on the 93 in every pass; at the 65 level 2 false passes over the three passes
 (docs-chg-013 on iteration 4's run under two salts); at the 75 level 3 false fails (docs-mix-055
 on the first dev run under two salts, docs-core-009 on iteration 4's run under one);
-docs-ai-003-p3's two verdicts moved to pass at every cell; and the kept table per cell
+docs-ai-003-p3's two verdicts moved to pass at every cell; on the 125 at the 70 level with *s*
+off, 23 errors over the three passes, all on the 32 (7, 7 and 9 per pass: revision 1's 25 less
+the two verdicts the clearing moves), against v2's 24 (9, 8 and 7); and the kept table per cell
 (docs-chg-010 on iteration 4's run 3 of 3 at the 65 and 70 levels and 0 of 3 at 75; docs-mix-058
 0 of 3 everywhere; the other five 3 of 3).
 
@@ -391,15 +446,36 @@ every pass). The names count, the term records and the downgrades are reported b
 
 ### Stage C: the online check on fresh blind labels, unchanged
 
-v5's stage C: the frozen judge, pinned under `judge-v6`, grades the five reference runs (431
-answers) once; the three pre-label checks (fail rate at most v2's 74.7% plus 5 points, judge
-errors at most 2%, a quiet leave-one-day-out run); the seeded draw of 60 fresh answers (6 the
-judge passes and 6 it fails per day) from the 376 never labeled, excluding the first check's 30
-and both judges' dashboard lists, refused if any other label exists; the 60 hand-labeled blind;
-and the bar, false passes at most 4 of 30 among the passes drawn. The power table and the reported
-estimates are v5's. Two additions, reported and not gated: for each labeled answer, the gap types
-the judge gave and whether its terms were in a quote, and the names count, so the rules' hit rates
-on fresh labels are known at the end.
+v5's stage C with twice the labels: the frozen judge, pinned under `judge-v6`, grades the five
+reference runs (431 answers) once; the three pre-label checks (fail rate at most v2's 74.7% plus
+5 points, judge errors at most 2%, a quiet leave-one-day-out run); the seeded draw
+(`judge-check-v6-DAY`) of 120 fresh answers, 12 the judge passes and 12 it fails per day, from
+the 376 never labeled, excluding the first check's 30 and both judges' dashboard lists, refused if
+any other label exists; the 120 hand-labeled blind; and the bar, false passes at most 7 of 60
+among the passes drawn (decision 6). If a day has fewer than 12 fresh passes, it gives all it
+has, and the bar is the largest count whose share of the passes drawn is at most 7 of 60. The
+reported estimates are v5's. How often the bar admits a judge, by its true false-pass rate among
+the answers it passes (exact binomial, as if the passes drawn were one sample; v5's 60-label bar
+beside it; `o_stage_c_power`):
+
+| True false-pass rate | 120 labels: at most 7 of 60 | 60 labels: at most 4 of 30 |
+|---|---|---|
+| 5% | 0.99 | 0.98 |
+| 10% | 0.75 | 0.82 |
+| 15% | 0.31 | 0.52 |
+| 20% | 0.07 | 0.25 |
+| 27% (v2's rate on the first check, 4 of 15) | 0.003 | 0.06 |
+
+The doubling mostly shuts out a clearly bad judge; a judge with a 10% rate is still admitted three
+times in four, and the fail-rate cap keeps a judge from meeting the bar by failing more answers.
+Two additions, reported and not gated: for each labeled answer, the gap types the judge gave and
+whether its terms were in a quote, and the names count, so the rules' hit rates on fresh labels
+are known at the end. Where a v6 judge's remaining errors should sit, if the classes of v5's
+reasons carry over: the implication class stays score-decided (41 of the 115 weakest claims, 17
+on supported answers and 24 on unsupported), so a false pass at stage C is expected to be an
+implied claim scored at or above the level, and a false fail an implied or scoped claim scored
+under it; the gap types recorded beside each label show whether that is so, and make a fail
+interpretable.
 
 ### Keeping it blind
 
@@ -450,10 +526,15 @@ At $0.012 per claim-judge answer (budget) and $0.005 per v2 answer:
 | Stage B: the frozen judge on 171 under three salts; v2 under two more | 513 | 342 | $7.87 |
 | Stage B: about 33 probe bases and their variants (8 kinds each); v2 on the 4 mutant kinds | about 300 | about 132 | $4.26 |
 | Stage C: the five reference days | 431 | 0 | $5.17 |
-| **Before any label** | 3,494 | 474 | **$44 at $0.012; $39 to $41 at the measured cost; cap $60** |
+| Only on a v2 cache miss: v2 under two new salts on the 125 | 0 | 250 | $1.25 |
+| **Before any label** | 3,494 | 474 (724 on a v2 cache miss) | **$44 at $0.012, $45 on a v2 cache miss; $39 to $41 at the measured cost; cap $60** |
 | Only if stage C passes: re-judge days 6 to 11 | about 940 | 0 | about $11 |
 
-Human time: about 15 minutes for the decisions, then the 60 blind labels, about 55 minutes.
+Human time: about 15 minutes for the decisions (taken 2026-10-30), then the 120 blind labels,
+about 1 hour 50 minutes. Engineering time, which the first text left out: the gap field and its
+rules, the service-name pipeline, the round-parameterized ledger, the stage A script with its
+replay check, the review of stage B's partial build kept outside the repository, stage C's draw
+and score, and the fake-model tests are a build of several days before the first paid call.
 
 ## Risks, and how the design meets them
 
@@ -468,9 +549,20 @@ Human time: about 15 minutes for the decisions, then the 60 blind labels, about 
 - **The judge may type fewer gaps than its reasons name today.** Then the rule removes fewer false
   passes, and the skeptic's *s* in the 50s is the second line, resting on one 5-point gap.
 - **The own-name map has gaps.** A missed name only sends the flag to the skeptic, as in v5.
-- **Tight caps and a binding build check.** On the 93 the caps are 2.67 and 1.33 as in v5; on the
-  32 the frozen version must beat 7.33 errors per pass. Three passes per version make the means
-  steadier; the per-pass figures are reported.
+- **Tight caps and a binding total gate.** On the 93 the caps are 2.67 and 1.33 as in v5; on the
+  125 the frozen version must make fewer than 8.00 errors per pass, five judgings of margin over
+  three passes on the fitted projection (19 against 24); the build check on the 32, three
+  judgings of margin (19 against 22), is reported, not gated, so one flip per pass on the named
+  cases does not stop the round on noise. Three passes per version make the means steadier; the
+  per-pass figures are reported.
+- **The named list is a ratchet.** Every case a design quotes leaves the eligibility count, and
+  on v5's saved passes revision 1 makes no error on the 93 by construction, so that gate is a
+  regression guard, not a selector. The total gate on the 125 is the one gate the line cannot
+  move, and it is the one that ranks and stops.
+- **Change 2 removes a second look.** A claim mis-sorted into words of no claim whose only
+  capitalized word is the service's name is cleared by code and caught only by the skeptic's
+  search against *s*; the cleared spans and the skeptic's score on each are reported at every
+  stage and beside each fresh label.
 - **Selection.** Fresh salts for the choice, and the simulation above (12% for a version just
   over the caps).
 - **The fail-rate cap of stage C.** Reported per cell at every stage A step, before stage B is
@@ -484,34 +576,70 @@ Human time: about 15 minutes for the decisions, then the 60 blind labels, about 
 - The judge's scores are levels, and at the level where the labels split, its reasons separate
   them: the gap type makes the reason a field that a rule can read.
 - Two calls had to agree for a hedge that names the service: code decides that case.
+- A gate on a subset the designer draws can be met by moving the line: one gate on the whole
+  set, which the split cannot soften, ranks and stops.
 - A write-up must be checked against every record: every figure here is recomputed by a committed
   script from the round's records, and the readings that are not recomputations are marked as
   such.
 
-## Decisions (to approve)
+## Decisions (approved 2026-10-30)
 
-Recommended defaults are marked. Approval covers the `graders/` changes AGENTS.md requires
-agreement for, up to three revisions in stage A, and the paid steps up to the cap.
+The first text (2026-10-29) put six decisions. An external review of it, seven points and smaller
+items, each checked against the records and found right, added five; every figure the review cited
+is now recomputed by `scripts/judge_v6_figures.py` (figures k to o). All eleven were decided on
+2026-10-30 as below. The approval covers the `graders/` changes AGENTS.md requires agreement for,
+up to three revisions in stage A, and the paid steps up to the cap.
 
 1. **The design**: the process, the named list with the 93 and 32 counts, the gap types with the
    two rule-decided types and the code downgrade for the service's own name, the verdict-time
    clearing, the grid, the names count as reported only, and the draft-then-revision order.
-   *Recommended.* Alternatives: gap types from the first draft (saves one version and about $4.50,
-   loses the isolation); code only throughout; or giving the judge the cited services' names as
-   one line of input, derived from the citation URLs, instead of the code downgrade (an input
-   change, and a narrow URL channel).
-2. **docs-mix-058**: (a) pre-registered as a known miss, exempt from the kept rule and reported.
-   *Recommended.* (b) In the kept rule, which the design cannot pass without showing link targets.
-   (c) Show console link targets as text naming the console (not recommended: one answer, 3,389
-   such cells in the snapshot, and it reopens the URL channel).
-3. **The rubric**: (a) rubric v5's text unchanged; the publisher note lives in the gap-type
-   instruction and the service's own name in code. *Recommended.* (b) Add rubric v2.1's sentence
-   on the publisher and the service's own name to the rubric, as rubric v6.
-4. **Fresh labels at stage C**: (a) 60, about 55 minutes. *Recommended.* (b) 30, with v5's weaker
-   power figures.
-5. **Budget**: (a) a new ledger capped at $60 before any label, estimate about $44, the pilot's
-   stop at 1.3 times $0.012 per answer. *Recommended.* (b) Carry v5's remaining $53.05 as the cap.
-6. **Scope of a pass**: online only, as v5's decision 6. *Recommended.*
+   *Approved.* Not taken: gap types from the first draft; code only throughout; and giving the
+   judge the cited services' names as one line of input derived from the citation URLs, which the
+   review asked to weigh as a revision. It is not taken because a service's name derived from a
+   page's address is the attribution channel the v2 lesson closed (`docs/judge-validation.md`,
+   section 9): with it the judge can credit "Bedrock does this" to the page's owner when no quote
+   names Bedrock, content or no content.
+2. **The total gate** (review, points 1 to 3): the frozen version makes fewer errors than v2 on
+   all 125 on its fresh means, false passes and false fails reported separately; candidates are
+   ranked by that total first; the build check on the 32 is reported as a prediction with its
+   deviation, not gated. *Approved.* Not taken: both stops kept.
+3. **Later revisions and the list** (review, point 2): the list is frozen for the round; a case a
+   later revision quotes is listed as added and stays in its count. *Approved.* Not taken: moving a
+   case at the time, which changes the denominator mid-round.
+4. **Change 2's second look** (review, point 4): the clearing stays; the risk is written down and
+   every cleared span is reported with the skeptic's score on it. *Approved.* Not taken: clearing
+   only when the skeptic's search does not name the same span (on docs-ai-003-p3 the search named
+   another span, so the fix would survive, but on fresh data it reopens v5's failure whenever the
+   search treats the hedge as a claim); clearing only spans with hedge words.
+5. **The term rule's lexical record** (review, point 5): the record never decides. *Approved*, on
+   the simulation the review asked for: of 12 distinct term-class claims the match finds a term in
+   a quote for 3, all on unsupported answers, and for none on a supported answer, so a downgrade on
+   a lexical hit would spare the wrong claims only. The readers' agreement on the rule-reading
+   classes is reported (36 of 41 the same class, 40 with alternatives, 5 where the rule would fire
+   for one reader only).
+6. **Fresh labels at stage C** (review, point 6): 120, with the bar at 7 of 60, about 1 hour 50
+   minutes. *Approved.* Not taken: 60 (v5's 4 of 30); 30.
+7. **A majority of three judgings as the production verdict** (review, point 7): not adopted; one
+   judging, with flips between salts reported at every stage, to be revisited after stage C.
+   *Approved.* On the saved passes the majority makes 8 errors for revision 1 against its per-pass
+   7, 8 and 10, and 7 for v2 against its 9, 8 and 7, so it would raise v2's bar more than help v6,
+   at three times the cost per answer (stage C about $15, the re-judge about $34).
+8. **docs-mix-058**: pre-registered as a known miss, exempt from the kept rule and reported.
+   *Approved.* Not taken: in the kept rule, which the design cannot pass without showing link
+   targets; showing console link targets as text (one answer, 3,389 such cells in the snapshot,
+   and it reopens the URL channel).
+9. **The rubric**: rubric v5's text unchanged; the publisher note lives in the gap-type
+   instruction and the service's own name in code. *Approved.* Not taken: a rubric v6 with rubric
+   v2.1's sentence on the publisher and the service's own name.
+10. **Budget**: a new ledger capped at $60 before any label, estimate about $44 ($45 on a v2
+    cache miss), the pilot's stop at 1.3 times $0.012 per answer. *Approved.* Not taken: carrying
+    v5's remaining $53.05 as the cap.
+11. **Scope of a pass**: online only, as v5's decision 6. *Approved.*
+
+The review's smaller points are taken in above: the cost of a v2 cache miss is in the table; "no
+version is judged after the choice" says on the tuning set; docs-chg-010's kept run has its
+weakest claims' classes stated; the implication class is named as the expected shape of a stage C
+error; and engineering time is listed.
 
 ## Appendix: named cases (frozen 2026-10-29)
 
