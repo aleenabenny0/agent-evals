@@ -637,9 +637,9 @@ def _claim_checks_v6(grader: ClaimJudgeGrader) -> str:
         f"term {c.gaps_term}, cell {c.gaps_cell}, other {c.gaps_other}; failed by the gap rule "
         f"{c.rule_fails}; downgraded as a cited service's own name {c.downgrades}; terms in a "
         f"quote or the question {c.terms_quoted}, in none {c.terms_unquoted}. Own names cleared by "
-        f"code {c.names_cleared}, {c.names_cleared_skeptic_low} of them scored under t by the "
-        f"skeptic. Names in claims that no quote states: {c.names_unquoted}, in "
-        f"{c.claims_with_names_unquoted} claims."
+        f"code {c.names_cleared}, of which judge v5's rule would have failed "
+        f"{c.names_cleared_skeptic_low}. Names in claims that no quote states: {c.names_unquoted}, "
+        f"in {c.claims_with_names_unquoted} claims."
     )
 
 

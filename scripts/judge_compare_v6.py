@@ -37,6 +37,7 @@ script finds goes to results/judge-v6/.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -59,6 +60,7 @@ from rich.progress import BarColumn, Progress, TextColumn
 from agent_evals import spend
 from agent_evals.config import Config, JudgeConfig, load_config
 from agent_evals.graders import claim_judge as cj
+from agent_evals.graders import judge_prompts, service_names
 from agent_evals.graders.claim_judge import (
     GRADING_CODE_VERSION,
     RULES_VERSION,
@@ -116,6 +118,7 @@ PILOT_FILE = spend.PILOT_FILE
 REPLAY_FILE = "replay-check.json"
 CHOICE_FILE = "stage-a-choice.json"
 COST_STOP_FILE = "cost-stop.json"  # a version the pilot did not measure that cost too much
+CHOICE_JOURNAL = "choice-salts.json"  # each choice pass's salt, written before its first call
 # The projection the build check is reported against, at the continuity cell: fitted, not
 # evidence (docs/plans/judge-v6.md, "How this reads"). v2 makes 7.33 per pass on the 32.
 PROJECTION_CELL: tuple[int, int | None] = (69, None)
@@ -663,6 +666,7 @@ def replay_check(
         "grading_code_version": GRADING_CODE_VERSION,
         "rules_version": RULES_VERSION,
         "service_names_sha256": names.sha256,
+        "code_sha256": code_sha256(),
         "passes_read": [v5.pass_path(v5.OUT_DIR, V5_REV1, salt).as_posix() for salt in v5.SALTS],
         "v2_errors_on_125": v2_total,
         "moved_answer": {"key": REPLAY_MOVED, "cells_passed_per_salt": moved},
@@ -719,6 +723,15 @@ def replay_record(out_dir: Path) -> dict[str, Any] | None:
     return held
 
 
+def code_sha256() -> str:
+    """The grading code's own bytes: a replay check holds for this code and no other, whether or
+    not a version constant was bumped."""
+    digest = hashlib.sha256()
+    for module in (cj, judge_prompts, service_names):
+        digest.update(Path(str(module.__file__)).read_bytes())
+    return digest.hexdigest()
+
+
 def require_replay(out_dir: Path, names: ServiceNames, first_version: bool) -> None:
     """The first paid pass needs a passed replay check of the code in place; a later version
     needs a passed check of some code version (its own code is read against the saved passes of
@@ -733,6 +746,7 @@ def require_replay(out_dir: Path, names: ServiceNames, first_version: bool) -> N
         held.get("grading_code_version") == GRADING_CODE_VERSION
         and held.get("rules_version") == RULES_VERSION
         and held.get("service_names_sha256") == names.sha256
+        and held.get("code_sha256") == code_sha256()
     )
     if first_version and not same:
         raise Refused(
@@ -996,6 +1010,20 @@ def _cell_report(c: Cell, v2: Reading, answers: Sequence[v5.Answer]) -> dict[str
     }
 
 
+def refuse_after_cost_stop(out_dir: Path) -> None:
+    if (out_dir / COST_STOP_FILE).exists():
+        raise Refused(
+            f"{out_dir / COST_STOP_FILE} records a version over the stop: the work stops and the "
+            "budget is revisited (stage A step 1)"
+        )
+
+
+def complete(saved: Mapping[str, list[PassFile]]) -> dict[str, list[PassFile]]:
+    """The versions with all their passes, in their order. A version that broke off, or that the
+    cost stop halted, is in no candidate order: it has no three-pass means."""
+    return {label: passes for label, passes in saved.items() if len(passes) == PASSES}
+
+
 def stage_a(
     label: str,
     gap_types: bool,
@@ -1027,14 +1055,25 @@ def stage_a(
         same = [o for o, held in saved.items() if held[0].versions == current and o != label]
         if same:
             raise Refused(f"this version was judged already, as {same[0]!r}: one label per version")
-        if choice.exists():
-            raise Refused(f"{choice} exists: the choice is made, and no version is judged after it")
-        if (out_dir / COST_STOP_FILE).exists():
+        if choice.exists() or (out_dir / CHOICE_JOURNAL).exists():
             raise Refused(
-                f"{out_dir / COST_STOP_FILE} records a version over the stop: the work stops and "
-                "the budget is revisited (stage A step 1)"
+                f"{choice} or its journal exists: the choice has begun, and no version is judged "
+                "after it"
             )
-        piloted = (spend.pilot_record(out_dir) or {}).get("versions")
+        refuse_after_cost_stop(out_dir)
+        held_pilot = spend.pilot_record(out_dir) or {}
+        piloted = held_pilot.get("versions")
+        if label not in saved and piloted is not None:
+            if piloted == current and held_pilot.get("label") != label:
+                raise Refused(
+                    f"the pilot judged this version as {held_pilot.get('label')!r}: one label per "
+                    "version"
+                )
+            if piloted != current and held_pilot.get("label") == label:
+                raise Refused(
+                    f"the pilot judged another version as {label!r}: a revision is judged under "
+                    "a label of its own, so its salts are its own"
+                )
         counted = [held[0].versions for held in saved.values()]
         if piloted is not None and piloted not in counted:
             counted.append(piloted)  # a draft changed after the pilot is a revision
@@ -1096,7 +1135,7 @@ def stage_a(
     v2 = read(answers, [p for _, p in v2_passes(answers)])
     by_version = {
         held_label: grid(held_label, n, answers, [p.verdicts for p in passes], v2)
-        for n, (held_label, passes) in enumerate(saved.items())
+        for n, (held_label, passes) in enumerate(complete(saved).items())
     }
     passes = saved[label]
     counts = JudgingCounts()
@@ -1171,6 +1210,28 @@ def choice_salt(n: int) -> str:
     return f"{ROUND}-{CHOICE}-{n}"
 
 
+def choice_journal(out_dir: Path) -> list[dict[str, Any]]:
+    path = out_dir / CHOICE_JOURNAL
+    if not path.is_file():
+        return []
+    held: list[dict[str, Any]] = json.loads(path.read_text(encoding="utf-8"))
+    return held
+
+
+def start_choice_pass(out_dir: Path, label: str, n: int) -> str:
+    """The salt of a choice pass, written down before its first call. A salt is used once: a pass
+    that broke off is thrown away unread, since its replies sit in the call cache and were never
+    saved, and the pass is judged under the next number. So a crash cannot end the round, and
+    every call of a pass is still a fresh sample."""
+    held = choice_journal(out_dir)
+    used = [int(e["number"]) for e in held if e["label"] == label]
+    number = n if n not in used else max(PASSES, *used) + 1
+    held.append({"label": label, "pass": n, "number": number, "salt": choice_salt(number)})
+    out_dir.mkdir(parents=True, exist_ok=True)
+    (out_dir / CHOICE_JOURNAL).write_text(json.dumps(held, indent=1) + "\n", encoding="utf-8")
+    return choice_salt(number)
+
+
 def choice_path(out_dir: Path, label: str, n: int) -> Path:
     return out_dir / f"stage-a-{label}.{CHOICE}{n}.json"
 
@@ -1220,6 +1281,7 @@ def choose(
     path = out_dir / CHOICE_FILE
     if path.exists():
         raise Refused(f"{path} exists: the choice is made once")
+    refuse_after_cost_stop(out_dir)
     wanted = [parse_candidate(spec) for spec in specs]
     v2 = read(answers, [p for _, p in v2_passes(answers)])
     saved: dict[str, list[PassFile]] = {}
@@ -1230,7 +1292,7 @@ def choose(
             for label, passes in load_versions(out_dir, answers, current).items()
             if passes[0].gap_types == gap_types
         }
-    saved = dict(sorted(saved.items(), key=lambda kv: kv[1][0].judged_at))
+    saved = complete(dict(sorted(saved.items(), key=lambda kv: kv[1][0].judged_at)))
     order = candidate_order(
         cell
         for n, (label, passes) in enumerate(saved.items())
@@ -1271,9 +1333,8 @@ def choose(
     try:
         for label, n in todo:
             cfg = config.model_copy(update={"gap_types": saved[label][0].gap_types})
-            judged = judge_pass(
-                meter, cfg, names, answers, choice_salt(n), workers=workers, tick=tick
-            )
+            salt = start_choice_pass(out_dir, label, n)
+            judged = judge_pass(meter, cfg, names, answers, salt, workers=workers, tick=tick)
             held = PassFile(
                 label=label,
                 salt=judged.salt,
@@ -1296,12 +1357,14 @@ def choose(
             "the choice step's calls were not all sent to the API; its ledger entry says so"
         )
     candidates = []  # in step 4's order on the exploration passes, all they give the choice
+    salts: dict[str, list[str]] = {}
     for cell in expected:
         label, t, s = cell.label, cell.t, cell.s
         fresh = [
             PassFile.model_validate_json(choice_path(out_dir, label, n).read_text(encoding="utf-8"))
             for n in range(1, PASSES + 1)
         ]
+        salts[label] = [p.salt for p in fresh]
         per_pass = [claim_verdicts(p.verdicts, t, s) for p in fresh]
         reading = read(answers, per_pass)
         judge_errors = [sum(v.judge_error for v in p.verdicts.values()) for p in fresh]
@@ -1334,7 +1397,10 @@ def choose(
     )
     record = {
         "decided_at": _now(),
-        "salts": [choice_salt(n) for n in range(1, PASSES + 1)],
+        "salts": salts,
+        "salts_abandoned_unread": [
+            e for e in choice_journal(out_dir) if e["salt"] not in salts.get(e["label"], [])
+        ],
         "candidates": [_candidate_json(c, answers) for c in ordered],
         "v2": {"version": ONLINE_JUDGE_VERSION, **_reading_json(v2, answers)},
         "chosen": None if chosen is None else {"label": chosen.label, "t": chosen.t, "s": chosen.s},
@@ -1461,9 +1527,10 @@ def _counts_line(c: JudgingCounts) -> str:
         f"{share(c.dropped, c.support_entries)}; searches naming words not in the answer "
         f"{share(c.search_missing, c.judgings)}. Gap types: {gaps}; rule fails {c.rule_fails}; "
         f"downgrades {c.downgrades}; terms in a quote {c.terms_quoted}, in none "
-        f"{c.terms_unquoted}. Own names cleared by code {c.names_cleared} (the skeptic scored "
-        f"{c.names_cleared_skeptic_low} of them under t). Names in claims that no quote states: "
-        f"{c.names_unquoted} in {c.claims_with_names_unquoted} claims."
+        f"{c.terms_unquoted}. Own names cleared by code {c.names_cleared} (read at the config's "
+        f"t and s, judge v5's rule would have failed {c.names_cleared_skeptic_low} of them). Names "
+        f"in claims that no quote states: {c.names_unquoted} in {c.claims_with_names_unquoted} "
+        "claims."
     )
 
 
@@ -1534,11 +1601,14 @@ def render_stage_a(result: StageAResult, ledger: SpendLedger) -> str:
     cost = ", ".join(f"${c:.4f}" for c in result.costs)
     lines.append(f"cost per answer, per pass: {cost}.")
     lines.append(f"the skeptic's search, gap types given: {result.search_gaps or 'none'}.")
-    low = sum(r["skeptic_score"] is not None and r["skeptic_score"] < at.t for r in result.cleared)
+    low = sum(
+        r["skeptic_score"] is None or (r["skeptic_score"] < at.t and not r["skeptic_not_a_claim"])
+        for r in result.cleared
+    )
     wrong = sum(not r["supported"] for r in result.cleared)
     lines.append(
-        f"spans cleared by code: {len(result.cleared)}, {low} of them scored under t = {at.t} by "
-        f"the skeptic, {wrong} on answers labeled unsupported. All in {result.report}."
+        f"spans cleared by code: {len(result.cleared)}, of which judge v5's rule would have failed "
+        f"{low} at t = {at.t}, {wrong} on answers labeled unsupported. All in {result.report}."
     )
     known = [k for k in result.cells[0].reading.kept_passes if k.endswith(KNOWN_MISS)]
     for key in known:
@@ -1574,8 +1644,8 @@ def render_stage_a(result: StageAResult, ledger: SpendLedger) -> str:
 
 def render_choice(result: ChoiceResult, ledger: SpendLedger) -> str:
     lines = [
-        f"the choice (stage A steps 5 and 6) on three fresh passes under {choice_salt(1)} to "
-        f"{choice_salt(PASSES)}; every count is a mean over the passes.",
+        "the choice (stage A steps 5 and 6) on three fresh passes under the choice salts; every "
+        "count is a mean over the passes.",
         _spent([result.spent], ledger),
         "",
     ]

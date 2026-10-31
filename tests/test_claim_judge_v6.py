@@ -468,3 +468,91 @@ def test_evals_judge_prints_judge_v6s_counts_and_nothing_new_for_judge_v5() -> N
         ScriptedLLM([]), config(grader_name="judge-v5"), service_names=names()
     )
     assert "Gap types" not in cli._claim_checks(earlier)
+
+
+ROUTE_53 = ["Amazon Route 53", "Route 53", "AWS", "Amazon"]
+CONTROL_TOWER = ["AWS Control Tower", "Control Tower", "AWS", "Amazon"]
+BEDROCK = ["Amazon Bedrock", "Bedrock", "AWS", "Amazon"]
+
+
+def flag(token: str, span: str) -> FlaggedItem:
+    return FlaggedItem(number=1, kind="not_claims", token=token, context=span)
+
+
+def test_a_word_repeated_in_a_hedge_clears_only_when_every_occurrence_is_in_the_name() -> None:
+    twice = "I did not check AWS Control Tower or Control policies."
+    assert not cj._own_name_cleared(flag("Control", twice), CONTROL_TOWER)
+    both = "I did not check Control Tower or AWS Control Tower."
+    assert cj._own_name_cleared(flag("Control", both), CONTROL_TOWER)
+
+
+def test_a_number_is_never_cleared_by_code_even_inside_a_name() -> None:
+    for span in (
+        "I did not check Route 53 beyond its 53 health checks.",
+        "I did not check Route 53 specifically.",
+    ):
+        assert not cj._own_name_cleared(flag("53", span), ROUTE_53)
+    assert cj._own_name_cleared(flag("Route", "I did not check Route 53."), ROUTE_53)
+
+
+def test_a_possessive_own_name_is_the_name() -> None:
+    hedge = "Note that this applies to Bedrock's cross-Region inference specifically."
+    assert cj._own_name_cleared(flag("Bedrock's", hedge), BEDROCK)
+    full = "Note that this applies to Amazon Bedrock's inference specifically."
+    assert cj._own_name_cleared(flag("Amazon", full), BEDROCK)
+    assert cj._own_name_cleared(flag("Bedrock's", full), BEDROCK)
+
+
+def test_a_term_is_the_cited_services_name_in_any_form() -> None:
+    for term in (
+        "Bedrock",
+        "bedrock.",
+        "Bedrock's",
+        "Amazon Bedrock",
+        "AWS Bedrock",
+        "AWS",
+        "Amazon",
+    ):
+        assert cj._is_listed_name(term, BEDROCK), term
+    for term in ("Bedrock Agents", "AWS Lambda", "Harness"):
+        assert not cj._is_listed_name(term, BEDROCK), term
+
+
+def test_the_term_record_reads_a_possessive_term() -> None:
+    span = "Requests go to other Regions, where Cross-Region inference's rule applies"
+    llm = ScriptedLLM([table(claim(span, 90, "term", "Cross-Region inference's")), skeptic()])
+    found = assessed(llm, span + ".", gap_types=True)
+    assert found.claims[0].term_quoted is True
+
+
+def test_the_names_count_counts_overlapping_claims_and_only_whole_listed_names() -> None:
+    answer = "You can use Service Control Policies here, and the API's Harness too."
+    names_ = ["AWS Control Tower", "Control Tower", "AWS", "Amazon"]
+    spans = ("You can use Service Control Policies", "Service Control Policies here")
+    claims = [
+        cj.CheckedClaim(answer_span=span, role="core", support=[], score=90, why="w")
+        for span in (*spans, "the API's Harness too")
+    ]
+    counts = cj._names_in_claims("Why?", answer, claims, [QUOTE], names_)
+    assert counts == [3, 3, 1]  # Service, Control, Policies in both; Harness, and API's is generic
+
+
+def test_a_gap_type_that_was_not_asked_for_is_refused_as_judge_v5_would() -> None:
+    span = "It routes requests to other Regions"
+    llm = ScriptedLLM([table(claim(span, 90, "none")), table(claim(span, 90)), skeptic()])
+    found = assessed(llm, span + ".")
+    assert found.retries == 1 and found.claims[0].gap is None
+
+
+def test_the_count_of_cleared_names_is_those_v5s_rule_would_have_failed() -> None:
+    hedge = "Note that this applies to Bedrock specifically; I did not check other services."
+    answer = f"It routes requests to other Regions. {hedge}"
+    llm = ScriptedLLM(
+        [
+            table(claim("routes requests to other Regions", 95), not_claims=(hedge,)),
+            skeptic({1: 35}, no_claim=(1,)),
+        ]
+    )
+    found = assessed(llm, answer)
+    v = found.verdict(69, None)
+    assert v.names_cleared == 1 and v.names_cleared_skeptic_low == 0  # no claim clears it in v5

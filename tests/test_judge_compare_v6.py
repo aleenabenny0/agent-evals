@@ -293,6 +293,7 @@ def replay_passed(out: Path, names: ServiceNames = NAMES) -> None:
         "grading_code_version": jc.GRADING_CODE_VERSION,
         "rules_version": jc.RULES_VERSION,
         "service_names_sha256": names.sha256,
+        "code_sha256": jc.code_sha256(),
         "passed": True,
     }
     (out / jc.REPLAY_FILE).write_text(json.dumps(record), encoding="utf-8")
@@ -760,3 +761,107 @@ def test_every_stage_a_step_reports_per_pass_errors_flips_v5s_split_and_cleared_
     assert "per cell: errors on the 125 per pass" in rendered
     assert "against the fitted projection's 6.33" in rendered and "cost per answer" in rendered
     assert "spans cleared by code: 0" in rendered
+
+
+class Breaks:
+    """A model that goes down after this many calls, as the API can in the middle of a pass."""
+
+    def __init__(self, llm: Any, after: int) -> None:
+        self.llm = llm
+        self.left = after
+
+    def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
+        if self.left == 0:
+            raise RuntimeError("the API is down")
+        self.left -= 1
+        resp: LLMResponse = self.llm.create(request, salt=salt)
+        return resp
+
+
+def test_a_replay_check_of_other_code_does_not_open_the_first_paid_pass(records: Path) -> None:
+    replay_passed(records)
+    held = json.loads((records / jc.REPLAY_FILE).read_text(encoding="utf-8"))
+    held["code_sha256"] = "0" * 64  # the constants are the same; the code is not
+    (records / jc.REPLAY_FILE).write_text(json.dumps(held), encoding="utf-8")
+    with pytest.raises(jc.Refused, match="another code version's"):
+        run_stage_a("draft", Judges(tuning()), records)
+
+
+def test_a_version_with_fewer_than_three_passes_is_in_no_order_and_cannot_be_chosen(
+    records: Path,
+) -> None:
+    answers = tuning()
+    replay_passed(records)
+    run_stage_a("draft", Cached(Judges(answers)), records, answers=answers)
+    broken = Breaks(Cached(Judges(answers)), 170)  # past rev1's first pass, 159 calls
+    with pytest.raises(RuntimeError, match="the API is down"):
+        run_stage_a("rev1", broken, records, answers=answers, gap_types=True)
+    assert (records / "stage-a-rev1.pass1.json").is_file()
+    back = run_stage_a("draft", Judges(answers), records, answers=answers)
+    assert {c.label for c in back.order} == {"draft"}
+    with pytest.raises(jc.Refused, match="the candidates are step 4's first cell"):
+        choose(["rev1:64:off"], Judges(answers), records, answers)
+    # Resumed, it judges the passes it lacks, and joins the order.
+    done = run_stage_a("rev1", Cached(Judges(answers)), records, answers=answers, gap_types=True)
+    assert done.versions_counted == 2 and {c.label for c in done.order} == {"draft", "rev1"}
+
+
+def test_a_crash_inside_a_choice_pass_throws_it_away_unread_and_uses_the_next_salt(
+    records: Path,
+) -> None:
+    answers = tuning()
+    replay_passed(records)
+    judge = Judges(answers)
+    run_stage_a("draft", Cached(judge), records, answers=answers)
+    cached = Cached(judge)
+    with pytest.raises(RuntimeError, match="the API is down"):
+        choose(["draft:64:off", "draft:69:off"], Breaks(cached, 40), records, answers)
+    assert not (records / "stage-a-draft.choice1.json").exists()
+    result = choose(["draft:64:off", "draft:69:off"], cached, records, answers)
+    record = json.loads(result.path.read_text(encoding="utf-8"))
+    assert record["salts"] == {
+        "draft": ["judge-v6-choice-4", "judge-v6-choice-2", "judge-v6-choice-3"]
+    }
+    assert [e["salt"] for e in record["salts_abandoned_unread"]] == ["judge-v6-choice-1"]
+    entries = spend.round_for("judge-v6").ledger().entries()
+    assert entries[-2].step.endswith("(stopped early)")
+    assert entries[-1].uncached_calls == entries[-1].calls  # every call of the rerun is fresh
+
+
+def test_one_label_per_version_holds_across_the_pilot(records: Path) -> None:
+    answers = tuning()
+    replay_passed(records)
+    held = jc.versions(ScriptedLLM([]), claim_config(), NAMES)
+    pilot = {"cost_per_answer_usd": 0.0105, "label": "draft", "versions": held}
+    records.mkdir(parents=True, exist_ok=True)
+    (records / jc.PILOT_FILE).write_text(json.dumps(pilot), encoding="utf-8")
+    judge = Judges(answers)
+    with pytest.raises(jc.Refused, match="the pilot judged this version as 'draft'"):
+        run_stage_a("draft2", judge, records, answers=answers)
+    changed = pilot | {"versions": {k: f"old-{v}" for k, v in held.items()}}
+    (records / jc.PILOT_FILE).write_text(json.dumps(changed), encoding="utf-8")
+    with pytest.raises(jc.Refused, match="a revision is judged under a label of its own"):
+        run_stage_a("draft", judge, records, answers=answers)
+    assert judge.requests == []
+
+
+def test_no_version_is_judged_once_a_choice_pass_has_begun(records: Path) -> None:
+    answers = tuning()
+    replay_passed(records)
+    judge = Judges(answers)
+    run_stage_a("draft", Cached(judge), records, answers=answers)
+    with pytest.raises(RuntimeError, match="the API is down"):
+        choose(["draft:64:off", "draft:69:off"], Breaks(Cached(judge), 1), records, answers)
+    with pytest.raises(jc.Refused, match="the choice has begun"):
+        run_stage_a("rev1", Cached(judge), records, answers=answers, gap_types=True)
+
+
+def test_choose_refuses_after_a_recorded_cost_stop(records: Path) -> None:
+    answers = tuning()
+    replay_passed(records)
+    run_stage_a("draft", Cached(Judges(answers)), records, answers=answers)
+    (records / jc.COST_STOP_FILE).write_text("{}", encoding="utf-8")
+    judge = Judges(answers)
+    with pytest.raises(jc.Refused, match="the budget is revisited"):
+        choose(["draft:64:off", "draft:69:off"], judge, records, answers)
+    assert judge.requests == []

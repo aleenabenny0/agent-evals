@@ -686,6 +686,34 @@ version is judged after the choice" says on the tuning set; docs-chg-010's kept 
 weakest claims' classes stated; the implication class is named as the expected shape of a stage C
 error; and engineering time is listed.
 
+## Clarifications from the code review (2026-10-31)
+
+A review of the build against this design, before any paid pass, led to these clarifications. None
+changes a gate; each says how a case the text left open is read.
+
+- **Change 2 clears names, never numbers.** A number inside a listed name, such as the 53 of Route
+  53, stays with the skeptic, since a number passes only on its score. A word flagged more than
+  once in the same words of no claim is one item, so it clears only when every occurrence lies
+  inside a listed name. A possessive ("Bedrock's") is read as the name. The source-word list is
+  matched as written, so a plural it does not hold ("pages") is no source word; the cleared spans
+  are reported, so a miss is visible.
+- **A term is compared with the listed names in any form:** without punctuation around it or a
+  possessive, and with or without a leading "AWS" or "Amazon" ("AWS Bedrock").
+- **The names count** covers a word in every claim that holds it, and leaves out a word only when
+  it lies inside an occurrence of a whole listed name.
+- **A version with fewer than three saved passes is in no candidate order**, so one that broke off
+  or that the cost stop halted cannot be chosen. A crash mid-pass resumes on the salts already
+  named. No version is judged once a choice pass has begun.
+- **A choice pass that breaks off is thrown away unread.** Its replies sit in the call cache and
+  were never saved or shown, its salt is not used again, and the pass is judged under the next
+  number (`judge-v6-choice-4` and on). Without this a crash inside a choice pass would end the
+  round, since every rerun would be served by the cache. Each salt used and each abandoned is in
+  the choice record, and the refusal of a cached reply stands.
+- **v2's two extra passes** are read from their committed record
+  (`results/judge-v5/analysis/v2-extra-passes.json`), which the figure script replayed through a
+  client that refuses any miss, and their totals are checked against v5's choice record at every
+  step.
+
 ## Appendix: named cases (listed 2026-10-29, frozen by decision 3 on 2026-10-30)
 
 v5's 25: online-d01-085, online-d02-071, online-d03-068, online-d04-030, online-d04-032,

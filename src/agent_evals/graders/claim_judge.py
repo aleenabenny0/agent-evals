@@ -366,7 +366,7 @@ class ClaimVerdict(BaseModel):
     reason: str
     rule_fails: int = 0  # claims the gap rule failed at every t (judge v6, change 1)
     names_cleared: int = 0  # flagged own names code cleared (judge v6, change 2)
-    names_cleared_skeptic_low: int = 0  # of those, ones the skeptic scored under t
+    names_cleared_skeptic_low: int = 0  # of those, ones v5's rule would have failed
 
 
 class Assessment(BaseModel):
@@ -416,7 +416,7 @@ class Assessment(BaseModel):
         for item in self.flagged:
             result = scored.get(item.number)
             if item.number in cleared:
-                skeptic_low += int(result is not None and result.score < t)
+                skeptic_low += int(not _cleared(item, result, t))
                 continue
             if not _cleared(item, result, t):
                 failures.append((item.core, _item_failure(item, result)))
@@ -747,6 +747,8 @@ class ClaimJudgeGrader:
                 return f'an answer_span not in the answer ("{claim.answer_span}")'
             if self.config.gap_types and claim.gap is None:
                 return f'a claim without a gap type ("{claim.answer_span}")'
+            if not self.config.gap_types and (claim.gap is not None or claim.term):
+                return f'a gap type that was not asked for ("{claim.answer_span}")'
             if claim.gap == "term" and not normalize(claim.term):
                 return f'a term gap with no term ("{claim.answer_span}")'
         return table
@@ -820,7 +822,7 @@ def _checked(claim: Claim, quotes: list[str], question: str, names: Sequence[str
     term_quoted = None
     if term:
         folded = [normalize(q) for q in (*quotes, question)]
-        term_quoted = any(_occurs(term, text) for text in folded)
+        term_quoted = any(_occurs(_bare(term), text) for text in folded)
     return CheckedClaim(
         answer_span=claim.answer_span,
         role=claim.role,
@@ -834,24 +836,35 @@ def _checked(claim: Claim, quotes: list[str], question: str, names: Sequence[str
     )
 
 
+def _bare(word: str) -> str:
+    """A word or name as these rules compare it: normalized, without the punctuation around it
+    or a possessive."""
+    return _RIGHT_EDGE.sub("", _LEFT_EDGE.sub("", normalize(word))).removesuffix("'s")
+
+
 def _is_listed_name(term: str, names: Sequence[str]) -> bool:
-    """The term is one of the listed names, normalized, a possessive aside."""
-    folded = normalize(term).removesuffix("'s")
-    return any(folded == normalize(name) for name in names)
+    """The term is one of the listed names in any form: normalized, with punctuation around it
+    and a possessive aside, and with or without a leading publisher ("AWS Bedrock")."""
+    folded = _bare(term)
+    forms = {folded, folded.removeprefix("aws "), folded.removeprefix("amazon ")}
+    return any(normalize(name) in forms for name in names)
 
 
 def _own_name_cleared(item: FlaggedItem, names: Sequence[str]) -> bool:
     """Judge v6, change 2: a name flagged inside words of no claim is cleared by code when it lies
     inside an occurrence of the whole of one listed name (a cited service's or the publisher's) in
     those words, normalized, and the words hold no source word. A one-word name matches one word;
-    a word of a longer name clears nothing on its own."""
-    if item.kind != "not_claims" or not names:
+    a word of a longer name clears nothing on its own. Repeats of a word in one span are one
+    flagged item, so every occurrence must lie inside a listed name. A number is never cleared
+    here, even one inside a name: a number passes only on its score (_cleared)."""
+    if item.kind != "not_claims" or not names or _is_number(item.token):
         return False
     span = normalize(item.context)
     if any(_occurs(word, span) for word in SOURCE_WORDS):
         return False
     inside = [place for name in names for place in _places(name, span)]
-    return any(any(a <= lo and hi <= b for a, b in inside) for lo, hi in _places(item.token, span))
+    places = _places(_bare(item.token), span)
+    return bool(places) and all(any(a <= lo and hi <= b for a, b in inside) for lo, hi in places)
 
 
 def _names_in_claims(
@@ -862,27 +875,27 @@ def _names_in_claims(
     names: Sequence[str],
 ) -> list[int]:
     """Judge v6, change 4: for each claim, the capitalized names inside its answer_span, as the
-    coverage check finds them over the answer, that occur in none of the quotes, are not inside a
-    listed name of a cited service or the publisher, and are not generic words."""
+    coverage check finds them over the answer, that occur in none of the quotes, do not lie inside
+    an occurrence of a whole listed name of a cited service or the publisher, and are not generic
+    words. Overlapping claims each count a word they hold."""
     folded = _fold(answer)
     text = folded.replace("\n", " ").casefold()  # normalize(answer)
     at = _casefold_offsets(folded)
     asked = normalize(question)
     quoted = [normalize(q) for q in quotes]
-    listed = [normalize(name) for name in names]
+    listed = [place for name in names for place in _places(name, text)]
     places = [_places(claim.answer_span, text) for claim in claims]
     counts = [0] * len(claims)
     for word in _words(answer):
-        if not _is_name(word, asked) or normalize(word.text) in GENERIC_NAMES:
-            continue
-        token = normalize(word.text).removesuffix("'s")
-        if any(_occurs(token, q) for q in quoted) or any(_occurs(token, n) for n in listed):
+        token = _bare(word.text)
+        if not _is_name(word, asked) or token in GENERIC_NAMES:
             continue
         lo, hi = at[word.start], at[word.end]
+        if any(_occurs(token, q) for q in quoted) or any(a <= lo and hi <= b for a, b in listed):
+            continue
         for n, held in enumerate(places):
             if any(a <= lo and hi <= b for a, b in held):
                 counts[n] += 1
-                break  # a word lies in one claim's span; the first claim takes it
     return counts
 
 
