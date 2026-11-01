@@ -204,6 +204,7 @@ def test_a_question_gets_a_cited_answer_with_its_version_and_cost(tmp_path: Path
     )
     assert body["cost_usd"] == pytest.approx((1000 * 1 + 200 * 5) / 1e6)
     assert body["model_calls"] == 2 and len(body["request_id"]) == 32
+    assert body["providers"] == []  # no gateway behind this agent, so nothing is reported
 
 
 def test_each_request_is_its_own_sample_with_a_case_the_agent_accepts(tmp_path: Path) -> None:

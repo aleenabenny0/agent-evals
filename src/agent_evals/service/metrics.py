@@ -8,13 +8,15 @@ from __future__ import annotations
 
 from prometheus_client import CollectorRegistry, Counter, Gauge, Histogram, generate_latest
 
+from agent_evals.harness.gateway import GatewayEvent
+
 # An answer takes seconds, not milliseconds, so the default buckets would not resolve it.
 LATENCY_BUCKETS = (0.5, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144)
 OUTCOMES = (
     "answered",
     "abstained",
     "agent_failed",
-    "provider_error",
+    "provider_error",  # every provider failed
     "timeout",
     "overloaded",
     "over_budget",
@@ -69,6 +71,35 @@ class ServiceMetrics:
             "1 while the registry file on disk is unusable and the last good state is in force.",
             registry=self.registry,
         )
+
+        self.provider_failures = Counter(
+            "gateway_provider_failures",
+            "Model calls a provider failed.",
+            ["provider", "kind"],
+            registry=self.registry,
+        )
+        self.failovers = Counter(
+            "gateway_failovers",
+            "Model calls served by a provider other than the first.",
+            ["provider"],
+            registry=self.registry,
+        )
+        self.circuit_open = Gauge(
+            "gateway_circuit_open",
+            "1 while a provider's circuit is open.",
+            ["provider"],
+            registry=self.registry,
+        )
+
+    def on_gateway_event(self, event: GatewayEvent) -> None:
+        if event.kind == "failure":
+            self.provider_failures.labels(event.provider, event.detail).inc()
+        elif event.kind == "failover":
+            self.failovers.labels(event.provider).inc()
+        elif event.kind == "circuit_open":
+            self.circuit_open.labels(event.provider).set(1)
+        elif event.kind == "circuit_closed":
+            self.circuit_open.labels(event.provider).set(0)
 
     def render(self) -> bytes:
         return generate_latest(self.registry)

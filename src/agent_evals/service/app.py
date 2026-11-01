@@ -20,7 +20,7 @@ import logging
 import threading
 import time
 import uuid
-from collections.abc import AsyncIterator, Callable, Mapping
+from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
 from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager
@@ -34,6 +34,7 @@ from pydantic import BaseModel, Field
 
 from agent_evals.config import Pricing, ServiceConfig
 from agent_evals.harness.cache import sha256_text
+from agent_evals.harness.gateway import CURRENT_CALLS, CallRecord
 from agent_evals.service.budget import DailyBudget
 from agent_evals.service.metrics import ServiceMetrics
 from agent_evals.service.registry import Assignment, PromptRegistry, assign
@@ -59,6 +60,7 @@ class AskResponse(BaseModel):
     prompt_version: str
     role: str
     agent_version: str
+    providers: list[str]  # who answered, in order; more than one means a failover happened
     model_calls: int
     cost_usd: float | None
     latency_ms: float
@@ -75,6 +77,31 @@ class Deps:
     budget: DailyBudget
     metrics: ServiceMetrics = field(default_factory=ServiceMetrics)
     ready_checks: Mapping[str, Callable[[], bool]] = field(default_factory=dict)
+    # Prices by provider name, when a gateway reports who served each call. Any other call is
+    # priced at `pricing`.
+    provider_pricing: Mapping[str, Pricing] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class Answered:
+    result: AgentResult
+    calls: list[CallRecord]
+
+
+def _answer(agent: Agent, case: Case, context: RunContext) -> Answered:
+    """One agent run, with a record of who served its model calls. Runs on an answer's thread, so
+    the record is that answer's alone."""
+    calls: list[CallRecord] = []
+    token = CURRENT_CALLS.set(calls)
+    try:
+        return Answered(agent.run(case, context), calls)
+    finally:
+        CURRENT_CALLS.reset(token)
+
+
+def _providers(calls: Sequence[CallRecord]) -> list[str]:
+    """Who served the calls, each once, in the order they first did."""
+    return list(dict.fromkeys(call.provider for call in calls))
 
 
 def _case(request_id: str, question: str) -> Case:
@@ -128,7 +155,20 @@ def create_app(deps: Deps) -> FastAPI:
         body = {"error": outcome, "message": message, "request_id": request_id}
         return JSONResponse(body, status_code=status, headers=headers)
 
-    def settle(assigned: Assignment, started: float, future: Future[AgentResult]) -> None:
+    def cost_of(answered: Answered) -> float | None:
+        """What an answer cost, each call at its own provider's prices."""
+        if not answered.calls:
+            return answered.result.usage.cost_usd(deps.pricing)
+        total = 0.0
+        for call in answered.calls:
+            pricing = deps.provider_pricing.get(call.provider, deps.pricing)
+            cost = call.usage.cost_usd(pricing)
+            if cost is None:
+                return None
+            total += cost
+        return total
+
+    def settle(assigned: Assignment, started: float, future: Future[Answered]) -> None:
         """Runs when an answer's thread ends, in time or not: free the slot, count what it spent."""
         slots.release()
         metrics.in_flight.dec()
@@ -137,7 +177,8 @@ def create_app(deps: Deps) -> FastAPI:
         )
         if future.cancelled() or future.exception() is not None:
             return
-        result = future.result()
+        answered = future.result()
+        result = answered.result
         usage, version = result.usage, assigned.version
         metrics.tokens.labels("input", version).inc(usage.input_tokens)
         metrics.tokens.labels("output", version).inc(usage.output_tokens)
@@ -145,7 +186,7 @@ def create_app(deps: Deps) -> FastAPI:
         metrics.tool_errors.labels(version).inc(
             sum(s.kind == "tool" and s.is_error for s in result.trajectory)
         )
-        cost = usage.cost_usd(deps.pricing)
+        cost = cost_of(answered)
         if cost is not None:
             metrics.cost.labels(version).inc(cost)
             deps.budget.add(cost)
@@ -178,10 +219,10 @@ def create_app(deps: Deps) -> FastAPI:
         started = time.perf_counter()
         metrics.in_flight.inc()
         context = RunContext(run_id="service", case_id=request_id, attempt=1)
-        future = pool.submit(agent.run, _case(request_id, question), context)
+        future = pool.submit(_answer, agent, _case(request_id, question), context)
         future.add_done_callback(lambda done: settle(assigned, started, done))
         try:
-            result = future.result(timeout=settings.answer_timeout_s)
+            answered = future.result(timeout=settings.answer_timeout_s)
         except FutureTimeout:
             return refused(504, "timeout", "the answer took too long", request_id, assigned)
         except Exception as exc:  # an API failure the client gave up on
@@ -189,12 +230,14 @@ def create_app(deps: Deps) -> FastAPI:
             log.info(json.dumps({"request_id": request_id, "exception": kind}))
             return refused(502, "provider_error", "the model provider failed", request_id, assigned)
         latency_ms = (time.perf_counter() - started) * 1000
+        result = answered.result
         if result.error:
             return refused(502, "agent_failed", "no answer was produced", request_id, assigned)
         abstained = bool(result.output.get("abstained", False))
         outcome = "abstained" if abstained else "answered"
         metrics.requests.labels(outcome, assigned.version, assigned.role).inc()
-        cost = result.usage.cost_usd(deps.pricing)
+        cost = cost_of(answered)
+        providers = _providers(answered.calls)
         log.info(
             json.dumps(
                 {
@@ -204,6 +247,7 @@ def create_app(deps: Deps) -> FastAPI:
                     "outcome": outcome,
                     "prompt_version": assigned.version,
                     "role": assigned.role,
+                    "providers": providers,
                     "model_calls": result.usage.model_calls,
                     "latency_ms": round(latency_ms, 1),
                     "cost_usd": cost,
@@ -218,6 +262,7 @@ def create_app(deps: Deps) -> FastAPI:
             prompt_version=assigned.version,
             role=assigned.role,
             agent_version=agent.version,
+            providers=providers,
             model_calls=result.usage.model_calls,
             cost_usd=cost,
             latency_ms=latency_ms,

@@ -104,18 +104,28 @@ class AnthropicClient:
     prompt cache (`with_prompt_cache`)."""
 
     def __init__(
-        self, cache: CallCache | None = None, max_retries: int = 5, prompt_cache: bool = True
+        self,
+        cache: CallCache | None = None,
+        max_retries: int = 5,
+        prompt_cache: bool = True,
+        timeout_s: float | None = None,  # the SDK's default when None, as batch runs want
     ) -> None:
         self._cache = cache
         self._max_retries = max_retries
         self._prompt_cache = prompt_cache
+        self._timeout_s = timeout_s
         self._client: Any = None
 
     def _sdk(self) -> Any:
         if self._client is None:
             import anthropic  # imported lazily so offline commands never need an API key
 
-            self._client = anthropic.Anthropic(max_retries=self._max_retries)
+            if self._timeout_s is None:
+                self._client = anthropic.Anthropic(max_retries=self._max_retries)
+            else:
+                self._client = anthropic.Anthropic(
+                    max_retries=self._max_retries, timeout=self._timeout_s
+                )
         return self._client
 
     def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:

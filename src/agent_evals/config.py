@@ -105,6 +105,29 @@ class SuitesConfig(_Strict):
     held_out_services: list[str] = Field(default_factory=list)
 
 
+class ProviderConfig(_Strict):
+    """A provider behind the OpenAI-compatible API (harness/openai_compat.py)."""
+
+    name: str
+    base_url: str
+    api_key_env: str  # the environment variable that holds the key, never the key
+    model: str
+    pricing: Pricing = Pricing()
+    timeout_s: float = 30.0
+    max_tokens_field: str = "max_completion_tokens"  # some servers want "max_tokens"
+
+
+class GatewayConfig(_Strict):
+    """Failover (harness/gateway.py). With no fallback, it is one provider and a breaker."""
+
+    primary_name: str = "anthropic"
+    primary_timeout_s: float = 30.0
+    primary_retries: int = 1  # kept low: a failover is faster than waiting out long retries
+    failure_threshold: int = 3  # failures in a row that open a provider's circuit
+    cooldown_s: float = 30.0
+    fallback: ProviderConfig | None = None
+
+
 class ServiceConfig(_Strict):
     """The docs agent as a service (docs/plans/phase-8-llm-ops.md)."""
 
@@ -120,6 +143,7 @@ class ServiceConfig(_Strict):
     spend_path: Path = Path("results/service/spend.json")
     registry_path: Path = Path("configs/registry.yaml")
     registry_log: Path = Path("results/registry-log.jsonl")
+    gateway: GatewayConfig = GatewayConfig()
 
 
 class Config(_Strict):
