@@ -30,6 +30,8 @@ from typing import Any
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from opentelemetry import trace
+from opentelemetry.trace import Status, StatusCode, Tracer
 from pydantic import BaseModel, Field
 
 from agent_evals.config import Pricing, ServiceConfig
@@ -38,6 +40,7 @@ from agent_evals.harness.gateway import CURRENT_CALLS, CallRecord
 from agent_evals.service.budget import DailyBudget
 from agent_evals.service.metrics import ServiceMetrics
 from agent_evals.service.registry import Assignment, PromptRegistry, assign
+from agent_evals.service.tracing import record_steps
 from agent_evals.types import Agent, AgentResult, Case, RunContext
 
 log = logging.getLogger("agent_evals.service")
@@ -80,6 +83,7 @@ class Deps:
     # Prices by provider name, when a gateway reports who served each call. Any other call is
     # priced at `pricing`.
     provider_pricing: Mapping[str, Pricing] = field(default_factory=dict)
+    tracer: Tracer = field(default_factory=trace.NoOpTracer)
 
 
 @dataclass(frozen=True)
@@ -151,6 +155,10 @@ def create_app(deps: Deps) -> FastAPI:
         version = assigned.version if assigned else "none"
         role = assigned.role if assigned else "none"
         metrics.requests.labels(outcome, version, role).inc()
+        span = trace.get_current_span()
+        span.set_attributes({"request.id": request_id, "outcome": outcome})
+        if status >= 500:
+            span.set_status(Status(StatusCode.ERROR, outcome))
         log.info(json.dumps({"request_id": request_id, "outcome": outcome, "status": status}))
         body = {"error": outcome, "message": message, "request_id": request_id}
         return JSONResponse(body, status_code=status, headers=headers)
@@ -197,6 +205,10 @@ def create_app(deps: Deps) -> FastAPI:
 
     @app.post("/v1/ask", response_model=AskResponse)
     def ask(body: AskRequest) -> AskResponse | JSONResponse:
+        with deps.tracer.start_as_current_span("ask"):
+            return answer_question(body)
+
+    def answer_question(body: AskRequest) -> AskResponse | JSONResponse:
         request_id = uuid.uuid4().hex
         question = body.question
         if len(question) > settings.max_question_chars:
@@ -217,6 +229,7 @@ def create_app(deps: Deps) -> FastAPI:
             log.exception("no agent for %s", assigned.version)
             return refused(500, "provider_error", "the agent is unavailable", request_id, assigned)
         started = time.perf_counter()
+        started_ns = time.time_ns()
         metrics.in_flight.inc()
         context = RunContext(run_id="service", case_id=request_id, attempt=1)
         future = pool.submit(_answer, agent, _case(request_id, question), context)
@@ -231,6 +244,15 @@ def create_app(deps: Deps) -> FastAPI:
             return refused(502, "provider_error", "the model provider failed", request_id, assigned)
         latency_ms = (time.perf_counter() - started) * 1000
         result = answered.result
+        record_steps(deps.tracer, started_ns, result, answered.calls)
+        trace.get_current_span().set_attributes(
+            {
+                "prompt.version": assigned.version,
+                "prompt.role": assigned.role,
+                "question.chars": len(question),
+                "llm.model_calls": result.usage.model_calls,
+            }
+        )
         if result.error:
             return refused(502, "agent_failed", "no answer was produced", request_id, assigned)
         abstained = bool(result.output.get("abstained", False))
@@ -238,6 +260,7 @@ def create_app(deps: Deps) -> FastAPI:
         metrics.requests.labels(outcome, assigned.version, assigned.role).inc()
         cost = cost_of(answered)
         providers = _providers(answered.calls)
+        trace.get_current_span().set_attributes({"request.id": request_id, "outcome": outcome})
         log.info(
             json.dumps(
                 {

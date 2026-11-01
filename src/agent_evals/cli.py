@@ -1388,6 +1388,10 @@ def gate_cmd(
     target: Annotated[
         str, typer.Option(help="Metric the change is meant to improve.")
     ] = "judge_supported",
+    write_receipt: Annotated[
+        bool,
+        typer.Option("--write-receipt", help="On a pass, record it for the CI check (ADR 0008)."),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
     """The ADR 0008 gate: target improved, no monitored metric regressed, no category regressed."""
@@ -1412,6 +1416,7 @@ def gate_cmd(
             )
             raise typer.Exit(code=2)
         cases = load_suite(suite_path) if suite_path.exists() else []
+        candidate = store.run_info(challenger)
         try:
             g = gate(store, champion, challenger, cases, target, cfg.judge.grader_name)
         except ValueError as exc:
@@ -1456,6 +1461,17 @@ def gate_cmd(
         console.print(
             f"[bold green]GATE PASSED[/bold green]: {target} improved, nothing regressed."
         )
+        if write_receipt:
+            from agent_evals import receipts
+
+            path = receipts.write_receipt(
+                agent_version=str(candidate["agent_version"]),
+                prompt_sha256=str(candidate["manifest"]["agent"]["prompt_sha256"]),
+                target=target,
+                champion_run=champion,
+                challenger_run=challenger,
+            )
+            console.print(f"receipt: {path}")
     else:
         reasons = []
         if g.target.verdict != "improved":
@@ -2550,14 +2566,19 @@ app.add_typer(registry_app, name="registry")
 
 
 @app.command()
-def serve(config: ServiceConfigOpt = SERVICE_CONFIG) -> None:
-    """Run the docs agent as a service. Every answer it gives costs money."""
+def serve(
+    config: ServiceConfigOpt = SERVICE_CONFIG,
+    host: Annotated[str | None, typer.Option(help="Overrides service.host.")] = None,
+    port: Annotated[int | None, typer.Option(help="Overrides service.port.")] = None,
+) -> None:
+    """Run the docs agent as a service. Every answer costs money, unless the config sets the fake
+    provider."""
     import uvicorn
 
     from agent_evals.service.main import build_app
 
     cfg = _config(config)
-    uvicorn.run(build_app(config), host=cfg.service.host, port=cfg.service.port)
+    uvicorn.run(build_app(config), host=host or cfg.service.host, port=port or cfg.service.port)
 
 
 def _registry(config: Path) -> Any:

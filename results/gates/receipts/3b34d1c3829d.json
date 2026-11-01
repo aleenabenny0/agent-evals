@@ -1,0 +1,11 @@
+{
+ "agent_version": "3b34d1c3829d",
+ "prompt_sha256": "a6da6c4b4b1b",
+ "basis": "carried",
+ "target": "judge_supported",
+ "champion_run": "docs-20261011-223111-702e87",
+ "challenger_run": "docs-20261016-214710-02abb7",
+ "gated_version": "8784b07dbd32",
+ "decided_at": "2026-11-01T00:00:00+00:00",
+ "note": "Iteration 1's gate passed on 8784b07dbd32. Iteration 2 added the option require_number_coverage, off by default, and the rejection text it uses only when on, and both entered the fingerprint, which moved to 3b34d1c3829d with no change in behavior. Removing those two from the fingerprint gives 8784b07dbd32 exactly, and tests/test_ops.py recomputes this."
+}

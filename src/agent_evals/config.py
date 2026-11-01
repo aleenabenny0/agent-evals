@@ -144,6 +144,9 @@ class ServiceConfig(_Strict):
     registry_path: Path = Path("configs/registry.yaml")
     registry_log: Path = Path("results/registry-log.jsonl")
     gateway: GatewayConfig = GatewayConfig()
+    # Set, the service runs on a fake provider at about this latency per model call, for a free
+    # load test (service/fake.py). Every answer then reports the provider `fake`.
+    fake_latency_s: float | None = None
 
 
 class Config(_Strict):

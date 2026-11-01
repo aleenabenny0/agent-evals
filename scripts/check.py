@@ -24,6 +24,7 @@ CHECKS: list[tuple[str, list[str]]] = [
     ("types", [PY, "-m", "mypy"]),
     ("tests", [PY, "-m", "pytest"]),
     ("suites", [PY, "-m", "agent_evals.cli", "validate", "suites/docs/smoke.jsonl"]),
+    ("gate receipt", [PY, "scripts/check_gate_receipt.py"]),
 ]
 FIXES: list[tuple[str, list[str]]] = [
     ("lint --fix", [PY, "-m", "ruff", "check", "--fix", "."]),

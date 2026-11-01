@@ -17,18 +17,21 @@ from fastapi import FastAPI
 
 from agent_evals.agents.docs.agent import DocsAgent
 from agent_evals.agents.docs.prompts import SYSTEM_PROMPTS
-from agent_evals.config import Config, load_config
+from agent_evals.config import Config, Pricing, load_config
 from agent_evals.corpus import Corpus
 from agent_evals.harness.gateway import CircuitBreaker, Provider, ResilientClient
 from agent_evals.harness.llm import AnthropicClient
 from agent_evals.harness.openai_compat import OpenAICompatibleClient
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
+from agent_evals.service.fake import FakeProvider
 from agent_evals.service.metrics import ServiceMetrics
 from agent_evals.service.registry import PromptRegistry
+from agent_evals.service.tracing import make_tracer
 from agent_evals.types import Agent
 
 log = logging.getLogger("agent_evals.service")
+FAKE = "fake"
 
 
 def registry_of(config: Config) -> PromptRegistry:
@@ -43,6 +46,9 @@ def gateway_of(config: Config, metrics: ServiceMetrics) -> ResilientClient:
     def breaker() -> CircuitBreaker:
         return CircuitBreaker(settings.failure_threshold, settings.cooldown_s)
 
+    if config.service.fake_latency_s is not None:
+        fake = Provider(FAKE, FakeProvider(config.service.fake_latency_s), breaker())
+        return ResilientClient([fake], on_event=metrics.on_gateway_event)
     primary = AnthropicClient(
         max_retries=settings.primary_retries, timeout_s=settings.primary_timeout_s
     )
@@ -71,6 +77,7 @@ def build_app(config_path: Path) -> FastAPI:
     metrics = ServiceMetrics()
     llm = gateway_of(config, metrics)
     fallback = config.service.gateway.fallback
+    prices = {FAKE: Pricing()} | ({fallback.name: fallback.pricing} if fallback else {})
     agents: dict[str, Agent] = {}
     lock = threading.Lock()
 
@@ -90,6 +97,7 @@ def build_app(config_path: Path) -> FastAPI:
             budget=DailyBudget(config.service.spend_path, config.service.daily_budget_usd),
             metrics=metrics,
             ready_checks={"snapshot": lambda: bool(corpus.pages), "provider": llm.available},
-            provider_pricing={fallback.name: fallback.pricing} if fallback else {},
+            provider_pricing=prices,
+            tracer=make_tracer(os.environ.get("OTEL_EXPORTER_OTLP_ENDPOINT")),
         )
     )

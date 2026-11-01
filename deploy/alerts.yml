@@ -1,0 +1,56 @@
+# Each alert has a section of the same name in docs/runbook.md. The thresholds are starting points
+# until the load test sets the service objectives.
+groups:
+  - name: docs-agent
+    rules:
+      - alert: ServiceDown
+        expr: up{job="docs-agent"} == 0
+        for: 1m
+        labels: {severity: page}
+        annotations:
+          summary: Prometheus cannot reach the service.
+
+      - alert: AnswersFailing
+        expr: |
+          sum(rate(ask_requests_total{outcome=~"provider_error|agent_failed|timeout"}[2m]))
+            / sum(rate(ask_requests_total[2m])) > 0.05
+        for: 2m
+        labels: {severity: page}
+        annotations:
+          summary: More than 5% of questions are getting no answer.
+
+      - alert: AnswersSlow
+        expr: |
+          histogram_quantile(0.95, sum by (le) (rate(ask_latency_seconds_bucket[5m]))) > 60
+        for: 5m
+        labels: {severity: warn}
+        annotations:
+          summary: The 95th percentile answer takes over a minute.
+
+      - alert: ProviderCircuitOpen
+        expr: gateway_circuit_open == 1
+        for: 1m
+        labels: {severity: warn}
+        annotations:
+          summary: A model provider's circuit is open, so traffic is on the fallback or failing.
+
+      - alert: AtCapacity
+        expr: sum(rate(ask_requests_total{outcome="overloaded"}[2m])) > 0
+        for: 2m
+        labels: {severity: warn}
+        annotations:
+          summary: The service is refusing questions because it is full.
+
+      - alert: SpendHigh
+        expr: sum(increase(llm_cost_usd_total[1h])) > 0.5
+        for: 5m
+        labels: {severity: warn}
+        annotations:
+          summary: Spend is over half the daily cap within an hour.
+
+      - alert: RegistryFileBad
+        expr: registry_file_bad == 1
+        for: 1m
+        labels: {severity: page}
+        annotations:
+          summary: The registry file is unusable, so a rollback would not take effect.
