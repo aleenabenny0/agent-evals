@@ -105,6 +105,23 @@ class SuitesConfig(_Strict):
     held_out_services: list[str] = Field(default_factory=list)
 
 
+class ServiceConfig(_Strict):
+    """The docs agent as a service (docs/plans/phase-8-llm-ops.md)."""
+
+    host: str = "127.0.0.1"  # localhost only: the service has no authentication
+    port: int = 8000
+    # Answers worked on at once. Past this a request is refused at once: a queue in front of a
+    # slow backend turns a short overload into a long one.
+    max_concurrent: int = 8
+    retry_after_s: int = 5  # what a refused client is told to wait
+    answer_timeout_s: float = 120.0
+    max_question_chars: int = 2000
+    daily_budget_usd: float = 1.0  # past this the service refuses questions until the next UTC day
+    spend_path: Path = Path("results/service/spend.json")
+    registry_path: Path = Path("configs/registry.yaml")
+    registry_log: Path = Path("results/registry-log.jsonl")
+
+
 class Config(_Strict):
     paths: Paths = Paths()
     run: RunConfig = RunConfig()
@@ -112,6 +129,7 @@ class Config(_Strict):
     graders: GradersConfig = GradersConfig()
     judge: JudgeConfig = JudgeConfig()
     suites: SuitesConfig = SuitesConfig()
+    service: ServiceConfig = ServiceConfig()
 
 
 def load_config(path: Path | None = None) -> Config:

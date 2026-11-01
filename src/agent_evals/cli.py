@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Any
@@ -2538,6 +2539,89 @@ BLIND_EXPECTED: dict[str, list[str]] = {  # the family alerts pre-registered for
 }
 BLIND_PATH = Path("results/online/blind.json")
 BLIND_REVEAL_PATH = Path("results/online/blind-reveal.json")
+SERVICE_CONFIG = Path("configs/service.yaml")
+ServiceConfigOpt = Annotated[Path, typer.Option("--config", "-c", help="Service config file.")]
+registry_app = typer.Typer(
+    add_completion=False,
+    no_args_is_help=True,
+    help="The prompt registry: which version serves traffic (docs/plans/phase-8-llm-ops.md).",
+)
+app.add_typer(registry_app, name="registry")
+
+
+@app.command()
+def serve(config: ServiceConfigOpt = SERVICE_CONFIG) -> None:
+    """Run the docs agent as a service. Every answer it gives costs money."""
+    import uvicorn
+
+    from agent_evals.service.main import build_app
+
+    cfg = _config(config)
+    uvicorn.run(build_app(config), host=cfg.service.host, port=cfg.service.port)
+
+
+def _registry(config: Path) -> Any:
+    from agent_evals.service.main import registry_of
+
+    return registry_of(_config(config))
+
+
+def _show(state: Any) -> None:
+    canary = f"{state.canary.version} at {state.canary_share:.0%}" if state.canary else "none"
+    previous = state.previous.version if state.previous else "none"
+    console.print(
+        f"champion {state.champion.version}, canary {canary}, previous champion {previous}"
+    )
+
+
+def _registry_change(run: Callable[[], Any]) -> None:
+    from agent_evals.service.registry import RegistryError
+
+    try:
+        _show(run())
+    except RegistryError as exc:
+        console.print(f"[red]{exc}[/red]")
+        raise typer.Exit(code=2) from exc
+
+
+Why = Annotated[str, typer.Option("--why", help="Why this change is made. It goes in the log.")]
+Who = Annotated[str, typer.Option("--who", help="Who makes it.")]
+
+
+@registry_app.command("show")
+def registry_show(config: ServiceConfigOpt = SERVICE_CONFIG) -> None:
+    """Show which prompt versions are live."""
+    _registry_change(lambda: _registry(config).state())
+
+
+@registry_app.command("canary")
+def registry_canary(
+    version: str,
+    why: Why,
+    share: Annotated[float, typer.Option(help="Share of traffic, above 0 and at most 1.")] = 0.2,
+    who: Who = "operator",
+    config: ServiceConfigOpt = SERVICE_CONFIG,
+) -> None:
+    """Send a share of traffic to a prompt version."""
+    _registry_change(lambda: _registry(config).set_canary(version, share, who=who, why=why))
+
+
+@registry_app.command("promote")
+def registry_promote(
+    why: Why, who: Who = "operator", config: ServiceConfigOpt = SERVICE_CONFIG
+) -> None:
+    """Make the canary the champion. The old champion stays on record for a rollback."""
+    _registry_change(lambda: _registry(config).promote(who=who, why=why))
+
+
+@registry_app.command("rollback")
+def registry_rollback(
+    why: Why, who: Who = "operator", config: ServiceConfigOpt = SERVICE_CONFIG
+) -> None:
+    """Drop the canary, or with no canary go back to the previous champion."""
+    _registry_change(lambda: _registry(config).rollback(who=who, why=why))
+
+
 blind_app = typer.Typer(
     no_args_is_help=True,
     help="The blind days 9 to 11 (phase 7 part 5): seal the choices, run a day under its sealed "

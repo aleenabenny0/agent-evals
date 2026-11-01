@@ -1,0 +1,8 @@
+# The live prompt pointers, changed with `evals registry`, not by hand: each hash is checked
+# against the version's text in agents/docs/prompts.py.
+champion:
+  version: v3
+  sha256: a6da6c4b4b1b
+canary: null
+canary_share: 0.0
+previous: null
