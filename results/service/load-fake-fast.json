@@ -1,0 +1,104 @@
+{
+ "label": "fake-fast",
+ "seconds_per_rate": 20.0,
+ "steps": [
+  {
+   "rate_per_s": 10.0,
+   "sent": 181,
+   "offered_per_s": 9.05,
+   "statuses": {
+    "200": 181
+   },
+   "answered_per_s": 9.085,
+   "refused_share": 0.0,
+   "latency_s": {
+    "p50": 0.046,
+    "p95": 0.064,
+    "p99": 0.104
+   }
+  },
+  {
+   "rate_per_s": 40.0,
+   "sent": 842,
+   "offered_per_s": 42.1,
+   "statuses": {
+    "200": 841,
+    "ReadError": 1
+   },
+   "answered_per_s": 42.103,
+   "refused_share": 0.0012,
+   "latency_s": {
+    "p50": 0.051,
+    "p95": 0.076,
+    "p99": 0.086
+   }
+  },
+  {
+   "rate_per_s": 80.0,
+   "sent": 1662,
+   "offered_per_s": 83.1,
+   "statuses": {
+    "200": 1662
+   },
+   "answered_per_s": 82.739,
+   "refused_share": 0.0,
+   "latency_s": {
+    "p50": 0.077,
+    "p95": 0.202,
+    "p99": 0.323
+   }
+  },
+  {
+   "rate_per_s": 120.0,
+   "sent": 2376,
+   "offered_per_s": 118.8,
+   "statuses": {
+    "200": 1899,
+    "ConnectError": 442,
+    "ReadError": 35
+   },
+   "answered_per_s": 58.284,
+   "refused_share": 0.2008,
+   "latency_s": {
+    "p50": 4.176,
+    "p95": 12.152,
+    "p99": 15.02
+   }
+  },
+  {
+   "rate_per_s": 160.0,
+   "sent": 3184,
+   "offered_per_s": 159.2,
+   "statuses": {
+    "200": 2356,
+    "ConnectError": 785,
+    "ReadError": 42,
+    "RemoteProtocolError": 1
+   },
+   "answered_per_s": 42.422,
+   "refused_share": 0.2601,
+   "latency_s": {
+    "p50": 18.491,
+    "p95": 44.029,
+    "p99": 50.875
+   }
+  },
+  {
+   "rate_per_s": 240.0,
+   "sent": 4803,
+   "offered_per_s": 240.15,
+   "statuses": {
+    "200": 2852,
+    "ConnectError": 1931,
+    "ReadError": 20
+   },
+   "answered_per_s": 55.605,
+   "refused_share": 0.4062,
+   "latency_s": {
+    "p50": 19.694,
+    "p95": 45.948,
+    "p99": 48.113
+   }
+  }
+ ]
+}

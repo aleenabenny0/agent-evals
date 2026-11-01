@@ -15,6 +15,7 @@ Logs and metrics never hold a question's text: a log line has its hash and lengt
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import threading
@@ -22,7 +23,6 @@ import time
 import uuid
 from collections.abc import AsyncIterator, Callable, Mapping, Sequence
 from concurrent.futures import Future, ThreadPoolExecutor
-from concurrent.futures import TimeoutError as FutureTimeout
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from typing import Any
@@ -204,11 +204,14 @@ def create_app(deps: Deps) -> FastAPI:
         return refused(422, "invalid", "the body must be JSON with a question", uuid.uuid4().hex)
 
     @app.post("/v1/ask", response_model=AskResponse)
-    def ask(body: AskRequest) -> AskResponse | JSONResponse:
+    async def ask(body: AskRequest) -> AskResponse | JSONResponse:
+        # Async on purpose. A sync endpoint would hold one thread of the server's hidden pool of 40
+        # while it waits, so a capacity above 40 could never be reached, and requests would queue
+        # ahead of the capacity check that exists to stop a queue.
         with deps.tracer.start_as_current_span("ask"):
-            return answer_question(body)
+            return await answer_question(body)
 
-    def answer_question(body: AskRequest) -> AskResponse | JSONResponse:
+    async def answer_question(body: AskRequest) -> AskResponse | JSONResponse:
         request_id = uuid.uuid4().hex
         question = body.question
         if len(question) > settings.max_question_chars:
@@ -235,8 +238,9 @@ def create_app(deps: Deps) -> FastAPI:
         future = pool.submit(_answer, agent, _case(request_id, question), context)
         future.add_done_callback(lambda done: settle(assigned, started, done))
         try:
-            answered = future.result(timeout=settings.answer_timeout_s)
-        except FutureTimeout:
+            waiting = asyncio.wrap_future(future)
+            answered = await asyncio.wait_for(waiting, settings.answer_timeout_s)
+        except TimeoutError:
             return refused(504, "timeout", "the answer took too long", request_id, assigned)
         except Exception as exc:  # an API failure the client gave up on
             kind = type(exc).__name__

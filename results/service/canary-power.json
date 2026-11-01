@@ -1,0 +1,103 @@
+{
+ "share": 0.2,
+ "looks": [
+  20,
+  40,
+  60
+ ],
+ "alpha": 0.01,
+ "rounds": 20000,
+ "seed": 20261101,
+ "rows": [
+  {
+   "baseline": 0.05,
+   "canary": 0.05,
+   "fires": 0.0031,
+   "mean_look": 2.03
+  },
+  {
+   "baseline": 0.05,
+   "canary": 0.15,
+   "fires": 0.3831,
+   "mean_look": 2.26
+  },
+  {
+   "baseline": 0.05,
+   "canary": 0.25,
+   "fires": 0.9154,
+   "mean_look": 1.87
+  },
+  {
+   "baseline": 0.05,
+   "canary": 0.35,
+   "fires": 0.9974,
+   "mean_look": 1.38
+  },
+  {
+   "baseline": 0.05,
+   "canary": 0.55,
+   "fires": 1.0,
+   "mean_look": 1.02
+  },
+  {
+   "baseline": 0.1,
+   "canary": 0.1,
+   "fires": 0.0038,
+   "mean_look": 2.08
+  },
+  {
+   "baseline": 0.1,
+   "canary": 0.2,
+   "fires": 0.2245,
+   "mean_look": 2.31
+  },
+  {
+   "baseline": 0.1,
+   "canary": 0.3,
+   "fires": 0.8008,
+   "mean_look": 2.05
+  },
+  {
+   "baseline": 0.1,
+   "canary": 0.4,
+   "fires": 0.9871,
+   "mean_look": 1.57
+  },
+  {
+   "baseline": 0.1,
+   "canary": 0.6,
+   "fires": 1.0,
+   "mean_look": 1.05
+  },
+  {
+   "baseline": 0.2,
+   "canary": 0.2,
+   "fires": 0.0042,
+   "mean_look": 1.98
+  },
+  {
+   "baseline": 0.2,
+   "canary": 0.3,
+   "fires": 0.1352,
+   "mean_look": 2.29
+  },
+  {
+   "baseline": 0.2,
+   "canary": 0.4,
+   "fires": 0.6227,
+   "mean_look": 2.18
+  },
+  {
+   "baseline": 0.2,
+   "canary": 0.5,
+   "fires": 0.9549,
+   "mean_look": 1.77
+  },
+  {
+   "baseline": 0.2,
+   "canary": 0.7,
+   "fires": 1.0,
+   "mean_look": 1.09
+  }
+ ]
+}

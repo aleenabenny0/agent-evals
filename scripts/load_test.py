@@ -64,16 +64,25 @@ async def step(
     latencies: list[float] = []
     tasks: list[asyncio.Task[None]] = []
     started = time.perf_counter()
-    while time.perf_counter() - started < seconds:
+    # Arrivals are placed on the clock, not by sleeping one gap at a time: a short sleep can return
+    # early, and on Windows it does, which once sent half as much again as the rate asked for.
+    at = 0.0
+    while True:
+        at += rng.expovariate(rate)  # the gaps of a Poisson arrival process
+        if at >= seconds:
+            break
+        wait = started + at - time.perf_counter()
+        if wait > 0:
+            await asyncio.sleep(wait)
         question = rng.choice(asked)
         tasks.append(asyncio.create_task(one(client, question, statuses, latencies)))
-        await asyncio.sleep(rng.expovariate(rate))  # gaps of a Poisson arrival process
     await asyncio.gather(*tasks)
     elapsed = time.perf_counter() - started
     answered = statuses["200"]
     return {
         "rate_per_s": rate,
         "sent": len(tasks),
+        "offered_per_s": round(len(tasks) / seconds, 3),
         "statuses": dict(sorted(statuses.items())),
         "answered_per_s": round(answered / elapsed, 3),
         "refused_share": round(1 - answered / len(tasks), 4) if tasks else 0.0,
@@ -97,7 +106,7 @@ async def run(url: str, rates: Sequence[float], seconds: float) -> list[dict[str
             found = await step(client, rate, seconds, asked, rng)
             latency = found["latency_s"]
             print(
-                f"{rate:>6} per s: sent {found['sent']:>5}, answered "
+                f"{rate:>6} per s: offered {found['offered_per_s']:>7}, answered "
                 f"{found['answered_per_s']:>6} per s, p50 {latency['p50']}, p95 {latency['p95']}, "
                 f"p99 {latency['p99']}, {found['statuses']}",
                 flush=True,

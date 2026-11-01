@@ -314,8 +314,9 @@ Done:
 
 Next, in order:
 
-6. **LLM Ops**: the docs agent as a service, with a prompt registry, failover to a second
-   provider, tracing and metrics, an eval gate in CI, a canary and rollback drill, and a load test.
+6. **LLM Ops** *(in progress)*: the docs agent as a service, with a prompt registry, failover to a
+   second provider, tracing and metrics, an eval gate in CI, a canary and rollback drill, and a load
+   test ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
 7. **Model routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers
    between them.
 8. **The code agent** (boto3, checked against botocore's service models, run against moto with no

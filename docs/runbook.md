@@ -25,6 +25,16 @@ uv run evals registry rollback --why "what you saw" --who "your name"
 With a canary live, this drops the canary. With none, it goes back to the previous champion. Check
 the result with `uv run evals registry show`, and the log in `results/registry-log.jsonl`.
 
+## Capacity
+
+Measured on the fake provider at about 5 seconds an answer (`docs/plans/phase-8-llm-ops.md`, part 7).
+
+- Capacity is `max_concurrent` divided by the time an answer takes: about 1.5 a second at 8 slots.
+- Refusals begin well before capacity, since arrivals bunch up: about 16% at 1.2 a second on 8 slots.
+  To refuse under 1% at 1 a second takes 12 slots.
+- One process tops out near 80 answers a second, and past that it fails with connection errors
+  rather than refusals. Real answers are slow enough that slots run out first.
+
 ## ServiceDown
 
 **Means:** Prometheus cannot reach the service.

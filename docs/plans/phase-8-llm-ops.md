@@ -6,7 +6,7 @@ without a deploy, failover to a second model provider, traces and metrics, an ev
 an unmeasured change from reaching `main`, a canary with an automatic rollback, and a load test. The
 phase ends with a drill, in which a deliberately bad prompt is released to a share of traffic and
 the system has to catch it and roll it back, and with the runbook and the postmortem that drill
-produces. Everything runs on one machine under Docker Compose. Estimated cost about $5, capped at
+produces. Everything runs on one machine under Docker Compose. Estimated cost about $6, capped at
 $10, plus a small balance with the second provider.
 
 **Status:** proposed 2026-11-01, awaiting approval of the decisions at the end. The parts that need
@@ -108,10 +108,33 @@ A canary sends a share of live traffic to a new version. Phase 7's alert compare
 too slowly for this, so the canary needs a rule of its own, on signals that code can grade at once:
 errors, no citations, rejected submissions, abstention, fabricated citations and latency.
 
-**(agree first)** The rule is a statistical decision, so it is written and agreed before any code,
-as in phase 7: which signals, what sample, a sequential bound that keeps the false-alarm rate fixed
-under repeated looks, and what it can and cannot see. Like the online alert, it cannot see a fault
-that only a judge would catch, and that will be said up front.
+**(agree first)** The rule is a statistical decision, so it is agreed before any code, as in phase
+7. The proposal is decision 6:
+
+- **One signal.** A bad answer is one that errored, abstained, or came back with no citation. One
+  signal needs no correction across signals, and every one of those is graded by code at once.
+- **Against the champion at the same time.** The canary's share of bad answers is compared with the
+  champion's over the same period, so a change in the questions moves both.
+- **Three looks,** after 20, 40 and 60 canary answers, with a one-sided Fisher exact test at each,
+  the test the online monitor already uses. Each look is held to 0.33%, so an overall false alarm
+  stays under 1% however many of the looks are taken.
+- **A canary that reaches the third look without firing is left in place for a person,** since
+  passing shows only the absence of a large fault.
+
+Simulated in `scripts/canary_power.py` (20,000 rounds at 20% traffic,
+`results/service/canary-power.json`), the chance the rule fires:
+
+| Bad answers, champion | Canary no worse | 10 points worse | 20 points worse | 30 points worse | 50 points worse |
+|---|---|---|---|---|---|
+| 5% | 0.3% | 38% | 92% | 99.7% | 100% |
+| 10% | 0.4% | 22% | 80% | 99% | 100% |
+| 20% | 0.4% | 14% | 62% | 95% | 100% |
+
+So it catches a badly broken prompt quickly, and at 50 points worse usually at the first look, after
+about 100 answers served. It often misses a change of 10 points, and that is the honest limit of 60
+answers. Phase 7's alert, over whole days, remains the guard against a small regression. Like that
+alert, this rule cannot see a fault that only a judge would catch: a prompt that gives confident,
+cited, wrong answers looks healthy here, which is why the gate comes first.
 
 **The drill.** Simulated questions run through the service, with the canary at 20%. The fault, the
 expected outcome and the time to detect are pre-registered and sealed before the run. The fault is a
@@ -129,6 +152,35 @@ for realistic latencies, so finding the capacity costs nothing. A short run agai
 then checks that the fake was realistic. The output is a capacity figure on this machine, the point
 where latency turns upward, how the limits behave past it, and service objectives set from what was
 measured.
+
+**Measured so far, on the fake provider (2026-11-01), so at no cost.** The tools, the search and the
+submission checks are real, and the fake waits about 1.7 seconds per model call, so an answer takes
+about 5 seconds (`results/service/load-*.json`).
+
+| Slots | Offered per second | Answered per second | Refused | 95th percentile answer |
+|---|---|---|---|---|
+| 8 | 0.5 | 0.46 | 0% | 7.5 s |
+| 8 | 1.2 | 0.93 | 16% | 8.9 s |
+| 8 | 2.3 | 1.29 | 39% | 8.9 s |
+| 8 | 5.0 | 1.50 | 68% | 8.1 s |
+| 8 | 198 | 1.52 | 99% | 7.9 s |
+| 16 | 1.0 | 0.95 | 0% | 7.7 s |
+| 16 | 1.8 | 1.65 | 1% | 8.2 s |
+| 16 | 3.3 | 2.20 | 19% | 8.9 s |
+| 16 | 5.1 | 2.77 | 41% | 7.7 s |
+
+- **Overload degrades the way it was designed to.** At 130 times capacity the service refused 7,307
+  requests with no errors, and the answers it did give took as long as at low load.
+- **Capacity is slots over answer time,** about 1.5 answers a second at 8 slots and 3 at 16. The
+  share refused follows the Erlang B formula from queueing theory: at 2.3 a second on 8 slots it
+  predicts about 40% and the service refused 39%. So the slots a traffic level needs can be worked
+  out, and the real limit on slots is the provider's rate limit.
+- **One process has a ceiling of about 80 answers a second** on this 8-core machine, because search
+  is Python work on one interpreter. With the model's latency removed and 64 slots, the service
+  held up to 83 a second. Past that it fails badly: connections are refused and answers take tens
+  of seconds. That is about 55 times today's capacity, and a real model's latency keeps the slots
+  full long before it is reached, but going near it would take more processes.
+- **The real provider is still to be measured,** which is what the short paid run is for.
 
 ## Part 8: the runbook and the postmortem
 
@@ -159,10 +211,10 @@ At about $0.005 per answer, from the dev runs.
 | Step | Answers | Estimate |
 |---|---|---|
 | Dev suite on the second provider | 130 | about $1.50, at that provider's prices |
-| Canary drills, a bad prompt and a harmless change | about 400 | about $2 |
+| Canary drills, a bad prompt and a harmless change | about 600 | about $3 |
 | Failover drill | about 100 | about $0.50 |
 | Load test against the real API | about 200 | about $1 |
-| **Total** | about 830 | **about $5, capped at $10** |
+| **Total** | about 1,030 | **about $6, capped at $10** |
 
 Human time: about 15 minutes for the decisions, and a few minutes to create a key with the second
 provider and set a spending limit there.
@@ -196,3 +248,5 @@ Recommended defaults are marked. Approval covers the paid steps up to the cap.
    pull request that changes the agent, with a key stored as a GitHub secret.
 5. **Rollback.** (a) Automatic on the agreed rule, with promotion always done by a person.
    *Recommended.* (b) The rule only raises an alert, and a person rolls back.
+6. **The canary rule.** (a) The rule in part 6, as simulated. *Recommended.* (b) More looks or more
+   answers, which catches smaller faults for more money per release.

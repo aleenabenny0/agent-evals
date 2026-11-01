@@ -1,0 +1,101 @@
+{
+ "label": "fake-1.5s",
+ "seconds_per_rate": 60.0,
+ "steps": [
+  {
+   "rate_per_s": 0.5,
+   "sent": 30,
+   "offered_per_s": 0.5,
+   "statuses": {
+    "200": 30
+   },
+   "answered_per_s": 0.463,
+   "refused_share": 0.0,
+   "latency_s": {
+    "p50": 4.82,
+    "p95": 7.459,
+    "p99": 7.948
+   }
+  },
+  {
+   "rate_per_s": 1.0,
+   "sent": 70,
+   "offered_per_s": 1.167,
+   "statuses": {
+    "200": 59,
+    "429": 11
+   },
+   "answered_per_s": 0.931,
+   "refused_share": 0.1571,
+   "latency_s": {
+    "p50": 4.824,
+    "p95": 8.889,
+    "p99": 9.827
+   }
+  },
+  {
+   "rate_per_s": 1.5,
+   "sent": 69,
+   "offered_per_s": 1.15,
+   "statuses": {
+    "200": 61,
+    "429": 8
+   },
+   "answered_per_s": 0.899,
+   "refused_share": 0.1159,
+   "latency_s": {
+    "p50": 4.432,
+    "p95": 7.134,
+    "p99": 10.796
+   }
+  },
+  {
+   "rate_per_s": 2.0,
+   "sent": 135,
+   "offered_per_s": 2.25,
+   "statuses": {
+    "200": 83,
+    "429": 52
+   },
+   "answered_per_s": 1.285,
+   "refused_share": 0.3852,
+   "latency_s": {
+    "p50": 4.922,
+    "p95": 8.866,
+    "p99": 9.904
+   }
+  },
+  {
+   "rate_per_s": 3.0,
+   "sent": 193,
+   "offered_per_s": 3.217,
+   "statuses": {
+    "200": 89,
+    "429": 104
+   },
+   "answered_per_s": 1.345,
+   "refused_share": 0.5389,
+   "latency_s": {
+    "p50": 4.975,
+    "p95": 8.406,
+    "p99": 12.353
+   }
+  },
+  {
+   "rate_per_s": 5.0,
+   "sent": 302,
+   "offered_per_s": 5.033,
+   "statuses": {
+    "200": 98,
+    "429": 204
+   },
+   "answered_per_s": 1.502,
+   "refused_share": 0.6755,
+   "latency_s": {
+    "p50": 4.565,
+    "p95": 8.12,
+    "p99": 10.736
+   }
+  }
+ ]
+}
