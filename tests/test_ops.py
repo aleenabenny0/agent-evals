@@ -30,7 +30,7 @@ from agent_evals.receipts import Receipt, load_receipt, write_receipt
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
 from agent_evals.service.fake import FakeProvider
-from agent_evals.service.metrics import ServiceMetrics
+from agent_evals.service.metrics import OUTCOMES, ServiceMetrics
 from agent_evals.service.registry import PromptRegistry
 from agent_evals.service.tracing import make_tracer, record_steps
 from agent_evals.types import AgentResult, RunContext, Step
@@ -255,7 +255,9 @@ def metric_names() -> set[str]:
 
 
 def used_in(text: str) -> set[str]:
-    return set(re.findall(r"\b(?:ask|llm|gateway|agent|registry)_[a-z_]+\b", text))
+    """Metric names in a query. An outcome such as agent_failed is a label's value, not a metric."""
+    found = re.findall(r"\b(?:ask|llm|gateway|agent|registry)_[a-z_]+\b", text)
+    return set(found) - set(OUTCOMES)
 
 
 def test_every_alert_and_dashboard_query_names_a_metric_the_service_exports() -> None:
