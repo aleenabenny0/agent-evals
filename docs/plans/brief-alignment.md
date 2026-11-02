@@ -113,5 +113,5 @@ Order follows the briefs' own recommendation.
 - ~~A decision on the vendor-neutral deviation~~ Decided 2026-10-17: keep the Anthropic SDK behind
   `LLMClient` until Brief 03; the OpenAI-compatible client is added there as a second
   implementation, with an ADR.
-  *(Proposed to move up to the LLM Ops phase on 2026-11-01, since real failover needs a second
-  provider: ADR 0010.)*
+  *(Moved up to the LLM Ops phase on 2026-11-02, since real failover needs a second provider:
+  ADR 0010.)*

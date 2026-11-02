@@ -1,8 +1,9 @@
 # Runbook: the docs agent service
 
 For whoever is on call. Each alert in `deploy/alerts.yml` has a section here: what it means, how to
-check it, and what to do. **Status:** written from the design. The failover and canary drills
-(`docs/plans/phase-8-llm-ops.md`) will correct it with what really happened.
+check it, and what to do. **Status:** corrected by the canary drills of 2026-11-02
+(`docs/postmortems/2026-11-02-release-drills.md`). The failover drill has not run yet, so the
+sections on failover still describe the design.
 
 ## First steps, for any alert
 
@@ -38,15 +39,38 @@ the result with `uv run evals registry show`, and the log in `results/service/re
 
 A service restart starts the looks again, so avoid one during a canary.
 
+**What the rule can and cannot do.** It catches a broken prompt: a stale notice that made every
+answer abstain was removed in about 5 minutes, after 20 bad answers, at 0.45 questions a second. It
+does not catch a worse one: a prompt that stopped the agent reading pages gave 1 bad answer in 12 in
+a pilot, and would very likely pass. A quiet canary is not evidence of accuracy.
+
+## Service objectives
+
+Set on 2026-11-02 from the real model: 733 champion answers in the drills and a short load test, on
+simulated questions, on one machine. They are a first measurement, so treat them as starting points.
+
+| Objective | Target | Measured |
+|---|---|---|
+| Accepted questions that get an answer | at least 99% | 1,005 of 1,008 |
+| 95th percentile answer time | at most 25 s | 19.8 s |
+| Questions refused, at 0.2 a second on 8 slots | under 1% | at most 0.4% predicted, see below |
+| Cost per answer | at most $0.003 | $0.0019 |
+
+The champion's bad-answer share, as the canary rule counts it, was 13%. Most of that is correct:
+abstaining on questions the docs cannot answer is what the agent should do.
+
 ## Capacity
 
-Measured on the fake provider at about 5 seconds an answer (`docs/plans/phase-8-llm-ops.md`, part 7).
+Measured on the real model on 8 slots (`docs/plans/phase-8-llm-ops.md`, part 7).
 
-- Capacity is `max_concurrent` divided by the time an answer takes: about 1.5 a second at 8 slots.
-- Refusals begin well before capacity, since arrivals bunch up: about 16% at 1.2 a second on 8 slots.
-  To refuse under 1% at 1 a second takes 12 slots.
-- One process tops out near 80 answers a second, and past that it fails with connection errors
-  rather than refusals. Real answers are slow enough that slots run out first.
+- An answer takes about 11 s at the median and about 5 model calls.
+- Capacity is `max_concurrent` divided by the time an answer takes: about 0.6 a second on 8 slots.
+- Refusals begin well before capacity, since arrivals bunch up. The Erlang B formula predicts them:
+  it gave 8% to 11% at 0.45 a second, and three drills refused 8.1%, 8.9% and 9.7%. It gives at most
+  0.4% at 0.2 a second, and under 1% at 0.45 a second takes 12 slots.
+- The real limit on slots is the provider's rate limit, which these runs did not reach.
+- One process tops out near 80 answers a second on the fake provider, and past that it fails with
+  connection errors rather than refusals. Real answers are slow enough that slots run out first.
 
 ## ServiceDown
 
@@ -66,7 +90,7 @@ at startup there is no last good state to fall back on.
 
 ## AnswersSlow
 
-**Means:** the 95th percentile answer takes over a minute.
+**Means:** the 95th percentile answer takes over 40 s, about twice what was measured.
 **Check:** a slow trace in Jaeger shows whether the time is in model calls or in many steps. Many
 steps suggests a prompt problem, and long model calls suggest the provider.
 **Do:** if it is the provider, check its status page and expect the circuit to open. If a canary
@@ -82,6 +106,8 @@ authentication error means a key is wrong or expired, and needs a person.
 recovers. Answers on the fallback come from a different model, which was never gated, so say so if
 the outage is long.
 **With no fallback configured** this means an outage: questions fail until the provider recovers.
+In a real check on 2026-11-02, with the primary taken away, each question failed with a 502 in about
+5 s. Answers came back with the next question after it returned, with no restart.
 
 ## AtCapacity
 

@@ -80,9 +80,15 @@ class CircuitBreaker:
                 return True
             return False
 
-    def success(self) -> None:
+    def success(self) -> bool:
+        """Record a provider that answered, and say whether that closed an open circuit. The
+        breaker must say: a call that began while it was closed can end after it opened, so a
+        reading taken before the call would miss the close, and leave the circuit reported open
+        for good."""
         with self._lock:
+            closed_it = self._opened_at is not None
             self._failures, self._opened_at, self._probing = 0, None, False
+            return closed_it
 
     def failure(self) -> None:
         with self._lock:
@@ -144,12 +150,11 @@ class ResilientClient:
             if not provider.breaker.allow():
                 problems.append(f"{provider.name}: circuit open")
                 continue
-            before = provider.breaker.state
             try:
                 resp = provider.client.create(request, salt=salt)
             except Exception as exc:
-                if is_caller_error(exc):
-                    provider.breaker.success()  # it answered; the request was the problem
+                if is_caller_error(exc):  # it answered; the request was the problem
+                    self._succeeded(provider)
                     raise
                 kind = type(exc).__name__
                 problems.append(f"{provider.name}: {kind}")
@@ -158,9 +163,7 @@ class ResilientClient:
                 if provider.breaker.state != "closed":
                     self.on_event(GatewayEvent("circuit_open", provider.name))
                 continue
-            provider.breaker.success()
-            if before != "closed":
-                self.on_event(GatewayEvent("circuit_closed", provider.name))
+            self._succeeded(provider)
             if n > 0:
                 self.on_event(GatewayEvent("failover", provider.name))
             calls = CURRENT_CALLS.get()
@@ -168,3 +171,7 @@ class ResilientClient:
                 calls.append(CallRecord(provider.name, usage_from(resp)))
             return resp
         raise AllProvidersFailed("; ".join(problems))
+
+    def _succeeded(self, provider: Provider) -> None:
+        if provider.breaker.success():
+            self.on_event(GatewayEvent("circuit_closed", provider.name))

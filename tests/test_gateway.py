@@ -187,6 +187,46 @@ def test_the_primary_comes_back_after_the_cool_down() -> None:
     assert kinds(events)[-1] == ("circuit_closed", "p0")
 
 
+def test_a_call_that_ends_after_the_circuit_opened_still_reports_the_close() -> None:
+    """Found by a real check on 2026-11-02: the gauge stayed at 1 with answers flowing, which would
+    have left ProviderCircuitOpen firing after a recovery."""
+    breaker: list[CircuitBreaker] = []
+
+    class SlowThenFine:
+        def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
+            for _ in range(3):  # other answers' calls fail while this one is in flight
+                breaker[0].failure()
+            return ok(1).create(request, salt=salt)
+
+    client, events = gateway(SlowThenFine(), ok())
+    breaker.append(client.providers[0].breaker)
+    client.create(REQUEST, salt="s")
+    assert breaker[0].state == "closed"
+    assert kinds(events)[-1] == ("circuit_closed", "p0")
+
+
+def test_a_refused_request_also_reports_the_close() -> None:
+    breaker: list[CircuitBreaker] = []
+
+    class Refuses:
+        def create(self, request: dict[str, Any], *, salt: str) -> LLMResponse:
+            for _ in range(3):
+                breaker[0].failure()
+            raise ProviderHTTPError(400, "bad request")
+
+    client, events = gateway(Refuses(), ok())
+    breaker.append(client.providers[0].breaker)
+    with pytest.raises(ProviderHTTPError):
+        client.create(REQUEST, salt="s")
+    assert kinds(events)[-1] == ("circuit_closed", "p0")
+
+
+def test_a_success_on_a_closed_circuit_reports_nothing() -> None:
+    client, events = gateway(ok(), ok())
+    client.create(REQUEST, salt="s")
+    assert not [kind for kind, _ in kinds(events) if kind == "circuit_closed"]
+
+
 def test_with_every_provider_down_the_call_fails_and_says_why() -> None:
     client, _ = gateway(Down(), Down(), threshold=1)
     with pytest.raises(AllProvidersFailed, match="p0: RuntimeError; p1: RuntimeError"):

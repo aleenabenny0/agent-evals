@@ -9,8 +9,11 @@ the system has to catch it and roll it back, and with the runbook and the postmo
 produces. Everything runs on one machine under Docker Compose. Estimated cost about $6, capped at
 $10, plus a small balance with the second provider.
 
-**Status:** proposed 2026-11-01, awaiting approval of the decisions at the end. The parts that need
-no decision and no paid call are being built first.
+**Status:** all six decisions were approved on 2026-11-02, with the recommended options. Everything
+is built and has run, except the two steps that need the second provider's key: the dev suite on that
+provider, and the failover drill. The automatic rollback has worked on the real model. $3.15 of the
+$10 cap is spent. Results are in parts 6 and 7 and in
+`docs/postmortems/2026-11-02-release-drills.md`.
 
 **Goal.** Show that a change to this agent can be released safely: measured before it merges,
 watched while it rolls out, and undone in seconds when it goes wrong, with the cost of each step
@@ -145,6 +148,20 @@ stay quiet. Failover gets its own drill, in which the primary provider is blocke
 **Blindness.** The drill uses newly simulated questions. It reads nothing from `results/online/`, so
 the 376 fresh answers kept for a later judge round stay unread.
 
+**Result (2026-11-02).** Three drills ran against the real model, each with pass marks committed
+first.
+
+| Drill | Change released | Canary bad | Champion bad | Outcome |
+|---|---|---|---|---|
+| 1 | An over-strict abstention rule | 2 of 50 | 29 of 256 | **Failed:** the rule never fired |
+| 2 | A reworded heading | 10 of 71 | 39 of 324 | **Passed:** quiet through three looks |
+| 1b | A stale "docs unavailable" notice | 20 of 20 | 29 of 153 | **Passed:** rolled back in 310 s |
+
+Drill 1 failed because its fault was predicted and did no harm on this signal, so the rollback was
+not exercised. Its record stands, and drill 1b is a separate run with a fault measured first. A pilot
+also showed the blind spot above in numbers: a prompt that stopped the agent reading pages gave 1 bad
+answer in 12. The rule catches a broken prompt, not a worse one.
+
 ## Part 7: the load test
 
 A load generator against the running service. Almost all of it runs with a fake provider that sleeps
@@ -180,7 +197,22 @@ about 5 seconds (`results/service/load-*.json`).
   held up to 83 a second. Past that it fails badly: connections are refused and answers take tens
   of seconds. That is about 55 times today's capacity, and a real model's latency keeps the slots
   full long before it is reached, but going near it would take more processes.
-- **The real provider is still to be measured,** which is what the short paid run is for.
+
+**Measured on the real model (2026-11-02), on 8 slots** (`results/service/load-real.json`).
+
+| Offered per second | Answered per second | Refused | 95th percentile answer |
+|---|---|---|---|
+| 0.25 | 0.19 | 0% | 31 s |
+| 0.70 | 0.47 | 17% | 22 s |
+| 0.95 | 0.51 | 33% | 17 s |
+| 2.27 | 0.59 | 68% | 19 s |
+
+- **Real answers are about twice as slow as the fake's,** at about 11 s and 5 model calls, so
+  capacity on 8 slots is about 0.6 a second rather than 1.5. The fake was right about the shape and
+  optimistic about the size.
+- **The refusals still follow Erlang B.** At 0.45 a second it gave 8% to 11%, and the three drills
+  refused 8.1%, 8.9% and 9.7%.
+- **The service objectives are in `docs/runbook.md`,** set from these runs and 733 champion answers.
 
 ## Part 8: the runbook and the postmortem
 
@@ -208,13 +240,18 @@ drill goes wrong, that is the postmortem.
 
 At about $0.005 per answer, from the dev runs.
 
-| Step | Answers | Estimate |
-|---|---|---|
-| Dev suite on the second provider | 130 | about $1.50, at that provider's prices |
-| Canary drills, a bad prompt and a harmless change | about 600 | about $3 |
-| Failover drill | about 100 | about $0.50 |
-| Load test against the real API | about 200 | about $1 |
-| **Total** | about 1,030 | **about $6, capped at $10** |
+| Step | Answers | Estimate | Spent |
+|---|---|---|---|
+| Drill questions, 200 new ones | none | left out of the plan | $1.21 |
+| Load test against the real API | 132 | about $1 | $0.23 |
+| Canary drills, three runs | 874 | about $3 | $1.65 |
+| Fault pilot and forwarder check | 43 | left out of the plan | $0.06 |
+| **Spent so far** | 1,049 | | **$3.15 of $10** |
+| Failover drill | about 120 | about $0.50 | not run |
+| Dev suite on the second provider | 130 | about $1.50, at that provider's prices | not run |
+
+An answer cost about $0.0019, about 40% of the $0.005 assumed above, so the drills came in under
+their estimate even with a failed run and a rerun.
 
 Human time: about 15 minutes for the decisions, and a few minutes to create a key with the second
 provider and set a spending limit there.
@@ -230,9 +267,15 @@ provider and set a spending limit there.
 - **Scope.** This is the largest phase by surface area. Each part stands alone and is committed
   alone, so stopping after any part leaves working software.
 
-## Decisions (to approve)
+## Decisions
 
-Recommended defaults are marked. Approval covers the paid steps up to the cap.
+All six were approved on 2026-11-02, with the recommended options. Approval covers the paid steps up
+to the cap.
+
+**Correction to decision 1.** It says the second provider is about the same price per answer. It is
+not. The chosen model, `gpt-5-mini`, costs $0.25 and $2.00 per million input and output tokens,
+against $0.10 and $0.50 for the primary (both read 2026-11-02). That price is paid only during an
+outage, so the decision stands.
 
 1. **The second provider.** (a) OpenAI, or another OpenAI-compatible provider, with a key and a low
    spending limit set there. *Recommended.* It is real failover, at about the same price per answer.

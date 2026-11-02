@@ -171,6 +171,17 @@ Format:
 
 ## Unreleased
 
+- 2026-11-02: LLM Ops: the canary rule, the automatic rollback and the real drills
+  (`docs/plans/phase-8-llm-ops.md`, decisions approved 2026-11-02). The Docker stack has run: the
+  service, Prometheus, Grafana and Jaeger all work. Drill 1 failed its pre-registered marks: the
+  prompt written as a fault did no harm on the rule's signal, so the rollback was not exercised.
+  Drill 2, a harmless change, stayed quiet through three looks. Drill 1b, a fault measured first,
+  was removed by the service in 310 s, after 20 bad answers. Real answers take about 11 s and cost
+  about $0.0019, and service objectives are set in `docs/runbook.md`. Two defects were found and
+  fixed: a spend alert fixed at the production cap, and a circuit metric that could stay open after
+  a recovery. The rule catches a broken prompt, not a worse one, and the postmortem says so
+  (`docs/postmortems/2026-11-02-release-drills.md`). $3.15 of the $10 cap is spent. The failover drill
+  and the dev suite on the second provider wait for its key. No champion moved.
 - 2026-10-31: the second judge improvement round stopped at stage A (`docs/plans/judge-v6.md`,
   approved 2026-10-30). Built: a gap type per claim, the cited service's own name cleared in code,
   the threshold grid read as the judge's score levels, a names count, a service-name file built from

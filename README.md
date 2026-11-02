@@ -40,9 +40,11 @@ The platform evaluates two agents that engineers use every day:
 > tested on simulated days, three of them blind, work end to end; the charts and tables below
 > summarize them. Two judge improvement rounds, meant to let the judge's score join the online
 > alert, each stopped at their first pre-registered check, the second on 2026-10-31, so the
-> validated judge stays and its score stays out of the alert. Next: LLM Ops, model routing and the
-> code agent (see
-> [Roadmap](#roadmap)).
+> validated judge stays and its score stays out of the alert. LLM Ops is nearly done: the agent
+> runs as a service under Docker Compose, and a canary drill on the real model rolled a bad prompt
+> back with no person involved, after an earlier drill failed
+> ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Next: the failover drill, model
+> routing and the code agent (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -314,9 +316,12 @@ Done:
 
 Next, in order:
 
-6. **LLM Ops** *(in progress)*: the docs agent as a service, with a prompt registry, failover to a
-   second provider, tracing and metrics, an eval gate in CI, a canary and rollback drill, and a load
-   test ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
+6. **LLM Ops** *(nearly done)*: the docs agent as a service, with a prompt registry, tracing and
+   metrics, an eval gate in CI, a canary with an automatic rollback, a load test, service objectives,
+   a [runbook](docs/runbook.md) and a
+   [postmortem](docs/postmortems/2026-11-02-release-drills.md). Failover to a second provider is
+   built and tested offline, and its drill on the real provider is still to run
+   ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
 7. **Model routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers
    between them.
 8. **The code agent** (boto3, checked against botocore's service models, run against moto with no

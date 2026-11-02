@@ -1,5 +1,5 @@
-# Each alert has a section of the same name in docs/runbook.md. The thresholds are starting points
-# until the load test sets the service objectives.
+# Each alert has a section of the same name in docs/runbook.md. The thresholds follow the service
+# objectives set there from the real load test and the drills.
 groups:
   - name: docs-agent
     rules:
@@ -21,11 +21,11 @@ groups:
 
       - alert: AnswersSlow
         expr: |
-          histogram_quantile(0.95, sum by (le) (rate(ask_latency_seconds_bucket[5m]))) > 60
+          histogram_quantile(0.95, sum by (le) (rate(ask_latency_seconds_bucket[5m]))) > 40
         for: 5m
         labels: {severity: warn}
         annotations:
-          summary: The 95th percentile answer takes over a minute.
+          summary: The 95th percentile answer takes over 40 seconds.
 
       - alert: ProviderCircuitOpen
         expr: gateway_circuit_open == 1

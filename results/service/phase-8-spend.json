@@ -1,6 +1,6 @@
 {
   "cap_usd": 10.0,
-  "total_usd": 3.138879,
+  "total_usd": 3.152382,
   "entries": [
     {
       "time": "2026-11-02T17:18:45+00:00",
@@ -43,6 +43,13 @@
       "calls": 173,
       "uncached_calls": 173,
       "usd": 0.32325
+    },
+    {
+      "time": "2026-11-02T20:17:33+00:00",
+      "step": "drill gate-check",
+      "calls": 7,
+      "uncached_calls": 7,
+      "usd": 0.013503
     }
   ]
 }
