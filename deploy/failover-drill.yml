@@ -1,0 +1,20 @@
+# Added on top of docker-compose.yml for the failover drill only: the service reaches the primary
+# through a forwarder, and stopping the forwarder takes the primary away (scripts/primary_gate.py).
+# It publishes no port, so it is reachable only from the service.
+#
+#   docker compose -f deploy/docker-compose.yml -f deploy/failover-drill.yml up --build -d
+
+services:
+  service:
+    environment:
+      ANTHROPIC_BASE_URL: http://primary-gate:9000
+    depends_on:
+      - primary-gate
+
+  primary-gate:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    command: ["/app/.venv/bin/python", "/app/scripts/primary_gate.py"]
+    volumes:
+      - ../scripts:/app/scripts:ro

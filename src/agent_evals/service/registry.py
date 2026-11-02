@@ -17,6 +17,7 @@ import json
 import os
 import tempfile
 import threading
+import uuid
 from collections.abc import Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -24,7 +25,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, model_validator
 
 from agent_evals.harness.cache import sha256_text
 
@@ -33,6 +34,10 @@ Role = Literal["champion", "canary"]
 
 class RegistryError(RuntimeError):
     """A registry file that cannot be used, or a change that cannot be made."""
+
+
+class CanaryGone(RegistryError):
+    """The canary to be dropped is no longer the live one, so there is nothing to do."""
 
 
 class Pointer(BaseModel):
@@ -50,7 +55,15 @@ class RegistryState(BaseModel):
     champion: Pointer
     canary: Pointer | None = None
     canary_share: float = Field(default=0.0, ge=0.0, le=1.0)
+    # One release of a canary. A second try of the same version is a new run, with fresh counts.
+    canary_run: str | None = None
     previous: Pointer | None = None  # the champion before the last promotion
+
+    @model_validator(mode="after")
+    def _a_canary_has_a_run(self) -> RegistryState:
+        if (self.canary is None) != (self.canary_run is None):
+            raise ValueError("a canary and its run are set together")
+        return self
 
 
 @dataclass(frozen=True)
@@ -111,7 +124,10 @@ class PromptRegistry:
             canary = self.pointer(version)
             if canary == state.champion:
                 raise RegistryError(f"{version} is the champion already")
-            return state.model_copy(update={"canary": canary, "canary_share": share})
+            run = uuid.uuid4().hex[:12]
+            return state.model_copy(
+                update={"canary": canary, "canary_share": share, "canary_run": run}
+            )
 
         return self._change("canary", who, why, change)
 
@@ -128,12 +144,24 @@ class PromptRegistry:
 
         def change(state: RegistryState) -> RegistryState:
             if state.canary is not None:
-                return state.model_copy(update={"canary": None, "canary_share": 0.0})
+                return _without_canary(state)
             if state.previous is None:
                 raise RegistryError("there is nothing to roll back to")
             return RegistryState(champion=state.previous)
 
         return self._change("rollback", who, why, change)
+
+    def drop_canary(self, run: str, *, who: str, why: str) -> RegistryState:
+        """Drop this one canary run, and change nothing else. The automatic rollback uses this and
+        not `rollback`, which with no canary goes back a champion: a person may have dropped the
+        canary a moment earlier, and the rule must not then undo the champion as well."""
+
+        def change(state: RegistryState) -> RegistryState:
+            if state.canary_run != run:
+                raise CanaryGone(f"canary run {run} is no longer live")
+            return _without_canary(state)
+
+        return self._change("auto-rollback", who, why, change)
 
     @classmethod
     def create(
@@ -199,6 +227,10 @@ class PromptRegistry:
             with self.log_path.open("a", encoding="utf-8") as fh:
                 fh.write(json.dumps(entry) + "\n")
             return after
+
+
+def _without_canary(state: RegistryState) -> RegistryState:
+    return state.model_copy(update={"canary": None, "canary_share": 0.0, "canary_run": None})
 
 
 def _write_yaml(path: Path, state: RegistryState) -> None:

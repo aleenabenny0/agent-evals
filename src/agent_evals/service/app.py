@@ -38,8 +38,15 @@ from agent_evals.config import Pricing, ServiceConfig
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.gateway import CURRENT_CALLS, CallRecord
 from agent_evals.service.budget import DailyBudget
+from agent_evals.service.canary import CanaryWatch, is_bad
 from agent_evals.service.metrics import ServiceMetrics
-from agent_evals.service.registry import Assignment, PromptRegistry, assign
+from agent_evals.service.registry import (
+    Assignment,
+    CanaryGone,
+    PromptRegistry,
+    RegistryError,
+    assign,
+)
 from agent_evals.service.tracing import record_steps
 from agent_evals.types import Agent, AgentResult, Case, RunContext
 
@@ -84,6 +91,7 @@ class Deps:
     # priced at `pricing`.
     provider_pricing: Mapping[str, Pricing] = field(default_factory=dict)
     tracer: Tracer = field(default_factory=trace.NoOpTracer)
+    canary: CanaryWatch = field(default_factory=CanaryWatch)
 
 
 @dataclass(frozen=True)
@@ -199,6 +207,28 @@ def create_app(deps: Deps) -> FastAPI:
             metrics.cost.labels(version).inc(cost)
             deps.budget.add(cost)
 
+    def watch(run: str | None, assigned: Assignment, bad: bool) -> None:
+        """Count a finished answer for the canary rule, and act on a look it completes."""
+        if run is None:
+            return
+        metrics.canary_answers.labels(assigned.role, "bad" if bad else "good").inc()
+        look = deps.canary.record(run, assigned.role, bad)
+        if look is None:
+            return
+        log.info(json.dumps({"canary_run": run, "canary_look": look.why(), "fired": look.fired}))
+        if not look.fired:
+            if look.last:
+                metrics.canary_passed.inc()
+            return
+        metrics.canary_rollbacks.inc()
+        try:
+            deps.registry.drop_canary(run, who="canary-rule", why=look.why())
+        except CanaryGone:  # a person got there first
+            log.info(json.dumps({"canary_run": run, "rollback": "already gone"}))
+        except (RegistryError, OSError) as exc:  # its traffic has stopped, but the file still says
+            metrics.canary_rollback_failures.inc()
+            log.error(json.dumps({"canary_run": run, "rollback_failed": type(exc).__name__}))
+
     @app.exception_handler(RequestValidationError)
     def bad_request(_: Request, exc: RequestValidationError) -> JSONResponse:
         return refused(422, "invalid", "the body must be JSON with a question", uuid.uuid4().hex)
@@ -224,12 +254,17 @@ def create_app(deps: Deps) -> FastAPI:
             return refused(429, "overloaded", "at capacity", request_id, headers=headers)
         state = deps.registry.state()
         metrics.registry_stale.set(0 if deps.registry.error is None else 1)
+        run = state.canary_run
+        deps.canary.follow(run)
         assigned = assign(state, request_id)
+        if assigned.role == "canary" and deps.canary.stopped:
+            assigned = Assignment(state.champion.version, "champion")
         try:
             agent = deps.agent_for(assigned.version)
         except Exception:
             slots.release()
             log.exception("no agent for %s", assigned.version)
+            watch(run, assigned, is_bad(errored=True))
             return refused(500, "provider_error", "the agent is unavailable", request_id, assigned)
         started = time.perf_counter()
         started_ns = time.time_ns()
@@ -241,10 +276,12 @@ def create_app(deps: Deps) -> FastAPI:
             waiting = asyncio.wrap_future(future)
             answered = await asyncio.wait_for(waiting, settings.answer_timeout_s)
         except TimeoutError:
+            watch(run, assigned, is_bad(errored=True))
             return refused(504, "timeout", "the answer took too long", request_id, assigned)
         except Exception as exc:  # an API failure the client gave up on
             kind = type(exc).__name__
             log.info(json.dumps({"request_id": request_id, "exception": kind}))
+            watch(run, assigned, is_bad(errored=True))
             return refused(502, "provider_error", "the model provider failed", request_id, assigned)
         latency_ms = (time.perf_counter() - started) * 1000
         result = answered.result
@@ -258,8 +295,11 @@ def create_app(deps: Deps) -> FastAPI:
             }
         )
         if result.error:
+            watch(run, assigned, is_bad(errored=True))
             return refused(502, "agent_failed", "no answer was produced", request_id, assigned)
         abstained = bool(result.output.get("abstained", False))
+        citations = _citations(result.output)
+        watch(run, assigned, is_bad(errored=False, abstained=abstained, citations=len(citations)))
         outcome = "abstained" if abstained else "answered"
         metrics.requests.labels(outcome, assigned.version, assigned.role).inc()
         cost = cost_of(answered)
@@ -284,7 +324,7 @@ def create_app(deps: Deps) -> FastAPI:
         return AskResponse(
             request_id=request_id,
             answer=str(result.output.get("answer", "")),
-            citations=_citations(result.output),
+            citations=citations,
             abstained=abstained,
             prompt_version=assigned.version,
             role=assigned.role,

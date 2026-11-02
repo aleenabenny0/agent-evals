@@ -56,7 +56,7 @@ and every model call still goes through `LLMClient`.
 `configs/registry.yaml` holds the live pointers: `champion`, an optional `canary`, and the canary's
 traffic share. Each version's text stays in `prompts.py`, so it is reviewed like code, and a pointer
 may only name a version whose hash is on record. `evals registry show`, `canary`, `promote` and
-`rollback` change the pointers and append to `results/registry-log.jsonl`: who, when, why, from and
+`rollback` change the pointers and append to `results/service/registry-log.jsonl`: who, when, why, from
 to. The service rereads the file when it changes, so a rollback takes effect with no restart. A
 request is assigned by a hash of its id, so the split is deterministic and reproducible.
 

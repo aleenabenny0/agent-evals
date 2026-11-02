@@ -1,0 +1,18 @@
+# The image is built from pyproject.toml, uv.lock, README.md and src only. Everything else stays
+# out of the build context, and the first line matters most: a key must never reach an image.
+.env
+.env.*
+.git
+.venv
+.cache
+.claude
+.hypothesis
+.mypy_cache
+.pytest_cache
+.ruff_cache
+HANDOFF.md
+data
+results
+docs
+tests
+**/__pycache__

@@ -10,6 +10,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
+from collections.abc import Mapping
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -24,6 +25,7 @@ from agent_evals.harness.llm import AnthropicClient
 from agent_evals.harness.openai_compat import OpenAICompatibleClient
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
+from agent_evals.service.drills import DRILL_PROMPTS
 from agent_evals.service.fake import FakeProvider
 from agent_evals.service.metrics import ServiceMetrics
 from agent_evals.service.registry import PromptRegistry
@@ -34,8 +36,15 @@ log = logging.getLogger("agent_evals.service")
 FAKE = "fake"
 
 
+def prompts_of(config: Config) -> Mapping[str, str]:
+    """The prompts this service may serve. A drill's exist only under a drill's config."""
+    return {**SYSTEM_PROMPTS, **DRILL_PROMPTS} if config.service.drill else SYSTEM_PROMPTS
+
+
 def registry_of(config: Config) -> PromptRegistry:
-    return PromptRegistry(config.service.registry_path, config.service.registry_log, SYSTEM_PROMPTS)
+    return PromptRegistry(
+        config.service.registry_path, config.service.registry_log, prompts_of(config)
+    )
 
 
 def gateway_of(config: Config, metrics: ServiceMetrics) -> ResilientClient:
@@ -85,7 +94,7 @@ def build_app(config_path: Path) -> FastAPI:
         with lock:
             if version not in agents:
                 settings = config.docs_agent.model_copy(update={"prompt_version": version})
-                agents[version] = DocsAgent(llm, corpus, settings)
+                agents[version] = DocsAgent(llm, corpus, settings, prompts_of(config))
             return agents[version]
 
     return create_app(

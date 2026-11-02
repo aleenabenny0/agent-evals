@@ -1,0 +1,4377 @@
+{
+ "label": "rehearsal-harmless",
+ "canary": "drill-harmless",
+ "share": 0.2,
+ "rate_per_s": 1.0,
+ "started": "2026-11-02T17:08:10+00:00",
+ "blocked_s": null,
+ "summary": {
+  "sent": 320,
+  "statuses": {
+   "200": 303,
+   "429": 17
+  },
+  "roles": {
+   "canary": {
+    "answers": 63,
+    "bad": 0
+   },
+   "champion": {
+    "answers": 240,
+    "bad": 0
+   }
+  },
+  "canary_live_s": 10.04,
+  "first_canary_sent_s": 20.8,
+  "rollback_seen_s": null,
+  "seconds_to_rollback": null,
+  "canary_answers_sent_after_rollback": 0,
+  "cost_seen_usd": 0.0
+ },
+ "rows": [
+  {
+   "sent_s": 1.6,
+   "status": 200,
+   "latency_s": 7.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 1.82,
+   "status": 200,
+   "latency_s": 4.45,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 3.48,
+   "status": 200,
+   "latency_s": 3.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 4.9,
+   "status": 200,
+   "latency_s": 5.14,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 4.99,
+   "status": 200,
+   "latency_s": 4.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 6.02,
+   "status": 200,
+   "latency_s": 4.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 8.72,
+   "status": 200,
+   "latency_s": 6.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 9.07,
+   "status": 200,
+   "latency_s": 7.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 9.6,
+   "status": 200,
+   "latency_s": 5.52,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 9.93,
+   "status": 200,
+   "latency_s": 9.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 10.04,
+   "status": 200,
+   "latency_s": 3.48,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 10.34,
+   "status": 200,
+   "latency_s": 5.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 11.42,
+   "status": 200,
+   "latency_s": 3.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 11.91,
+   "status": 200,
+   "latency_s": 5.28,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 12.73,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 14.16,
+   "status": 200,
+   "latency_s": 4.61,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 14.52,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 16.29,
+   "status": 200,
+   "latency_s": 4.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 20.33,
+   "status": 200,
+   "latency_s": 4.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 20.8,
+   "status": 200,
+   "latency_s": 5.09,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 21.14,
+   "status": 200,
+   "latency_s": 3.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 23.46,
+   "status": 200,
+   "latency_s": 2.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 24.08,
+   "status": 200,
+   "latency_s": 2.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 25.51,
+   "status": 200,
+   "latency_s": 4.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 26.18,
+   "status": 200,
+   "latency_s": 4.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 26.55,
+   "status": 200,
+   "latency_s": 4.26,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 30.35,
+   "status": 200,
+   "latency_s": 4.73,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 31.56,
+   "status": 200,
+   "latency_s": 2.7,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 32.26,
+   "status": 200,
+   "latency_s": 5.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 33.13,
+   "status": 200,
+   "latency_s": 2.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 34.14,
+   "status": 200,
+   "latency_s": 4.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 34.44,
+   "status": 200,
+   "latency_s": 5.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 36.03,
+   "status": 200,
+   "latency_s": 2.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 36.42,
+   "status": 200,
+   "latency_s": 6.0,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 36.91,
+   "status": 200,
+   "latency_s": 9.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 37.79,
+   "status": 200,
+   "latency_s": 4.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 38.64,
+   "status": 200,
+   "latency_s": 3.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 40.66,
+   "status": 200,
+   "latency_s": 3.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 41.78,
+   "status": 200,
+   "latency_s": 4.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 42.23,
+   "status": 200,
+   "latency_s": 3.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 45.05,
+   "status": 200,
+   "latency_s": 3.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 47.97,
+   "status": 200,
+   "latency_s": 4.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 48.74,
+   "status": 200,
+   "latency_s": 5.83,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 49.01,
+   "status": 200,
+   "latency_s": 4.52,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 49.81,
+   "status": 200,
+   "latency_s": 4.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 50.08,
+   "status": 200,
+   "latency_s": 6.19,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 53.42,
+   "status": 200,
+   "latency_s": 3.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 55.45,
+   "status": 200,
+   "latency_s": 4.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 56.27,
+   "status": 200,
+   "latency_s": 3.31,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 56.76,
+   "status": 200,
+   "latency_s": 6.03,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 57.29,
+   "status": 200,
+   "latency_s": 5.55,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 57.81,
+   "status": 200,
+   "latency_s": 5.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 58.0,
+   "status": 200,
+   "latency_s": 3.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 58.71,
+   "status": 200,
+   "latency_s": 3.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 59.62,
+   "status": 200,
+   "latency_s": 3.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 60.6,
+   "status": 200,
+   "latency_s": 4.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 62.98,
+   "status": 200,
+   "latency_s": 4.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 63.1,
+   "status": 200,
+   "latency_s": 3.16,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 63.87,
+   "status": 200,
+   "latency_s": 5.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 64.06,
+   "status": 200,
+   "latency_s": 4.19,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 67.94,
+   "status": 200,
+   "latency_s": 5.73,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 70.7,
+   "status": 200,
+   "latency_s": 6.25,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 72.28,
+   "status": 200,
+   "latency_s": 2.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 72.69,
+   "status": 200,
+   "latency_s": 4.55,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 74.85,
+   "status": 200,
+   "latency_s": 5.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 75.07,
+   "status": 200,
+   "latency_s": 6.18,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 75.23,
+   "status": 200,
+   "latency_s": 5.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 76.42,
+   "status": 200,
+   "latency_s": 3.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 78.27,
+   "status": 200,
+   "latency_s": 3.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 78.27,
+   "status": 200,
+   "latency_s": 8.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 78.75,
+   "status": 200,
+   "latency_s": 4.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 80.36,
+   "status": 200,
+   "latency_s": 3.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 84.03,
+   "status": 200,
+   "latency_s": 4.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 85.92,
+   "status": 200,
+   "latency_s": 4.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 90.08,
+   "status": 200,
+   "latency_s": 4.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 90.71,
+   "status": 200,
+   "latency_s": 9.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 91.37,
+   "status": 200,
+   "latency_s": 5.14,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 91.54,
+   "status": 200,
+   "latency_s": 5.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 91.75,
+   "status": 200,
+   "latency_s": 4.96,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 92.9,
+   "status": 200,
+   "latency_s": 3.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 93.47,
+   "status": 200,
+   "latency_s": 6.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 94.18,
+   "status": 200,
+   "latency_s": 5.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 95.28,
+   "status": 200,
+   "latency_s": 6.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 96.98,
+   "status": 200,
+   "latency_s": 4.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 99.82,
+   "status": 200,
+   "latency_s": 7.57,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 100.02,
+   "status": 200,
+   "latency_s": 3.63,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 101.11,
+   "status": 200,
+   "latency_s": 3.9,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 101.33,
+   "status": 200,
+   "latency_s": 3.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 101.85,
+   "status": 200,
+   "latency_s": 4.89,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 102.56,
+   "status": 200,
+   "latency_s": 6.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 103.06,
+   "status": 200,
+   "latency_s": 2.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 105.87,
+   "status": 200,
+   "latency_s": 4.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 107.71,
+   "status": 200,
+   "latency_s": 7.19,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 108.48,
+   "status": 200,
+   "latency_s": 3.87,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 109.48,
+   "status": 200,
+   "latency_s": 9.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 112.81,
+   "status": 200,
+   "latency_s": 3.79,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 114.71,
+   "status": 200,
+   "latency_s": 7.07,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 117.27,
+   "status": 200,
+   "latency_s": 5.1,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 117.87,
+   "status": 200,
+   "latency_s": 3.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 118.93,
+   "status": 200,
+   "latency_s": 3.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 118.93,
+   "status": 200,
+   "latency_s": 5.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 119.11,
+   "status": 200,
+   "latency_s": 3.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 121.18,
+   "status": 200,
+   "latency_s": 3.46,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 122.0,
+   "status": 200,
+   "latency_s": 6.13,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 122.84,
+   "status": 200,
+   "latency_s": 3.31,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 122.9,
+   "status": 200,
+   "latency_s": 5.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 124.28,
+   "status": 200,
+   "latency_s": 4.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 124.59,
+   "status": 200,
+   "latency_s": 6.21,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 126.07,
+   "status": 200,
+   "latency_s": 4.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 127.1,
+   "status": 200,
+   "latency_s": 6.06,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 129.38,
+   "status": 200,
+   "latency_s": 3.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 130.27,
+   "status": 200,
+   "latency_s": 3.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 131.17,
+   "status": 200,
+   "latency_s": 4.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 131.9,
+   "status": 200,
+   "latency_s": 4.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 133.13,
+   "status": 200,
+   "latency_s": 4.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 133.44,
+   "status": 200,
+   "latency_s": 7.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 133.53,
+   "status": 200,
+   "latency_s": 4.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 133.83,
+   "status": 200,
+   "latency_s": 3.13,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 133.97,
+   "status": 200,
+   "latency_s": 2.78,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 135.03,
+   "status": 200,
+   "latency_s": 5.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 135.38,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 136.38,
+   "status": 200,
+   "latency_s": 4.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 136.78,
+   "status": 200,
+   "latency_s": 5.16,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 138.37,
+   "status": 200,
+   "latency_s": 3.83,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 138.69,
+   "status": 200,
+   "latency_s": 3.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 139.42,
+   "status": 200,
+   "latency_s": 7.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 140.22,
+   "status": 200,
+   "latency_s": 4.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 140.62,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 140.69,
+   "status": 429,
+   "latency_s": 0.0,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 141.3,
+   "status": 200,
+   "latency_s": 4.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 142.14,
+   "status": 200,
+   "latency_s": 4.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 145.58,
+   "status": 200,
+   "latency_s": 8.21,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 146.02,
+   "status": 200,
+   "latency_s": 3.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 146.9,
+   "status": 200,
+   "latency_s": 4.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 147.18,
+   "status": 200,
+   "latency_s": 4.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 147.31,
+   "status": 200,
+   "latency_s": 7.86,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 147.91,
+   "status": 200,
+   "latency_s": 6.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 148.71,
+   "status": 200,
+   "latency_s": 3.12,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 152.9,
+   "status": 200,
+   "latency_s": 6.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 153.1,
+   "status": 200,
+   "latency_s": 4.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 153.62,
+   "status": 200,
+   "latency_s": 7.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 156.82,
+   "status": 200,
+   "latency_s": 2.72,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 158.05,
+   "status": 200,
+   "latency_s": 3.53,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 160.47,
+   "status": 200,
+   "latency_s": 3.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 161.37,
+   "status": 200,
+   "latency_s": 5.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 161.79,
+   "status": 200,
+   "latency_s": 3.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 162.25,
+   "status": 200,
+   "latency_s": 5.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 162.45,
+   "status": 200,
+   "latency_s": 5.08,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 166.04,
+   "status": 200,
+   "latency_s": 3.84,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 167.48,
+   "status": 200,
+   "latency_s": 2.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 168.06,
+   "status": 200,
+   "latency_s": 5.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 168.38,
+   "status": 200,
+   "latency_s": 3.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 169.43,
+   "status": 200,
+   "latency_s": 4.21,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 169.71,
+   "status": 200,
+   "latency_s": 3.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 170.19,
+   "status": 200,
+   "latency_s": 5.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 170.65,
+   "status": 200,
+   "latency_s": 3.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 171.17,
+   "status": 200,
+   "latency_s": 5.48,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 171.26,
+   "status": 200,
+   "latency_s": 6.19,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 171.44,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 172.05,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 174.06,
+   "status": 200,
+   "latency_s": 6.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 175.06,
+   "status": 200,
+   "latency_s": 3.83,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 175.12,
+   "status": 200,
+   "latency_s": 2.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 175.61,
+   "status": 200,
+   "latency_s": 3.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 176.55,
+   "status": 200,
+   "latency_s": 6.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 177.26,
+   "status": 200,
+   "latency_s": 5.37,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 177.77,
+   "status": 200,
+   "latency_s": 5.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 177.85,
+   "status": 200,
+   "latency_s": 5.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 178.15,
+   "status": 200,
+   "latency_s": 4.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 182.33,
+   "status": 200,
+   "latency_s": 4.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 182.36,
+   "status": 200,
+   "latency_s": 2.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 183.95,
+   "status": 200,
+   "latency_s": 3.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 185.67,
+   "status": 200,
+   "latency_s": 5.28,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 186.08,
+   "status": 200,
+   "latency_s": 7.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 186.67,
+   "status": 200,
+   "latency_s": 9.73,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 187.42,
+   "status": 200,
+   "latency_s": 5.28,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 188.71,
+   "status": 200,
+   "latency_s": 7.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 189.27,
+   "status": 200,
+   "latency_s": 4.5,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 189.27,
+   "status": 200,
+   "latency_s": 5.21,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 192.86,
+   "status": 200,
+   "latency_s": 8.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 193.2,
+   "status": 200,
+   "latency_s": 4.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 193.55,
+   "status": 200,
+   "latency_s": 7.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 193.77,
+   "status": 200,
+   "latency_s": 4.87,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 195.43,
+   "status": 200,
+   "latency_s": 3.9,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 196.39,
+   "status": 200,
+   "latency_s": 3.64,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 196.65,
+   "status": 200,
+   "latency_s": 4.45,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 196.99,
+   "status": 200,
+   "latency_s": 4.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 197.69,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 201.15,
+   "status": 200,
+   "latency_s": 3.86,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 201.23,
+   "status": 200,
+   "latency_s": 4.45,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 202.37,
+   "status": 200,
+   "latency_s": 7.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 203.38,
+   "status": 200,
+   "latency_s": 3.99,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 203.91,
+   "status": 200,
+   "latency_s": 6.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 204.53,
+   "status": 200,
+   "latency_s": 4.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 205.12,
+   "status": 200,
+   "latency_s": 4.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 205.82,
+   "status": 200,
+   "latency_s": 4.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 206.4,
+   "status": 200,
+   "latency_s": 5.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 206.61,
+   "status": 200,
+   "latency_s": 4.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 207.42,
+   "status": 200,
+   "latency_s": 3.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 210.8,
+   "status": 200,
+   "latency_s": 9.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 211.2,
+   "status": 200,
+   "latency_s": 2.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 212.41,
+   "status": 200,
+   "latency_s": 3.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 215.26,
+   "status": 200,
+   "latency_s": 5.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 215.84,
+   "status": 200,
+   "latency_s": 5.86,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 215.9,
+   "status": 200,
+   "latency_s": 2.88,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 216.27,
+   "status": 200,
+   "latency_s": 3.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 217.48,
+   "status": 200,
+   "latency_s": 3.66,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 217.8,
+   "status": 200,
+   "latency_s": 4.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 218.41,
+   "status": 200,
+   "latency_s": 7.19,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 219.26,
+   "status": 200,
+   "latency_s": 5.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 221.74,
+   "status": 200,
+   "latency_s": 8.74,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 222.8,
+   "status": 200,
+   "latency_s": 7.07,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 223.57,
+   "status": 200,
+   "latency_s": 5.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 223.66,
+   "status": 200,
+   "latency_s": 5.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 223.74,
+   "status": 200,
+   "latency_s": 5.03,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 224.89,
+   "status": 200,
+   "latency_s": 4.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 226.61,
+   "status": 200,
+   "latency_s": 5.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 228.07,
+   "status": 200,
+   "latency_s": 2.8,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 229.08,
+   "status": 200,
+   "latency_s": 6.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 229.55,
+   "status": 200,
+   "latency_s": 3.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 229.58,
+   "status": 200,
+   "latency_s": 3.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 230.23,
+   "status": 200,
+   "latency_s": 4.47,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 235.42,
+   "status": 200,
+   "latency_s": 5.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 237.09,
+   "status": 200,
+   "latency_s": 7.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 237.95,
+   "status": 200,
+   "latency_s": 4.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 239.3,
+   "status": 200,
+   "latency_s": 6.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 239.4,
+   "status": 200,
+   "latency_s": 4.57,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 239.9,
+   "status": 200,
+   "latency_s": 6.18,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 240.37,
+   "status": 200,
+   "latency_s": 6.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 242.67,
+   "status": 200,
+   "latency_s": 4.84,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 246.43,
+   "status": 200,
+   "latency_s": 2.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 247.45,
+   "status": 200,
+   "latency_s": 8.23,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 249.86,
+   "status": 200,
+   "latency_s": 3.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 250.87,
+   "status": 200,
+   "latency_s": 6.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 251.6,
+   "status": 200,
+   "latency_s": 7.38,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 252.29,
+   "status": 200,
+   "latency_s": 4.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 253.77,
+   "status": 200,
+   "latency_s": 4.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 253.86,
+   "status": 200,
+   "latency_s": 7.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 254.79,
+   "status": 200,
+   "latency_s": 3.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 255.05,
+   "status": 200,
+   "latency_s": 3.22,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 255.3,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 255.6,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 258.11,
+   "status": 200,
+   "latency_s": 3.69,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 258.59,
+   "status": 200,
+   "latency_s": 5.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 259.89,
+   "status": 200,
+   "latency_s": 5.39,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 260.35,
+   "status": 200,
+   "latency_s": 6.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 261.8,
+   "status": 200,
+   "latency_s": 7.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 262.11,
+   "status": 200,
+   "latency_s": 5.81,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 266.33,
+   "status": 200,
+   "latency_s": 3.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 266.59,
+   "status": 200,
+   "latency_s": 5.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 268.93,
+   "status": 200,
+   "latency_s": 5.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 269.78,
+   "status": 200,
+   "latency_s": 7.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 270.0,
+   "status": 200,
+   "latency_s": 4.14,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 270.11,
+   "status": 200,
+   "latency_s": 3.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 270.11,
+   "status": 200,
+   "latency_s": 3.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 270.59,
+   "status": 200,
+   "latency_s": 9.07,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 271.41,
+   "status": 200,
+   "latency_s": 3.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 271.48,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 271.48,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 271.57,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 273.88,
+   "status": 200,
+   "latency_s": 3.56,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 274.62,
+   "status": 200,
+   "latency_s": 6.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 277.22,
+   "status": 200,
+   "latency_s": 4.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 278.36,
+   "status": 200,
+   "latency_s": 4.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 278.99,
+   "status": 200,
+   "latency_s": 3.83,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 278.99,
+   "status": 200,
+   "latency_s": 7.49,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 282.32,
+   "status": 200,
+   "latency_s": 5.12,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 284.74,
+   "status": 200,
+   "latency_s": 3.74,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 285.97,
+   "status": 200,
+   "latency_s": 6.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 287.44,
+   "status": 200,
+   "latency_s": 7.53,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 292.31,
+   "status": 200,
+   "latency_s": 4.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 292.52,
+   "status": 200,
+   "latency_s": 4.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 293.05,
+   "status": 200,
+   "latency_s": 4.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 295.67,
+   "status": 200,
+   "latency_s": 2.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 299.71,
+   "status": 200,
+   "latency_s": 3.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 300.13,
+   "status": 200,
+   "latency_s": 6.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 300.56,
+   "status": 200,
+   "latency_s": 4.69,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 300.71,
+   "status": 200,
+   "latency_s": 6.58,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 301.16,
+   "status": 200,
+   "latency_s": 4.2,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 302.32,
+   "status": 200,
+   "latency_s": 4.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 302.88,
+   "status": 200,
+   "latency_s": 7.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 303.06,
+   "status": 200,
+   "latency_s": 4.96,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 304.03,
+   "status": 200,
+   "latency_s": 6.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 305.45,
+   "status": 200,
+   "latency_s": 7.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 306.58,
+   "status": 200,
+   "latency_s": 5.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 310.33,
+   "status": 200,
+   "latency_s": 4.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 310.39,
+   "status": 200,
+   "latency_s": 3.12,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 310.6,
+   "status": 200,
+   "latency_s": 5.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 311.23,
+   "status": 200,
+   "latency_s": 3.45,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 312.51,
+   "status": 200,
+   "latency_s": 4.09,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 314.21,
+   "status": 200,
+   "latency_s": 4.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 314.88,
+   "status": 200,
+   "latency_s": 4.31,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 316.12,
+   "status": 200,
+   "latency_s": 5.02,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 316.73,
+   "status": 200,
+   "latency_s": 3.07,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 316.73,
+   "status": 200,
+   "latency_s": 5.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 316.79,
+   "status": 200,
+   "latency_s": 5.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 318.05,
+   "status": 200,
+   "latency_s": 4.97,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 318.73,
+   "status": 200,
+   "latency_s": 8.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 320.55,
+   "status": 200,
+   "latency_s": 2.75,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 321.47,
+   "status": 200,
+   "latency_s": 4.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 322.25,
+   "status": 200,
+   "latency_s": 6.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 323.63,
+   "status": 200,
+   "latency_s": 2.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 324.23,
+   "status": 200,
+   "latency_s": 3.97,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 324.45,
+   "status": 200,
+   "latency_s": 3.07,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 324.68,
+   "status": 200,
+   "latency_s": 5.78,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 324.83,
+   "status": 200,
+   "latency_s": 4.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 325.5,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 325.72,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 325.72,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 326.5,
+   "status": 200,
+   "latency_s": 4.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 326.56,
+   "status": 200,
+   "latency_s": 6.4,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 327.8,
+   "status": 200,
+   "latency_s": 6.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 328.46,
+   "status": 200,
+   "latency_s": 6.25,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 330.01,
+   "status": 200,
+   "latency_s": 7.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 331.12,
+   "status": 200,
+   "latency_s": 3.22,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 331.33,
+   "status": 200,
+   "latency_s": 5.92,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 332.47,
+   "status": 200,
+   "latency_s": 10.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 332.52,
+   "status": 200,
+   "latency_s": 7.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  },
+  {
+   "sent_s": 332.87,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 335.6,
+   "status": 200,
+   "latency_s": 4.05,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "fake"
+   ],
+   "model_calls": 3,
+   "cost_usd": null
+  }
+ ]
+}

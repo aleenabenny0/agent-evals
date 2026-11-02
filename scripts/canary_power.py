@@ -15,11 +15,9 @@ import json
 import random
 from pathlib import Path
 
-from agent_evals.stats.monitor import fisher_greater
+from agent_evals.service.canary import ALPHA, LOOKS, fires
 
 SHARE = 0.2  # of traffic that goes to the canary
-LOOKS = (20, 40, 60)  # canary answers at each look
-ALPHA = 0.01  # overall false-alarm rate per canary
 BASELINES = (0.05, 0.10, 0.20)
 LIFTS = (0.0, 0.10, 0.20, 0.30, 0.50)
 ROUNDS = 20_000
@@ -33,7 +31,6 @@ def binomial(rng: random.Random, n: int, p: float) -> int:
 
 def one_canary(rng: random.Random, base: float, canary: float) -> int | None:
     """The look at which the rule fires, or None."""
-    per_look = ALPHA / len(LOOKS)
     bad_canary = bad_champion = 0
     seen = 0
     for n, look in enumerate(LOOKS, 1):
@@ -42,7 +39,7 @@ def one_canary(rng: random.Random, base: float, canary: float) -> int | None:
         bad_canary += binomial(rng, new, canary)
         bad_champion += binomial(rng, round(new * (1 - SHARE) / SHARE), base)
         champion_n = round(look * (1 - SHARE) / SHARE)
-        if fisher_greater(bad_canary, look, bad_champion, champion_n) < per_look:
+        if fires(bad_canary, look, bad_champion, champion_n)[1]:
             return n
     return None
 

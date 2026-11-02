@@ -299,6 +299,88 @@
      "refId": "C"
     }
    ]
+  },
+  {
+   "id": 9,
+   "title": "Bad answers while a canary is live",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 6,
+    "x": 0,
+    "y": 16
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "percentunit"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "expr": "sum by (role) (increase(canary_answers_total{grade=\"bad\"}[30m])) / sum by (role) (increase(canary_answers_total[30m]))",
+     "legendFormat": "{{role}}",
+     "refId": "A"
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "title": "The canary rule",
+   "type": "timeseries",
+   "datasource": {
+    "type": "prometheus",
+    "uid": "prometheus"
+   },
+   "gridPos": {
+    "h": 8,
+    "w": 6,
+    "x": 6,
+    "y": 16
+   },
+   "fieldConfig": {
+    "defaults": {
+     "unit": "short"
+    },
+    "overrides": []
+   },
+   "targets": [
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "expr": "canary_rollbacks_total",
+     "legendFormat": "fired",
+     "refId": "A"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "expr": "canary_passed_total",
+     "legendFormat": "reached the last look",
+     "refId": "B"
+    },
+    {
+     "datasource": {
+      "type": "prometheus",
+      "uid": "prometheus"
+     },
+     "expr": "canary_rollback_failures_total",
+     "legendFormat": "rollback failed",
+     "refId": "C"
+    }
+   ]
   }
  ]
 }

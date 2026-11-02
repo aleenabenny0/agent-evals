@@ -397,6 +397,13 @@ def test_the_gate_refuses_online_runs(tmp_path: Path) -> None:
     assert result.exit_code == 2 and "monitor" in result.output
 
 
+def test_the_gate_refuses_a_run_on_the_fallback_provider(tmp_path: Path) -> None:
+    _start(tmp_path, "a", online=False)
+    _start(tmp_path, "b", online=False, manifest={"provider": {"name": "x", "model": "y"}})
+    result = CliRunner().invoke(cli.app, ["gate", "a", "b", "-c", str(_config(tmp_path))])
+    assert result.exit_code == 2 and "fallback provider" in " ".join(result.output.split())
+
+
 def _traffic(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     traffic = tmp_path / "traffic"
     traffic.mkdir()

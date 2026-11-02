@@ -142,11 +142,13 @@ class ServiceConfig(_Strict):
     daily_budget_usd: float = 1.0  # past this the service refuses questions until the next UTC day
     spend_path: Path = Path("results/service/spend.json")
     registry_path: Path = Path("configs/registry.yaml")
-    registry_log: Path = Path("results/registry-log.jsonl")
+    registry_log: Path = Path("results/service/registry-log.jsonl")
     gateway: GatewayConfig = GatewayConfig()
     # Set, the service runs on a fake provider at about this latency per model call, for a free
     # load test (service/fake.py). Every answer then reports the provider `fake`.
     fake_latency_s: float | None = None
+    # The release drills' prompts are known only when this is set (service/drills.py).
+    drill: bool = False
 
 
 class Config(_Strict):

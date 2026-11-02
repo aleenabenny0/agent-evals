@@ -55,6 +55,10 @@ V6_PATH = Path("results/judge-v6/spend.json")
 V6_CAP_USD = 60.0
 V6_ESTIMATE_PER_ANSWER_USD = 0.012
 V6_STOP_FACTOR = 1.3
+# LLM Ops (docs/plans/phase-8-llm-ops.md, decision 2, approved 2026-11-02): the Anthropic spend of
+# its drills and its real load test, in a ledger apart from the judge rounds.
+PHASE_8_PATH = Path("results/service/phase-8-spend.json")
+PHASE_8_CAP_USD = 10.0
 
 
 @dataclass(frozen=True)
@@ -295,13 +299,29 @@ class SpendLedger:
 
     def record(self, step: str, *meters: MeteredLLM) -> SpendEntry:
         """Add what a step spent, read from its meters, to the file."""
-        entry = SpendEntry(
-            time=datetime.now(UTC).isoformat(timespec="seconds"),
-            step=step,
-            calls=sum(m.calls for m in meters),
-            uncached_calls=sum(m.uncached.model_calls for m in meters),
-            usd=round(sum(m.uncached_usd for m in meters), 6),
+        return self._add(
+            SpendEntry(
+                time=datetime.now(UTC).isoformat(timespec="seconds"),
+                step=step,
+                calls=sum(m.calls for m in meters),
+                uncached_calls=sum(m.uncached.model_calls for m in meters),
+                usd=round(sum(m.uncached_usd for m in meters), 6),
+            )
         )
+
+    def add(self, step: str, *, calls: int, usd: float) -> SpendEntry:
+        """Add a step that was not metered here, such as answers the service gave and priced."""
+        return self._add(
+            SpendEntry(
+                time=datetime.now(UTC).isoformat(timespec="seconds"),
+                step=step,
+                calls=calls,
+                uncached_calls=calls,
+                usd=round(usd, 6),
+            )
+        )
+
+    def _add(self, entry: SpendEntry) -> SpendEntry:
         entries = [*self.entries(), entry]
         ledger = _Ledger(
             cap_usd=self.cap_usd,

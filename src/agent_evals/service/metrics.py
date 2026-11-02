@@ -72,6 +72,26 @@ class ServiceMetrics:
             registry=self.registry,
         )
 
+        self.canary_answers = Counter(
+            "canary_answers",
+            "Finished answers while a canary is live, as the canary rule grades them.",
+            ["role", "grade"],
+            registry=self.registry,
+        )
+        self.canary_rollbacks = Counter(
+            "canary_rollbacks", "Times the canary rule fired.", registry=self.registry
+        )
+        self.canary_rollback_failures = Counter(
+            "canary_rollback_failures",
+            "Times the rule fired and the registry file could not be changed.",
+            registry=self.registry,
+        )
+        self.canary_passed = Counter(
+            "canary_passed",
+            "Canaries that reached the last look: a person decides what happens next.",
+            registry=self.registry,
+        )
+
         self.provider_failures = Counter(
             "gateway_provider_failures",
             "Model calls a provider failed.",

@@ -1,7 +1,8 @@
 # ADR 0010: A second model provider, for failover
 
-**Status:** proposed (2026-11-01), with decision 1 of `docs/plans/phase-8-llm-ops.md`. The code is
-built and tested offline, and it does nothing until a fallback provider is configured.
+**Status:** accepted (2026-11-02), with decision 1 of `docs/plans/phase-8-llm-ops.md`. The fallback
+is OpenAI's `gpt-5-mini`, set in `configs/service.yaml`. The code is built and tested offline, and it
+does nothing until the provider's key is set.
 
 ## Context
 
@@ -37,7 +38,10 @@ already failing.
   translation. The agent validates every tool input itself either way.
 - The second provider is a different model, so answers during an outage are not the answers that
   were gated. How much worse they are is measured on the dev suite and stated in the runbook, and
-  nothing is ever promoted on that path.
+  nothing is ever promoted on that path: such a run records its provider in its manifest, and
+  `evals gate` refuses it, since the agent's version alone cannot tell the two runs apart.
+- It costs more per token than the primary: $0.25 and $2.00 per million input and output tokens,
+  against $0.10 and $0.50 (both read 2026-11-02). That is a price paid only during an outage.
 - Mapping one conversation between two APIs is code that has to stay correct as they change. A
   gateway library would hide it, at the cost of a dependency in the one path every call takes; the
   translation is about a hundred lines and has its own tests.

@@ -1,0 +1,54 @@
+# The release drills (docs/plans/phase-8-llm-ops.md, part 6). They have their own registry, log and
+# spend file, so a drill can never move configs/registry.yaml, and only here does the registry know
+# the drill prompts.
+
+paths:
+  corpus_dir: data/snapshots/aws-docs
+  docs_lock: configs/docs_pages.lock.json   # page hashes, committed; see evals snapshot --check
+  suites_dir: suites
+  cache_dir: .cache/llm
+  db: results/evals.duckdb
+
+docs_agent:
+  model:
+    name: claude-haiku-5-5
+    max_tokens: 2048
+    temperature: null      # leave null: anthropic SDK 1.x messages.create has no temperature
+    pricing:
+      # USD per million tokens for claude-haiku-5-5, Anthropic first-party rates as of 2026-10-06,
+      # for prompts up to 100K tokens (every request here is far below that). Re-check at
+      # https://platform.claude.com/docs/en/about-claude/pricing when the model changes.
+      input_per_mtok: 0.10
+      output_per_mtok: 0.50
+  max_steps: 12
+  search_k: 5
+  page_chars: 8000
+  strict_tools: true       # set false if the API rejects strict tool schemas for this model
+  max_submission_rejections: 3   # then the attempt fails as malformed_submission
+  prompt_version: v3             # champion since iteration 1 (2026-10-16); v2 is the previous champion
+
+service:
+  host: 127.0.0.1           # localhost only: the service has no authentication
+  port: 8000
+  max_concurrent: 8         # past this a request is refused at once, not queued
+  retry_after_s: 5
+  answer_timeout_s: 120
+  max_question_chars: 2000
+  daily_budget_usd: 7.0     # the hard stop for one day of drills, under the phase's $10 ledger
+  gateway:
+    fallback:               # used only once the key is set (ADR 0010)
+      name: openai
+      base_url: https://api.openai.com/v1
+      api_key_env: OPENAI_API_KEY
+      model: gpt-5-mini
+      pricing:
+        # USD per million tokens, OpenAI's standard rates, read 2026-11-02 at
+        # https://developers.openai.com/api/docs/pricing. Cached input is 0.1x, with no write fee.
+        input_per_mtok: 0.25
+        output_per_mtok: 2.00
+        cache_read_multiplier: 0.1
+        cache_write_multiplier: 1.0
+  drill: true
+  registry_path: results/service/drills/registry.yaml
+  registry_log: results/service/drills/registry-log.jsonl
+  spend_path: results/service/drills/spend.json

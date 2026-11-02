@@ -256,7 +256,7 @@ def metric_names() -> set[str]:
 
 def used_in(text: str) -> set[str]:
     """Metric names in a query. An outcome such as agent_failed is a label's value, not a metric."""
-    found = re.findall(r"\b(?:ask|llm|gateway|agent|registry)_[a-z_]+\b", text)
+    found = re.findall(r"\b(?:ask|llm|gateway|agent|registry|canary)_[a-z_]+\b", text)
     return set(found) - set(OUTCOMES)
 
 

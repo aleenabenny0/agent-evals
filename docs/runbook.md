@@ -23,7 +23,20 @@ uv run evals registry rollback --why "what you saw" --who "your name"
 ```
 
 With a canary live, this drops the canary. With none, it goes back to the previous champion. Check
-the result with `uv run evals registry show`, and the log in `results/registry-log.jsonl`.
+the result with `uv run evals registry show`, and the log in `results/service/registry-log.jsonl`.
+
+## Releasing a prompt version
+
+1. Gate it first (`evals gate`, ADR 0008). The canary rule cannot see a prompt that gives confident,
+   cited, wrong answers, so the gate is the only check on accuracy.
+2. Start the canary: `uv run evals registry canary VERSION --share 0.2 --why "..." --who "..."`.
+3. Watch the "Bad answers while a canary is live" panel. The rule looks at 20, 40 and 60 canary
+   answers, and rolls the canary back by itself if it is worse than the champion.
+4. Past the third look the rule has no more to say, and the canary stays at its share until a person
+   acts. It has shown only the absence of a large fault. Promote it with
+   `uv run evals registry promote --why "..." --who "..."`, or roll it back.
+
+A service restart starts the looks again, so avoid one during a canary.
 
 ## Capacity
 
@@ -87,6 +100,26 @@ with a 503 until the next UTC day.
 first.
 **Do:** if a change caused it, roll back. Otherwise decide whether the traffic is worth the money
 before raising `service.daily_budget_usd`.
+
+## CanaryRolledBack
+
+**Means:** the canary rule found the canary worse than the champion and took it off traffic. The
+service is back on the champion, so nothing is urgent.
+**Check:** the last line of `results/service/registry-log.jsonl` holds the counts and the p-value.
+The abstention and spend panels show what changed. A failure the two sides share, such as an outage,
+does not fire the rule, because the comparison is with the champion over the same period.
+**Do:** find out why before releasing that version again. Releasing it unchanged starts fresh counts,
+so the rule would have to catch it a second time, at the cost of a second set of bad answers. If the
+version should not have been rejected, remember the rule's false alarms are under 1%.
+
+## CanaryRollbackFailed
+
+**Means:** the rule fired and the canary gets no more traffic, but the registry file could not be
+changed. The stop lives in the service's memory, so **a restart would put the canary back.**
+**Check:** `uv run evals registry show` says what is wrong with the file. RegistryFileBad is probably
+firing too.
+**Do:** do not restart. Repair the file as under RegistryFileBad, then run the rollback command from
+the top of this page.
 
 ## RegistryFileBad
 

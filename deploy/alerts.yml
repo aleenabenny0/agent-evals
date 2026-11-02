@@ -54,3 +54,15 @@ groups:
         labels: {severity: page}
         annotations:
           summary: The registry file is unusable, so a rollback would not take effect.
+
+      - alert: CanaryRolledBack
+        expr: increase(canary_rollbacks_total[15m]) > 0
+        labels: {severity: warn}
+        annotations:
+          summary: The canary rule took a prompt version off traffic.
+
+      - alert: CanaryRollbackFailed
+        expr: increase(canary_rollback_failures_total[15m]) > 0
+        labels: {severity: page}
+        annotations:
+          summary: The canary rule fired, but the registry file still names the canary.

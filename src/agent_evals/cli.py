@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -13,10 +14,11 @@ from dotenv import load_dotenv
 from rich.console import Console
 from rich.table import Table
 
-from agent_evals.config import Config, JudgeConfig, load_config
+from agent_evals.config import Config, JudgeConfig, ProviderConfig, load_config
 
 if TYPE_CHECKING:
     from agent_evals.graders.claim_judge import ClaimJudgeGrader
+    from agent_evals.harness.cache import CallCache
     from agent_evals.harness.llm import LLMClient
     from agent_evals.spend import MeteredLLM, SpendLedger
     from agent_evals.stats.core import Estimate
@@ -390,6 +392,14 @@ def run(
             help="Score unverified drafts and unassigned cases too. Never for a release decision.",
         ),
     ] = False,
+    on_fallback: Annotated[
+        bool,
+        typer.Option(
+            "--on-fallback",
+            help="Run on service.gateway.fallback, to measure what a failover costs in quality. "
+            "The gate refuses such a run: nothing is promoted on it.",
+        ),
+    ] = False,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> str:
     """Run an agent on a suite, grade every attempt, and store the results."""
@@ -432,7 +442,12 @@ def run(
         )
         raise typer.Exit(code=2)
     corpus = Corpus.load(cfg.paths.corpus_dir)
-    llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
+    fallback = _fallback(cfg) if on_fallback else None
+    llm: LLMClient = (
+        fallback_client(fallback, CallCache(cfg.paths.cache_dir))
+        if fallback is not None
+        else AnthropicClient(CallCache(cfg.paths.cache_dir))
+    )
     docs_agent = agents[agent](llm, corpus, cfg.docs_agent)
     graders: list[Grader] = [
         AnswerGrader(),
@@ -449,6 +464,9 @@ def run(
         config=cfg.model_dump(mode="json"),
         attempts=attempts,
     )
+    if fallback is not None:
+        # The agent's version cannot say this: the same agent, on another provider's model.
+        manifest["provider"] = {"name": fallback.name, "model": fallback.model}
     store = ResultsStore(cfg.paths.db)
     try:
         run_id = run_suite(
@@ -459,7 +477,7 @@ def run(
             suite_name=suite.stem,
             attempts=attempts,
             workers=cfg.run.workers,
-            pricing=cfg.docs_agent.model.pricing,
+            pricing=fallback.pricing if fallback is not None else cfg.docs_agent.model.pricing,
             budget_usd=cfg.run.budget_usd,
             manifest=manifest,
         )
@@ -467,6 +485,31 @@ def run(
     finally:
         store.close()
     return run_id
+
+
+def _fallback(cfg: Config) -> ProviderConfig:
+    """The configured fallback provider, or a refusal that names what is missing."""
+    held = cfg.service.gateway.fallback
+    if held is None:
+        console.print("[red]--on-fallback needs service.gateway.fallback in the config.[/red]")
+        raise typer.Exit(code=2)
+    if not os.environ.get(held.api_key_env):
+        console.print(f"[red]--on-fallback needs a key in {held.api_key_env}.[/red]")
+        raise typer.Exit(code=2)
+    return held
+
+
+def fallback_client(held: ProviderConfig, cache: CallCache | None) -> LLMClient:
+    from agent_evals.harness.openai_compat import OpenAICompatibleClient
+
+    return OpenAICompatibleClient(
+        base_url=held.base_url,
+        api_key=os.environ[held.api_key_env],
+        model=held.model,
+        timeout_s=held.timeout_s,
+        max_tokens_field=held.max_tokens_field,
+        cache=cache,
+    )
 
 
 @app.command()
@@ -1406,6 +1449,12 @@ def gate_cmd(
             console.print(
                 "[red]The gate compares suite runs, which have reference answers; online runs "
                 "have none and are watched by the monitor instead (phase 7 part 3).[/red]"
+            )
+            raise typer.Exit(code=2)
+        if any(store.run_info(run)["manifest"].get("provider") for run in (champion, challenger)):
+            console.print(
+                "[red]A run on the fallback provider measures what a failover costs in quality. "
+                "Nothing is promoted on it, so the gate refuses it (ADR 0010).[/red]"
             )
             raise typer.Exit(code=2)
         manifest = store.run_info(champion)["manifest"]

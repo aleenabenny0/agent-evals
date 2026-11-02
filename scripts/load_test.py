@@ -9,7 +9,8 @@ and hides the overload it was meant to find. Each rate runs for a while, and the
 latency turns up and how the limits behave past that point.
 
 Run it against the fake provider and it costs nothing. Against the real one it costs what the
-answers cost, so a real run is short, and the service's daily cap still holds.
+answers cost, so a real run is short, the service's daily cap still holds, and --paid-config checks
+it against the phase's ledger first and adds what it spent afterwards.
 """
 
 from __future__ import annotations
@@ -26,13 +27,17 @@ from typing import Any
 
 import httpx
 
+from agent_evals.config import load_config
+from agent_evals.service.budget import DailyBudget
+from agent_evals.spend import PHASE_8_CAP_USD, PHASE_8_PATH, SpendLedger
+
 SUITE = Path("suites/docs/smoke.jsonl")
 OUT = Path("results/service")
 SEED = 20261101
 
 
-def questions() -> list[str]:
-    rows = SUITE.read_text(encoding="utf-8").splitlines()
+def questions(path: Path = SUITE) -> list[str]:
+    rows = path.read_text(encoding="utf-8").splitlines()
     return [str(json.loads(row)["question"]) for row in rows if row.strip()]
 
 
@@ -93,9 +98,10 @@ async def step(
     }
 
 
-async def run(url: str, rates: Sequence[float], seconds: float) -> list[dict[str, Any]]:
+async def run(
+    url: str, rates: Sequence[float], seconds: float, asked: Sequence[str]
+) -> list[dict[str, Any]]:
     rng = random.Random(SEED)
-    asked = questions()
     limits = httpx.Limits(max_connections=None)
     results = []
     async with httpx.AsyncClient(base_url=url, timeout=300.0, limits=limits) as client:
@@ -121,12 +127,31 @@ def main() -> None:
     parser.add_argument("--label", required=True, help="Names the results file.")
     parser.add_argument("--rates", default="1,2,4,8", help="Questions per second, in steps.")
     parser.add_argument("--seconds", type=float, default=30.0, help="How long each rate runs.")
+    parser.add_argument("--questions", type=Path, default=SUITE)
+    parser.add_argument("--paid-config", type=Path, help="The real service's config, for spend.")
+    parser.add_argument("--estimate-usd", type=float, default=1.0, help="Checked against the cap.")
     args = parser.parse_args()
     rates = [float(r) for r in args.rates.split(",")]
-    results = asyncio.run(run(args.url, rates, args.seconds))
+    step = f"load test {args.label}"
+    ledger = SpendLedger(PHASE_8_PATH, PHASE_8_CAP_USD)
+    budget = None
+    if args.paid_config:
+        service = load_config(args.paid_config).service
+        budget = DailyBudget(service.spend_path, service.daily_budget_usd)
+        ledger.check(step, args.estimate_usd)
+    before = budget.spent_usd() if budget else 0.0
+    results = asyncio.run(run(args.url, rates, args.seconds, questions(args.questions)))
+    record: dict[str, Any] = {"label": args.label, "seconds_per_rate": args.seconds}
+    if budget:
+        time.sleep(1.0)  # the last answers' spend reaches the file as their threads end
+        spent = budget.spent_usd() - before
+        answers = sum(step_["statuses"].get("200", 0) for step_ in results)
+        ledger.add(step, calls=answers, usd=spent)
+        record["spent_usd"] = round(spent, 6)
+        print(f"spent ${spent:.4f}; the phase's total is ${ledger.total_usd():.4f}")
+    record["steps"] = results
     OUT.mkdir(parents=True, exist_ok=True)
     path = OUT / f"load-{args.label}.json"
-    record = {"label": args.label, "seconds_per_rate": args.seconds, "steps": results}
     path.write_text(json.dumps(record, indent=1) + "\n", encoding="utf-8")
     print(f"written: {path}")
 

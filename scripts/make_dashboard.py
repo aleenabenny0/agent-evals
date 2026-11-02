@@ -79,6 +79,26 @@ PANELS: list[tuple[str, str, list[tuple[str, str]]]] = [
             ("gateway_circuit_open", "{{provider}} circuit open"),
         ],
     ),
+    (
+        "Bad answers while a canary is live",
+        "percentunit",
+        [
+            (
+                'sum by (role) (increase(canary_answers_total{grade="bad"}[30m])) / '
+                "sum by (role) (increase(canary_answers_total[30m]))",
+                "{{role}}",
+            )
+        ],
+    ),
+    (
+        "The canary rule",
+        "short",
+        [
+            ("canary_rollbacks_total", "fired"),
+            ("canary_passed_total", "reached the last look"),
+            ("canary_rollback_failures_total", "rollback failed"),
+        ],
+    ),
 ]
 
 

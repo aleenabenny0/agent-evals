@@ -8,6 +8,7 @@ submission must also pass `submission_problems`; failures go back to the model a
 from __future__ import annotations
 
 import time
+from collections.abc import Mapping
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
@@ -177,16 +178,22 @@ class DocsAgent:
     name = "docs"
     require_citations = True  # the closed-book baseline turns this off
 
-    def __init__(self, llm: LLMClient, corpus: Corpus, config: DocsAgentConfig) -> None:
+    def __init__(
+        self,
+        llm: LLMClient,
+        corpus: Corpus,
+        config: DocsAgentConfig,
+        prompts: Mapping[str, str] = SYSTEM_PROMPTS,
+    ) -> None:
         self.llm = llm
         self.corpus = corpus
         self.config = config
-        if config.prompt_version not in SYSTEM_PROMPTS:
+        if config.prompt_version not in prompts:
             raise ValueError(
                 f"unknown docs_agent.prompt_version {config.prompt_version!r}; "
-                f"known: {sorted(SYSTEM_PROMPTS)}"
+                f"known: {sorted(prompts)}"
             )
-        self.system_prompt = SYSTEM_PROMPTS[config.prompt_version]
+        self.system_prompt = prompts[config.prompt_version]
         self.tools = tool_specs(config.strict_tools)
 
     def first_message(self, case: Case) -> str:
