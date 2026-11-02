@@ -43,8 +43,9 @@ The platform evaluates two agents that engineers use every day:
 > validated judge stays and its score stays out of the alert. LLM Ops is nearly done: the agent
 > runs as a service under Docker Compose, and a canary drill on the real model rolled a bad prompt
 > back with no person involved, after an earlier drill failed
-> ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Next: the failover drill, model
-> routing and the code agent (see [Roadmap](#roadmap)).
+> ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Paid work is paused: the failover
+> drill on a real second provider has not run, because the project has no budget left for API
+> calls. After that come model routing and the code agent (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -322,7 +323,8 @@ Next, in order:
    metrics, an eval gate in CI, a canary with an automatic rollback, a load test, service objectives,
    a [runbook](docs/runbook.md) and a
    [postmortem](docs/postmortems/2026-11-02-release-drills.md). Failover to a second provider is
-   built and tested offline, and its drill on the real provider is still to run
+   built and tested offline. Its drill on a real provider has not run, because that needs paid
+   API calls and the project has no budget left for them
    ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
 7. **Model routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers
    between them.

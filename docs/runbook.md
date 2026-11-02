@@ -2,8 +2,9 @@
 
 For whoever is on call. Each alert in `deploy/alerts.yml` has a section here: what it means, how to
 check it, and what to do. **Status:** corrected by the canary drills of 2026-11-02
-(`docs/postmortems/2026-11-02-release-drills.md`). The failover drill has not run yet, so the
-sections on failover still describe the design.
+(`docs/postmortems/2026-11-02-release-drills.md`). The failover drill has not run, because the
+project has no budget left for paid API calls, so the sections on failover still describe the
+design.
 
 ## First steps, for any alert
 

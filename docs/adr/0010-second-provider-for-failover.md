@@ -2,7 +2,8 @@
 
 **Status:** accepted (2026-11-02), with decision 1 of `docs/plans/phase-8-llm-ops.md`. The fallback
 is OpenAI's `gpt-5-mini`, set in `configs/service.yaml`. The code is built and tested offline, and it
-does nothing until the provider's key is set.
+does nothing until the provider's key is set. As of 2026-11-02 no key is set and the project has no
+budget left for paid API calls, so the real provider has never been called.
 
 ## Context
 

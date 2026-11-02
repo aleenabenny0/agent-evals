@@ -80,6 +80,9 @@ word. Abstaining is always better than answering."
 
 This one needs the second provider's key, so it runs later, under the same marks.
 
+**Status, 2026-11-02:** not run. It needs paid API calls and the project has no budget left for
+them. The marks below stand for when it does.
+
 **Setup.** `deploy/failover-drill.yml` puts a forwarder between the service and the primary. At 0.3
 questions a second, the forwarder is stopped after 40 questions and started again after 80, out of
 120. Nothing in the service changes, and it is not restarted.

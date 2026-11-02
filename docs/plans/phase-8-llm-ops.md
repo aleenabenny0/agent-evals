@@ -10,9 +10,10 @@ produces. Everything runs on one machine under Docker Compose. Estimated cost ab
 $10, plus a small balance with the second provider.
 
 **Status:** all six decisions were approved on 2026-11-02, with the recommended options. Everything
-is built and has run, except the two steps that need the second provider's key: the dev suite on that
-provider, and the failover drill. The automatic rollback has worked on the real model. $3.15 of the
-$10 cap is spent. Results are in parts 6 and 7 and in
+is built and has run, except two steps that need the second provider: the dev suite on it, and the
+failover drill. Neither is running for now, because the project has no budget left for paid API
+calls, so failover is tested offline only and `gpt-5-mini` has never been called. The automatic
+rollback has worked on the real model. $3.15 of the $10 cap is spent. Results are in parts 6 and 7 and in
 `docs/postmortems/2026-11-02-release-drills.md`.
 
 **Goal.** Show that a change to this agent can be released safely: measured before it merges,

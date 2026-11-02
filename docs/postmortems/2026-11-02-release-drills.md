@@ -124,5 +124,5 @@ this happening: the canaries abstained on every outside-the-docs question they g
 | Make the spend alert follow the configured cap | Done |
 | Report a circuit's close from the breaker itself | Done |
 | Send enough questions for a drill to reach its last look | Done |
-| Run the failover drill on the second provider | Waiting for the provider's key |
+| Run the failover drill on the second provider | Not run: no budget left for paid API calls |
 | Decide whether to add a signal for answers that stop reading pages | Open |
