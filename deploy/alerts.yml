@@ -42,7 +42,7 @@ groups:
           summary: The service is refusing questions because it is full.
 
       - alert: SpendHigh
-        expr: sum(increase(llm_cost_usd_total[1h])) > 0.5
+        expr: sum(increase(llm_cost_usd_total[1h])) > 0.5 * scalar(ask_daily_budget_usd)
         for: 5m
         labels: {severity: warn}
         annotations:

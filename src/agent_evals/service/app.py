@@ -144,6 +144,7 @@ def create_app(deps: Deps) -> FastAPI:
     pool = ThreadPoolExecutor(max_workers=settings.max_concurrent, thread_name_prefix="answer")
     slots = threading.BoundedSemaphore(settings.max_concurrent)
     metrics.capacity.set(settings.max_concurrent)
+    metrics.daily_budget.set(deps.budget.cap_usd)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:

@@ -1,0 +1,5775 @@
+{
+ "label": "drill-2-harmless",
+ "canary": "drill-harmless",
+ "share": 0.2,
+ "rate_per_s": 0.45,
+ "started": "2026-11-02T17:55:20+00:00",
+ "blocked_s": null,
+ "unblocked_s": null,
+ "summary": {
+  "sent": 430,
+  "statuses": {
+   "200": 395,
+   "429": 35
+  },
+  "roles": {
+   "canary": {
+    "answers": 71,
+    "bad": 10
+   },
+   "champion": {
+    "answers": 324,
+    "bad": 39
+   }
+  },
+  "canary_live_s": 80.76,
+  "first_canary_sent_s": 85.87,
+  "rollback_seen_s": null,
+  "seconds_to_rollback": null,
+  "canary_answers_sent_after_rollback": 0,
+  "cost_seen_usd": 0.743238
+ },
+ "rows": [
+  {
+   "sent_s": 2.44,
+   "status": 200,
+   "latency_s": 8.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0012489800000000002
+  },
+  {
+   "sent_s": 3.94,
+   "status": 200,
+   "latency_s": 30.03,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 11,
+   "cost_usd": 0.00688469
+  },
+  {
+   "sent_s": 5.5,
+   "status": 200,
+   "latency_s": 11.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00193986
+  },
+  {
+   "sent_s": 18.15,
+   "status": 200,
+   "latency_s": 14.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00255829
+  },
+  {
+   "sent_s": 18.37,
+   "status": 200,
+   "latency_s": 15.01,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019251200000000002
+  },
+  {
+   "sent_s": 21.18,
+   "status": 200,
+   "latency_s": 7.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011338300000000002
+  },
+  {
+   "sent_s": 23.3,
+   "status": 200,
+   "latency_s": 13.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.002624925
+  },
+  {
+   "sent_s": 23.79,
+   "status": 200,
+   "latency_s": 11.73,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00149199
+  },
+  {
+   "sent_s": 26.76,
+   "status": 200,
+   "latency_s": 22.07,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 12,
+   "cost_usd": 0.00393626
+  },
+  {
+   "sent_s": 28.18,
+   "status": 200,
+   "latency_s": 7.78,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001066465
+  },
+  {
+   "sent_s": 35.66,
+   "status": 200,
+   "latency_s": 10.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00155406
+  },
+  {
+   "sent_s": 37.49,
+   "status": 200,
+   "latency_s": 18.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 10,
+   "cost_usd": 0.0030489899999999997
+  },
+  {
+   "sent_s": 37.56,
+   "status": 200,
+   "latency_s": 12.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016572700000000002
+  },
+  {
+   "sent_s": 37.61,
+   "status": 200,
+   "latency_s": 7.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001408985
+  },
+  {
+   "sent_s": 39.93,
+   "status": 200,
+   "latency_s": 10.83,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0019650550000000003
+  },
+  {
+   "sent_s": 41.93,
+   "status": 200,
+   "latency_s": 9.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0014240000000000001
+  },
+  {
+   "sent_s": 46.14,
+   "status": 200,
+   "latency_s": 8.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001207535
+  },
+  {
+   "sent_s": 56.65,
+   "status": 200,
+   "latency_s": 10.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002368025
+  },
+  {
+   "sent_s": 57.47,
+   "status": 200,
+   "latency_s": 6.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001016345
+  },
+  {
+   "sent_s": 63.52,
+   "status": 200,
+   "latency_s": 12.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00221335
+  },
+  {
+   "sent_s": 69.04,
+   "status": 200,
+   "latency_s": 10.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0018242650000000003
+  },
+  {
+   "sent_s": 72.17,
+   "status": 200,
+   "latency_s": 6.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001153265
+  },
+  {
+   "sent_s": 74.85,
+   "status": 200,
+   "latency_s": 11.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00170253
+  },
+  {
+   "sent_s": 77.74,
+   "status": 200,
+   "latency_s": 7.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00107755
+  },
+  {
+   "sent_s": 79.64,
+   "status": 200,
+   "latency_s": 10.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002372315
+  },
+  {
+   "sent_s": 80.76,
+   "status": 200,
+   "latency_s": 5.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0007486350000000001
+  },
+  {
+   "sent_s": 81.09,
+   "status": 200,
+   "latency_s": 18.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.00335494
+  },
+  {
+   "sent_s": 85.05,
+   "status": 200,
+   "latency_s": 7.68,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00122359
+  },
+  {
+   "sent_s": 85.87,
+   "status": 200,
+   "latency_s": 8.74,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019266
+  },
+  {
+   "sent_s": 87.82,
+   "status": 200,
+   "latency_s": 18.25,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0028737850000000002
+  },
+  {
+   "sent_s": 89.38,
+   "status": 200,
+   "latency_s": 13.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002588295
+  },
+  {
+   "sent_s": 91.3,
+   "status": 200,
+   "latency_s": 12.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001928865
+  },
+  {
+   "sent_s": 91.42,
+   "status": 200,
+   "latency_s": 6.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001307615
+  },
+  {
+   "sent_s": 91.43,
+   "status": 200,
+   "latency_s": 12.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00190874
+  },
+  {
+   "sent_s": 91.94,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 97.14,
+   "status": 200,
+   "latency_s": 10.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00228393
+  },
+  {
+   "sent_s": 104.44,
+   "status": 200,
+   "latency_s": 13.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001884805
+  },
+  {
+   "sent_s": 109.89,
+   "status": 200,
+   "latency_s": 11.5,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014134500000000001
+  },
+  {
+   "sent_s": 115.73,
+   "status": 200,
+   "latency_s": 12.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00207789
+  },
+  {
+   "sent_s": 116.97,
+   "status": 200,
+   "latency_s": 13.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00210435
+  },
+  {
+   "sent_s": 119.47,
+   "status": 200,
+   "latency_s": 14.89,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002139995
+  },
+  {
+   "sent_s": 119.94,
+   "status": 200,
+   "latency_s": 7.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011886750000000001
+  },
+  {
+   "sent_s": 120.78,
+   "status": 200,
+   "latency_s": 12.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0020986500000000005
+  },
+  {
+   "sent_s": 124.71,
+   "status": 200,
+   "latency_s": 16.28,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00272593
+  },
+  {
+   "sent_s": 124.77,
+   "status": 200,
+   "latency_s": 7.88,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001305305
+  },
+  {
+   "sent_s": 124.85,
+   "status": 200,
+   "latency_s": 15.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0026630050000000004
+  },
+  {
+   "sent_s": 127.8,
+   "status": 200,
+   "latency_s": 9.61,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00210383
+  },
+  {
+   "sent_s": 129.24,
+   "status": 200,
+   "latency_s": 11.73,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0016598300000000002
+  },
+  {
+   "sent_s": 131.5,
+   "status": 200,
+   "latency_s": 7.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015059300000000002
+  },
+  {
+   "sent_s": 134.02,
+   "status": 200,
+   "latency_s": 17.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 10,
+   "cost_usd": 0.003928705
+  },
+  {
+   "sent_s": 134.12,
+   "status": 200,
+   "latency_s": 20.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0038251000000000005
+  },
+  {
+   "sent_s": 136.5,
+   "status": 200,
+   "latency_s": 10.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00169723
+  },
+  {
+   "sent_s": 139.32,
+   "status": 200,
+   "latency_s": 10.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016283299999999999
+  },
+  {
+   "sent_s": 139.79,
+   "status": 200,
+   "latency_s": 11.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00219207
+  },
+  {
+   "sent_s": 144.62,
+   "status": 200,
+   "latency_s": 11.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0018716100000000001
+  },
+  {
+   "sent_s": 147.13,
+   "status": 200,
+   "latency_s": 18.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 10,
+   "cost_usd": 0.0027400200000000006
+  },
+  {
+   "sent_s": 147.25,
+   "status": 200,
+   "latency_s": 8.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001339265
+  },
+  {
+   "sent_s": 150.7,
+   "status": 200,
+   "latency_s": 15.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00190532
+  },
+  {
+   "sent_s": 153.86,
+   "status": 200,
+   "latency_s": 11.57,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001556955
+  },
+  {
+   "sent_s": 154.02,
+   "status": 200,
+   "latency_s": 6.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009238600000000001
+  },
+  {
+   "sent_s": 155.57,
+   "status": 200,
+   "latency_s": 8.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00129343
+  },
+  {
+   "sent_s": 158.38,
+   "status": 200,
+   "latency_s": 13.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00273495
+  },
+  {
+   "sent_s": 160.93,
+   "status": 200,
+   "latency_s": 12.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0022459999999999997
+  },
+  {
+   "sent_s": 162.7,
+   "status": 200,
+   "latency_s": 18.31,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.003456435
+  },
+  {
+   "sent_s": 166.64,
+   "status": 200,
+   "latency_s": 7.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0017685900000000002
+  },
+  {
+   "sent_s": 168.19,
+   "status": 200,
+   "latency_s": 14.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00235818
+  },
+  {
+   "sent_s": 168.33,
+   "status": 200,
+   "latency_s": 5.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009808450000000002
+  },
+  {
+   "sent_s": 173.17,
+   "status": 200,
+   "latency_s": 6.57,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00126441
+  },
+  {
+   "sent_s": 174.11,
+   "status": 200,
+   "latency_s": 7.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00085587
+  },
+  {
+   "sent_s": 175.6,
+   "status": 200,
+   "latency_s": 12.48,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002349655
+  },
+  {
+   "sent_s": 177.0,
+   "status": 200,
+   "latency_s": 15.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002066205
+  },
+  {
+   "sent_s": 178.93,
+   "status": 200,
+   "latency_s": 21.43,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0036161500000000003
+  },
+  {
+   "sent_s": 182.63,
+   "status": 200,
+   "latency_s": 5.95,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001191435
+  },
+  {
+   "sent_s": 185.53,
+   "status": 200,
+   "latency_s": 8.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012644450000000001
+  },
+  {
+   "sent_s": 185.72,
+   "status": 200,
+   "latency_s": 14.16,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00257331
+  },
+  {
+   "sent_s": 192.86,
+   "status": 200,
+   "latency_s": 25.83,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 11,
+   "cost_usd": 0.00463109
+  },
+  {
+   "sent_s": 193.26,
+   "status": 200,
+   "latency_s": 10.21,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016741000000000002
+  },
+  {
+   "sent_s": 196.8,
+   "status": 200,
+   "latency_s": 7.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001179995
+  },
+  {
+   "sent_s": 198.25,
+   "status": 200,
+   "latency_s": 11.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00175519
+  },
+  {
+   "sent_s": 200.77,
+   "status": 200,
+   "latency_s": 11.64,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0028295900000000003
+  },
+  {
+   "sent_s": 206.24,
+   "status": 200,
+   "latency_s": 9.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001833965
+  },
+  {
+   "sent_s": 208.66,
+   "status": 200,
+   "latency_s": 8.36,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001278325
+  },
+  {
+   "sent_s": 209.75,
+   "status": 200,
+   "latency_s": 7.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001102745
+  },
+  {
+   "sent_s": 212.88,
+   "status": 200,
+   "latency_s": 10.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00138786
+  },
+  {
+   "sent_s": 213.18,
+   "status": 200,
+   "latency_s": 11.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.002019915
+  },
+  {
+   "sent_s": 213.98,
+   "status": 200,
+   "latency_s": 6.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00102815
+  },
+  {
+   "sent_s": 214.75,
+   "status": 200,
+   "latency_s": 7.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00121558
+  },
+  {
+   "sent_s": 216.86,
+   "status": 200,
+   "latency_s": 11.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001224725
+  },
+  {
+   "sent_s": 219.77,
+   "status": 200,
+   "latency_s": 18.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00268144
+  },
+  {
+   "sent_s": 221.58,
+   "status": 200,
+   "latency_s": 17.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002971535
+  },
+  {
+   "sent_s": 221.91,
+   "status": 200,
+   "latency_s": 12.47,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019486450000000002
+  },
+  {
+   "sent_s": 223.57,
+   "status": 200,
+   "latency_s": 8.4,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013218700000000002
+  },
+  {
+   "sent_s": 225.9,
+   "status": 200,
+   "latency_s": 6.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00141328
+  },
+  {
+   "sent_s": 225.95,
+   "status": 200,
+   "latency_s": 15.74,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.003315035
+  },
+  {
+   "sent_s": 232.29,
+   "status": 200,
+   "latency_s": 8.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001385195
+  },
+  {
+   "sent_s": 233.16,
+   "status": 200,
+   "latency_s": 7.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00117568
+  },
+  {
+   "sent_s": 233.25,
+   "status": 200,
+   "latency_s": 8.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001359525
+  },
+  {
+   "sent_s": 235.93,
+   "status": 200,
+   "latency_s": 9.43,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0011526449999999999
+  },
+  {
+   "sent_s": 236.41,
+   "status": 200,
+   "latency_s": 6.56,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000884325
+  },
+  {
+   "sent_s": 236.67,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 237.99,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 238.16,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 242.05,
+   "status": 200,
+   "latency_s": 7.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00127654
+  },
+  {
+   "sent_s": 242.48,
+   "status": 200,
+   "latency_s": 20.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00253987
+  },
+  {
+   "sent_s": 243.21,
+   "status": 200,
+   "latency_s": 8.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001688075
+  },
+  {
+   "sent_s": 243.82,
+   "status": 200,
+   "latency_s": 11.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00195465
+  },
+  {
+   "sent_s": 249.06,
+   "status": 200,
+   "latency_s": 7.18,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014371450000000001
+  },
+  {
+   "sent_s": 249.64,
+   "status": 200,
+   "latency_s": 7.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0012649
+  },
+  {
+   "sent_s": 253.08,
+   "status": 200,
+   "latency_s": 8.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001171345
+  },
+  {
+   "sent_s": 253.23,
+   "status": 200,
+   "latency_s": 4.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008000100000000001
+  },
+  {
+   "sent_s": 258.72,
+   "status": 200,
+   "latency_s": 4.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008678500000000001
+  },
+  {
+   "sent_s": 263.24,
+   "status": 200,
+   "latency_s": 10.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0019097600000000004
+  },
+  {
+   "sent_s": 266.65,
+   "status": 200,
+   "latency_s": 14.21,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002240565
+  },
+  {
+   "sent_s": 270.72,
+   "status": 200,
+   "latency_s": 9.88,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.002118325
+  },
+  {
+   "sent_s": 270.94,
+   "status": 200,
+   "latency_s": 10.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.001912435
+  },
+  {
+   "sent_s": 277.22,
+   "status": 200,
+   "latency_s": 13.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002087425
+  },
+  {
+   "sent_s": 277.86,
+   "status": 200,
+   "latency_s": 15.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.00296383
+  },
+  {
+   "sent_s": 285.24,
+   "status": 200,
+   "latency_s": 9.6,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0020657
+  },
+  {
+   "sent_s": 288.88,
+   "status": 200,
+   "latency_s": 9.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001316705
+  },
+  {
+   "sent_s": 289.93,
+   "status": 200,
+   "latency_s": 8.82,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00114929
+  },
+  {
+   "sent_s": 290.37,
+   "status": 200,
+   "latency_s": 8.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010092450000000002
+  },
+  {
+   "sent_s": 290.45,
+   "status": 200,
+   "latency_s": 8.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001131165
+  },
+  {
+   "sent_s": 290.51,
+   "status": 200,
+   "latency_s": 7.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00085341
+  },
+  {
+   "sent_s": 291.27,
+   "status": 200,
+   "latency_s": 6.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008821650000000001
+  },
+  {
+   "sent_s": 292.02,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 295.79,
+   "status": 200,
+   "latency_s": 10.01,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00107388
+  },
+  {
+   "sent_s": 297.44,
+   "status": 200,
+   "latency_s": 11.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0026910700000000003
+  },
+  {
+   "sent_s": 297.7,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 300.11,
+   "status": 200,
+   "latency_s": 16.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0032551299999999997
+  },
+  {
+   "sent_s": 301.32,
+   "status": 200,
+   "latency_s": 11.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0024761900000000005
+  },
+  {
+   "sent_s": 303.88,
+   "status": 200,
+   "latency_s": 17.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0033446350000000003
+  },
+  {
+   "sent_s": 306.0,
+   "status": 200,
+   "latency_s": 5.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001065345
+  },
+  {
+   "sent_s": 313.95,
+   "status": 200,
+   "latency_s": 7.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0011276
+  },
+  {
+   "sent_s": 314.36,
+   "status": 200,
+   "latency_s": 7.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0015091750000000002
+  },
+  {
+   "sent_s": 315.98,
+   "status": 200,
+   "latency_s": 14.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0026841900000000004
+  },
+  {
+   "sent_s": 317.75,
+   "status": 200,
+   "latency_s": 8.81,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014460200000000001
+  },
+  {
+   "sent_s": 320.18,
+   "status": 200,
+   "latency_s": 10.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015784150000000001
+  },
+  {
+   "sent_s": 320.48,
+   "status": 200,
+   "latency_s": 10.48,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0013984750000000002
+  },
+  {
+   "sent_s": 321.85,
+   "status": 200,
+   "latency_s": 8.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001205905
+  },
+  {
+   "sent_s": 323.2,
+   "status": 200,
+   "latency_s": 6.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00099984
+  },
+  {
+   "sent_s": 328.59,
+   "status": 200,
+   "latency_s": 8.47,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00132532
+  },
+  {
+   "sent_s": 331.67,
+   "status": 200,
+   "latency_s": 6.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001321155
+  },
+  {
+   "sent_s": 333.52,
+   "status": 200,
+   "latency_s": 8.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00147746
+  },
+  {
+   "sent_s": 335.16,
+   "status": 200,
+   "latency_s": 13.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0018800099999999999
+  },
+  {
+   "sent_s": 336.16,
+   "status": 200,
+   "latency_s": 14.39,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0032876750000000003
+  },
+  {
+   "sent_s": 336.38,
+   "status": 200,
+   "latency_s": 9.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001216515
+  },
+  {
+   "sent_s": 339.73,
+   "status": 200,
+   "latency_s": 9.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015384349999999999
+  },
+  {
+   "sent_s": 341.69,
+   "status": 200,
+   "latency_s": 22.1,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.002790135
+  },
+  {
+   "sent_s": 341.89,
+   "status": 200,
+   "latency_s": 21.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0035230900000000004
+  },
+  {
+   "sent_s": 344.67,
+   "status": 200,
+   "latency_s": 11.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019545300000000003
+  },
+  {
+   "sent_s": 347.26,
+   "status": 200,
+   "latency_s": 12.45,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00264494
+  },
+  {
+   "sent_s": 349.62,
+   "status": 200,
+   "latency_s": 13.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00224653
+  },
+  {
+   "sent_s": 352.06,
+   "status": 200,
+   "latency_s": 17.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0033187950000000003
+  },
+  {
+   "sent_s": 353.31,
+   "status": 200,
+   "latency_s": 9.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001391875
+  },
+  {
+   "sent_s": 355.32,
+   "status": 200,
+   "latency_s": 13.88,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00224061
+  },
+  {
+   "sent_s": 357.59,
+   "status": 200,
+   "latency_s": 11.12,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001959915
+  },
+  {
+   "sent_s": 359.82,
+   "status": 200,
+   "latency_s": 9.22,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010307250000000001
+  },
+  {
+   "sent_s": 364.53,
+   "status": 200,
+   "latency_s": 10.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0017978400000000002
+  },
+  {
+   "sent_s": 365.42,
+   "status": 200,
+   "latency_s": 5.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00093074
+  },
+  {
+   "sent_s": 365.48,
+   "status": 200,
+   "latency_s": 15.63,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002243685
+  },
+  {
+   "sent_s": 365.51,
+   "status": 200,
+   "latency_s": 12.52,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0013148
+  },
+  {
+   "sent_s": 370.7,
+   "status": 200,
+   "latency_s": 17.23,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0032020600000000005
+  },
+  {
+   "sent_s": 373.08,
+   "status": 200,
+   "latency_s": 10.12,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016766800000000003
+  },
+  {
+   "sent_s": 374.82,
+   "status": 200,
+   "latency_s": 16.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0034432300000000002
+  },
+  {
+   "sent_s": 375.48,
+   "status": 200,
+   "latency_s": 6.96,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001174485
+  },
+  {
+   "sent_s": 380.5,
+   "status": 200,
+   "latency_s": 7.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00118205
+  },
+  {
+   "sent_s": 382.82,
+   "status": 200,
+   "latency_s": 10.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00185002
+  },
+  {
+   "sent_s": 383.77,
+   "status": 200,
+   "latency_s": 8.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00143873
+  },
+  {
+   "sent_s": 384.24,
+   "status": 200,
+   "latency_s": 9.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0018069000000000002
+  },
+  {
+   "sent_s": 389.03,
+   "status": 200,
+   "latency_s": 8.49,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012149
+  },
+  {
+   "sent_s": 389.39,
+   "status": 200,
+   "latency_s": 6.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000742855
+  },
+  {
+   "sent_s": 394.87,
+   "status": 200,
+   "latency_s": 7.92,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013580100000000002
+  },
+  {
+   "sent_s": 395.26,
+   "status": 200,
+   "latency_s": 8.41,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011681999999999999
+  },
+  {
+   "sent_s": 395.64,
+   "status": 200,
+   "latency_s": 6.5,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008429150000000001
+  },
+  {
+   "sent_s": 399.13,
+   "status": 200,
+   "latency_s": 13.13,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00204996
+  },
+  {
+   "sent_s": 400.46,
+   "status": 200,
+   "latency_s": 11.24,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001618455
+  },
+  {
+   "sent_s": 401.32,
+   "status": 200,
+   "latency_s": 8.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00117382
+  },
+  {
+   "sent_s": 402.96,
+   "status": 200,
+   "latency_s": 9.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002110885
+  },
+  {
+   "sent_s": 408.43,
+   "status": 200,
+   "latency_s": 5.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010316000000000001
+  },
+  {
+   "sent_s": 409.63,
+   "status": 200,
+   "latency_s": 20.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0031114800000000002
+  },
+  {
+   "sent_s": 411.67,
+   "status": 200,
+   "latency_s": 14.2,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00206692
+  },
+  {
+   "sent_s": 412.49,
+   "status": 200,
+   "latency_s": 13.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00209162
+  },
+  {
+   "sent_s": 415.36,
+   "status": 200,
+   "latency_s": 12.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001938385
+  },
+  {
+   "sent_s": 418.43,
+   "status": 200,
+   "latency_s": 12.27,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014489000000000001
+  },
+  {
+   "sent_s": 418.68,
+   "status": 200,
+   "latency_s": 15.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00165638
+  },
+  {
+   "sent_s": 418.77,
+   "status": 200,
+   "latency_s": 10.19,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009774850000000002
+  },
+  {
+   "sent_s": 419.59,
+   "status": 200,
+   "latency_s": 17.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00249342
+  },
+  {
+   "sent_s": 419.71,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 420.91,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 421.45,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 422.07,
+   "status": 200,
+   "latency_s": 8.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000943665
+  },
+  {
+   "sent_s": 426.69,
+   "status": 200,
+   "latency_s": 11.48,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002142935
+  },
+  {
+   "sent_s": 428.29,
+   "status": 200,
+   "latency_s": 12.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0027870100000000004
+  },
+  {
+   "sent_s": 430.28,
+   "status": 200,
+   "latency_s": 11.52,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00162086
+  },
+  {
+   "sent_s": 432.3,
+   "status": 200,
+   "latency_s": 14.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002211705
+  },
+  {
+   "sent_s": 435.24,
+   "status": 200,
+   "latency_s": 21.39,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.004272805
+  },
+  {
+   "sent_s": 435.54,
+   "status": 200,
+   "latency_s": 8.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00167038
+  },
+  {
+   "sent_s": 435.81,
+   "status": 200,
+   "latency_s": 10.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00212876
+  },
+  {
+   "sent_s": 437.58,
+   "status": 200,
+   "latency_s": 19.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.003167315
+  },
+  {
+   "sent_s": 438.05,
+   "status": 200,
+   "latency_s": 15.61,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002850455
+  },
+  {
+   "sent_s": 438.83,
+   "status": 429,
+   "latency_s": 0.06,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 439.59,
+   "status": 429,
+   "latency_s": 0.05,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 442.5,
+   "status": 200,
+   "latency_s": 9.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001262115
+  },
+  {
+   "sent_s": 443.8,
+   "status": 200,
+   "latency_s": 10.84,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001881075
+  },
+  {
+   "sent_s": 447.9,
+   "status": 200,
+   "latency_s": 17.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0031607600000000003
+  },
+  {
+   "sent_s": 449.34,
+   "status": 200,
+   "latency_s": 10.19,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001937415
+  },
+  {
+   "sent_s": 450.61,
+   "status": 200,
+   "latency_s": 16.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0024625750000000007
+  },
+  {
+   "sent_s": 453.52,
+   "status": 200,
+   "latency_s": 13.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0025738000000000002
+  },
+  {
+   "sent_s": 454.81,
+   "status": 200,
+   "latency_s": 11.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001932845
+  },
+  {
+   "sent_s": 456.15,
+   "status": 200,
+   "latency_s": 13.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0021321149999999995
+  },
+  {
+   "sent_s": 457.53,
+   "status": 200,
+   "latency_s": 17.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0025578800000000002
+  },
+  {
+   "sent_s": 459.07,
+   "status": 200,
+   "latency_s": 9.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00190263
+  },
+  {
+   "sent_s": 459.26,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 462.41,
+   "status": 200,
+   "latency_s": 10.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0020766
+  },
+  {
+   "sent_s": 463.49,
+   "status": 429,
+   "latency_s": 0.15,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 465.27,
+   "status": 200,
+   "latency_s": 8.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014928250000000001
+  },
+  {
+   "sent_s": 468.92,
+   "status": 200,
+   "latency_s": 15.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.002514755
+  },
+  {
+   "sent_s": 473.1,
+   "status": 200,
+   "latency_s": 12.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00293613
+  },
+  {
+   "sent_s": 473.21,
+   "status": 200,
+   "latency_s": 7.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001249175
+  },
+  {
+   "sent_s": 476.38,
+   "status": 200,
+   "latency_s": 11.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0015894
+  },
+  {
+   "sent_s": 477.52,
+   "status": 200,
+   "latency_s": 13.57,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0022652650000000002
+  },
+  {
+   "sent_s": 478.25,
+   "status": 200,
+   "latency_s": 6.11,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001039995
+  },
+  {
+   "sent_s": 481.01,
+   "status": 200,
+   "latency_s": 6.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008510950000000001
+  },
+  {
+   "sent_s": 482.76,
+   "status": 200,
+   "latency_s": 9.94,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014814750000000001
+  },
+  {
+   "sent_s": 483.15,
+   "status": 200,
+   "latency_s": 9.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016674150000000002
+  },
+  {
+   "sent_s": 483.59,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 483.9,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 486.84,
+   "status": 200,
+   "latency_s": 10.09,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001291975
+  },
+  {
+   "sent_s": 488.11,
+   "status": 200,
+   "latency_s": 19.61,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0032324800000000002
+  },
+  {
+   "sent_s": 488.7,
+   "status": 200,
+   "latency_s": 10.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001314005
+  },
+  {
+   "sent_s": 491.7,
+   "status": 200,
+   "latency_s": 6.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009128600000000001
+  },
+  {
+   "sent_s": 491.86,
+   "status": 200,
+   "latency_s": 8.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013436200000000002
+  },
+  {
+   "sent_s": 493.05,
+   "status": 200,
+   "latency_s": 10.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00182796
+  },
+  {
+   "sent_s": 495.4,
+   "status": 200,
+   "latency_s": 8.79,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00189284
+  },
+  {
+   "sent_s": 496.46,
+   "status": 200,
+   "latency_s": 14.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002444705
+  },
+  {
+   "sent_s": 496.51,
+   "status": 200,
+   "latency_s": 19.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001888315
+  },
+  {
+   "sent_s": 501.41,
+   "status": 200,
+   "latency_s": 10.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015812900000000002
+  },
+  {
+   "sent_s": 502.09,
+   "status": 200,
+   "latency_s": 6.02,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000857945
+  },
+  {
+   "sent_s": 503.37,
+   "status": 200,
+   "latency_s": 8.57,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0011356550000000002
+  },
+  {
+   "sent_s": 503.48,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 504.74,
+   "status": 200,
+   "latency_s": 13.57,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00237257
+  },
+  {
+   "sent_s": 506.65,
+   "status": 200,
+   "latency_s": 6.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00117126
+  },
+  {
+   "sent_s": 508.81,
+   "status": 200,
+   "latency_s": 5.18,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00101539
+  },
+  {
+   "sent_s": 510.2,
+   "status": 200,
+   "latency_s": 16.37,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00308822
+  },
+  {
+   "sent_s": 511.93,
+   "status": 200,
+   "latency_s": 21.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00300047
+  },
+  {
+   "sent_s": 512.43,
+   "status": 200,
+   "latency_s": 8.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0017828000000000002
+  },
+  {
+   "sent_s": 516.32,
+   "status": 200,
+   "latency_s": 9.16,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00161767
+  },
+  {
+   "sent_s": 518.83,
+   "status": 200,
+   "latency_s": 18.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0026644750000000004
+  },
+  {
+   "sent_s": 525.82,
+   "status": 200,
+   "latency_s": 10.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 9,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0017240649999999999
+  },
+  {
+   "sent_s": 526.19,
+   "status": 200,
+   "latency_s": 17.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.00368579
+  },
+  {
+   "sent_s": 527.31,
+   "status": 200,
+   "latency_s": 16.51,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00221361
+  },
+  {
+   "sent_s": 534.42,
+   "status": 200,
+   "latency_s": 12.59,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00221386
+  },
+  {
+   "sent_s": 535.85,
+   "status": 200,
+   "latency_s": 10.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001831545
+  },
+  {
+   "sent_s": 535.93,
+   "status": 200,
+   "latency_s": 18.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.003386405
+  },
+  {
+   "sent_s": 536.83,
+   "status": 200,
+   "latency_s": 16.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0036497
+  },
+  {
+   "sent_s": 537.93,
+   "status": 200,
+   "latency_s": 10.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0023828250000000003
+  },
+  {
+   "sent_s": 543.98,
+   "status": 200,
+   "latency_s": 14.24,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002026405
+  },
+  {
+   "sent_s": 544.19,
+   "status": 200,
+   "latency_s": 5.08,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000897875
+  },
+  {
+   "sent_s": 544.4,
+   "status": 200,
+   "latency_s": 13.01,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 12,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.002162275
+  },
+  {
+   "sent_s": 548.24,
+   "status": 200,
+   "latency_s": 5.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009181150000000002
+  },
+  {
+   "sent_s": 548.87,
+   "status": 200,
+   "latency_s": 16.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00324774
+  },
+  {
+   "sent_s": 550.41,
+   "status": 200,
+   "latency_s": 17.99,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0032463350000000004
+  },
+  {
+   "sent_s": 550.61,
+   "status": 200,
+   "latency_s": 22.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 10,
+   "cost_usd": 0.0038850650000000005
+  },
+  {
+   "sent_s": 555.0,
+   "status": 200,
+   "latency_s": 5.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000769095
+  },
+  {
+   "sent_s": 555.32,
+   "status": 200,
+   "latency_s": 16.13,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00252475
+  },
+  {
+   "sent_s": 555.4,
+   "status": 200,
+   "latency_s": 21.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.003941535
+  },
+  {
+   "sent_s": 556.23,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 556.28,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 562.49,
+   "status": 200,
+   "latency_s": 7.5,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00091408
+  },
+  {
+   "sent_s": 563.08,
+   "status": 200,
+   "latency_s": 7.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001263295
+  },
+  {
+   "sent_s": 563.8,
+   "status": 200,
+   "latency_s": 9.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015806550000000003
+  },
+  {
+   "sent_s": 563.9,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 566.63,
+   "status": 200,
+   "latency_s": 11.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00174436
+  },
+  {
+   "sent_s": 570.16,
+   "status": 200,
+   "latency_s": 10.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001892715
+  },
+  {
+   "sent_s": 570.72,
+   "status": 200,
+   "latency_s": 18.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00263841
+  },
+  {
+   "sent_s": 571.16,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 571.16,
+   "status": 200,
+   "latency_s": 12.21,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002096605
+  },
+  {
+   "sent_s": 571.57,
+   "status": 200,
+   "latency_s": 13.83,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0024123850000000004
+  },
+  {
+   "sent_s": 571.7,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 575.03,
+   "status": 200,
+   "latency_s": 7.34,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0013607
+  },
+  {
+   "sent_s": 575.55,
+   "status": 200,
+   "latency_s": 7.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00174874
+  },
+  {
+   "sent_s": 578.6,
+   "status": 200,
+   "latency_s": 17.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.00346248
+  },
+  {
+   "sent_s": 582.11,
+   "status": 200,
+   "latency_s": 5.66,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0005437199999999999
+  },
+  {
+   "sent_s": 583.01,
+   "status": 200,
+   "latency_s": 18.2,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0023778000000000002
+  },
+  {
+   "sent_s": 583.45,
+   "status": 200,
+   "latency_s": 11.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0018078249999999999
+  },
+  {
+   "sent_s": 584.26,
+   "status": 200,
+   "latency_s": 10.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0013738
+  },
+  {
+   "sent_s": 584.97,
+   "status": 200,
+   "latency_s": 19.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00310172
+  },
+  {
+   "sent_s": 589.26,
+   "status": 200,
+   "latency_s": 12.9,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001939835
+  },
+  {
+   "sent_s": 589.87,
+   "status": 200,
+   "latency_s": 28.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0056549849999999995
+  },
+  {
+   "sent_s": 591.85,
+   "status": 200,
+   "latency_s": 7.23,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00141382
+  },
+  {
+   "sent_s": 593.23,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 594.09,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 595.9,
+   "status": 200,
+   "latency_s": 11.04,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001321915
+  },
+  {
+   "sent_s": 600.36,
+   "status": 200,
+   "latency_s": 14.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001405085
+  },
+  {
+   "sent_s": 602.8,
+   "status": 200,
+   "latency_s": 11.77,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0018378500000000002
+  },
+  {
+   "sent_s": 614.6,
+   "status": 200,
+   "latency_s": 10.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0020334949999999997
+  },
+  {
+   "sent_s": 616.02,
+   "status": 200,
+   "latency_s": 13.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0023187000000000004
+  },
+  {
+   "sent_s": 616.54,
+   "status": 200,
+   "latency_s": 17.92,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0015499149999999998
+  },
+  {
+   "sent_s": 616.68,
+   "status": 200,
+   "latency_s": 13.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0023545050000000002
+  },
+  {
+   "sent_s": 617.07,
+   "status": 200,
+   "latency_s": 7.76,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00126844
+  },
+  {
+   "sent_s": 617.26,
+   "status": 200,
+   "latency_s": 8.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001231695
+  },
+  {
+   "sent_s": 617.66,
+   "status": 200,
+   "latency_s": 6.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00104008
+  },
+  {
+   "sent_s": 625.97,
+   "status": 200,
+   "latency_s": 12.65,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.002053095
+  },
+  {
+   "sent_s": 626.53,
+   "status": 200,
+   "latency_s": 14.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00201805
+  },
+  {
+   "sent_s": 629.3,
+   "status": 200,
+   "latency_s": 5.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0007260900000000001
+  },
+  {
+   "sent_s": 630.76,
+   "status": 200,
+   "latency_s": 6.56,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011527
+  },
+  {
+   "sent_s": 631.74,
+   "status": 200,
+   "latency_s": 8.26,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001387265
+  },
+  {
+   "sent_s": 635.88,
+   "status": 200,
+   "latency_s": 6.68,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011978050000000001
+  },
+  {
+   "sent_s": 641.23,
+   "status": 200,
+   "latency_s": 10.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00157531
+  },
+  {
+   "sent_s": 645.28,
+   "status": 200,
+   "latency_s": 14.34,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001653595
+  },
+  {
+   "sent_s": 648.66,
+   "status": 200,
+   "latency_s": 17.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0023835950000000005
+  },
+  {
+   "sent_s": 651.45,
+   "status": 200,
+   "latency_s": 11.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0020103150000000004
+  },
+  {
+   "sent_s": 659.61,
+   "status": 200,
+   "latency_s": 11.97,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0017546150000000002
+  },
+  {
+   "sent_s": 660.77,
+   "status": 200,
+   "latency_s": 7.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00056569
+  },
+  {
+   "sent_s": 668.16,
+   "status": 200,
+   "latency_s": 8.61,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.000875265
+  },
+  {
+   "sent_s": 668.43,
+   "status": 200,
+   "latency_s": 6.43,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0012900950000000002
+  },
+  {
+   "sent_s": 672.65,
+   "status": 200,
+   "latency_s": 16.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0028062950000000003
+  },
+  {
+   "sent_s": 677.0,
+   "status": 200,
+   "latency_s": 13.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002475865
+  },
+  {
+   "sent_s": 678.87,
+   "status": 200,
+   "latency_s": 7.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012822850000000002
+  },
+  {
+   "sent_s": 680.27,
+   "status": 200,
+   "latency_s": 8.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0017326000000000002
+  },
+  {
+   "sent_s": 680.99,
+   "status": 200,
+   "latency_s": 8.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001344525
+  },
+  {
+   "sent_s": 682.29,
+   "status": 200,
+   "latency_s": 11.03,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00157364
+  },
+  {
+   "sent_s": 682.65,
+   "status": 200,
+   "latency_s": 9.61,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00121644
+  },
+  {
+   "sent_s": 688.83,
+   "status": 200,
+   "latency_s": 10.93,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00174151
+  },
+  {
+   "sent_s": 689.82,
+   "status": 200,
+   "latency_s": 10.09,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001598295
+  },
+  {
+   "sent_s": 690.85,
+   "status": 200,
+   "latency_s": 7.96,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011651600000000002
+  },
+  {
+   "sent_s": 691.84,
+   "status": 200,
+   "latency_s": 14.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00231647
+  },
+  {
+   "sent_s": 694.98,
+   "status": 200,
+   "latency_s": 7.92,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014633900000000002
+  },
+  {
+   "sent_s": 696.4,
+   "status": 200,
+   "latency_s": 6.48,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0013121950000000002
+  },
+  {
+   "sent_s": 696.99,
+   "status": 200,
+   "latency_s": 13.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002275005
+  },
+  {
+   "sent_s": 698.92,
+   "status": 200,
+   "latency_s": 10.18,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013567050000000002
+  },
+  {
+   "sent_s": 707.75,
+   "status": 200,
+   "latency_s": 11.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0021897699999999997
+  },
+  {
+   "sent_s": 707.97,
+   "status": 200,
+   "latency_s": 10.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001211575
+  },
+  {
+   "sent_s": 712.09,
+   "status": 200,
+   "latency_s": 12.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016376750000000001
+  },
+  {
+   "sent_s": 713.23,
+   "status": 200,
+   "latency_s": 10.09,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015985550000000002
+  },
+  {
+   "sent_s": 725.54,
+   "status": 200,
+   "latency_s": 8.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001387385
+  },
+  {
+   "sent_s": 726.97,
+   "status": 200,
+   "latency_s": 14.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0021720100000000003
+  },
+  {
+   "sent_s": 728.84,
+   "status": 200,
+   "latency_s": 8.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00085104
+  },
+  {
+   "sent_s": 729.9,
+   "status": 200,
+   "latency_s": 14.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0021271700000000003
+  },
+  {
+   "sent_s": 734.03,
+   "status": 200,
+   "latency_s": 20.86,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0030761700000000005
+  },
+  {
+   "sent_s": 734.25,
+   "status": 200,
+   "latency_s": 11.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0018713600000000003
+  },
+  {
+   "sent_s": 735.51,
+   "status": 200,
+   "latency_s": 5.87,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00076723
+  },
+  {
+   "sent_s": 737.97,
+   "status": 200,
+   "latency_s": 16.91,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.003093665
+  },
+  {
+   "sent_s": 743.66,
+   "status": 200,
+   "latency_s": 12.38,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0019280349999999998
+  },
+  {
+   "sent_s": 746.3,
+   "status": 200,
+   "latency_s": 7.4,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011332550000000001
+  },
+  {
+   "sent_s": 746.3,
+   "status": 200,
+   "latency_s": 10.15,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0013418050000000002
+  },
+  {
+   "sent_s": 747.71,
+   "status": 200,
+   "latency_s": 16.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00213923
+  },
+  {
+   "sent_s": 747.93,
+   "status": 200,
+   "latency_s": 9.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016808399999999999
+  },
+  {
+   "sent_s": 751.62,
+   "status": 200,
+   "latency_s": 6.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000906035
+  },
+  {
+   "sent_s": 751.68,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 756.94,
+   "status": 200,
+   "latency_s": 13.5,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0013808800000000001
+  },
+  {
+   "sent_s": 758.05,
+   "status": 200,
+   "latency_s": 6.09,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000700045
+  },
+  {
+   "sent_s": 765.29,
+   "status": 200,
+   "latency_s": 8.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001596675
+  },
+  {
+   "sent_s": 770.33,
+   "status": 200,
+   "latency_s": 10.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00117111
+  },
+  {
+   "sent_s": 772.35,
+   "status": 200,
+   "latency_s": 13.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00245669
+  },
+  {
+   "sent_s": 773.59,
+   "status": 200,
+   "latency_s": 9.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0020264650000000003
+  },
+  {
+   "sent_s": 777.76,
+   "status": 200,
+   "latency_s": 13.49,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016241150000000002
+  },
+  {
+   "sent_s": 782.13,
+   "status": 200,
+   "latency_s": 21.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0030242850000000003
+  },
+  {
+   "sent_s": 782.3,
+   "status": 200,
+   "latency_s": 8.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001028465
+  },
+  {
+   "sent_s": 783.06,
+   "status": 200,
+   "latency_s": 14.91,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.003149715
+  },
+  {
+   "sent_s": 786.34,
+   "status": 200,
+   "latency_s": 6.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000852455
+  },
+  {
+   "sent_s": 786.54,
+   "status": 200,
+   "latency_s": 13.37,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00248202
+  },
+  {
+   "sent_s": 791.31,
+   "status": 200,
+   "latency_s": 15.52,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002446915
+  },
+  {
+   "sent_s": 792.43,
+   "status": 200,
+   "latency_s": 16.13,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002558425
+  },
+  {
+   "sent_s": 796.29,
+   "status": 200,
+   "latency_s": 10.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00148519
+  },
+  {
+   "sent_s": 802.49,
+   "status": 200,
+   "latency_s": 11.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002419745
+  },
+  {
+   "sent_s": 803.09,
+   "status": 200,
+   "latency_s": 16.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0028791800000000003
+  },
+  {
+   "sent_s": 803.37,
+   "status": 200,
+   "latency_s": 6.72,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011404
+  },
+  {
+   "sent_s": 808.38,
+   "status": 200,
+   "latency_s": 6.13,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001100925
+  },
+  {
+   "sent_s": 810.32,
+   "status": 200,
+   "latency_s": 7.4,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00118636
+  },
+  {
+   "sent_s": 810.76,
+   "status": 200,
+   "latency_s": 7.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00111854
+  },
+  {
+   "sent_s": 811.07,
+   "status": 200,
+   "latency_s": 9.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00142273
+  },
+  {
+   "sent_s": 814.34,
+   "status": 200,
+   "latency_s": 14.13,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0023298399999999997
+  },
+  {
+   "sent_s": 815.44,
+   "status": 200,
+   "latency_s": 22.45,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.004117434999999999
+  },
+  {
+   "sent_s": 818.52,
+   "status": 200,
+   "latency_s": 4.86,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00102428
+  },
+  {
+   "sent_s": 822.22,
+   "status": 200,
+   "latency_s": 21.03,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002037535
+  },
+  {
+   "sent_s": 826.87,
+   "status": 200,
+   "latency_s": 4.22,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009137650000000001
+  },
+  {
+   "sent_s": 829.1,
+   "status": 200,
+   "latency_s": 17.29,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002998245
+  },
+  {
+   "sent_s": 832.49,
+   "status": 200,
+   "latency_s": 10.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0019463800000000002
+  },
+  {
+   "sent_s": 840.08,
+   "status": 200,
+   "latency_s": 13.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00217713
+  },
+  {
+   "sent_s": 840.93,
+   "status": 200,
+   "latency_s": 8.97,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001923285
+  },
+  {
+   "sent_s": 841.06,
+   "status": 200,
+   "latency_s": 10.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00172193
+  },
+  {
+   "sent_s": 843.22,
+   "status": 200,
+   "latency_s": 5.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0007339
+  },
+  {
+   "sent_s": 845.07,
+   "status": 200,
+   "latency_s": 5.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00105602
+  },
+  {
+   "sent_s": 845.71,
+   "status": 200,
+   "latency_s": 15.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002000935
+  },
+  {
+   "sent_s": 856.97,
+   "status": 200,
+   "latency_s": 5.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001036725
+  },
+  {
+   "sent_s": 857.88,
+   "status": 200,
+   "latency_s": 24.35,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.003940125
+  },
+  {
+   "sent_s": 858.2,
+   "status": 200,
+   "latency_s": 7.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00097838
+  },
+  {
+   "sent_s": 858.26,
+   "status": 200,
+   "latency_s": 13.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016454500000000001
+  },
+  {
+   "sent_s": 859.03,
+   "status": 200,
+   "latency_s": 12.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001749525
+  },
+  {
+   "sent_s": 859.46,
+   "status": 200,
+   "latency_s": 9.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00150655
+  },
+  {
+   "sent_s": 861.46,
+   "status": 200,
+   "latency_s": 8.73,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016758650000000001
+  },
+  {
+   "sent_s": 863.31,
+   "status": 200,
+   "latency_s": 16.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.0039488100000000005
+  },
+  {
+   "sent_s": 864.7,
+   "status": 200,
+   "latency_s": 9.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.002292775
+  },
+  {
+   "sent_s": 865.7,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 865.91,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 879.5,
+   "status": 200,
+   "latency_s": 6.85,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001298985
+  },
+  {
+   "sent_s": 882.88,
+   "status": 200,
+   "latency_s": 15.27,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0029880999999999996
+  },
+  {
+   "sent_s": 883.45,
+   "status": 200,
+   "latency_s": 4.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008718500000000001
+  },
+  {
+   "sent_s": 883.9,
+   "status": 200,
+   "latency_s": 5.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000990725
+  },
+  {
+   "sent_s": 884.65,
+   "status": 200,
+   "latency_s": 7.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001311825
+  },
+  {
+   "sent_s": 885.58,
+   "status": 200,
+   "latency_s": 13.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0023990500000000002
+  },
+  {
+   "sent_s": 886.43,
+   "status": 200,
+   "latency_s": 11.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0020558900000000003
+  },
+  {
+   "sent_s": 888.03,
+   "status": 200,
+   "latency_s": 9.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001709425
+  },
+  {
+   "sent_s": 891.53,
+   "status": 200,
+   "latency_s": 8.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001308785
+  },
+  {
+   "sent_s": 892.78,
+   "status": 200,
+   "latency_s": 27.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 12,
+   "cost_usd": 0.0034139350000000003
+  },
+  {
+   "sent_s": 893.02,
+   "status": 200,
+   "latency_s": 11.88,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001635705
+  },
+  {
+   "sent_s": 893.17,
+   "status": 200,
+   "latency_s": 11.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002108125
+  },
+  {
+   "sent_s": 895.89,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 897.56,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 900.9,
+   "status": 200,
+   "latency_s": 8.1,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00054217
+  },
+  {
+   "sent_s": 901.55,
+   "status": 200,
+   "latency_s": 6.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001267185
+  },
+  {
+   "sent_s": 901.81,
+   "status": 200,
+   "latency_s": 7.32,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000997245
+  },
+  {
+   "sent_s": 902.56,
+   "status": 200,
+   "latency_s": 11.55,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.002018525
+  },
+  {
+   "sent_s": 903.85,
+   "status": 200,
+   "latency_s": 10.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002387065
+  },
+  {
+   "sent_s": 904.76,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 904.76,
+   "status": 200,
+   "latency_s": 14.84,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013858850000000001
+  },
+  {
+   "sent_s": 906.91,
+   "status": 200,
+   "latency_s": 14.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0018929799999999998
+  },
+  {
+   "sent_s": 908.67,
+   "status": 200,
+   "latency_s": 11.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001868335
+  },
+  {
+   "sent_s": 910.95,
+   "status": 200,
+   "latency_s": 8.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0018403350000000002
+  },
+  {
+   "sent_s": 911.77,
+   "status": 200,
+   "latency_s": 6.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0012486300000000001
+  },
+  {
+   "sent_s": 912.59,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 912.98,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 914.09,
+   "status": 200,
+   "latency_s": 14.29,
+   "role": "canary",
+   "version": "drill-harmless",
+   "abstained": false,
+   "citations": 4,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0016465
+  },
+  {
+   "sent_s": 914.9,
+   "status": 200,
+   "latency_s": 6.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0007299000000000001
+  },
+  {
+   "sent_s": 914.97,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 916.49,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 917.34,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 918.09,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 919.12,
+   "status": 200,
+   "latency_s": 15.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002280995
+  }
+ ],
+ "spent_usd": 0.74324
+}

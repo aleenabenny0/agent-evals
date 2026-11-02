@@ -1,6 +1,6 @@
 {
   "cap_usd": 10.0,
-  "total_usd": 2.072389,
+  "total_usd": 2.815629,
   "entries": [
     {
       "time": "2026-11-02T17:18:45+00:00",
@@ -29,6 +29,13 @@
       "calls": 111,
       "uncached_calls": 111,
       "usd": 0.041777
+    },
+    {
+      "time": "2026-11-02T17:55:21+00:00",
+      "step": "drill drill-2-harmless",
+      "calls": 395,
+      "uncached_calls": 395,
+      "usd": 0.74324
     }
   ]
 }

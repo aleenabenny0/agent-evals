@@ -18,6 +18,7 @@ build/
 results/*.duckdb
 results/*.duckdb.wal
 results/service/spend.json
+results/service/drills/spend.json
 
 # Docs snapshot: rebuilt with `evals snapshot`. Check the AWS docs license before committing it.
 data/snapshots/

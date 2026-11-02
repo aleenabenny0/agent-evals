@@ -48,6 +48,9 @@ class ServiceMetrics:
         self.capacity = Gauge(
             "ask_capacity", "The most answers worked on at once.", registry=self.registry
         )
+        self.daily_budget = Gauge(
+            "ask_daily_budget_usd", "The daily spend cap.", registry=self.registry
+        )
         self.tokens = Counter(
             "llm_tokens", "Tokens spent.", ["kind", "prompt_version"], registry=self.registry
         )

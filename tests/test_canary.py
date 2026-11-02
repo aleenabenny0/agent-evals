@@ -392,6 +392,11 @@ def test_a_rollback_by_a_person_mid_canary_ends_the_watch(tmp_path: Path) -> Non
     assert deps.canary.record("anything", "canary", True) is None
 
 
+def test_the_service_exports_its_daily_cap_for_the_spend_alert_to_follow(tmp_path: Path) -> None:
+    c, _ = service(tmp_path, registry(tmp_path), lambda _: answered(GOOD), budget=7.0)
+    assert "ask_daily_budget_usd 7.0" in c.get("/metrics").text
+
+
 # ---- the drill prompts -------------------------------------------------------------------------
 
 
