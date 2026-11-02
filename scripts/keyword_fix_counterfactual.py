@@ -1,6 +1,7 @@
 """Counterfactual, on a COPY of the results store: widen the keyword lists of 10 dev cases with the
 correct wordings found in BOTH runs' keyword failures, regrade both runs with the answer grader,
-and re-run the ADR 0008 gate. Nothing in results/ or suites/ is modified."""
+and re-run the ADR 0008 gate. Nothing in results/ or suites/ is modified. A record of 2026-10-17:
+docs-chg-025 has since lost the keyword group it widens, so this no longer runs on today's suite."""
 
 import shutil
 import sys

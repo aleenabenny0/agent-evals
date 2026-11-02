@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from agent_evals.agents.docs.agent import tool_specs
+from agent_evals.contracts import Citation, DocsAnswer
 from agent_evals.corpus import Corpus
 from agent_evals.graders.deterministic import (
     AnswerGrader,
@@ -122,6 +124,63 @@ def test_plain_answer_is_well_formed() -> None:
 
 def test_format_grader_skips_agent_errors() -> None:
     assert FormatGrader().grade(make_case(), AgentResult(error="max_steps")) == []
+
+
+def test_output_contract_passes_a_complete_output() -> None:
+    cited = answer("Up to 5 GB.", [{"url": BUCKETS_URL, "quote": "a quote"}])
+    g = by_metric(FormatGrader().grade(make_case(), cited))["output_contract"]
+    assert g.passed and g.value == 1.0 and g.reason == ""
+
+
+@pytest.mark.parametrize(
+    ("change", "field"),
+    [
+        ({"answer": None}, "answer"),
+        ({"answer": ["63"]}, "answer"),
+        ({"citations": "none"}, "citations"),
+        ({"citations": ["a page"]}, "citations.0"),
+        ({"citations": [{"url": BUCKETS_URL}]}, "citations.0.quote"),
+        ({"abstained": "no"}, "abstained"),
+        ({"confidence": "0.5"}, "confidence"),
+        ({"confidence": 1.5}, "confidence"),
+        ({"source": "memory"}, "source"),
+    ],
+)
+def test_output_contract_names_the_field_that_breaks_it(
+    change: dict[str, object], field: str
+) -> None:
+    broken = AgentResult(output={**answer("Up to 5 GB.").output, **change})
+    g = by_metric(FormatGrader().grade(make_case(), broken))["output_contract"]
+    assert not g.passed and g.value == 0.0
+    assert g.reason.startswith(f"{field}:")
+
+
+def test_output_contract_fails_an_empty_output_that_the_markup_check_passes() -> None:
+    g = by_metric(FormatGrader().grade(make_case(), AgentResult(output={})))
+    assert g["malformed_output"].passed
+    assert not g["output_contract"].passed
+    for field in ("answer", "citations", "abstained", "confidence"):
+        assert f"{field}: Field required" in g["output_contract"].reason
+
+
+def test_output_contract_does_not_judge_what_the_answer_says() -> None:
+    g = by_metric(FormatGrader().grade(make_case(), answer("Up to 5 GB.</answer>")))
+    assert not g["malformed_output"].passed
+    assert g["output_contract"].passed
+
+
+def test_output_contract_fails_an_agent_with_no_contract() -> None:
+    g = by_metric(FormatGrader().grade(make_case(agent="code"), answer("Up to 5 GB.")))
+    assert not g["output_contract"].passed
+    assert g["output_contract"].reason == "no output contract for agent 'code'"
+    assert g["malformed_output"].passed  # the other check still runs
+
+
+def test_the_contract_and_the_submit_answer_tool_spec_name_the_same_fields() -> None:
+    spec = next(s for s in tool_specs(False) if s["name"] == "submit_answer")["input_schema"]
+    assert set(spec["required"]) == set(spec["properties"]) == set(DocsAnswer.model_fields)
+    item = spec["properties"]["citations"]["items"]
+    assert set(item["required"]) == set(item["properties"]) == set(Citation.model_fields)
 
 
 # ---- TrajectoryGrader ----------------------------------------------------------------

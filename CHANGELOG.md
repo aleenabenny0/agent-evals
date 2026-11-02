@@ -17,6 +17,32 @@ Format:
 - Runs: baseline <run id>, candidate <run id>
 ```
 
+## Instrument (2026-11-02): one dev case fixed, an output contract added; ten dev runs regraded
+
+- Case: `docs-chg-025` no longer requires a price clause its question never asks about. The clause
+  left the gold answer, `must_include` and `support`, and the question is unchanged. This edits a
+  gold answer, which is allowed only for a defect in the case, and it was approved first. It
+  raises dev scores slightly. `docs-int-023` and `docs-int-017` stay as they are, since no page
+  contradicts them (`docs/failure-taxonomy.md`, Case decisions). Test cases are untouched.
+- Instrument: `FormatGrader` v3 adds `output_contract`, a strict check of the whole output against
+  a shared contract, and the gate now watches it (ADR 0011). The agent's version did not move.
+- Regrade: all ten runs on the dev suite, with no model calls. Compared row by row with a copy of
+  the store taken first, 11 grades changed, all `correct` on `docs-chg-025` going 0 -> 1, and 2,584
+  `output_contract` grades were added. Judge grades were left alone. Nothing else moved.
+- correct, before -> after (`results/case-fixes/`): v2 0.956 -> 0.962; v3 0.969 -> 0.974 (378 -> 380
+  of 390); iteration-2 challenger 0.962 -> 0.967; v4 0.959 -> 0.964; v5 0.967 -> 0.969; oracle 0.938
+  -> 0.946; phase 7 v2 replay 0.938 -> 0.946. Closed-book 0.585 and the two phase 7 retrieval
+  faults, 0.946 and 0.915, are unchanged.
+- output_contract: all 2,584 finished attempts met it, and the other 16 of 2,600 had errored. It
+  catches nothing today, and is a guard against future breaks.
+- Restated comparisons: closed-book minus docs v2, -0.377 (CI -0.467 to -0.287; was -0.372); oracle
+  minus docs v2, -0.015 (CI -0.062 to +0.028; was -0.018), no detectable change either way; dev flip
+  rate v2 0.031 (was 0.038), v3 0.046 (was 0.054). The gates re-read for the record
+  (`results/gates/iteration-*-dev-gate-after-case-fix.txt`) reach the same four decisions, for the
+  same reasons: iterations 1 and 4 pass, 2 and 3 fail.
+- Not regraded: the test runs, which stay frozen, and the online runs, which stay sealed. Neither
+  holds `output_contract` grades.
+
 ## Not shipped: iteration 4 (2026-10-17) - system prompt v5: v4 plus an abstention guard
 
 - Change: `docs_agent.prompt_version` v3 -> v5 (`configs/challenger-v5.yaml`, commit 8922746).

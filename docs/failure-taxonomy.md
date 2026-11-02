@@ -76,7 +76,7 @@ does not get an answer.
 - `docs-int-017`, 3 attempts: rejects the premise exactly as the gold does ("managed rotation
   doesn't use a Lambda function"), then abstains because the second half of the question, where
   the template lives, is on a page outside the snapshot. A compound question with an
-  unanswerable half; see the case note under C below.
+  unanswerable half; see Case decisions below.
 - Also `docs-chg-007` #1 ("Probably not. Don't plan a new platform around Model Monitor...",
   abstained), `docs-mix-050` #1 and #3 (the overview page only names the "Scaling to Zero ACUs"
   section; the detail page is not in the snapshot).
@@ -92,17 +92,26 @@ Both are measured, not assumed: champion versus challenger on dev, then test, wi
 abstain, nothing is announced. The agent, three times: "There is no date... the limit is a hard
 quota... the premise is not supported", `abstained: false`, citing the quota row. The content is
 right and the format is the opposite of category B. The question reads like a false premise, so
-the agent treated it as one. Case note: either reclassify the case as `false_premise` with
-"no date" alternatives, or keep it unanswerable and let the prompt rule above settle the format.
+the agent treated it as one. Kept unanswerable; see Case decisions below.
 
 ## D. Case defect (3 attempts, 1 case)
 
 `docs-chg-025` asks only whether PITR is fixed at 35 days; the gold also requires the clause
 "changing the window does not change the price", which the question does not ask. The agent
 answered the question asked, correctly, three times. Drafting error (in the LLM-drafted case,
-2026-10-11), caught by the first run. The fix is the author's call: drop that `must_include` group
-or extend the question. It is a case fix, not a gold-to-pass edit, and the decision is still
-open.
+2026-10-11), caught by the first run. It is a case fix, not a gold-to-pass edit; see Case decisions
+below.
+
+## Case decisions (2026-11-02)
+
+The author settled the three open cases. Only `docs-chg-025` changed, and `evals regrade` applied
+that to all ten dev runs with no model calls (CHANGELOG, Instrument 2026-11-02).
+
+| Case | Decision | Why |
+|---|---|---|
+| `docs-chg-025` | The price clause leaves the gold answer, `must_include` and `support`. The question stays. | The question asks only whether the window is fixed, so the old gold failed right answers. `PointInTimeRecovery_Howitworks.html` answers it: "any number between 1 and 35 days". |
+| `docs-int-023` | Unchanged: `unanswerable`, and the agent should abstain. | No page contradicts the gold. `service-quotas.html` lists the 1 MB definition size as a hard quota and gives no date. The case is fair: v4 passed it 3 of 3, and the shipped v3 passes 1 of 3. |
+| `docs-int-017` | Unchanged. | The docs confirm the gold: "Managed rotation doesn't use a Lambda function." The gold never asks for the template, so abstaining here is the agent's failure, not the case's. v2, v3 and v4 passed it 0 of 3, and v5 1 of 3. |
 
 ## What the judge adds on the passing attempts
 

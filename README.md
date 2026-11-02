@@ -83,28 +83,30 @@ although those prompts were not shipped. Both charts are rebuilt from the result
 | --- | --- | --- | --- | --- | --- | --- |
 | docs agent v3 (after iteration 1) | test | 150 | 1 | **0.980** (0.943 to 0.993) | 0.035 | $0.34 |
 | docs agent v2 (baseline) | test | 150 | 1 | 0.987 (0.953 to 0.996) | 0.028 | $0.35 |
-| docs agent v3 | dev | 130 | 3 | 0.969 (0.944 to 0.990) | 0.013 | $0.99 |
-| docs agent v2 | dev | 130 | 3 | 0.956 (0.921 to 0.985) | 0.021 | $0.97 |
+| docs agent v3 | dev | 130 | 3 | 0.974 (0.951 to 0.992) | 0.013 | $0.99 |
+| docs agent v2 | dev | 130 | 3 | 0.962 (0.928 to 0.987) | 0.021 | $0.97 |
 | closed-book baseline (no tools) | dev | 130 | 1 | 0.585 (0.499 to 0.666) | n/a | $0.06 |
-| oracle baseline (gold pages given) | dev | 130 | 1 | 0.938 (0.883 to 0.968) | 0.000 | $0.07 |
+| oracle baseline (gold pages given) | dev | 130 | 1 | 0.946 (0.893 to 0.974) | 0.000 | $0.07 |
 
 Rates in this table are per run. The CHANGELOG pairs the cases two runs share, so a figure can
 differ slightly: v3's test fabricated_citation is 0.035 over its 143 cited cases and 0.028 over
 the 142 it shares with v2.
 
-- Retrieval is worth 37 points: closed-book minus the docs agent (v2) on the same dev cases is
-  -0.372 (95% CI -0.462 to -0.282, McNemar p = 3e-12).
-- Retrieval is not the bottleneck: the oracle, handed the right pages, scores 0.018 below the
-  docs agent (95% CI -0.064 to +0.028, no detectable change).
-- Reliability on dev with 3 attempts (v2): pass^3 0.938, pass@3 0.977, **flip rate 0.038**
-  (0.017 to 0.087). It first read 0.100; most of that was the keyword grader (next point). A
+- Retrieval is worth 38 points: closed-book minus the docs agent (v2) on the same dev cases is
+  -0.377 (95% CI -0.467 to -0.287, McNemar p = 2e-12).
+- Retrieval is not the bottleneck: the oracle, handed the right pages, scores 0.015 below the
+  docs agent (95% CI -0.062 to +0.028, no detectable change).
+- Reliability on dev with 3 attempts (v2): pass^3 0.946, pass@3 0.977, **flip rate 0.031**
+  (0.012 to 0.076). It first read 0.100; most of that was the keyword grader (next point). A
   change between two prompt versions smaller than that band is noise.
 - Dev is the harder split by design (it holds the paraphrase groups and the held cases), which is
   why its score is below test's. Dev correctness was regraded after iteration 1 widened the keyword
   lists of 20 dev cases, and again on 2026-10-17 after 10 more, both approved before the regrade
   (gold answers unchanged; test cases untouched). The second regrade covered all six dev runs,
-  including the two baselines the first had skipped, so every dev number above rests on the same
-  keyword lists.
+  including the two baselines the first had skipped. A third, on 2026-11-02, covered all ten dev
+  runs after one case dropped a clause its question never asks about. That edit did change a gold
+  answer, was approved first, and is in the [CHANGELOG](CHANGELOG.md). Every dev number above rests
+  on the same cases.
 - LLM judge (Sonnet 5.5, run after the fact on the stored answers), **validated against 65 hand
   labels made blind**: on "fully supported" (every claim in the answer is in the quotes it cites)
   the judge and the human labeler agree on all 65, kappa 1.00, on 36 of 40 fresh answers in a second

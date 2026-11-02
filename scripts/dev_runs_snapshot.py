@@ -17,6 +17,10 @@ DEV_RUNS = {
     "docs v3 (champion)": "docs-20261016-214710-02abb7",
     "iteration 2 challenger": "docs-20261016-225705-5447b9",
     "iteration 3 challenger (v4)": "docs-20261017-163240-f5782a",
+    "iteration 4 challenger (v5)": "docs-20261017-174739-1c0e8e",
+    "phase 7 v2 replay": "docs-20261021-030556-6fae1e",
+    "phase 7 one search result": "docs-20261021-031002-e724f3",
+    "phase 7 one result, short pages": "docs-20261021-031621-45b504",
 }
 COMPARISONS = [
     (
@@ -36,6 +40,7 @@ COMPARISONS = [
         "docs-20261016-225705-5447b9",
     ),
     ("iteration 3: v4 minus v3", "docs-20261016-214710-02abb7", "docs-20261017-163240-f5782a"),
+    ("iteration 4: v5 minus v3", "docs-20261016-214710-02abb7", "docs-20261017-174739-1c0e8e"),
 ]
 store = ResultsStore(Path("results/evals.duckdb"))
 try:

@@ -1,0 +1,33 @@
+                        paired on the shared dev cases (judge metrics from 'judge')                        
+┌──────────────────────────┬──────────┬────────────┬────────────┬──────────────────┬──────────────────────┐
+│ metric                   │ champion │ challenger │ difference │           95% CI │              verdict │
+├──────────────────────────┼──────────┼────────────┼────────────┼──────────────────┼──────────────────────┤
+│ judge_supported (target) │    0.308 │      0.612 │     +0.304 │ +0.240 to +0.370 │             improved │
+│ correct                  │    0.974 │      0.969 │     -0.005 │ -0.028 to +0.015 │ no detectable change │
+│ fabricated_citation      │    0.013 │      0.005 │     -0.008 │ -0.021 to +0.003 │ no detectable change │
+│ uncited_answer           │    0.000 │      0.000 │     +0.000 │ +0.000 to +0.000 │ no detectable change │
+│ wrong_abstention         │    0.017 │      0.008 │     -0.008 │ -0.020 to +0.000 │ no detectable change │
+│ missed_abstention        │    0.056 │      0.028 │     -0.028 │ -0.083 to +0.000 │ no detectable change │
+│ rejected_submissions     │    0.021 │      0.008 │     -0.013 │ -0.033 to +0.003 │ no detectable change │
+│ output_contract          │    1.000 │      1.000 │     +0.000 │ +0.000 to +0.000 │ no detectable change │
+└──────────────────────────┴──────────┴────────────┴────────────┴──────────────────┴──────────────────────┘
+                  correct by category, paired                   
+┌──────────────────────┬────┬────────────┬──────────────────┬──┐
+│ category             │  n │ difference │ 95% CI           │  │
+├──────────────────────┼────┼────────────┼──────────────────┼──┤
+│ type=changed_default │ 20 │ -0.050     │ -0.150 to +0.017 │  │
+│ type=false_premise   │ 12 │ -0.000     │ -0.083 to +0.083 │  │
+│ type=lookup          │ 74 │ -0.005     │ -0.032 to +0.018 │  │
+│ type=multi_step      │ 12 │ +0.000     │ +0.000 to +0.000 │  │
+│ type=unanswerable    │ 12 │ +0.056     │ +0.000 to +0.139 │  │
+│ area=ai_ml           │ 48 │ -0.014     │ -0.049 to +0.014 │  │
+│ area=analytics       │  6 │ +0.000     │ +0.000 to +0.000 │  │
+│ area=compute         │ 17 │ -0.039     │ -0.137 to +0.039 │  │
+│ area=databases       │  7 │ +0.000     │ -0.143 to +0.143 │  │
+│ area=integration     │ 11 │ +0.030     │ +0.000 to +0.091 │  │
+│ area=management      │  4 │ +0.000     │ +0.000 to +0.000 │  │
+│ area=networking      │ 14 │ +0.000     │ +0.000 to +0.000 │  │
+│ area=security        │ 11 │ -0.000     │ -0.091 to +0.091 │  │
+│ area=storage         │ 12 │ +0.028     │ +0.000 to +0.083 │  │
+└──────────────────────┴────┴────────────┴──────────────────┴──┘
+GATE PASSED: judge_supported improved, nothing regressed.

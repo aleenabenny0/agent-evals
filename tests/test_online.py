@@ -181,7 +181,8 @@ def test_evidence_metrics_are_skipped_and_reference_free_checks_still_run(corpus
     assert {g.metric for g in citations} >= {"citation_valid_rate", "fabricated_citation"}
     uncited = CitationGrader(corpus, min_quote_chars=12).grade(_online(), _answered(cite=False))
     assert [(g.metric, g.value) for g in uncited] == [("uncited_answer", 1.0)]
-    assert {g.metric for g in FormatGrader().grade(_online(), _answered())} == {"malformed_output"}
+    formats = {g.metric for g in FormatGrader().grade(_online(), _answered())}
+    assert formats == {"malformed_output", "output_contract"}
     grounding = GroundingGrader(corpus).grade(_online(), _answered())
     assert [g.metric for g in grounding] == ["unsupported_entity"]
 

@@ -267,7 +267,8 @@ def test_prompt_v5_is_v4_plus_the_abstention_guard(corpus: Corpus) -> None:
 def test_number_coverage_rejects_unquoted_numbers_then_accepts_the_fix(
     corpus: Corpus, case: Case
 ) -> None:
-    from agent_evals.agents.docs.agent import DocsAnswer, submission_problems
+    from agent_evals.agents.docs.agent import submission_problems
+    from agent_evals.contracts import DocsAnswer
 
     unquoted = {
         **GOOD_ANSWER,

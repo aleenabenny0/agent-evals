@@ -23,6 +23,7 @@ from agent_evals.agents.docs.prompts import (
     SYSTEM_PROMPTS,
 )
 from agent_evals.config import DocsAgentConfig
+from agent_evals.contracts import DocsAnswer
 from agent_evals.corpus import Corpus
 from agent_evals.entities import numbers_in
 from agent_evals.harness.cache import canonical_json, sha256_text
@@ -31,20 +32,6 @@ from agent_evals.tool_markup import TOOL_MARKUP, find_tool_markup
 from agent_evals.types import AgentResult, Case, RunContext, Step, Usage
 
 _TOOL_OUTPUT_LOG_CHARS = 2000
-
-
-class Citation(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    url: str
-    quote: str
-
-
-class DocsAnswer(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-    answer: str
-    citations: list[Citation]
-    abstained: bool
-    confidence: float = Field(ge=0.0, le=1.0)
 
 
 class SearchInput(BaseModel):

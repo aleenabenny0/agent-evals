@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from agent_evals.contracts import contract_problems
 from agent_evals.corpus import Corpus, normalize, phrase_in
 from agent_evals.entities import normalize_url, numbers_in, urls_in
 from agent_evals.tool_markup import find_tool_markup
@@ -154,26 +155,35 @@ class CitationGrader:
 
 
 class FormatGrader:
-    """The answer must be plain prose: no tool-call markup leaked into it.
+    """The output must have its agent's shape, and the answer must be plain prose.
 
-    Scope is the `answer` field only. Citation quotes may legitimately contain XML, and the
-    shape of the output is checked by the agent's schema, not here.
+    `output_contract` checks the whole output, and reads 1 when it meets the contract (ADR 0011).
+    `malformed_output` looks for leaked tool-call markup in the `answer` field only, because
+    citation quotes may legitimately contain XML. An attempt that errored has no final output to
+    check, and `correct` already counts it as wrong.
     """
 
     name = "output_format"
-    version = "2"  # 2: narrower, case-sensitive detector that ignores AWS placeholders and XML
+    version = "3"  # 3: output_contract; 2: narrower detector that ignores AWS placeholders and XML
 
     def grade(self, case: Case, result: AgentResult) -> list[Grade]:
         if result.error:
             return []
         snippet = find_tool_markup(str(result.output.get("answer", "")))
+        problems = contract_problems(case.agent, result.output)
         return [
             Grade(
                 metric="malformed_output",
                 value=float(snippet is not None),
                 passed=snippet is None,
                 reason="" if snippet is None else f"tool-call markup in answer: {snippet!r}",
-            )
+            ),
+            Grade(
+                metric="output_contract",
+                value=float(not problems),
+                passed=not problems,
+                reason="; ".join(problems),
+            ),
         ]
 
 

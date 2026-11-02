@@ -219,6 +219,7 @@ MONITORED = (
     "wrong_abstention",
     "missed_abstention",
     "rejected_submissions",
+    "output_contract",
 )
 
 

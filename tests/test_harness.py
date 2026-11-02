@@ -252,6 +252,24 @@ def test_gate_passes_only_when_target_improves_and_nothing_regresses(tmp_path: P
     store.close()
 
 
+def test_gate_fails_when_the_output_contract_regresses(tmp_path: Path) -> None:
+    from agent_evals.report import gate
+    from agent_evals.types import Grade
+
+    store = ResultsStore(tmp_path / "e.duckdb")
+    cases = [make_case(id=f"c{i}") for i in range(12)]
+    champ = _run(store, FakeAgent({}), cases, attempts=1)
+    better = _run(store, FakeAgent({c.id: {1} for c in cases}), cases, attempts=1)
+    for case in cases:
+        for run, value in ((champ, 1.0), (better, 0.0)):
+            grade = Grade(metric="output_contract", value=value)
+            store.add_grades(run, case.id, 1, [("output_format", grade)])
+    g = gate(store, champ, better, cases, target="correct")
+    assert g.target.verdict == "improved"  # the target is better, and the gate still fails
+    assert "output_contract" in g.regressed_metrics and not g.passed
+    store.close()
+
+
 def test_regrade_rescores_stored_answers_against_changed_cases(tmp_path: Path) -> None:
     from agent_evals.harness.runner import regrade_run
     from agent_evals.types import Gold, Grade
