@@ -17,7 +17,14 @@ from agent_evals.harness.llm import LLMResponse
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
 from agent_evals.service.canary import ALPHA, LOOKS, PER_LOOK, CanaryWatch, fires, is_bad
-from agent_evals.service.drills import DRILL_FAULT, DRILL_HARMLESS, DRILL_PROMPTS, FAULT_RULE
+from agent_evals.service.drills import (
+    DRILL_FAULT,
+    DRILL_HARMLESS,
+    DRILL_PROMPTS,
+    DRILL_STALE_NOTE,
+    FAULT_RULE,
+    STALE_NOTE,
+)
 from agent_evals.service.fake import FakeProvider
 from agent_evals.service.main import prompts_of, registry_of
 from agent_evals.service.registry import (
@@ -394,6 +401,10 @@ def test_each_drill_prompt_is_the_champion_with_one_change() -> None:
     assert FAULT_RULE in DRILL_PROMPTS[DRILL_FAULT]
     assert "How to work" not in DRILL_PROMPTS[DRILL_HARMLESS]
     assert not set(DRILL_PROMPTS) & set(SYSTEM_PROMPTS)
+
+
+def test_the_stale_note_drill_is_the_champion_with_the_notice_added() -> None:
+    assert DRILL_PROMPTS[DRILL_STALE_NOTE] == SYSTEM_PROMPT_V3 + STALE_NOTE
 
 
 def test_a_production_service_refuses_a_drill_prompt(tmp_path: Path) -> None:

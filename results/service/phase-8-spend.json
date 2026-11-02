@@ -1,6 +1,6 @@
 {
   "cap_usd": 10.0,
-  "total_usd": 2.030612,
+  "total_usd": 2.072389,
   "entries": [
     {
       "time": "2026-11-02T17:18:45+00:00",
@@ -22,6 +22,13 @@
       "calls": 306,
       "uncached_calls": 306,
       "usd": 0.58664
+    },
+    {
+      "time": "2026-11-02T17:41:47+00:00",
+      "step": "drill pilot",
+      "calls": 111,
+      "uncached_calls": 111,
+      "usd": 0.041777
     }
   ]
 }
