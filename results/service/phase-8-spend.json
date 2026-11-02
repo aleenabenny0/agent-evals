@@ -1,6 +1,6 @@
 {
   "cap_usd": 10.0,
-  "total_usd": 2.815629,
+  "total_usd": 3.138879,
   "entries": [
     {
       "time": "2026-11-02T17:18:45+00:00",
@@ -36,6 +36,13 @@
       "calls": 395,
       "uncached_calls": 395,
       "usd": 0.74324
+    },
+    {
+      "time": "2026-11-02T20:14:16+00:00",
+      "step": "drill drill-1b-stale-note",
+      "calls": 173,
+      "uncached_calls": 173,
+      "usd": 0.32325
     }
   ]
 }
