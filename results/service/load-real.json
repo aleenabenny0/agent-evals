@@ -1,0 +1,71 @@
+{
+ "label": "real",
+ "seconds_per_rate": 60.0,
+ "spent_usd": 0.231226,
+ "steps": [
+  {
+   "rate_per_s": 0.25,
+   "sent": 15,
+   "offered_per_s": 0.25,
+   "statuses": {
+    "200": 14,
+    "502": 1
+   },
+   "answered_per_s": 0.189,
+   "refused_share": 0.0667,
+   "latency_s": {
+    "p50": 12.2,
+    "p95": 30.825,
+    "p99": 30.825
+   }
+  },
+  {
+   "rate_per_s": 0.5,
+   "sent": 42,
+   "offered_per_s": 0.7,
+   "statuses": {
+    "200": 35,
+    "429": 7
+   },
+   "answered_per_s": 0.472,
+   "refused_share": 0.1667,
+   "latency_s": {
+    "p50": 11.041,
+    "p95": 22.261,
+    "p99": 23.383
+   }
+  },
+  {
+   "rate_per_s": 1.0,
+   "sent": 57,
+   "offered_per_s": 0.95,
+   "statuses": {
+    "200": 38,
+    "429": 19
+   },
+   "answered_per_s": 0.512,
+   "refused_share": 0.3333,
+   "latency_s": {
+    "p50": 11.183,
+    "p95": 17.413,
+    "p99": 17.656
+   }
+  },
+  {
+   "rate_per_s": 2.0,
+   "sent": 136,
+   "offered_per_s": 2.267,
+   "statuses": {
+    "200": 44,
+    "429": 92
+   },
+   "answered_per_s": 0.591,
+   "refused_share": 0.6765,
+   "latency_s": {
+    "p50": 11.027,
+    "p95": 18.93,
+    "p99": 20.61
+   }
+  }
+ ]
+}

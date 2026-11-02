@@ -1,0 +1,20 @@
+{
+  "cap_usd": 10.0,
+  "total_usd": 1.443972,
+  "entries": [
+    {
+      "time": "2026-11-02T17:18:45+00:00",
+      "step": "drill questions",
+      "calls": 397,
+      "uncached_calls": 397,
+      "usd": 1.212746
+    },
+    {
+      "time": "2026-11-02T17:23:57+00:00",
+      "step": "load test real",
+      "calls": 131,
+      "uncached_calls": 131,
+      "usd": 0.231226
+    }
+  ]
+}

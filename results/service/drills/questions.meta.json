@@ -1,0 +1,63 @@
+{
+  "questions": 200,
+  "by_intent": {
+    "comparison": 20,
+    "false_premise": 20,
+    "lookup": 140,
+    "outside_snapshot": 20
+  },
+  "by_persona": {
+    "cost-manager": 40,
+    "new-developer": 40,
+    "non-native": 40,
+    "on-call": 40,
+    "security-reviewer": 40
+  },
+  "by_area": {
+    "ai_ml": 32,
+    "analytics": 11,
+    "compute": 20,
+    "databases": 13,
+    "devtools": 7,
+    "integration": 15,
+    "management": 12,
+    "migration": 4,
+    "networking": 19,
+    "security": 25,
+    "storage": 22
+  },
+  "outside_services": [
+    "Braket",
+    "Clean Rooms",
+    "Device Farm",
+    "HealthLake",
+    "Location Service",
+    "Managed Blockchain",
+    "Managed Grafana",
+    "MediaLive",
+    "RoboMaker",
+    "Snow Family",
+    "Wickr"
+  ],
+  "source_pages": 127,
+  "most_questions_from_one_page": 4,
+  "symptom_phrased": 40,
+  "mean_title_overlap": 0.137,
+  "copied_6_or_more_words": 7,
+  "mean_copied_run": 3.12,
+  "regenerated": 17,
+  "day": 801,
+  "halves": 2,
+  "generator": "claude-sonnet-5-5",
+  "generator_version": "v2.1",
+  "traffic_sha256": "42e2fb3aa5c10ff1085ffedede33f739e0b33f55d6f2c116813af4b53cf91406",
+  "retries": {
+    "failed": 0,
+    "check_failed": 0,
+    "unnamed_service": 0,
+    "duplicate": 1,
+    "unanswerable": 18,
+    "redrawn_page": 0
+  },
+  "spent_usd": 1.212746
+}
