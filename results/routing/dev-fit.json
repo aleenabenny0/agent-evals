@@ -1,0 +1,455 @@
+{
+ "plan": "docs/plans/phase-9-routing.md",
+ "runs": {
+  "haiku": "docs-20261016-214710-02abb7",
+  "sonnet": "docs-20261103-042430-1042ba",
+  "opus": "docs-20261103-044411-eb598a"
+ },
+ "choices": {
+  "good": {
+   "always_best": "opus",
+   "chosen": "nearest neighbours k=15 tau=0",
+   "reason": "highest dev rate among routers cheaper than always-best",
+   "knn": {
+    "k": 15,
+    "tau": 0.0
+   },
+   "by_type": {
+    "changed_default": "opus",
+    "false_premise": "haiku",
+    "lookup": "opus",
+    "multi_step": "opus",
+    "unanswerable": "sonnet"
+   }
+  },
+  "correct": {
+   "always_best": "opus",
+   "chosen": "cascade haiku -> sonnet",
+   "reason": "highest dev rate among routers cheaper than always-best",
+   "knn": {
+    "k": 15,
+    "tau": 0.2
+   },
+   "by_type": {
+    "changed_default": "haiku",
+    "false_premise": "opus",
+    "lookup": "haiku",
+    "multi_step": "haiku",
+    "unanswerable": "sonnet"
+   }
+  }
+ },
+ "choices_sha256": "d1698d6b8388e2d5443a906597e43603701a0488697559d3f7cc514c9bb1fdf8",
+ "dev": {
+  "good": {
+   "single": {
+    "haiku": {
+     "rate": 0.3308,
+     "rate_low": 0.2558,
+     "rate_high": 0.4155,
+     "cost_usd": 0.002499,
+     "cost_low": 0.002204,
+     "cost_high": 0.002814,
+     "n": 130
+    },
+    "sonnet": {
+     "rate": 0.5,
+     "rate_low": 0.4153,
+     "rate_high": 0.5847,
+     "cost_usd": 0.035246,
+     "cost_low": 0.031386,
+     "cost_high": 0.039516,
+     "n": 130
+    },
+    "opus": {
+     "rate": 0.6154,
+     "rate_low": 0.5296,
+     "rate_high": 0.6946,
+     "cost_usd": 0.075477,
+     "cost_low": 0.065953,
+     "cost_high": 0.087117,
+     "n": 130
+    }
+   },
+   "by_type_in_sample": {
+    "rate": 0.6154,
+    "rate_low": 0.5296,
+    "rate_high": 0.6946,
+    "cost_usd": 0.063675,
+    "cost_low": 0.05397,
+    "cost_high": 0.075391,
+    "n": 130
+   },
+   "cascade": {
+    "rate": 0.3462,
+    "rate_low": 0.2699,
+    "rate_high": 0.4313,
+    "cost_usd": 0.009818,
+    "cost_low": 0.006026,
+    "cost_high": 0.014354,
+    "n": 130
+   },
+   "knn_leave_one_out": {
+    "rate": 0.5923,
+    "rate_low": 0.5064,
+    "rate_high": 0.673,
+    "cost_usd": 0.067911,
+    "cost_low": 0.058136,
+    "cost_high": 0.079904,
+    "n": 130
+   },
+   "oracle": {
+    "rate": 0.7615,
+    "rate_low": 0.6814,
+    "rate_high": 0.8266,
+    "cost_usd": 0.025122,
+    "cost_low": 0.016566,
+    "cost_high": 0.035865,
+    "n": 130
+   },
+   "dev_discordance_chosen_vs_best": 0.0538,
+   "detectable_on_test": 0.0531
+  },
+  "correct": {
+   "single": {
+    "haiku": {
+     "rate": 0.9538,
+     "rate_low": 0.903,
+     "rate_high": 0.9787,
+     "cost_usd": 0.002499,
+     "cost_low": 0.002204,
+     "cost_high": 0.002814,
+     "n": 130
+    },
+    "sonnet": {
+     "rate": 0.9615,
+     "rate_low": 0.9131,
+     "rate_high": 0.9835,
+     "cost_usd": 0.035246,
+     "cost_low": 0.031386,
+     "cost_high": 0.039516,
+     "n": 130
+    },
+    "opus": {
+     "rate": 0.9692,
+     "rate_low": 0.9236,
+     "rate_high": 0.988,
+     "cost_usd": 0.075477,
+     "cost_low": 0.065953,
+     "cost_high": 0.087117,
+     "n": 130
+    }
+   },
+   "by_type_in_sample": {
+    "rate": 0.9692,
+    "rate_low": 0.9236,
+    "rate_high": 0.988,
+    "cost_usd": 0.014301,
+    "cost_low": 0.009392,
+    "cost_high": 0.020043,
+    "n": 130
+   },
+   "cascade": {
+    "rate": 0.9846,
+    "rate_low": 0.9456,
+    "rate_high": 0.9958,
+    "cost_usd": 0.009818,
+    "cost_low": 0.006026,
+    "cost_high": 0.014354,
+    "n": 130
+   },
+   "knn_leave_one_out": {
+    "rate": 0.9538,
+    "rate_low": 0.903,
+    "rate_high": 0.9787,
+    "cost_usd": 0.002499,
+    "cost_low": 0.002204,
+    "cost_high": 0.002814,
+    "n": 130
+   },
+   "oracle": {
+    "rate": 0.9923,
+    "rate_low": 0.9577,
+    "rate_high": 0.9986,
+    "cost_usd": 0.005652,
+    "cost_low": 0.002747,
+    "cost_high": 0.00939,
+    "n": 130
+   },
+   "dev_discordance_chosen_vs_best": 0.0308,
+   "detectable_on_test": 0.0401
+  }
+ },
+ "matrix_by_type": {
+  "changed_default": {
+   "haiku": {
+    "good": {
+     "rate": 0.05,
+     "low": 0.0089,
+     "high": 0.2361,
+     "n": 20
+    },
+    "correct": {
+     "rate": 0.95,
+     "low": 0.7639,
+     "high": 0.9911,
+     "n": 20
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.15,
+     "low": 0.0524,
+     "high": 0.3604,
+     "n": 20
+    },
+    "correct": {
+     "rate": 0.95,
+     "low": 0.7639,
+     "high": 0.9911,
+     "n": 20
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.3,
+     "low": 0.1455,
+     "high": 0.519,
+     "n": 20
+    },
+    "correct": {
+     "rate": 0.95,
+     "low": 0.7639,
+     "high": 0.9911,
+     "n": 20
+    }
+   }
+  },
+  "false_premise": {
+   "haiku": {
+    "good": {
+     "rate": 0.3333,
+     "low": 0.1381,
+     "high": 0.6094,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.0833,
+     "low": 0.0149,
+     "high": 0.3539,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.3333,
+     "low": 0.1381,
+     "high": 0.6094,
+     "n": 12
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.7575,
+     "high": 1.0,
+     "n": 12
+    }
+   }
+  },
+  "lookup": {
+   "haiku": {
+    "good": {
+     "rate": 0.3378,
+     "low": 0.2405,
+     "high": 0.4512,
+     "n": 74
+    },
+    "correct": {
+     "rate": 0.973,
+     "low": 0.9067,
+     "high": 0.9926,
+     "n": 74
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.6216,
+     "low": 0.5077,
+     "high": 0.7235,
+     "n": 74
+    },
+    "correct": {
+     "rate": 0.973,
+     "low": 0.9067,
+     "high": 0.9926,
+     "n": 74
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.7297,
+     "low": 0.6191,
+     "high": 0.8177,
+     "n": 74
+    },
+    "correct": {
+     "rate": 0.9865,
+     "low": 0.9273,
+     "high": 0.9976,
+     "n": 74
+    }
+   }
+  },
+  "multi_step": {
+   "haiku": {
+    "good": {
+     "rate": 0.25,
+     "low": 0.0889,
+     "high": 0.5323,
+     "n": 12
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.7575,
+     "high": 1.0,
+     "n": 12
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.3333,
+     "low": 0.1381,
+     "high": 0.6094,
+     "n": 12
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.7575,
+     "high": 1.0,
+     "n": 12
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.4167,
+     "low": 0.1933,
+     "high": 0.6805,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    }
+   }
+  },
+  "unanswerable": {
+   "haiku": {
+    "good": {
+     "rate": 0.8333,
+     "low": 0.552,
+     "high": 0.953,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.8333,
+     "low": 0.552,
+     "high": 0.953,
+     "n": 12
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    },
+    "correct": {
+     "rate": 0.9167,
+     "low": 0.6461,
+     "high": 0.9851,
+     "n": 12
+    }
+   }
+  }
+ },
+ "models": {
+  "haiku": {
+   "run": "docs-20261016-214710-02abb7",
+   "list_usd": 0.3249,
+   "with_prompt_cache_usd": 0.3249,
+   "latency_ms_p50": 6545,
+   "latency_ms_p95": 14728,
+   "latency_n": 128,
+   "errors": 2,
+   "abstained": 13,
+   "answered_supported": {
+    "rate": 0.287,
+    "low": 0.2122,
+    "high": 0.3755,
+    "n": 115
+   }
+  },
+  "sonnet": {
+   "run": "docs-20261103-042430-1042ba",
+   "list_usd": 4.582,
+   "with_prompt_cache_usd": 2.7618,
+   "latency_ms_p50": 6707,
+   "latency_ms_p95": 16412,
+   "latency_n": 130,
+   "errors": 0,
+   "abstained": 12,
+   "answered_supported": {
+    "rate": 0.4746,
+    "low": 0.3867,
+    "high": 0.564,
+    "n": 118
+   }
+  },
+  "opus": {
+   "run": "docs-20261103-044411-eb598a",
+   "list_usd": 9.812,
+   "with_prompt_cache_usd": 6.0152,
+   "latency_ms_p50": 10986,
+   "latency_ms_p95": 21348,
+   "latency_n": 127,
+   "errors": 1,
+   "abstained": 11,
+   "answered_supported": {
+    "rate": 0.5932,
+    "low": 0.503,
+    "high": 0.6776,
+    "n": 118
+   }
+  }
+ }
+}
