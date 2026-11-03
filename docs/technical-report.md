@@ -127,6 +127,11 @@ Prometheus metrics in Grafana ([phase 8 plan](plans/phase-8-llm-ops.md)).
   measurable harm, so nothing fired. A rerun with a fault measured first rolled back by itself in
   5.2 minutes. A harmless change stayed quiet. The [postmortem](postmortems/2026-11-02-release-drills.md)
   is blameless and keeps the failure.
+- **A blind spot, closed.** A pilot showed that a prompt telling the agent not to read pages gave
+  cited answers from search snippets, which the rule's signal could not see. The signal now also
+  counts an answer that read no page. In a real drill the rule removed that prompt at its first
+  look, where the old signal on the same answers would have stayed quiet
+  ([drill 1c](plans/phase-8-drill-1c.md)).
 - **A load test.** A real answer takes about 11 seconds and 5 model calls, so 8 slots serve about
   0.6 answers a second. Refusals past capacity followed the Erlang B formula from queueing theory.
   Service objectives were set from the measurements ([runbook](runbook.md)).

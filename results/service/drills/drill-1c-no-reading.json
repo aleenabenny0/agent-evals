@@ -1,0 +1,2101 @@
+{
+ "label": "drill-1c-no-reading",
+ "canary": "drill-no-reading",
+ "share": 0.2,
+ "rate_per_s": 0.45,
+ "started": "2026-11-03T19:06:50+00:00",
+ "blocked_s": null,
+ "unblocked_s": null,
+ "summary": {
+  "sent": 143,
+  "statuses": {
+   "200": 134,
+   "429": 9
+  },
+  "roles": {
+   "canary": {
+    "answers": 20,
+    "bad": 15,
+    "read_no_page": 15
+   },
+   "champion": {
+    "answers": 114,
+    "bad": 14,
+    "read_no_page": 10
+   }
+  },
+  "canary_live_s": 45.36,
+  "first_canary_sent_s": 52.87,
+  "rollback_seen_s": 238.08,
+  "seconds_to_rollback": 192.7,
+  "canary_answers_sent_after_rollback": 0,
+  "cost_seen_usd": 0.237565
+ },
+ "rows": [
+  {
+   "sent_s": 4.18,
+   "status": 200,
+   "latency_s": 11.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001296205
+  },
+  {
+   "sent_s": 5.66,
+   "status": 200,
+   "latency_s": 12.28,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001974
+  },
+  {
+   "sent_s": 7.71,
+   "status": 200,
+   "latency_s": 16.42,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0026088350000000003
+  },
+  {
+   "sent_s": 8.67,
+   "status": 200,
+   "latency_s": 6.53,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010068
+  },
+  {
+   "sent_s": 9.78,
+   "status": 200,
+   "latency_s": 6.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00111738
+  },
+  {
+   "sent_s": 10.48,
+   "status": 200,
+   "latency_s": 9.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001765545
+  },
+  {
+   "sent_s": 10.56,
+   "status": 200,
+   "latency_s": 9.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0020798450000000003
+  },
+  {
+   "sent_s": 14.1,
+   "status": 200,
+   "latency_s": 7.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016702449999999999
+  },
+  {
+   "sent_s": 14.55,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 16.11,
+   "status": 200,
+   "latency_s": 16.33,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002151875
+  },
+  {
+   "sent_s": 17.85,
+   "status": 200,
+   "latency_s": 4.68,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000859385
+  },
+  {
+   "sent_s": 22.46,
+   "status": 200,
+   "latency_s": 8.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001593605
+  },
+  {
+   "sent_s": 22.49,
+   "status": 200,
+   "latency_s": 14.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0033092350000000006
+  },
+  {
+   "sent_s": 27.6,
+   "status": 200,
+   "latency_s": 6.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001315265
+  },
+  {
+   "sent_s": 28.21,
+   "status": 200,
+   "latency_s": 7.55,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009743550000000001
+  },
+  {
+   "sent_s": 28.67,
+   "status": 200,
+   "latency_s": 10.46,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0015565450000000003
+  },
+  {
+   "sent_s": 29.26,
+   "status": 200,
+   "latency_s": 7.05,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0012443150000000002
+  },
+  {
+   "sent_s": 31.12,
+   "status": 200,
+   "latency_s": 6.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00120799
+  },
+  {
+   "sent_s": 32.31,
+   "status": 200,
+   "latency_s": 14.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0022971800000000002
+  },
+  {
+   "sent_s": 39.16,
+   "status": 200,
+   "latency_s": 8.99,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019279850000000001
+  },
+  {
+   "sent_s": 40.64,
+   "status": 200,
+   "latency_s": 7.23,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00105919
+  },
+  {
+   "sent_s": 43.34,
+   "status": 200,
+   "latency_s": 9.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0017333600000000002
+  },
+  {
+   "sent_s": 43.8,
+   "status": 200,
+   "latency_s": 10.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002221935
+  },
+  {
+   "sent_s": 43.9,
+   "status": 200,
+   "latency_s": 17.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0026589300000000003
+  },
+  {
+   "sent_s": 44.77,
+   "status": 200,
+   "latency_s": 9.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0016879350000000002
+  },
+  {
+   "sent_s": 45.36,
+   "status": 200,
+   "latency_s": 8.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012626199999999999
+  },
+  {
+   "sent_s": 45.52,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 48.55,
+   "status": 200,
+   "latency_s": 7.01,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012270100000000002
+  },
+  {
+   "sent_s": 49.89,
+   "status": 200,
+   "latency_s": 6.12,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00120627
+  },
+  {
+   "sent_s": 52.87,
+   "status": 200,
+   "latency_s": 9.45,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00177272
+  },
+  {
+   "sent_s": 53.31,
+   "status": 200,
+   "latency_s": 13.04,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.002493335
+  },
+  {
+   "sent_s": 54.36,
+   "status": 200,
+   "latency_s": 6.02,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010067350000000001
+  },
+  {
+   "sent_s": 57.43,
+   "status": 200,
+   "latency_s": 12.31,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 2,
+   "cost_usd": 0.00081591
+  },
+  {
+   "sent_s": 57.74,
+   "status": 200,
+   "latency_s": 14.71,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00315849
+  },
+  {
+   "sent_s": 59.26,
+   "status": 200,
+   "latency_s": 9.2,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0015333300000000003
+  },
+  {
+   "sent_s": 62.28,
+   "status": 200,
+   "latency_s": 7.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001348025
+  },
+  {
+   "sent_s": 62.31,
+   "status": 200,
+   "latency_s": 6.54,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0012551749999999999
+  },
+  {
+   "sent_s": 62.61,
+   "status": 200,
+   "latency_s": 10.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0024576700000000003
+  },
+  {
+   "sent_s": 64.63,
+   "status": 200,
+   "latency_s": 7.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001209305
+  },
+  {
+   "sent_s": 64.95,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 65.42,
+   "status": 429,
+   "latency_s": 0.06,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 67.78,
+   "status": 200,
+   "latency_s": 8.7,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.000933185
+  },
+  {
+   "sent_s": 70.38,
+   "status": 200,
+   "latency_s": 6.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014891700000000002
+  },
+  {
+   "sent_s": 72.79,
+   "status": 200,
+   "latency_s": 7.47,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001407855
+  },
+  {
+   "sent_s": 77.46,
+   "status": 200,
+   "latency_s": 13.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00193027
+  },
+  {
+   "sent_s": 79.94,
+   "status": 200,
+   "latency_s": 14.74,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.003092875
+  },
+  {
+   "sent_s": 80.25,
+   "status": 200,
+   "latency_s": 12.47,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00260914
+  },
+  {
+   "sent_s": 83.96,
+   "status": 200,
+   "latency_s": 8.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0017506650000000002
+  },
+  {
+   "sent_s": 84.05,
+   "status": 200,
+   "latency_s": 6.25,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011064350000000002
+  },
+  {
+   "sent_s": 84.49,
+   "status": 200,
+   "latency_s": 11.8,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00223425
+  },
+  {
+   "sent_s": 84.55,
+   "status": 200,
+   "latency_s": 8.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001343355
+  },
+  {
+   "sent_s": 85.28,
+   "status": 200,
+   "latency_s": 7.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00159027
+  },
+  {
+   "sent_s": 89.74,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 90.3,
+   "status": 200,
+   "latency_s": 6.9,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010815350000000002
+  },
+  {
+   "sent_s": 92.38,
+   "status": 200,
+   "latency_s": 9.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0013691900000000002
+  },
+  {
+   "sent_s": 93.93,
+   "status": 200,
+   "latency_s": 7.33,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000840115
+  },
+  {
+   "sent_s": 96.0,
+   "status": 200,
+   "latency_s": 9.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0017093300000000002
+  },
+  {
+   "sent_s": 99.47,
+   "status": 200,
+   "latency_s": 9.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0015690550000000002
+  },
+  {
+   "sent_s": 99.5,
+   "status": 200,
+   "latency_s": 12.75,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00187192
+  },
+  {
+   "sent_s": 104.0,
+   "status": 200,
+   "latency_s": 7.94,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 6,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001975035
+  },
+  {
+   "sent_s": 104.27,
+   "status": 200,
+   "latency_s": 6.95,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001478425
+  },
+  {
+   "sent_s": 104.42,
+   "status": 200,
+   "latency_s": 9.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001953335
+  },
+  {
+   "sent_s": 104.43,
+   "status": 200,
+   "latency_s": 9.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002186465
+  },
+  {
+   "sent_s": 105.25,
+   "status": 200,
+   "latency_s": 5.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001143515
+  },
+  {
+   "sent_s": 105.78,
+   "status": 200,
+   "latency_s": 5.84,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00088965
+  },
+  {
+   "sent_s": 106.98,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 109.37,
+   "status": 200,
+   "latency_s": 8.32,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00165075
+  },
+  {
+   "sent_s": 111.91,
+   "status": 200,
+   "latency_s": 15.64,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00251453
+  },
+  {
+   "sent_s": 112.7,
+   "status": 200,
+   "latency_s": 5.58,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000859415
+  },
+  {
+   "sent_s": 114.28,
+   "status": 200,
+   "latency_s": 6.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010242650000000001
+  },
+  {
+   "sent_s": 115.9,
+   "status": 200,
+   "latency_s": 20.08,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.004452135
+  },
+  {
+   "sent_s": 118.77,
+   "status": 200,
+   "latency_s": 12.91,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016974200000000003
+  },
+  {
+   "sent_s": 119.11,
+   "status": 200,
+   "latency_s": 6.93,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001159675
+  },
+  {
+   "sent_s": 120.92,
+   "status": 200,
+   "latency_s": 7.15,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0017362150000000002
+  },
+  {
+   "sent_s": 124.74,
+   "status": 200,
+   "latency_s": 11.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0022464349999999998
+  },
+  {
+   "sent_s": 132.11,
+   "status": 200,
+   "latency_s": 7.24,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00099529
+  },
+  {
+   "sent_s": 138.32,
+   "status": 200,
+   "latency_s": 8.72,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011931700000000001
+  },
+  {
+   "sent_s": 141.53,
+   "status": 200,
+   "latency_s": 8.61,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 5,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 2,
+   "cost_usd": 0.0011317599999999999
+  },
+  {
+   "sent_s": 149.99,
+   "status": 200,
+   "latency_s": 10.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001581305
+  },
+  {
+   "sent_s": 151.48,
+   "status": 200,
+   "latency_s": 5.3,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 2,
+   "cost_usd": 0.00060841
+  },
+  {
+   "sent_s": 152.02,
+   "status": 200,
+   "latency_s": 5.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00123491
+  },
+  {
+   "sent_s": 154.57,
+   "status": 200,
+   "latency_s": 11.82,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.002537585
+  },
+  {
+   "sent_s": 155.96,
+   "status": 200,
+   "latency_s": 12.04,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001878045
+  },
+  {
+   "sent_s": 157.68,
+   "status": 200,
+   "latency_s": 4.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010578649999999998
+  },
+  {
+   "sent_s": 157.98,
+   "status": 200,
+   "latency_s": 8.49,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001184345
+  },
+  {
+   "sent_s": 159.27,
+   "status": 200,
+   "latency_s": 5.44,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00115286
+  },
+  {
+   "sent_s": 161.69,
+   "status": 200,
+   "latency_s": 5.09,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010528949999999999
+  },
+  {
+   "sent_s": 163.95,
+   "status": 200,
+   "latency_s": 6.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008557300000000001
+  },
+  {
+   "sent_s": 165.31,
+   "status": 200,
+   "latency_s": 15.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00353846
+  },
+  {
+   "sent_s": 167.15,
+   "status": 200,
+   "latency_s": 7.23,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0011118900000000001
+  },
+  {
+   "sent_s": 168.51,
+   "status": 200,
+   "latency_s": 16.79,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.0036952
+  },
+  {
+   "sent_s": 168.86,
+   "status": 200,
+   "latency_s": 12.59,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002226175
+  },
+  {
+   "sent_s": 171.31,
+   "status": 200,
+   "latency_s": 9.29,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00180276
+  },
+  {
+   "sent_s": 172.38,
+   "status": 200,
+   "latency_s": 5.14,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009769550000000003
+  },
+  {
+   "sent_s": 174.71,
+   "status": 200,
+   "latency_s": 4.24,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.000921965
+  },
+  {
+   "sent_s": 174.88,
+   "status": 200,
+   "latency_s": 13.36,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00246881
+  },
+  {
+   "sent_s": 176.6,
+   "status": 200,
+   "latency_s": 8.77,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00190953
+  },
+  {
+   "sent_s": 177.29,
+   "status": 429,
+   "latency_s": 0.02,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 177.41,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 179.0,
+   "status": 200,
+   "latency_s": 12.28,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 3,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001879435
+  },
+  {
+   "sent_s": 180.4,
+   "status": 200,
+   "latency_s": 10.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002015565
+  },
+  {
+   "sent_s": 180.46,
+   "status": 429,
+   "latency_s": 0.01,
+   "outcome": "overloaded"
+  },
+  {
+   "sent_s": 181.76,
+   "status": 200,
+   "latency_s": 12.69,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0021427900000000003
+  },
+  {
+   "sent_s": 184.86,
+   "status": 200,
+   "latency_s": 9.39,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00182205
+  },
+  {
+   "sent_s": 185.97,
+   "status": 200,
+   "latency_s": 19.56,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.00451054
+  },
+  {
+   "sent_s": 191.66,
+   "status": 200,
+   "latency_s": 6.89,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 8,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0007645099999999999
+  },
+  {
+   "sent_s": 196.48,
+   "status": 200,
+   "latency_s": 8.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014869600000000003
+  },
+  {
+   "sent_s": 201.99,
+   "status": 200,
+   "latency_s": 11.84,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 1,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0019246800000000002
+  },
+  {
+   "sent_s": 202.09,
+   "status": 200,
+   "latency_s": 20.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.003647645
+  },
+  {
+   "sent_s": 203.66,
+   "status": 200,
+   "latency_s": 10.97,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0017288400000000002
+  },
+  {
+   "sent_s": 205.26,
+   "status": 200,
+   "latency_s": 8.46,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 1,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.001312275
+  },
+  {
+   "sent_s": 207.28,
+   "status": 200,
+   "latency_s": 9.58,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": true,
+   "citations": 1,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001863155
+  },
+  {
+   "sent_s": 207.56,
+   "status": 200,
+   "latency_s": 10.98,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0020480000000000003
+  },
+  {
+   "sent_s": 212.38,
+   "status": 200,
+   "latency_s": 4.74,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001081
+  },
+  {
+   "sent_s": 214.27,
+   "status": 200,
+   "latency_s": 5.62,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.001195115
+  },
+  {
+   "sent_s": 216.2,
+   "status": 200,
+   "latency_s": 10.31,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0017167150000000002
+  },
+  {
+   "sent_s": 218.49,
+   "status": 200,
+   "latency_s": 15.52,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.002397265
+  },
+  {
+   "sent_s": 224.72,
+   "status": 200,
+   "latency_s": 5.78,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00116694
+  },
+  {
+   "sent_s": 227.34,
+   "status": 200,
+   "latency_s": 9.79,
+   "role": "canary",
+   "version": "drill-no-reading",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.00118842
+  },
+  {
+   "sent_s": 229.64,
+   "status": 200,
+   "latency_s": 12.51,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00223806
+  },
+  {
+   "sent_s": 232.65,
+   "status": 200,
+   "latency_s": 5.6,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0009994700000000001
+  },
+  {
+   "sent_s": 234.08,
+   "status": 200,
+   "latency_s": 13.22,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0030510250000000006
+  },
+  {
+   "sent_s": 234.13,
+   "status": 200,
+   "latency_s": 13.48,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00245375
+  },
+  {
+   "sent_s": 238.08,
+   "status": 200,
+   "latency_s": 7.68,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.00124298
+  },
+  {
+   "sent_s": 238.22,
+   "status": 200,
+   "latency_s": 18.49,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 9,
+   "cost_usd": 0.002685715
+  },
+  {
+   "sent_s": 240.14,
+   "status": 200,
+   "latency_s": 10.85,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0019773850000000003
+  },
+  {
+   "sent_s": 246.4,
+   "status": 200,
+   "latency_s": 12.3,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.0024034399999999997
+  },
+  {
+   "sent_s": 250.05,
+   "status": 200,
+   "latency_s": 11.17,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 7,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00212116
+  },
+  {
+   "sent_s": 251.71,
+   "status": 200,
+   "latency_s": 15.81,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 5,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0023793400000000006
+  },
+  {
+   "sent_s": 252.21,
+   "status": 200,
+   "latency_s": 10.76,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.001763935
+  },
+  {
+   "sent_s": 252.41,
+   "status": 200,
+   "latency_s": 10.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0014724200000000001
+  },
+  {
+   "sent_s": 254.14,
+   "status": 200,
+   "latency_s": 19.25,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.003966315
+  },
+  {
+   "sent_s": 258.54,
+   "status": 200,
+   "latency_s": 12.0,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.001581565
+  },
+  {
+   "sent_s": 261.24,
+   "status": 200,
+   "latency_s": 5.41,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0010493450000000001
+  },
+  {
+   "sent_s": 266.34,
+   "status": 200,
+   "latency_s": 12.67,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.00225572
+  },
+  {
+   "sent_s": 266.43,
+   "status": 200,
+   "latency_s": 7.38,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0014646350000000002
+  },
+  {
+   "sent_s": 268.84,
+   "status": 200,
+   "latency_s": 12.11,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 6,
+   "cost_usd": 0.00214205
+  },
+  {
+   "sent_s": 276.51,
+   "status": 200,
+   "latency_s": 7.7,
+   "role": "champion",
+   "version": "v3",
+   "abstained": true,
+   "citations": 0,
+   "pages_read": 0,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.0016712950000000002
+  },
+  {
+   "sent_s": 279.56,
+   "status": 200,
+   "latency_s": 11.87,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 2,
+   "pages_read": 2,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 7,
+   "cost_usd": 0.0032068500000000007
+  },
+  {
+   "sent_s": 279.74,
+   "status": 200,
+   "latency_s": 18.26,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 4,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 8,
+   "cost_usd": 0.003779365
+  },
+  {
+   "sent_s": 282.86,
+   "status": 200,
+   "latency_s": 11.74,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 1,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 5,
+   "cost_usd": 0.00135405
+  },
+  {
+   "sent_s": 285.59,
+   "status": 200,
+   "latency_s": 10.06,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 4,
+   "cost_usd": 0.0014371100000000001
+  },
+  {
+   "sent_s": 288.29,
+   "status": 200,
+   "latency_s": 6.63,
+   "role": "champion",
+   "version": "v3",
+   "abstained": false,
+   "citations": 3,
+   "pages_read": 1,
+   "providers": [
+    "anthropic"
+   ],
+   "model_calls": 3,
+   "cost_usd": 0.0008998600000000002
+  }
+ ],
+ "spent_usd": 0.237565
+}

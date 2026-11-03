@@ -1,6 +1,6 @@
 {
   "cap_usd": 10.0,
-  "total_usd": 3.152382,
+  "total_usd": 3.427181,
   "entries": [
     {
       "time": "2026-11-02T17:18:45+00:00",
@@ -50,6 +50,20 @@
       "calls": 7,
       "uncached_calls": 7,
       "usd": 0.013503
+    },
+    {
+      "time": "2026-11-03T18:54:03+00:00",
+      "step": "drill pilot (pilot-1c)",
+      "calls": 94,
+      "uncached_calls": 94,
+      "usd": 0.037234
+    },
+    {
+      "time": "2026-11-03T19:06:51+00:00",
+      "step": "drill drill-1c-no-reading",
+      "calls": 134,
+      "uncached_calls": 134,
+      "usd": 0.237565
     }
   ]
 }

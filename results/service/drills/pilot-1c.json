@@ -1,0 +1,19 @@
+{
+ "questions": 12,
+ "candidates": {
+  "champion": {
+   "answers": 12,
+   "bad": 1,
+   "errored": 1,
+   "abstained": 0,
+   "read_no_page": 0
+  },
+  "no-reading": {
+   "answers": 12,
+   "bad": 11,
+   "errored": 0,
+   "abstained": 2,
+   "read_no_page": 11
+  }
+ }
+}

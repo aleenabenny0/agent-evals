@@ -111,6 +111,12 @@ it measured. The gate before a release is what guards accuracy, and phase 7's da
 small regressions. The rule is a last check for large breakage, and should not be read as more than
 that.
 
+*Update, 2026-11-03.* This blind spot is closed for the case measured. The signal now also counts an
+answer that read no page, and drill 1c released the same "do not read pages" prompt. The rule fired
+at its first look, 15 of 20 canary answers bad, where the old signal on the same answers would have
+stayed quiet (`docs/plans/phase-8-drill-1c.md`). A prompt that reads pages and answers worse is still
+invisible to it.
+
 The signal also counts every abstention as bad, including right ones on questions the docs cannot
 answer. That costs nothing when comparing like with like, since both sides see the same mix. But a
 prompt that stopped abstaining would look better on this signal, not worse. The drills did not show
@@ -124,5 +130,5 @@ this happening: the canaries abstained on every outside-the-docs question they g
 | Make the spend alert follow the configured cap | Done |
 | Report a circuit's close from the breaker itself | Done |
 | Send enough questions for a drill to reach its last look | Done |
-| Run the failover drill on the second provider | Not run: no budget left for paid API calls |
-| Decide whether to add a signal for answers that stop reading pages | Open |
+| Run the failover drill on the second provider | Not run: no budget for a second paid provider |
+| Decide whether to add a signal for answers that stop reading pages | Done 2026-11-03: added; drill 1c passed |

@@ -40,10 +40,11 @@ the result with `uv run evals registry show`, and the log in `results/service/re
 
 A service restart starts the looks again, so avoid one during a canary.
 
-**What the rule can and cannot do.** It catches a broken prompt: a stale notice that made every
-answer abstain was removed in about 5 minutes, after 20 bad answers, at 0.45 questions a second. It
-does not catch a worse one: a prompt that stopped the agent reading pages gave 1 bad answer in 12 in
-a pilot, and would very likely pass. A quiet canary is not evidence of accuracy.
+**What the rule can and cannot do.** A bad answer, to the rule, is one that errored, abstained,
+cited nothing or read no page. It catches a broken prompt: a stale notice that made every answer
+abstain was removed in about 5 minutes, after 20 bad answers, at 0.45 questions a second, and a
+prompt that stopped the agent reading pages was removed in about 3 minutes (drill 1c). It does not
+catch a prompt that reads pages and answers worse. A quiet canary is not evidence of accuracy.
 
 ## Service objectives
 

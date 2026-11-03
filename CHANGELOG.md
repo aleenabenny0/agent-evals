@@ -220,6 +220,14 @@ Format:
 
 ## Unreleased
 
+- 2026-11-03: LLM Ops: the canary rule's one signal also counts an answer that read no page, the
+  blind spot the postmortem left open (`docs/plans/phase-8-drill-1c.md`, agreed and pre-registered
+  before any run). On stored offline runs the champion read a page for all 482 of its answers. Drill
+  1c released a "do not read pages" prompt: the rule fired at its first look, 15 of 20 canary
+  answers bad against 6 of 66 on the champion, and the service removed it in 193 s. Graded by the
+  old signal, the same answers give p = 0.028 against a per-look bar of 0.0033, so the old rule
+  would not have fired there. All 7 pass marks met, for $0.27. The canary's share of bad answers,
+  75%, fell short of the 90% predicted. No champion moved.
 - 2026-11-02: LLM Ops: the canary rule, the automatic rollback and the real drills
   (`docs/plans/phase-8-llm-ops.md`, decisions approved 2026-11-02). The Docker stack has run: the
   service, Prometheus, Grafana and Jaeger all work. Drill 1 failed its pre-registered marks: the

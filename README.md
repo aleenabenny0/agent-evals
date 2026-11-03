@@ -52,8 +52,9 @@ The platform evaluates two agents that engineers use every day:
 > about 17 points ahead of Haiku (95% CI +7 to +26, compared after the fact) at 14 times the cost.
 > The judge failed its blind spot check on Opus's answers, too lenient by one answer over the bar,
 > so no support claim about Opus, or about routing to it, is made
-> ([plan and result](docs/plans/phase-9-routing.md)). A canary signal and the code agent come next
-> (see [Roadmap](#roadmap)).
+> ([plan and result](docs/plans/phase-9-routing.md)). The canary rule now also catches a prompt that
+> stops the agent reading pages ([drill 1c](docs/plans/phase-8-drill-1c.md)). The code agent comes
+> next (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -340,11 +341,13 @@ Done:
    spot check on Sonnet's answers and failed one on Opus's, so the support claims that rest on Opus
    were withdrawn ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
 8. **A technical report** *(2026-11-03)*: [docs/technical-report.md](docs/technical-report.md).
+9. **A canary signal for answers that read no page** *(2026-11-03, $0.27)*: the blind spot the
+   phase 8 postmortem left open. In a real drill the rule removed a "do not read pages" prompt at
+   its first look, where the old signal would have stayed quiet
+   ([docs/plans/phase-8-drill-1c.md](docs/plans/phase-8-drill-1c.md)).
 
 Next, in order:
 
-9. **A canary signal for answers that stop reading pages**, the blind spot the phase 8 postmortem
-   left open.
 10. **The code agent** (boto3, checked against botocore's service models, run against moto with no
     network), then **a red team** (prompt-injection suites).
 

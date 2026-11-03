@@ -13,7 +13,8 @@ $10, plus a small balance with the second provider.
 is built and has run, except two steps that need the second provider: the dev suite on it, and the
 failover drill. Neither is running for now, because the project has no budget left for paid API
 calls, so failover is tested offline only and `gpt-5-mini` has never been called. The automatic
-rollback has worked on the real model. $3.15 of the $10 cap is spent. Results are in parts 6 and 7 and in
+rollback has worked on the real model, and since drill 1c it also catches a prompt that stops the
+agent reading pages. $3.43 of the $10 cap is spent. Results are in parts 6 and 7 and in
 `docs/postmortems/2026-11-02-release-drills.md`.
 
 **Goal.** Show that a change to this agent can be released safely: measured before it merges,
@@ -159,11 +160,17 @@ first.
 | 1 | An over-strict abstention rule | 2 of 50 | 29 of 256 | **Failed:** the rule never fired |
 | 2 | A reworded heading | 10 of 71 | 39 of 324 | **Passed:** quiet through three looks |
 | 1b | A stale "docs unavailable" notice | 20 of 20 | 29 of 153 | **Passed:** rolled back in 310 s |
+| 1c | "Do not use read_page", after the signal was widened | 15 of 20 | 14 of 114 | **Passed:** rolled back in 193 s |
 
 Drill 1 failed because its fault was predicted and did no harm on this signal, so the rollback was
 not exercised. Its record stands, and drill 1b is a separate run with a fault measured first. A pilot
 also showed the blind spot above in numbers: a prompt that stopped the agent reading pages gave 1 bad
 answer in 12. The rule catches a broken prompt, not a worse one.
+
+That pilot's fault is now caught. On 2026-11-03 the signal was widened to count an answer that read
+no page, and drill 1c released the same prompt: the rule fired at its first look, where the old
+signal would not have (p = 0.028 against a bar of 0.0033). The champion answered 100 questions in
+that drill and read a page for every one (`docs/plans/phase-8-drill-1c.md`).
 
 ## Part 7: the load test
 
@@ -249,7 +256,8 @@ At about $0.005 per answer, from the dev runs.
 | Load test against the real API | 132 | about $1 | $0.23 |
 | Canary drills, three runs | 874 | about $3 | $1.65 |
 | Fault pilot and forwarder check | 43 | left out of the plan | $0.06 |
-| **Spent so far** | 1,049 | | **$3.15 of $10** |
+| Drill 1c and its pilot (2026-11-03) | 158 | at most $1, agreed | $0.27 |
+| **Spent so far** | 1,207 | | **$3.43 of $10** |
 | Failover drill | about 120 | about $0.50 | not run |
 | Dev suite on the second provider | 130 | about $1.50, at that provider's prices | not run |
 

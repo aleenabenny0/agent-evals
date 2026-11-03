@@ -64,6 +64,52 @@ registry. The drill script only releases the canary.
 6. Every answered response carries `pages_read`.
 7. The pilot and the drill together spend at most $1.00, the drill at most $0.75.
 
+## Result (2026-11-03): passed, 7 of 7 marks
+
+**The pilot** (`results/service/drills/pilot-1c.json`, $0.04): the no-reading prompt gave 11 bad
+answers in 12, and all 11 read no page. The champion gave 1 bad in 12, an errored answer, and
+read a page every time. Both met the bar, so the drill ran.
+
+**The rehearsal** (`results/service/drills/rehearsal-1c-no-reading.json`, free): 20 of 20 canary
+answers bad, rolled back after 267 s. The plumbing works.
+
+**The drill** (`results/service/drills/drill-1c-no-reading.json`, $0.24):
+
+| | Answers | Cited, read no page | Abstained | Good | Bad |
+|---|---|---|---|---|---|
+| Canary | 20 | 9 | 6 | 5 | 15 |
+| Champion | 114 | 0 | 14 | 100 | 14 |
+
+The rule fired at the first look: "15 of 20 canary answers bad, 6 of 66 on the champion, p =
+0.00000". The service removed the canary by itself 193 s after it went live.
+
+| Mark | Result |
+|---|---|
+| 1. Fires by the third look | Met: the first |
+| 2. Rollback by `canary-rule`, champion still `v3` | Met |
+| 3. No canary answer after the rollback was seen | Met: 0 |
+| 4. 5xx at most 2% | Met: 0 of 143 sent (9 were refused at capacity with a 429) |
+| 5. `configs/registry.yaml` unchanged | Met |
+| 6. Every answer carries `pages_read` | Met: 134 of 134 |
+| 7. At most $1.00 in all, the drill at most $0.75 | Met: $0.27, the drill $0.24 |
+
+**Against the predictions.** The champion's share of bad answers was 12.3%, inside the 10% to 20%
+predicted, and the rule fired at the first look, after 3.2 minutes rather than about 5. The
+canary's share was 75%, short of the 90% predicted: 5 of its 20 answers read a page despite the
+prompt, against 1 of 12 in the pilot.
+
+**What the change bought.** Graded by the old rule, the same 20 canary answers hold 6 bad ones, and
+the first look would have read 6 of 20 against 6 of 66, p = 0.028. That is above the per-look bar
+of 0.0033, so the old rule would not have fired there. The 9 cited answers that read no page made
+the difference.
+
+**What it cost the champion.** None of the champion's 100 answered questions read no page. Its 10
+answers with no page read were all abstentions, which were bad under the old rule anyway. So on
+simulated questions too, as on the 482 offline answers, the wider signal adds nothing to the
+champion's count.
+
+The phase 8 ledger stands at $3.43 of $10.
+
 ## What this run can and cannot show
 
 It shows the widened signal catching a prompt that stops the agent reading, end to end on the real
