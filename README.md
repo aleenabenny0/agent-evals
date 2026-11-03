@@ -3,6 +3,8 @@
 **Measure tool-using LLM agents for accuracy and hallucination, find out *why* they fail, and
 improve them only through changes that are proven on held-out data.**
 
+The whole project in one write-up: [docs/technical-report.md](docs/technical-report.md).
+
 ## Highlights
 
 - **Hallucination checked by code, not by opinion.** The AWS docs agent must quote the page
@@ -50,8 +52,8 @@ The platform evaluates two agents that engineers use every day:
 > about 17 points ahead of Haiku (95% CI +7 to +26, compared after the fact) at 14 times the cost.
 > The judge failed its blind spot check on Opus's answers, too lenient by one answer over the bar,
 > so no support claim about Opus, or about routing to it, is made
-> ([plan and result](docs/plans/phase-9-routing.md)). The code agent comes next (see
-> [Roadmap](#roadmap)).
+> ([plan and result](docs/plans/phase-9-routing.md)). A canary signal and the code agent come next
+> (see [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -323,24 +325,28 @@ Done:
    against 8.00, but one answer that had to keep passing passed 1 pass in 3, so that round ended too,
    after $16.04 of a $60 budget ([docs/plans/judge-v6.md](docs/plans/judge-v6.md)).
 
-Next, in order:
-
-6. **LLM Ops** *(nearly done)*: the docs agent as a service, with a prompt registry, tracing and
-   metrics, an eval gate in CI, a canary with an automatic rollback, a load test, service objectives,
-   a [runbook](docs/runbook.md) and a
+6. **LLM Ops** *(done except one drill)*: the docs agent as a service, with a prompt registry,
+   tracing and metrics, an eval gate in CI, a canary with an automatic rollback, a load test,
+   service objectives, a [runbook](docs/runbook.md) and a
    [postmortem](docs/postmortems/2026-11-02-release-drills.md). Failover to a second provider is
    built and tested offline. Its drill on a real provider has not run, because the project has
    no budget for a second paid provider
    ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
-7. **Model routing** *(done, 2026-11-03, $20.50)*: the docs agent on Haiku 5.5, Sonnet 5.5 and
-   Opus 5.5, and five routers fitted on dev, with the choice committed before test was read once.
-   On correctness Haiku alone is as good as any of them, at 3.5% of Opus's cost, so the service
-   keeps serving Haiku. On answers correct and fully supported by their quotes, Sonnet leads Haiku
-   by about 17 points at 14 times the cost, a comparison made after the fact. The judge passed a blind spot check on Sonnet's answers
-   and failed one on Opus's, so the support claims that rest on Opus were withdrawn
-   ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
-8. **The code agent** (boto3, checked against botocore's service models, run against moto with no
-   network), then **a red team** (prompt-injection suites) and a technical report.
+7. **Model routing** *(2026-11-03, $20.50)*: the docs agent on Haiku 5.5, Sonnet 5.5 and Opus 5.5,
+   and five routers fitted on dev, with the choice committed before test was read once. On
+   correctness Haiku alone is as good as any of them, at 3.5% of Opus's cost, so the service keeps
+   serving Haiku. On answers correct and fully supported by their quotes, Sonnet leads Haiku by
+   about 17 points at 14 times the cost, a comparison made after the fact. The judge passed a blind
+   spot check on Sonnet's answers and failed one on Opus's, so the support claims that rest on Opus
+   were withdrawn ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
+8. **A technical report** *(2026-11-03)*: [docs/technical-report.md](docs/technical-report.md).
+
+Next, in order:
+
+9. **A canary signal for answers that stop reading pages**, the blind spot the phase 8 postmortem
+   left open.
+10. **The code agent** (boto3, checked against botocore's service models, run against moto with no
+    network), then **a red team** (prompt-injection suites).
 
 How each piece maps to the three project briefs behind this repository is in
 [docs/plans/brief-alignment.md](docs/plans/brief-alignment.md).
