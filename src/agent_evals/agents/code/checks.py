@@ -1,7 +1,8 @@
 """Machine checks on a code case, run before a person reviews it (phase 3, part 4).
 
 A possible task passes when its setup runs, its reference solution passes the hidden test, and
-both a solution that does nothing and the case's near miss fail it, at the test and not before.
+both a solution that does nothing and the case's near miss fail it, at the test and not before,
+the near miss through one of the test's assertions.
 So the test is known to see the task: it is not satisfied by an empty account or by a solution
 that misses the point. The reference must also pass the static API check, so the reference itself
 calls nothing that does not exist.
@@ -61,6 +62,10 @@ def check_case(case: Case, runner: CodeRunner) -> CaseCheck:
             held.errors.append(f"{name} passes the test, so the test does not see the task")
         elif run.stage != "test":
             held.errors.append(f"{name} fails at {run.stage}, before the test: {run.error}")
+    # The near miss differs from the reference only in what the task asks for, so the test must
+    # fail it by asserting on that, not by crashing on a missing key on the way.
+    if near.stage == "test" and not (near.error or "").startswith("AssertionError"):
+        held.errors.append(f"the near miss crashes the test instead of failing it: {near.error}")
     return held
 
 

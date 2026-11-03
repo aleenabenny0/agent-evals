@@ -100,6 +100,19 @@ def test_a_broken_setup_is_the_case_not_the_code() -> None:
     assert held.errors == ["the setup fails: RuntimeError: typo"]
 
 
+def test_a_test_that_crashes_on_the_near_miss_does_not_count_as_seeing_the_task() -> None:
+    # A test that errors on the near miss, as indexing a key it never set would, proves less
+    # than one that asserts on the setting the task asks for.
+    crashing = TEST.replace(
+        'assert attrs["VisibilityTimeout"] == "60"',
+        'if attrs["VisibilityTimeout"] != "60":\n    raise KeyError("VisibilityTimeout")',
+    )
+    case = Case.model_validate(code_case(task={"test": crashing}))
+    held = check_case(case, InProcessRunner())
+    assert held.runs["near_miss"].error == "KeyError: 'VisibilityTimeout'"
+    assert any("crashes the test instead of failing it" in e for e in held.errors)
+
+
 def test_a_near_miss_that_crashes_is_a_weak_check() -> None:
     crash = "def solve(session):\n    raise ValueError('oops')\n"
     held = check_case(Case.model_validate(code_case(task={"near_miss": crash})), InProcessRunner())

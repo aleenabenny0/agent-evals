@@ -9,7 +9,9 @@ results store, the statistics and the gate stay as they are. Estimated cost abou
 Most of the cost is human time spent verifying the tasks.
 
 **Status:** approved 2026-11-03, with every recommended option (1a to 5a). Approval covers the paid
-steps up to the cap, each after the build before it is done.
+steps up to the cap, each after the build before it is done. Parts 1, 2, 3 and 5 are built and
+tested offline. The 120 cases are drafted in `suites/code/*.drafts.jsonl` and every one passes the
+machine checks; part 4's human verification is next. Nothing paid has run.
 
 **Goal.** Show that the method carries to a different kind of agent. Here hallucination means
 calling an operation or a parameter that does not exist, and being right means the account ends up
