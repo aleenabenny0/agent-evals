@@ -50,6 +50,18 @@ class DocsAgentConfig(_Strict):
     require_number_coverage: bool = False
 
 
+class CodeAgentConfig(_Strict):
+    """The code agent (docs/plans/phase-3-code-agent.md). Its code runs only in the sandbox."""
+
+    model: ModelConfig = ModelConfig()
+    max_steps: int = 16
+    strict_tools: bool = True
+    max_submission_rejections: int = 3
+    max_runs: int = 6  # run_code calls per attempt
+    describe_chars: int = 6000  # the most of one describe_operation result the model sees
+    prompt_version: str = "v1"
+
+
 class Paths(_Strict):
     corpus_dir: Path = Path("data/snapshots/aws-docs")
     # Committed hash-per-page record of the snapshot, for the monthly drift check (ADR 0005).
@@ -155,6 +167,7 @@ class Config(_Strict):
     paths: Paths = Paths()
     run: RunConfig = RunConfig()
     docs_agent: DocsAgentConfig = DocsAgentConfig()
+    code_agent: CodeAgentConfig = CodeAgentConfig()
     graders: GradersConfig = GradersConfig()
     judge: JudgeConfig = JudgeConfig()
     suites: SuitesConfig = SuitesConfig()

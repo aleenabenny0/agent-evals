@@ -33,7 +33,8 @@ def load_suite(path: Path) -> list[Case]:
         if case.id in seen:
             errors.append(f"line {lineno}: duplicate id {case.id!r}")
         # An online case has no reference answer, so no phrases to require.
-        if case.answerable and not case.is_online and not (case.gold and case.gold.must_include):
+        docs_answer = case.answerable and not case.is_online and case.task is None
+        if docs_answer and not (case.gold and case.gold.must_include):
             errors.append(f"line {lineno}: answerable case {case.id!r} has no must_include")
         seen.add(case.id)
         cases.append(case)

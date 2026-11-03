@@ -12,7 +12,18 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from agent_evals.config import Pricing
 
-CaseType = Literal["lookup", "multi_step", "changed_default", "unanswerable", "false_premise"]
+# The code agent's cases (phase 3) add create, modify and query, and share multi_step (two services
+# wired together) and unanswerable (a task that asks for something AWS does not have).
+CaseType = Literal[
+    "lookup",
+    "multi_step",
+    "changed_default",
+    "unanswerable",
+    "false_premise",
+    "create",
+    "modify",
+    "query",
+]
 # Service area, for the case mix and per-area reporting (docs/plans/phase-2-measurement.md).
 Area = Literal[
     "ai_ml",
@@ -71,6 +82,29 @@ class Gold(BaseModel):
         return [url for group in self.evidence for url in group]
 
 
+class CodeTask(BaseModel):
+    """A code agent's reference, in place of `Gold` (docs/plans/phase-3-code-agent.md, part 4).
+
+    `setup` creates what exists before the agent's code runs. `test` is hidden from the agent and
+    checks the state afterwards, with `session` and solve's `result` in scope. `reference` is a
+    `solve(session)` that passes it, and `near_miss` one that does almost the task but misses
+    what the task asks for, so it must fail: together they show the test detects the task. An
+    impossible task has none of the three, since the right outcome is to abstain, and
+    `impossible_because` says what does not exist.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    services: list[str]
+    setup: str = ""
+    test: str | None = None
+    reference: str | None = None
+    near_miss: str | None = None
+    impossible_because: str | None = None
+    # Delete, Terminate or Remove operations the task asks for; any other is unrequested.
+    destructive_ok: list[str] = Field(default_factory=list)
+
+
 class Case(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -82,6 +116,7 @@ class Case(BaseModel):
     # Absent only on an online case (simulated traffic has no reference answer); there it may
     # hold at most a minimal key, a false premise's contradicted sentence as `support`.
     gold: Gold | None = None
+    task: CodeTask | None = None  # the code agent's cases have this, and no gold
     split: Split
     # "simulated" is phase 7 traffic: generated, never verified by hand, and not a draft.
     provenance: Literal["hand", "synthetic", "simulated"]
@@ -109,6 +144,9 @@ class Case(BaseModel):
                 "an online case has suite 'online', split 'online' and provenance 'simulated'; "
                 "no other case has any of them"
             )
+        if self.task is not None or self.agent == "code":
+            self._code_rules()
+            return self
         if not self.is_online:
             if self.gold is None:
                 raise ValueError("gold may be absent only on an online case")
@@ -124,6 +162,21 @@ class Case(BaseModel):
             if self.type != "false_premise":
                 raise ValueError("only an online false premise has a gold: its minimal key")
         return self
+
+    def _code_rules(self) -> None:
+        task = self.task
+        if self.agent != "code" or task is None or self.gold is not None or self.is_online:
+            raise ValueError("a code case has agent 'code', a task, no gold, and is offline")
+        solved = (task.test, task.reference, task.near_miss)
+        if self.type == "unanswerable":
+            if any(part is not None for part in solved) or not task.impossible_because:
+                raise ValueError(
+                    "an impossible task has impossible_because, and no test, reference or near miss"
+                )
+        elif not all(part and part.strip() for part in solved) or task.impossible_because:
+            raise ValueError("a possible task has a test, a reference and a near miss")
+        if not task.services:
+            raise ValueError("a code case names the services it uses")
 
     @property
     def is_online(self) -> bool:

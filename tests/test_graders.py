@@ -170,9 +170,9 @@ def test_output_contract_does_not_judge_what_the_answer_says() -> None:
 
 
 def test_output_contract_fails_an_agent_with_no_contract() -> None:
-    g = by_metric(FormatGrader().grade(make_case(agent="code"), answer("Up to 5 GB.")))
+    g = by_metric(FormatGrader().grade(make_case(agent="browser"), answer("Up to 5 GB.")))
     assert not g["output_contract"].passed
-    assert g["output_contract"].reason == "no output contract for agent 'code'"
+    assert g["output_contract"].reason == "no output contract for agent 'browser'"
     assert g["malformed_output"].passed  # the other check still runs
 
 

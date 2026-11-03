@@ -27,8 +27,17 @@ class DocsAnswer(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
 
 
-# Keyed by `Case.agent`. The baselines answer docs cases through the same tool, so they share it.
-OUTPUT_CONTRACTS: dict[str, type[BaseModel]] = {"docs": DocsAnswer}
+class CodeAnswer(BaseModel):
+    """The code agent's answer: a module defining solve(session), or an abstention."""
+
+    model_config = ConfigDict(extra="forbid")
+    code: str
+    abstained: bool
+    explanation: str
+
+
+# Keyed by `Case.agent`. Baselines answer through their agent's tool, so they share its contract.
+OUTPUT_CONTRACTS: dict[str, type[BaseModel]] = {"docs": DocsAnswer, "code": CodeAnswer}
 
 
 def contract_problems(agent: str, output: Mapping[str, Any]) -> list[str]:

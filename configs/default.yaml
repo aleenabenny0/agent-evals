@@ -29,6 +29,20 @@ docs_agent:
   max_submission_rejections: 3   # then the attempt fails as malformed_submission
   prompt_version: v3             # champion since iteration 1 (2026-10-16); v2 is the previous champion
 
+code_agent:
+  # The AWS code agent (docs/plans/phase-3-code-agent.md). Its code runs only in the sandbox.
+  model:
+    name: claude-haiku-5-5
+    max_tokens: 4096       # a module of code runs longer than a docs answer
+    temperature: null
+    pricing:
+      # The same first-party rates as the docs agent's (see above).
+      input_per_mtok: 0.10
+      output_per_mtok: 0.50
+  max_steps: 16
+  max_runs: 6              # run_code calls per attempt
+  prompt_version: v1
+
 graders:
   min_quote_chars: 12      # shorter quotes can't be verified against a page; count as fabricated
 

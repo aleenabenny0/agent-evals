@@ -23,7 +23,7 @@ if TYPE_CHECKING:
     from agent_evals.spend import MeteredLLM, SpendLedger
     from agent_evals.stats.core import Estimate
     from agent_evals.store.db import ResultsStore
-    from agent_evals.types import Case, Grade
+    from agent_evals.types import Case, Gold, Grade
 
 app = typer.Typer(add_completion=False, no_args_is_help=True, help=__doc__)
 console = Console()
@@ -133,7 +133,8 @@ def snapshot(
 
 @app.command()
 def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
-    """Check a suite: schema, duplicate ids, gold answers; with a snapshot, evidence and quotes."""
+    """Check a suite: schema, duplicate ids, gold answers; with a snapshot, evidence and quotes.
+    For the code agent's cases, the machine checks in the sandbox instead (phase 3, part 4)."""
     from agent_evals.corpus import Corpus
     from agent_evals.suites import (
         SuiteError,
@@ -158,6 +159,10 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
         console.print(f"{len(open_split)} cases with split 'unassigned'; use `evals split`")
     if held := [c.id for c in cases if c.hold]:
         console.print(f"{len(held)} on hold (never placed in test): {', '.join(held)}")
+    if any(c.task is not None for c in cases):
+        if not _code_checks_pass(cases):
+            raise typer.Exit(code=1)
+        return
 
     corpus_dir = _config(config).paths.corpus_dir
     if not (corpus_dir / "pages.jsonl").exists():
@@ -174,6 +179,67 @@ def validate(suite: Path, config: ConfigOpt = DEFAULT_CONFIG) -> None:
         raise typer.Exit(code=1)
 
 
+def _code_checks(cases: list[Case]) -> dict[str, Any] | None:
+    """Each code case's machine checks, run in the sandbox, or None when there is no image."""
+    from agent_evals.agents.code.checks import check_cases
+    from agent_evals.agents.code.sandbox import DockerSandbox, image_available
+
+    if not image_available():
+        console.print(
+            "[yellow]No sandbox image, so the machine checks did not run: "
+            "uv run evals sandbox-build[/yellow]"
+        )
+        return None
+    code = [c for c in cases if c.task is not None]
+    with console.status(f"running the machine checks of {len(code)} code cases in the sandbox"):
+        return {held.case_id: held for held in check_cases(code, DockerSandbox())}
+
+
+def _code_checks_pass(cases: list[Case]) -> bool:
+    checks = _code_checks(cases)
+    if checks is None:
+        return True
+    failed = [held for held in checks.values() if not held.ok]
+    for held in failed:
+        for error in held.errors:
+            console.print(f"[red]error[/red] {held.case_id}: {error}")
+    console.print(f"machine checks: {len(checks) - len(failed)} of {len(checks)} cases pass")
+    return not failed
+
+
+def _show_code_case(c: Case, check: Any) -> bool:
+    """A code draft as its reviewer sees it. True when its machine checks passed."""
+    from rich.panel import Panel
+    from rich.syntax import Syntax
+
+    task = c.task
+    assert task is not None
+    console.print(Panel(c.question, title="task"))
+    console.print(f"services: {', '.join(task.services)}")
+    if task.destructive_ok:
+        console.print(f"destructive operations the task asks for: {', '.join(task.destructive_ok)}")
+    if task.impossible_because:
+        console.print(Panel(task.impossible_because, title="impossible because"))
+        return True
+    for title, code in (
+        ("setup (exists before the code runs)", task.setup),
+        ("hidden test", task.test),
+        ("reference solution", task.reference),
+        ("near miss (must fail the test)", task.near_miss),
+    ):
+        if code:
+            console.print(Panel(Syntax(code.strip(), "python", word_wrap=True), title=title))
+    if check is None:
+        console.print("[yellow]machine checks not run: no sandbox image[/yellow]")
+        return False
+    for name, run in check.runs.items():
+        said = "passes" if run.ok else f"fails at {run.stage}: {run.error}"
+        console.print(f"[dim]{name}:[/dim] {said}")
+    for error in check.errors:
+        console.print(f"[red]machine check failed:[/red] {error}")
+    return bool(check.ok)
+
+
 @app.command()
 def review(
     suite: Path,
@@ -185,7 +251,9 @@ def review(
     ] = None,
     config: ConfigOpt = DEFAULT_CONFIG,
 ) -> None:
-    """Walk through unverified drafts one by one, with the support quote shown in its page."""
+    """Walk through unverified drafts one by one, with the support quote shown in its page. A code
+    case is shown with its test, reference and near miss, and the outcome of its machine checks;
+    one whose checks failed can only be rejected or skipped."""
 
     from rich.panel import Panel
     from rich.prompt import Prompt
@@ -209,6 +277,35 @@ def review(
         for a, b in term_spans(segment, terms):
             t.stylize("bold cyan", a, b)
         return t
+
+    def show_docs(c: Case, gold: Gold) -> None:
+        console.print(Panel(c.question, title="question"))
+        console.print(Panel(gold.answer, title="gold answer"))
+        console.print(f"must_include: {gold.must_include}")
+        for url in gold.evidence_urls:
+            console.print(f"evidence: {url}")
+        terms = answer_terms(c)
+        missing = uncovered_terms(c)
+        if missing:
+            console.print("[cyan]answer facts with no support quote: " + ", ".join(missing) + "[/]")
+        console.print("[dim]yellow = support quote; cyan = other answer facts on the page[/dim]")
+        for n, quote in enumerate(gold.support, 1):
+            shown = False
+            if corpus is not None:
+                for url in gold.evidence_urls:
+                    page = corpus.pages.get(url)
+                    ctx = quote_context(page.text, quote) if page else None
+                    if ctx:
+                        before, match, after = ctx
+                        body = Text.assemble(
+                            mark(before, terms), (match, "bold yellow"), mark(after, terms)
+                        )
+                        title = f"support {n}/{len(gold.support)}, in context of {url}"
+                        console.print(Panel(body, title=title))
+                        shown = True
+                        break
+            if not shown:
+                console.print(Panel(quote, title=f"support {n}/{len(gold.support)}"))
 
     base = suite.name.removesuffix(".jsonl").removesuffix(".drafts")
     rejected_path = suite.with_name(f"{base}.rejected.jsonl")
@@ -244,44 +341,34 @@ def review(
         return
     rejected = load_suite(rejected_path) if rejected_path.exists() else []
     tally = {"accepted": 0, "rejected": 0, "skipped": 0}
+    code_checks = _code_checks(drafts) if any(c.task is not None for c in drafts) else None
 
     for i, c in enumerate(drafts, 1):
         gold = c.gold
-        if gold is None:  # drafts are offline cases, which always have gold
+        choices = ["a", "r", "s", "q"]
+        if c.task is not None:
+            console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(drafts)}")
+            checked = (code_checks or {}).get(c.id)
+            if not _show_code_case(c, checked):
+                choices = ["r", "s", "q"]
+            question = "Does the test check what the task says, no more and no less?"
+            console.print(f"[bold]{question}[/bold]")
+        if gold is None and c.task is None:  # drafts are offline cases, which have a reference
             continue
-        console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(drafts)}")
-        console.print(Panel(c.question, title="question"))
-        console.print(Panel(gold.answer, title="gold answer"))
-        console.print(f"must_include: {gold.must_include}")
-        for url in gold.evidence_urls:
-            console.print(f"evidence: {url}")
-        terms = answer_terms(c)
-        missing = uncovered_terms(c)
-        if missing:
-            console.print("[cyan]answer facts with no support quote: " + ", ".join(missing) + "[/]")
-        console.print("[dim]yellow = support quote; cyan = other answer facts on the page[/dim]")
-        for n, quote in enumerate(gold.support, 1):
-            shown = False
-            if corpus is not None:
-                for url in gold.evidence_urls:
-                    page = corpus.pages.get(url)
-                    ctx = quote_context(page.text, quote) if page else None
-                    if ctx:
-                        before, match, after = ctx
-                        body = Text.assemble(
-                            mark(before, terms), (match, "bold yellow"), mark(after, terms)
-                        )
-                        title = f"support {n}/{len(gold.support)}, in context of {url}"
-                        console.print(Panel(body, title=title))
-                        shown = True
-                        break
-            if not shown:
-                console.print(Panel(quote, title=f"support {n}/{len(gold.support)}"))
+        if gold is not None:
+            console.rule(f"{c.id}   {c.type}, {c.area}   {i}/{len(drafts)}")
+        if gold is not None:
+            show_docs(c, gold)
         if c.notes:
             console.print(f"notes: {c.notes}")
 
         try:
-            choice = Prompt.ask("(a)ccept, (r)eject, (s)kip, (q)uit", choices=["a", "r", "s", "q"])
+            asked = (
+                "(a)ccept, (r)eject, (s)kip, (q)uit"
+                if "a" in choices
+                else "(r)eject, (s)kip, (q)uit"
+            )
+            choice = Prompt.ask(asked, choices=choices)
         except EOFError:
             console.print("[yellow]No interactive input; stopping.[/yellow]")
             break
@@ -381,7 +468,10 @@ def split(
 def run(
     suite: Path,
     agent: Annotated[
-        str, typer.Option(help="Agent to evaluate: docs, closed-book or oracle-evidence.")
+        str,
+        typer.Option(
+            help="Agent to evaluate: docs, closed-book, oracle-evidence, code or code-closed-book."
+        ),
     ] = "docs",
     attempts: Annotated[int, typer.Option(min=1, help="Attempts per case (for pass^k).")] = 1,
     limit: Annotated[int | None, typer.Option(help="Only run the first N cases.")] = None,
@@ -427,8 +517,9 @@ def run(
         "closed-book": ClosedBookAgent,
         "oracle-evidence": OracleEvidenceAgent,
     }
-    if agent not in agents:
-        console.print(f"[red]Unknown agent {agent!r}. Available: {', '.join(agents)}[/red]")
+    if agent not in agents and agent not in CODE_AGENTS:
+        known = ", ".join([*agents, *CODE_AGENTS])
+        console.print(f"[red]Unknown agent {agent!r}. Available: {known}[/red]")
         raise typer.Exit(code=2)
 
     cfg = _config(config)
@@ -441,6 +532,17 @@ def run(
             "throwaway run.[/red]"
         )
         raise typer.Exit(code=2)
+    wanted = "code" if agent in CODE_AGENTS else "docs"
+    if strays := [c.id for c in cases if c.agent != wanted]:
+        console.print(
+            f"[red]{len(strays)} case(s) are not {wanted} cases, e.g. {strays[0]!r}.[/red]"
+        )
+        raise typer.Exit(code=2)
+    if agent in CODE_AGENTS:
+        if on_fallback:
+            console.print("[red]--on-fallback is for the docs agent's failover only.[/red]")
+            raise typer.Exit(code=2)
+        return _run_code_agent(agent, suite, cases, attempts, cfg)
     corpus = Corpus.load(cfg.paths.corpus_dir)
     fallback = _fallback(cfg) if on_fallback else None
     llm: LLMClient = (
@@ -478,6 +580,66 @@ def run(
             attempts=attempts,
             workers=cfg.run.workers,
             pricing=fallback.pricing if fallback is not None else cfg.docs_agent.model.pricing,
+            budget_usd=cfg.run.budget_usd,
+            manifest=manifest,
+        )
+        _print_summary(store, run_id, cfg.judge.grader_name)
+    finally:
+        store.close()
+    return run_id
+
+
+CODE_AGENTS = ("code", "code-closed-book")
+
+
+def _run_code_agent(agent: str, suite: Path, cases: list[Case], attempts: int, cfg: Config) -> str:
+    """`evals run` for the code agent or its baseline (docs/plans/phase-3-code-agent.md). Every
+    run of model-written code, the agent's own and the grader's, goes to the sandbox."""
+    from agent_evals.agents.code.agent import ClosedBookCodeAgent, CodeAgent
+    from agent_evals.agents.code.sandbox import DockerSandbox, image_available
+    from agent_evals.graders.code import CodeApiGrader, CodeTaskGrader
+    from agent_evals.graders.deterministic import FormatGrader, TrajectoryGrader
+    from agent_evals.harness.cache import CallCache
+    from agent_evals.harness.llm import AnthropicClient
+    from agent_evals.harness.manifest import build_manifest
+    from agent_evals.harness.runner import run_suite
+    from agent_evals.store.db import ResultsStore
+    from agent_evals.types import Grader
+
+    if not image_available():
+        console.print(
+            "[red]No sandbox image, and code never runs outside it: evals sandbox-build[/red]"
+        )
+        raise typer.Exit(code=2)
+    sandbox = DockerSandbox()
+    llm = AnthropicClient(CallCache(cfg.paths.cache_dir))
+    kind = CodeAgent if agent == "code" else ClosedBookCodeAgent
+    code_agent = kind(llm, sandbox, cfg.code_agent)
+    graders: list[Grader] = [
+        CodeTaskGrader(sandbox),
+        CodeApiGrader(),
+        FormatGrader(),
+        TrajectoryGrader(),
+    ]
+    manifest = build_manifest(
+        agent=code_agent,
+        graders=graders,
+        suite_path=suite,
+        corpus_fingerprint=sandbox.tag,  # the account the code runs in, in place of a snapshot
+        config=cfg.model_dump(mode="json"),
+        attempts=attempts,
+    )
+    store = ResultsStore(cfg.paths.db)
+    try:
+        run_id = run_suite(
+            agent=code_agent,
+            cases=cases,
+            graders=graders,
+            store=store,
+            suite_name=suite.stem,
+            attempts=attempts,
+            workers=cfg.run.workers,
+            pricing=cfg.code_agent.model.pricing,
             budget_usd=cfg.run.budget_usd,
             manifest=manifest,
         )
