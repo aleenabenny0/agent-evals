@@ -16,13 +16,23 @@ from agent_evals.corpus import Corpus
 from agent_evals.harness.llm import LLMResponse
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
-from agent_evals.service.canary import ALPHA, LOOKS, PER_LOOK, CanaryWatch, fires, is_bad
+from agent_evals.service.canary import (
+    ALPHA,
+    LOOKS,
+    PER_LOOK,
+    CanaryWatch,
+    fires,
+    is_bad,
+    pages_read,
+)
 from agent_evals.service.drills import (
     DRILL_FAULT,
     DRILL_HARMLESS,
+    DRILL_NO_READING,
     DRILL_PROMPTS,
     DRILL_STALE_NOTE,
     FAULT_RULE,
+    NO_READING_RULE,
     STALE_NOTE,
 )
 from agent_evals.service.fake import FakeProvider
@@ -33,7 +43,7 @@ from agent_evals.service.registry import (
     RegistryError,
 )
 from agent_evals.stats.monitor import fisher_greater
-from agent_evals.types import AgentResult, Case, RunContext, Usage
+from agent_evals.types import AgentResult, Case, RunContext, Step, Usage
 from conftest import BUCKETS_URL
 
 PROMPTS = {"v1": "first prompt", "v2": "second prompt", "v3": "third prompt"}
@@ -63,9 +73,16 @@ class Agent:
         return self.answer(self.prompt_version)
 
 
-def answered(output: dict[str, Any]) -> AgentResult:
+def read(url: str = BUCKETS_URL, *, failed: bool = False) -> Step:
+    return Step(index=0, kind="tool", name="read_page", input={"url": url}, is_error=failed)
+
+
+def answered(output: dict[str, Any], *, reads: int = 1) -> AgentResult:
+    """An answer as the agent gives it, having read a page unless told otherwise."""
     return AgentResult(
-        output=output, usage=Usage(input_tokens=100, output_tokens=20, model_calls=1)
+        output=output,
+        trajectory=[read()] * reads,
+        usage=Usage(input_tokens=100, output_tokens=20, model_calls=1),
     )
 
 
@@ -120,18 +137,32 @@ def watching() -> CanaryWatch:
 
 
 @pytest.mark.parametrize(
-    ("errored", "abstained", "citations", "bad"),
+    ("errored", "abstained", "citations", "pages", "bad"),
     [
-        (False, False, 2, False),
-        (True, False, 2, True),
-        (False, True, 2, True),
-        (False, False, 0, True),
+        (False, False, 2, 1, False),
+        (True, False, 2, 1, True),
+        (False, True, 2, 1, True),
+        (False, False, 0, 1, True),
+        (False, False, 2, 0, True),
     ],
 )
-def test_a_bad_answer_is_an_error_an_abstention_or_no_citation(
-    errored: bool, abstained: bool, citations: int, bad: bool
+def test_a_bad_answer_is_an_error_an_abstention_no_citation_or_no_page_read(
+    errored: bool, abstained: bool, citations: int, pages: int, bad: bool
 ) -> None:
-    assert is_bad(errored=errored, abstained=abstained, citations=citations) is bad
+    assert is_bad(errored=errored, abstained=abstained, citations=citations, pages=pages) is bad
+
+
+def test_an_answer_that_came_back_must_say_how_many_pages_it_read() -> None:
+    assert is_bad(errored=True) and is_bad(errored=False, abstained=True)
+    with pytest.raises(ValueError, match="pages read"):
+        is_bad(errored=False, citations=1)
+
+
+def test_pages_read_counts_distinct_pages_read_successfully() -> None:
+    other = "https://docs.aws.amazon.com/other.html"
+    assert pages_read([read(), read(), read(other, failed=True)]) == 1
+    assert pages_read([read(other, failed=True)]) == 0
+    assert pages_read([read(), read(other)]) == 2
 
 
 # ---- the looks ---------------------------------------------------------------------------------
@@ -299,6 +330,17 @@ def test_an_answer_with_no_citation_is_bad_for_the_rule(tmp_path: Path) -> None:
     assert held.state().canary is None
 
 
+def test_an_answer_that_read_no_page_is_bad_for_the_rule(tmp_path: Path) -> None:
+    """A cited answer from search snippets alone looked healthy to the first rule."""
+    held = registry(tmp_path)
+    held.set_canary("v2", 0.5, who="me", why="try")
+    c, _ = service(tmp_path, held, lambda v: answered(GOOD, reads=0 if v == "v2" else 1))
+    served = run_until_rolled_back(c, held)
+    assert {a["pages_read"] for a in served if a["role"] == "canary"} == {0}
+    assert {a["pages_read"] for a in served if a["role"] == "champion"} == {1}
+    assert "20 of 20 canary answers bad" in held.log_path.read_text(encoding="utf-8")
+
+
 def test_a_failed_answer_is_bad_for_the_rule(tmp_path: Path) -> None:
     held = registry(tmp_path)
     held.set_canary("v2", 0.5, who="me", why="try")
@@ -406,6 +448,13 @@ def test_each_drill_prompt_is_the_champion_with_one_change() -> None:
     assert FAULT_RULE in DRILL_PROMPTS[DRILL_FAULT]
     assert "How to work" not in DRILL_PROMPTS[DRILL_HARMLESS]
     assert not set(DRILL_PROMPTS) & set(SYSTEM_PROMPTS)
+
+
+def test_the_no_reading_drill_changes_one_line_of_the_champion() -> None:
+    old, new = NO_READING_RULE
+    text = DRILL_PROMPTS[DRILL_NO_READING]
+    assert old in SYSTEM_PROMPT_V3 and old not in text and new in text
+    assert text.replace(new, old) == SYSTEM_PROMPT_V3
 
 
 def test_the_stale_note_drill_is_the_champion_with_the_notice_added() -> None:

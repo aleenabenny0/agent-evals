@@ -106,7 +106,9 @@ def test_the_ledger_takes_a_step_it_did_not_meter_and_still_holds_the_cap(tmp_pa
 # ---- the drill's record ------------------------------------------------------------------------
 
 
-def row(sent_s: float, role: str, *, abstained: bool = False, status: int = 200) -> dict[str, Any]:
+def row(
+    sent_s: float, role: str, *, abstained: bool = False, status: int = 200, pages: int = 1
+) -> dict[str, Any]:
     if status != 200:
         return {"sent_s": sent_s, "status": status, "outcome": "overloaded"}
     return {
@@ -115,6 +117,7 @@ def row(sent_s: float, role: str, *, abstained: bool = False, status: int = 200)
         "role": role,
         "abstained": abstained,
         "citations": 0 if abstained else 1,
+        "pages_read": pages,
         "cost_usd": 0.01,
     }
 
@@ -124,17 +127,18 @@ def test_a_drills_summary_grades_as_the_rule_does_and_times_the_rollback() -> No
         row(1, "champion"),
         row(2, "canary", abstained=True),
         row(3, "champion", status=429),
+        row(20, "canary", pages=0),
         row(50, "champion"),
     ]
     held = script("drill").summary(rows, canary_at=1.5, rolled_at=31.5)
     assert held["roles"] == {
-        "canary": {"answers": 1, "bad": 1},
-        "champion": {"answers": 2, "bad": 0},
+        "canary": {"answers": 2, "bad": 2, "read_no_page": 1},
+        "champion": {"answers": 2, "bad": 0, "read_no_page": 0},
     }
-    assert held["statuses"] == {"200": 3, "429": 1}
+    assert held["statuses"] == {"200": 4, "429": 1}
     assert held["seconds_to_rollback"] == 30.0
     assert held["canary_answers_sent_after_rollback"] == 0
-    assert held["cost_seen_usd"] == 0.03
+    assert held["cost_seen_usd"] == 0.04
 
 
 def test_a_drill_counts_a_canary_answer_sent_after_the_rollback() -> None:

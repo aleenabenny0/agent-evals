@@ -1,16 +1,22 @@
 """Measure a candidate fault on a few questions before a drill relies on it (phase 8, part 6).
 
     uv run python scripts/drill_pilot.py
+    uv run python scripts/drill_pilot.py --only champion no-reading --out PATH
+
+The second form measures some candidates into a file of their own, as drill 1c does with
+results/service/drills/pilot-1c.json, so an earlier pilot's record stays as it was.
 
 Drill 1 predicted what its fault prompt would do and was wrong, and the fake provider could not have
 shown that, since it is told to abstain under that prompt. So a fault is now measured first. Each
 candidate answers the same few questions, through the real agent and the real model with no service
-around it, and the table shows each one's share of bad answers by the canary rule's own grading.
+around it, and the table shows each one's share of bad answers by the canary rule's own grading,
+and how many of its answers read no page.
 Costs a few cents, charged to the phase's ledger.
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -22,7 +28,7 @@ from agent_evals.agents.docs.prompts import SYSTEM_PROMPT_V3
 from agent_evals.config import load_config
 from agent_evals.corpus import Corpus
 from agent_evals.harness.llm import AnthropicClient
-from agent_evals.service.canary import is_bad
+from agent_evals.service.canary import is_bad, pages_read
 from agent_evals.service.drills import NO_READING_RULE, STALE_NOTE, _changed
 from agent_evals.spend import PHASE_8_CAP_USD, PHASE_8_PATH, MeteredLLM, SpendLedger, StepBudget
 from agent_evals.types import Case, RunContext
@@ -46,7 +52,7 @@ def lookups() -> list[str]:
     return [row["question"] for row in rows if row["intent"] == "lookup"][:ANSWERABLE]
 
 
-def answer(agent: DocsAgent, name: str, n: int, question: str) -> dict[str, bool]:
+def answer(agent: DocsAgent, name: str, n: int, question: str) -> dict[str, int | bool]:
     case = Case(
         id=f"pilot-{name}-{n}",
         suite="online",
@@ -60,22 +66,30 @@ def answer(agent: DocsAgent, name: str, n: int, question: str) -> dict[str, bool
     citations = result.output.get("citations") or []
     abstained = bool(result.output.get("abstained", False))
     errored = bool(result.error)
-    bad = is_bad(errored=errored, abstained=abstained, citations=len(citations))
-    return {"errored": errored, "abstained": abstained, "bad": bad}
+    read = pages_read(result.trajectory)
+    bad = is_bad(errored=errored, abstained=abstained, citations=len(citations), pages=read)
+    return {"errored": errored, "abstained": abstained, "bad": bad, "pages_read": read}
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0] if __doc__ else "")
+    parser.add_argument("--only", nargs="+", choices=sorted(CANDIDATES), default=sorted(CANDIDATES))
+    parser.add_argument("--out", type=Path, default=OUT)
+    args = parser.parse_args()
+    step = STEP if args.out == OUT else f"{STEP} ({args.out.stem})"
     load_dotenv()
     cfg = load_config(CONFIG)
     corpus = Corpus.load(cfg.paths.corpus_dir)
     ledger = SpendLedger(PHASE_8_PATH, PHASE_8_CAP_USD)
-    ledger.check(STEP, ESTIMATE_USD)
+    ledger.check(step, ESTIMATE_USD)
     meter = MeteredLLM(
-        AnthropicClient(), cfg.docs_agent.model.pricing, StepBudget(STEP, MOST_USD, 0.0)
+        AnthropicClient(), cfg.docs_agent.model.pricing, StepBudget(step, MOST_USD, 0.0)
     )
     asked = lookups()
     results = {}
     for name, text in CANDIDATES.items():
+        if name not in args.only:
+            continue
         settings = cfg.docs_agent.model_copy(update={"prompt_version": name})
         agent = DocsAgent(meter, corpus, settings, {name: text})
         numbers = range(len(asked))
@@ -87,10 +101,11 @@ def main() -> None:
             "bad": sum(r["bad"] for r in rows),
             "errored": sum(r["errored"] for r in rows),
             "abstained": sum(r["abstained"] for r in rows),
+            "read_no_page": sum(r["pages_read"] == 0 for r in rows),
         }
         print(name, results[name], flush=True)
-    ledger.record(STEP, meter)
-    OUT.write_text(
+    ledger.record(step, meter)
+    args.out.write_text(
         json.dumps({"questions": ANSWERABLE, "candidates": results}, indent=1) + "\n", "utf-8"
     )
     print(f"spent ${meter.uncached_usd:.4f}; the phase's total is ${ledger.total_usd():.4f}")

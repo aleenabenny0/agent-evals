@@ -29,6 +29,8 @@ from agent_evals.harness.gateway import CircuitBreaker, Provider, ResilientClien
 from agent_evals.receipts import Receipt, load_receipt, write_receipt
 from agent_evals.service.app import Deps, create_app
 from agent_evals.service.budget import DailyBudget
+from agent_evals.service.canary import is_bad, pages_read
+from agent_evals.service.drills import DRILL_NO_READING, DRILL_PROMPTS
 from agent_evals.service.fake import FakeProvider
 from agent_evals.service.metrics import OUTCOMES, ServiceMetrics
 from agent_evals.service.registry import PromptRegistry
@@ -87,6 +89,21 @@ def test_the_fake_provider_plays_the_whole_loop_through_the_real_agent(corpus: C
     ]
     assert result.output["citations"][0]["url"] == BUCKETS_URL
     assert result.output["citations"][0]["quote"] in corpus.pages[BUCKETS_URL].text
+
+
+def test_the_fake_provider_answers_without_reading_under_the_no_reading_drill(
+    corpus: Corpus,
+) -> None:
+    """Told what the drill prompt does, as for the fault rule, so a rehearsal is free."""
+    settings = DocsAgentConfig(prompt_version=DRILL_NO_READING)
+    agent = DocsAgent(fake_gateway(), corpus, settings, prompts=DRILL_PROMPTS)
+    result = agent.run(make_case(), RunContext(run_id="r", case_id="c", attempt=1))
+    assert result.error is None
+    assert "read_page" not in [s.name for s in result.trajectory if s.kind == "tool"]
+    assert pages_read(result.trajectory) == 0
+    citations = len(result.output.get("citations") or [])
+    abstained = bool(result.output.get("abstained"))
+    assert is_bad(errored=False, abstained=abstained, citations=citations, pages=0)
 
 
 def test_the_fake_provider_abstains_when_the_search_finds_nothing() -> None:

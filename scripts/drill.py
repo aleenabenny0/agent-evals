@@ -70,6 +70,7 @@ async def one(
             "version": body["prompt_version"],
             "abstained": body["abstained"],
             "citations": len(body["citations"]),
+            "pages_read": body["pages_read"],
             "providers": body["providers"],
             "model_calls": body["model_calls"],
             "cost_usd": body["cost_usd"],
@@ -90,8 +91,12 @@ def summary(
             held = roles.setdefault(str(row["role"]), Counter())
             held["answers"] += 1
             held["bad"] += is_bad(
-                errored=False, abstained=bool(row["abstained"]), citations=int(row["citations"])
+                errored=False,
+                abstained=bool(row["abstained"]),
+                citations=int(row["citations"]),
+                pages=int(row["pages_read"]),
             )
+            held["read_no_page"] += int(row["pages_read"]) == 0
     sent_after = [] if rolled_at is None else [r for r in rows if r["sent_s"] > rolled_at]
     canary_sent = [r["sent_s"] for r in rows if r.get("role") == "canary"]
     return {

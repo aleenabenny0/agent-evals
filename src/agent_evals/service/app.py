@@ -38,7 +38,7 @@ from agent_evals.config import Pricing, ServiceConfig
 from agent_evals.harness.cache import sha256_text
 from agent_evals.harness.gateway import CURRENT_CALLS, CallRecord
 from agent_evals.service.budget import DailyBudget
-from agent_evals.service.canary import CanaryWatch, is_bad
+from agent_evals.service.canary import CanaryWatch, is_bad, pages_read
 from agent_evals.service.metrics import ServiceMetrics
 from agent_evals.service.registry import (
     Assignment,
@@ -72,6 +72,7 @@ class AskResponse(BaseModel):
     agent_version: str
     providers: list[str]  # who answered, in order; more than one means a failover happened
     model_calls: int
+    pages_read: int  # distinct pages read; 0 means the answer rests on search snippets alone
     cost_usd: float | None
     latency_ms: float
 
@@ -300,7 +301,9 @@ def create_app(deps: Deps) -> FastAPI:
             return refused(502, "agent_failed", "no answer was produced", request_id, assigned)
         abstained = bool(result.output.get("abstained", False))
         citations = _citations(result.output)
-        watch(run, assigned, is_bad(errored=False, abstained=abstained, citations=len(citations)))
+        read = pages_read(result.trajectory)
+        bad = is_bad(errored=False, abstained=abstained, citations=len(citations), pages=read)
+        watch(run, assigned, bad)
         outcome = "abstained" if abstained else "answered"
         metrics.requests.labels(outcome, assigned.version, assigned.role).inc()
         cost = cost_of(answered)
@@ -317,6 +320,7 @@ def create_app(deps: Deps) -> FastAPI:
                     "role": assigned.role,
                     "providers": providers,
                     "model_calls": result.usage.model_calls,
+                    "pages_read": read,
                     "latency_ms": round(latency_ms, 1),
                     "cost_usd": cost,
                 }
@@ -332,6 +336,7 @@ def create_app(deps: Deps) -> FastAPI:
             agent_version=agent.version,
             providers=providers,
             model_calls=result.usage.model_calls,
+            pages_read=read,
             cost_usd=cost,
             latency_ms=latency_ms,
         )

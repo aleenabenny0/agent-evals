@@ -117,6 +117,8 @@ errors, no citations, rejected submissions, abstention, fabricated citations and
 
 - **One signal.** A bad answer is one that errored, abstained, or came back with no citation. One
   signal needs no correction across signals, and every one of those is graded by code at once.
+  *Widened on 2026-11-03, after the drills: an answer that read no page counts as bad too, still as
+  one signal (`docs/plans/phase-8-drill-1c.md`).*
 - **Against the champion at the same time.** The canary's share of bad answers is compared with the
   champion's over the same period, so a change in the questions moves both.
 - **Three looks,** after 20, 40 and 60 canary answers, with a one-sided Fisher exact test at each,

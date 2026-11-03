@@ -41,8 +41,12 @@ def _changed(old: str, new: str) -> str:
 DRILL_FAULT = "drill-fault"
 DRILL_STALE_NOTE = "drill-stale-note"
 DRILL_HARMLESS = "drill-harmless"
+DRILL_NO_READING = "drill-no-reading"
 DRILL_PROMPTS = {
     DRILL_FAULT: _changed(ABSTAIN_RULE, FAULT_RULE),  # meant to abstain too much; it did not
     DRILL_STALE_NOTE: SYSTEM_PROMPT_V3 + STALE_NOTE,  # measured first: abstains on everything
     DRILL_HARMLESS: _changed(HEADING, HARMLESS_HEADING),  # a heading reworded
+    # Cited answers from search snippets alone: invisible to the rule until it counted pages read
+    # (docs/plans/phase-8-drill-1c.md).
+    DRILL_NO_READING: _changed(*NO_READING_RULE),
 }

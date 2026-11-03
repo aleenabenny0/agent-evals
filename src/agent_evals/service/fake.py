@@ -1,8 +1,9 @@
 """A fake provider, so the service can be load-tested for free.
 
 It plays the docs agent's loop the way the model does: search, read the top page, submit its first
-sentence as a cited answer, or abstain at once under the drill's bad prompt, so a drill can be
-rehearsed for free. The tools, the corpus search and the submission checks all really run,
+sentence as a cited answer. Under a drill's fault prompt it is told what to do, so a drill can be
+rehearsed for free: abstain at once under one, and answer from the top search snippet without
+reading under the other. The tools, the corpus search and the submission checks all really run,
 so the service does its real work and only the model is replaced. Each reply sleeps for a random
 time around a set latency, since waiting on the model is what fills the service up. It says what
 it is: every answer reports the provider `fake`.
@@ -17,7 +18,7 @@ from collections.abc import Callable
 from typing import Any
 
 from agent_evals.harness.llm import LLMResponse
-from agent_evals.service.drills import FAULT_RULE
+from agent_evals.service.drills import FAULT_RULE, NO_READING_RULE
 
 _URL = re.compile(r"^URL: (\S+)$", re.MULTILINE)
 _SENTENCE = re.compile(r"[A-Z][^\n.|#*`\[\]]{30,200}\.")
@@ -72,10 +73,16 @@ class FakeProvider:
             found = _URL.search(result)
             if found is None:
                 return self._abstain(step)
+            if NO_READING_RULE[1] in str(request.get("system", "")):
+                snippet = result[found.end() :].split("\n\n", 1)[0]
+                return self._submit(found.group(1), _SENTENCE.search(snippet), step)
             return _tool_use("read_page", {"url": found.group(1), "start": 0}, step)
         previous = next((b for b in messages[-2]["content"] if b.get("type") == "tool_use"), None)
         url = str(previous["input"].get("url", "")) if previous else ""
-        sentence = _SENTENCE.search(result)
+        return self._submit(url, _SENTENCE.search(result), step)
+
+    def _submit(self, url: str, sentence: re.Match[str] | None, step: int) -> dict[str, Any]:
+        """The sentence as an answer citing itself, or an abstention when there is none."""
         if not url or sentence is None:
             return self._abstain(step)
         quote = sentence.group(0)

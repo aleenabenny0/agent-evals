@@ -1,7 +1,9 @@
 """The canary rule: is a new prompt version worse than the champion, while it serves?
 
-A bad answer is one that errored, abstained or came back with no citation, all of which code can
-grade at once. After 20, 40 and 60 canary answers the canary's share of bad answers is compared
+A bad answer is one that errored, abstained, came back with no citation, or read no page, all of
+which code can grade at once. The last was added after a prompt that stopped the agent reading
+gave cited answers from search snippets, and so looked healthy (docs/plans/phase-8-drill-1c.md).
+After 20, 40 and 60 canary answers the canary's share of bad answers is compared
 with the champion's over the same period, by a one-sided Fisher exact test. Each look is held to
 0.33%, so the chance of a false alarm stays under 1% however many looks are taken
 (docs/plans/phase-8-llm-ops.md, part 6, and scripts/canary_power.py, which simulates this rule).
@@ -16,19 +18,42 @@ each one spends the false-alarm allowance again, so the 1% holds for a canary wi
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from agent_evals.service.registry import Role
 from agent_evals.stats.monitor import fisher_greater
+from agent_evals.types import Step
 
 LOOKS = (20, 40, 60)  # canary answers at each look
 ALPHA = 0.01  # overall false-alarm rate per canary
 PER_LOOK = ALPHA / len(LOOKS)
 
 
-def is_bad(*, errored: bool, abstained: bool = False, citations: int = 0) -> bool:
-    """The rule's one signal for one answer."""
-    return errored or abstained or citations == 0
+def pages_read(trajectory: Sequence[Step]) -> int:
+    """The distinct pages an answer read successfully, counted as the graders count them."""
+    return len(
+        {
+            str(s.input.get("url"))
+            for s in trajectory
+            if s.kind == "tool"
+            and s.name == "read_page"
+            and not s.is_error
+            and isinstance(s.input, dict)
+        }
+    )
+
+
+def is_bad(
+    *, errored: bool, abstained: bool = False, citations: int = 0, pages: int | None = None
+) -> bool:
+    """The rule's one signal for one answer. An answer that came back must say how many pages it
+    read, so no caller can leave that part of the signal out by accident."""
+    if errored or abstained or citations == 0:
+        return True
+    if pages is None:
+        raise ValueError("an answer that came back needs its count of pages read")
+    return pages == 0
 
 
 def fires(bad_canary: int, n_canary: int, bad_champion: int, n_champion: int) -> tuple[float, bool]:
