@@ -26,8 +26,11 @@ Format:
 - Good answer (correct, and an abstention or fully supported by the judge), test, 149 questions:
   Haiku 0.389, Sonnet 0.557, Opus 0.611. Nearest neighbours, the chosen router, 0.604 at 81% of
   Opus's cost: -0.7 points against Opus (95% CI -6.7 to +4.7), so "as good for less" is not
-  claimed, and +21.5 against Haiku (+11.4 to +31.5, p = 0.0001). Provisional until a blind spot
-  check of the judge on the new models' answers.
+  claimed, and +21.5 against Haiku (+11.4 to +31.5, p = 0.0001). **Withdrawn:** the blind spot
+  check of the judge on 30 answers per new model held for Sonnet (0 false passes) and failed for
+  Opus (3 false passes against a bar of 2), so Opus's good-answer numbers are untrusted, and both
+  good-answer claims rest on them. Sonnet minus Haiku on good answers, computed after the spot check
+  and not pre-registered: +16.8 points on test (CI +7.4 to +26.2), at 14 times the cost.
 - Correct, test, 150 questions: Haiku 0.980, Sonnet 0.953, Opus 0.960. The Haiku-to-Sonnet
   cascade, the chosen router, 0.987 at 11% of Opus's cost: +2.7 against Opus (CI -0.7 to +6.7), so
   "as good for less" is claimed, and +0.7 against Haiku (CI 0.0 to +2.0, p = 1.0), no detectable

@@ -7,8 +7,9 @@ Haiku's part of the matrix comes from runs already stored, so it costs nothing. 
 $47, capped at $45.
 
 **Status:** approved 2026-11-03, with decisions 1b, 2a and 3a, and the ledger capped at $45. Dev and
-test have run, and the test result is below. The spot check of the judge on the new models'
-answers is pending, and the service's `model: auto` waits for it. About $20.50 is spent.
+test have run, and the test result is below. The spot check held for Sonnet and failed for Opus by
+one answer, so the good-answer claims are withdrawn. `model: auto` was not built (part 3). Done,
+for about $20.50.
 
 **Goal.** Know, with intervals, what a larger model buys on this agent, and whether choosing a model
 per question gives the same quality for less.
@@ -157,14 +158,37 @@ unchanged, which a rerun of `fit` confirmed.
   11% of Opus's cost, so "as good for less" **is** claimed. Against always-Haiku it is +0.7 points
   (0.0 to +2.0, p = 1.0), so it is **not** better than Haiku alone. It escalated 17 of the 150
   questions, each one a Haiku abstention.
-- **The good-answer numbers for Sonnet and Opus are provisional** until the spot check: the judge
-  was validated on Haiku's answers only.
+- **The good-answer numbers for Sonnet and Opus were provisional** until the spot check, since the
+  judge was validated on Haiku's answers only. The spot check below then failed for Opus, so both
+  good-answer claims, which rest on Opus's numbers, are withdrawn.
+
+## Spot check (2026-11-03): the judge holds on Sonnet and fails on Opus by one
+
+The author labeled the 30 pre-registered answers of each new model blind, with rubric v2 and no
+judge verdict on screen (`results/routing/spot-check.json`).
+
+| Model | Judge passed, labeler failed | Judge failed, labeler passed | Agreement | Rule: at most 2 false passes |
+|---|---|---|---|---|
+| Sonnet | 0 | 3 | 27 of 30 | holds |
+| Opus | 3 | 0 | 27 of 30 | **fails** |
+
+- **Sonnet's judge numbers stand.** If anything the judge was strict with it.
+- **Opus's do not.** The judge was too lenient with Opus's answers, as it was in iteration 4 with
+  a prompt whose answers were shorter, so Opus's 0.611 likely overstates it. Its good-answer
+  numbers are reported as untrusted, and Opus is compared on `correct` only.
+- **So both good-answer claims are withdrawn,** since always-best was Opus and the chosen router
+  sent 108 of 149 questions to Opus. The `correct` claims are code-graded and stand.
+
+**One comparison the spot check leaves standing, not pre-registered:** Sonnet minus Haiku on good
+answers, paired, is +16.8 points on test (95% CI +7.4 to +26.2, McNemar p = 0.0008, 149 questions)
+and +16.9 on dev (+6.9 to +26.9), at 14 times Haiku's cost per answer. It was computed after the
+spot check, so it describes the matrix and is not a tested claim.
 
 **What it means.** On correctness, Haiku alone is as good as any model or router here, at 3.5% of
-Opus's cost: always-best on dev, Opus, was not best on test. On support, the larger models are
-clearly better: Opus gives good answers 22 points more often than Haiku, at 30 times the cost per
-answer. The router keeps most of that gain at 81% of Opus's cost, but 150 questions cannot
-show it is as good as Opus. The oracle, at 0.819, shows room that no router here found.
+Opus's cost, and always-best on dev, Opus, was not best on test. On support, Sonnet is clearly
+better than Haiku, at 14 times the cost. Whether Opus is better still cannot be said with this
+judge: it is too lenient with Opus's answers. The oracle, at 0.819 on the untrusted good-answer
+numbers, suggests room that no router here found.
 
 **Spent:** $18.12 on the agent ($8.59 dev, $9.53 test) and about $2.40 on the judge (505 answers
 at its measured $0.0048), about $20.50 of the $45 cap.
@@ -174,6 +198,11 @@ at its measured $0.0048), about $20.50 of the $45 cap.
 If the chosen router is usable, the service gains `model: auto`, which picks the model per request
 and keeps failover per model call. The response and the metrics name the model that answered. This
 part is free and tested offline.
+
+**Not built (2026-11-03).** The only claim left standing is the cascade's on `correct`, and it is no
+better than Haiku alone, at 3.3 times Haiku's cost. Serving it would raise the cost for no measured
+gain, and it would put two new agent versions in service, each needing its own gate receipt. Haiku
+stays the only model the service serves.
 
 ## Part 4: the record
 

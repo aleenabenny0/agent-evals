@@ -1,0 +1,18 @@
+{
+ "sonnet": {
+  "run": "docs-20261103-042430-1042ba",
+  "false_passes": 0,
+  "false_fails": 3,
+  "agreement": 27,
+  "n": 30,
+  "trusted": true
+ },
+ "opus": {
+  "run": "docs-20261103-044411-eb598a",
+  "false_passes": 3,
+  "false_fails": 0,
+  "agreement": 27,
+  "n": 30,
+  "trusted": false
+ }
+}

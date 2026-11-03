@@ -46,9 +46,10 @@ The platform evaluates two agents that engineers use every day:
 > ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Its failover drill on a real
 > second provider has not run, because the project has no budget for a second paid provider.
 > Model routing has run on dev and test: on correctness Haiku alone matches Sonnet and Opus at
-> 3.5% of Opus's cost. On answers that are correct and fully supported by their quotes, Opus is 22
-> points ahead of Haiku, pending a spot check of the judge on the new models. A router keeps most
-> of that gain at 81% of Opus's cost, but 150 test questions cannot show it is as good as Opus
+> 3.5% of Opus's cost. On answers that are correct and fully supported by their quotes, Sonnet is
+> about 17 points ahead of Haiku (95% CI +7 to +26, compared after the fact) at 14 times the cost.
+> The judge failed its blind spot check on Opus's answers, too lenient by one answer over the bar,
+> so no support claim about Opus, or about routing to it, is made
 > ([plan and result](docs/plans/phase-9-routing.md)). The code agent comes next (see
 > [Roadmap](#roadmap)).
 
@@ -331,12 +332,13 @@ Next, in order:
    built and tested offline. Its drill on a real provider has not run, because the project has
    no budget for a second paid provider
    ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
-7. **Model routing** *(measured; a spot check of the judge is pending)*: the docs agent on Haiku
-   5.5, Sonnet 5.5 and Opus 5.5, and five routers fitted on dev, with the choice committed before
-   test was read once. On correctness Haiku alone is as good as any of them, at 3.5% of Opus's
-   cost. On answers correct and fully supported by their quotes Opus leads Haiku by 22 points, and a
-   nearest-neighbours router kept most of that at 81% of Opus's cost, short of the pre-registered
-   bar for "as good" ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
+7. **Model routing** *(done, 2026-11-03, $20.50)*: the docs agent on Haiku 5.5, Sonnet 5.5 and
+   Opus 5.5, and five routers fitted on dev, with the choice committed before test was read once.
+   On correctness Haiku alone is as good as any of them, at 3.5% of Opus's cost, so the service
+   keeps serving Haiku. On answers correct and fully supported by their quotes, Sonnet leads Haiku
+   by about 17 points at 14 times the cost, a comparison made after the fact. The judge passed a blind spot check on Sonnet's answers
+   and failed one on Opus's, so the support claims that rest on Opus were withdrawn
+   ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
 8. **The code agent** (boto3, checked against botocore's service models, run against moto with no
    network), then **a red team** (prompt-injection suites) and a technical report.
 
