@@ -1609,6 +1609,19 @@ def power(
     )
 
 
+@app.command("sandbox-build")
+def sandbox_build() -> None:
+    """Build the code agent's sandbox image, unless an image of this exact content exists. Needs
+    Docker, and the network the first time (docs/plans/phase-3-code-agent.md, part 3)."""
+    from agent_evals.agents.code.sandbox import build_image, image_available, image_tag
+
+    tag = image_tag()
+    if image_available(tag):
+        console.print(f"{tag} is already built")
+        return
+    console.print(f"built {build_image(tag)}")
+
+
 TRAFFIC_DIR = Path("results/online/traffic")
 
 

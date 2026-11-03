@@ -8,7 +8,8 @@ and hidden tests check the final state. Nothing runs against a real AWS account.
 results store, the statistics and the gate stay as they are. Estimated cost about $2, capped at $5.
 Most of the cost is human time spent verifying the tasks.
 
-**Status:** proposed, 2026-11-03. Nothing is built.
+**Status:** approved 2026-11-03, with every recommended option (1a to 5a). Approval covers the paid
+steps up to the cap, each after the build before it is done.
 
 **Goal.** Show that the method carries to a different kind of agent. Here hallucination means
 calling an operation or a parameter that does not exist, and being right means the account ends up
@@ -112,6 +113,10 @@ smoke run come to about $2. The cap is $5.
 - **The parser sees only what it can resolve.** Calls it cannot resolve are counted, not guessed.
 - **API versions.** The checker uses the botocore models pinned in `uv.lock`. An operation newer
   than that pin would read as hallucinated, so the pin is recorded in each run's manifest.
+- **The hidden test shares a process with the code under test.** Code written to cheat could patch
+  boto3 or the test's view of the state and pass. The agent is not trying to, and nothing in the
+  prompt invites it, so this measures an honest agent. Testing a dishonest one belongs to the red
+  team.
 - **Scope.** This is the largest build after phase 8.
 
 ## Decisions

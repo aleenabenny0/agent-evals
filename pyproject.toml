@@ -9,6 +9,7 @@ license = { text = "MIT" }
 dependencies = [
     "anthropic>=0.40",
     "beautifulsoup4>=4.12",
+    "botocore>=1.43.123",
     "duckdb>=1.1",
     "fastapi>=0.162.0",
     "httpx>=0.27",
@@ -31,7 +32,14 @@ dependencies = [
 evals = "agent_evals.cli:app"
 
 [dependency-groups]
+# What the code agent's sandbox image holds besides the standard library, pinned through uv.lock
+# into deploy/sandbox-requirements.txt (docs/plans/phase-3-code-agent.md, part 3).
+sandbox = [
+    "boto3>=1.43.123",
+    "moto[dynamodb,ec2,iam,kms,s3,secretsmanager,sns,sqs,ssm]>=5.2.5",
+]
 dev = [
+    {include-group = "sandbox"},
     "hypothesis>=6.100",
     "mypy>=1.10",
     "pytest>=8.2",
@@ -60,9 +68,12 @@ strict = true
 files = ["src"]
 
 [[tool.mypy.overrides]]
-module = ["rank_bm25", "markdownify", "bs4", "bs4.*"]
+module = ["rank_bm25", "markdownify", "bs4", "bs4.*", "boto3", "boto3.*", "botocore", "botocore.*", "moto", "moto.*"]
 ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "sandbox: needs Docker and the code agent's sandbox image (`uv run evals sandbox-build`); skipped without them",
+]
