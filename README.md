@@ -23,7 +23,7 @@ improve them only through changes that are proven on held-out data.**
   paired comparisons, exact tests, pre-registered predictions, and the rounds that failed, all
   in the docs below. The latest two, judge redesigns, each stopped at their first pre-registered
   check, after $6.95 and $16.04 of $60 budgets.
-- **Engineering:** Python 3.12, mypy strict, over 400 offline tests, a DuckDB results store, a
+- **Engineering:** Python 3.12, mypy strict, over 600 offline tests, a DuckDB results store, a
   content-addressed call cache that makes re-runs free and identical, and CI on every push to
   main and every pull request.
 
@@ -43,9 +43,14 @@ The platform evaluates two agents that engineers use every day:
 > validated judge stays and its score stays out of the alert. LLM Ops is nearly done: the agent
 > runs as a service under Docker Compose, and a canary drill on the real model rolled a bad prompt
 > back with no person involved, after an earlier drill failed
-> ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Paid work is paused: the failover
-> drill on a real second provider has not run, because the project has no budget left for API
-> calls. After that come model routing and the code agent (see [Roadmap](#roadmap)).
+> ([postmortem](docs/postmortems/2026-11-02-release-drills.md)). Its failover drill on a real
+> second provider has not run, because the project has no budget for a second paid provider.
+> Model routing has run on dev and test: on correctness Haiku alone matches Sonnet and Opus at
+> 3.5% of Opus's cost. On answers that are correct and fully supported by their quotes, Opus is 22
+> points ahead of Haiku, pending a spot check of the judge on the new models. A router keeps most
+> of that gain at 81% of Opus's cost, but 150 test questions cannot show it is as good as Opus
+> ([plan and result](docs/plans/phase-9-routing.md)). The code agent comes next (see
+> [Roadmap](#roadmap)).
 
 ## Why this is built the way it is
 
@@ -323,11 +328,15 @@ Next, in order:
    metrics, an eval gate in CI, a canary with an automatic rollback, a load test, service objectives,
    a [runbook](docs/runbook.md) and a
    [postmortem](docs/postmortems/2026-11-02-release-drills.md). Failover to a second provider is
-   built and tested offline. Its drill on a real provider has not run, because that needs paid
-   API calls and the project has no budget left for them
+   built and tested offline. Its drill on a real provider has not run, because the project has
+   no budget for a second paid provider
    ([docs/plans/phase-8-llm-ops.md](docs/plans/phase-8-llm-ops.md)).
-7. **Model routing**: the suite on Haiku 5.5, Sonnet 5.5 and Opus 5.5, baselines, and routers
-   between them.
+7. **Model routing** *(measured; a spot check of the judge is pending)*: the docs agent on Haiku
+   5.5, Sonnet 5.5 and Opus 5.5, and five routers fitted on dev, with the choice committed before
+   test was read once. On correctness Haiku alone is as good as any of them, at 3.5% of Opus's
+   cost. On answers correct and fully supported by their quotes Opus leads Haiku by 22 points, and a
+   nearest-neighbours router kept most of that at 81% of Opus's cost, short of the pre-registered
+   bar for "as good" ([docs/plans/phase-9-routing.md](docs/plans/phase-9-routing.md), ADR 0012).
 8. **The code agent** (boto3, checked against botocore's service models, run against moto with no
    network), then **a red team** (prompt-injection suites) and a technical report.
 

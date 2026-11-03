@@ -1,0 +1,449 @@
+{
+ "runs": {
+  "haiku": "docs-20261016-222256-04f0f4",
+  "sonnet": "docs-20261103-050320-f0a393",
+  "opus": "docs-20261103-050826-6eb2fc"
+ },
+ "choices_sha256": "d1698d6b8388e2d5443a906597e43603701a0488697559d3f7cc514c9bb1fdf8",
+ "unjudged": {
+  "docs-int-003": "haiku: the judge returned no verdict (docs-20261016-222256-04f0f4)"
+ },
+ "good": {
+  "routers": {
+   "always haiku": {
+    "rate": 0.3893,
+    "rate_low": 0.3147,
+    "rate_high": 0.4694,
+    "cost_usd": 0.002342,
+    "cost_low": 0.002113,
+    "cost_high": 0.002595,
+    "n": 149
+   },
+   "always sonnet": {
+    "rate": 0.557,
+    "rate_low": 0.4768,
+    "rate_high": 0.6344,
+    "cost_usd": 0.032703,
+    "cost_low": 0.029679,
+    "cost_high": 0.036103,
+    "n": 149
+   },
+   "always opus": {
+    "rate": 0.6107,
+    "rate_low": 0.5306,
+    "rate_high": 0.6853,
+    "cost_usd": 0.069264,
+    "cost_low": 0.063309,
+    "cost_high": 0.075784,
+    "n": 149
+   },
+   "by type": {
+    "rate": 0.5906,
+    "rate_low": 0.5103,
+    "rate_high": 0.6663,
+    "cost_usd": 0.054277,
+    "cost_low": 0.048462,
+    "cost_high": 0.060605,
+    "n": 149
+   },
+   "cascade haiku -> sonnet": {
+    "rate": 0.396,
+    "rate_low": 0.321,
+    "rate_high": 0.4762,
+    "cost_usd": 0.007795,
+    "cost_low": 0.0053,
+    "cost_high": 0.010683,
+    "n": 149
+   },
+   "nearest neighbours k=15 tau=0": {
+    "rate": 0.604,
+    "rate_low": 0.5238,
+    "rate_high": 0.679,
+    "cost_usd": 0.056044,
+    "cost_low": 0.050749,
+    "cost_high": 0.061778,
+    "n": 149
+   },
+   "oracle": {
+    "rate": 0.8188,
+    "rate_low": 0.7492,
+    "rate_high": 0.8724,
+    "cost_usd": 0.01839,
+    "cost_low": 0.014592,
+    "cost_high": 0.022504,
+    "n": 149
+   }
+  },
+  "chosen": "nearest neighbours k=15 tau=0",
+  "always_best": "opus",
+  "chosen_minus_best": {
+   "diff": -0.0067,
+   "low": -0.0671,
+   "high": 0.047
+  },
+  "cost_share_of_best": 0.8091,
+  "as_good_for_less": false,
+  "chosen_minus_haiku": {
+   "diff": 0.2148,
+   "low": 0.1141,
+   "high": 0.3154,
+   "mcnemar_p": 0.0001
+  },
+  "better_than_haiku": true
+ },
+ "correct": {
+  "routers": {
+   "always haiku": {
+    "rate": 0.98,
+    "rate_low": 0.9429,
+    "rate_high": 0.9932,
+    "cost_usd": 0.002353,
+    "cost_low": 0.002125,
+    "cost_high": 0.0026,
+    "n": 150
+   },
+   "always sonnet": {
+    "rate": 0.9533,
+    "rate_low": 0.9068,
+    "rate_high": 0.9772,
+    "cost_usd": 0.033036,
+    "cost_low": 0.029932,
+    "cost_high": 0.036519,
+    "n": 150
+   },
+   "always opus": {
+    "rate": 0.96,
+    "rate_low": 0.9155,
+    "rate_high": 0.9815,
+    "cost_usd": 0.069487,
+    "cost_low": 0.063578,
+    "cost_high": 0.076132,
+    "n": 150
+   },
+   "by type": {
+    "rate": 0.9733,
+    "rate_low": 0.9334,
+    "rate_high": 0.9896,
+    "cost_usd": 0.016767,
+    "cost_low": 0.011939,
+    "cost_high": 0.022303,
+    "n": 150
+   },
+   "cascade haiku -> sonnet": {
+    "rate": 0.9867,
+    "rate_low": 0.9527,
+    "rate_high": 0.9963,
+    "cost_usd": 0.007769,
+    "cost_low": 0.005298,
+    "cost_high": 0.010538,
+    "n": 150
+   },
+   "nearest neighbours k=15 tau=0.2": {
+    "rate": 0.98,
+    "rate_low": 0.9429,
+    "rate_high": 0.9932,
+    "cost_usd": 0.002353,
+    "cost_low": 0.002125,
+    "cost_high": 0.0026,
+    "n": 150
+   },
+   "oracle": {
+    "rate": 1.0,
+    "rate_low": 0.975,
+    "rate_high": 1.0,
+    "cost_usd": 0.003341,
+    "cost_low": 0.002324,
+    "cost_high": 0.004713,
+    "n": 150
+   }
+  },
+  "chosen": "cascade haiku -> sonnet",
+  "always_best": "opus",
+  "chosen_minus_best": {
+   "diff": 0.0267,
+   "low": -0.0067,
+   "high": 0.0667
+  },
+  "cost_share_of_best": 0.1118,
+  "as_good_for_less": true,
+  "chosen_minus_haiku": {
+   "diff": 0.0067,
+   "low": 0.0,
+   "high": 0.02,
+   "mcnemar_p": 1.0
+  },
+  "better_than_haiku": false
+ },
+ "matrix_by_type": {
+  "changed_default": {
+   "haiku": {
+    "good": {
+     "rate": 0.3462,
+     "low": 0.1941,
+     "high": 0.5378,
+     "n": 26
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8713,
+     "high": 1.0,
+     "n": 26
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.3846,
+     "low": 0.2243,
+     "high": 0.5747,
+     "n": 26
+    },
+    "correct": {
+     "rate": 0.8846,
+     "low": 0.7102,
+     "high": 0.96,
+     "n": 26
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.5,
+     "low": 0.3206,
+     "high": 0.6794,
+     "n": 26
+    },
+    "correct": {
+     "rate": 0.9231,
+     "low": 0.7586,
+     "high": 0.9786,
+     "n": 26
+    }
+   }
+  },
+  "false_premise": {
+   "haiku": {
+    "good": {
+     "rate": 0.2105,
+     "low": 0.0851,
+     "high": 0.4333,
+     "n": 19
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8318,
+     "high": 1.0,
+     "n": 19
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.2632,
+     "low": 0.1181,
+     "high": 0.4879,
+     "n": 19
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8318,
+     "high": 1.0,
+     "n": 19
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.4211,
+     "low": 0.2314,
+     "high": 0.6372,
+     "n": 19
+    },
+    "correct": {
+     "rate": 0.9474,
+     "low": 0.7536,
+     "high": 0.9906,
+     "n": 19
+    }
+   }
+  },
+  "lookup": {
+   "haiku": {
+    "good": {
+     "rate": 0.3472,
+     "low": 0.2475,
+     "high": 0.4624,
+     "n": 72
+    },
+    "correct": {
+     "rate": 0.9722,
+     "low": 0.9043,
+     "high": 0.9923,
+     "n": 72
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.6389,
+     "low": 0.5235,
+     "high": 0.7402,
+     "n": 72
+    },
+    "correct": {
+     "rate": 0.9444,
+     "low": 0.8657,
+     "high": 0.9782,
+     "n": 72
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.6528,
+     "low": 0.5376,
+     "high": 0.7525,
+     "n": 72
+    },
+    "correct": {
+     "rate": 0.9722,
+     "low": 0.9043,
+     "high": 0.9923,
+     "n": 72
+    }
+   }
+  },
+  "multi_step": {
+   "haiku": {
+    "good": {
+     "rate": 0.25,
+     "low": 0.1018,
+     "high": 0.495,
+     "n": 16
+    },
+    "correct": {
+     "rate": 0.9412,
+     "low": 0.7302,
+     "high": 0.9895,
+     "n": 17
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 0.375,
+     "low": 0.1848,
+     "high": 0.6136,
+     "n": 16
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8157,
+     "high": 1.0,
+     "n": 17
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.5,
+     "low": 0.28,
+     "high": 0.72,
+     "n": 16
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8157,
+     "high": 1.0,
+     "n": 17
+    }
+   }
+  },
+  "unanswerable": {
+   "haiku": {
+    "good": {
+     "rate": 1.0,
+     "low": 0.8064,
+     "high": 1.0,
+     "n": 16
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8064,
+     "high": 1.0,
+     "n": 16
+    }
+   },
+   "sonnet": {
+    "good": {
+     "rate": 1.0,
+     "low": 0.8064,
+     "high": 1.0,
+     "n": 16
+    },
+    "correct": {
+     "rate": 1.0,
+     "low": 0.8064,
+     "high": 1.0,
+     "n": 16
+    }
+   },
+   "opus": {
+    "good": {
+     "rate": 0.9375,
+     "low": 0.7167,
+     "high": 0.9889,
+     "n": 16
+    },
+    "correct": {
+     "rate": 0.9375,
+     "low": 0.7167,
+     "high": 0.9889,
+     "n": 16
+    }
+   }
+  }
+ },
+ "models": {
+  "haiku": {
+   "run": "docs-20261016-222256-04f0f4",
+   "list_usd": 0.3529,
+   "with_prompt_cache_usd": 0.3529,
+   "latency_ms_p50": 6481,
+   "latency_ms_p95": 13533,
+   "latency_n": 150,
+   "errors": 0,
+   "abstained": 17,
+   "answered_supported": {
+    "rate": 0.3182,
+    "low": 0.2448,
+    "high": 0.4018,
+    "n": 132
+   }
+  },
+  "sonnet": {
+   "run": "docs-20261103-050320-f0a393",
+   "list_usd": 4.9554,
+   "with_prompt_cache_usd": 3.0295,
+   "latency_ms_p50": 6613,
+   "latency_ms_p95": 14411,
+   "latency_n": 150,
+   "errors": 0,
+   "abstained": 16,
+   "answered_supported": {
+    "rate": 0.5149,
+    "low": 0.4311,
+    "high": 0.5979,
+    "n": 134
+   }
+  },
+  "opus": {
+   "run": "docs-20261103-050826-6eb2fc",
+   "list_usd": 10.4231,
+   "with_prompt_cache_usd": 6.5002,
+   "latency_ms_p50": 10578,
+   "latency_ms_p95": 20129,
+   "latency_n": 150,
+   "errors": 0,
+   "abstained": 15,
+   "answered_supported": {
+    "rate": 0.5852,
+    "low": 0.5008,
+    "high": 0.6648,
+    "n": 135
+   }
+  }
+ }
+}

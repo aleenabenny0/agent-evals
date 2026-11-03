@@ -6,7 +6,9 @@ each question type, and tests whether a router that picks a model per question b
 Haiku's part of the matrix comes from runs already stored, so it costs nothing. Estimated cost $24 to
 $47, capped at $45.
 
-**Status:** approved 2026-11-03, with decisions 1b, 2a and 3a, and the ledger capped at $45.
+**Status:** approved 2026-11-03, with decisions 1b, 2a and 3a, and the ledger capped at $45. Dev and
+test have run, and the test result is below. The spot check of the judge on the new models'
+answers is pending, and the service's `model: auto` waits for it. About $20.50 is spent.
 
 **Goal.** Know, with intervals, what a larger model buys on this agent, and whether choosing a model
 per question gives the same quality for less.
@@ -86,6 +88,8 @@ answers, the first 30 sorted by sha256("phase-9-spot-check:" + model + ":" + cas
 blind with rubric v2, with no judge verdict on screen. That model's judge numbers are trusted if
 the judge passes at most 2 answers the labeler fails, the rule of iteration 4. If a model fails,
 its judge numbers are reported as untrusted and the claim is made on `correct` only.
+`scripts/phase9_routing.py spot` prints the two samples and their label commands, and `spot-score`
+applies the rule.
 
 ## Dev result and the frozen choices (2026-11-03)
 
@@ -119,6 +123,51 @@ before any test run:
 
 Spent so far: $8.59 on the agent, and about $1.10 on the judge, estimated at its measured $0.0048
 per answer.
+
+## Test result (2026-11-03): read once, after the choices were committed
+
+Runs `docs-20261103-050320-f0a393` (Sonnet) and `docs-20261103-050826-6eb2fc` (Opus), no errors,
+judged by the same judge. Haiku's run is the frozen `docs-20261016-222256-04f0f4`
+(`results/routing/test-result.json`).
+
+**One deviation, disclosed.** On 2026-10-16 the judge returned no verdict on Haiku's answer to
+`docs-int-003`, which is why Haiku's published test figure is 42 of 132 rather than of 133. That run
+is frozen, so it was not judged again. The question leaves the good-answer comparison for all three
+models, which keeps it paired, and stays in `correct`. Dev had no such gap, so the frozen fit is
+unchanged, which a rerun of `fit` confirmed.
+
+| Test | Good answer (149) | Correct (150) | List cost per answer |
+|---|---|---|---|
+| Haiku | 0.389 (0.315 to 0.469) | 0.980 (0.943 to 0.993) | $0.0023 |
+| Sonnet | 0.557 (0.477 to 0.634) | 0.953 (0.907 to 0.977) | $0.0327 |
+| Opus | 0.611 (0.531 to 0.685) | 0.960 (0.915 to 0.982) | $0.0693 |
+| By type (comparison only) | 0.591 | 0.973 | $0.0543 and $0.0168 |
+| Cascade, Haiku then Sonnet | 0.396 | **0.987** (0.953 to 0.996) | $0.0078 |
+| Nearest neighbours | **0.604** (0.524 to 0.679) | 0.980 | $0.0560 and $0.0024 |
+| Oracle (reads outcomes) | 0.819 | 1.000 | $0.0184 and $0.0033 |
+
+**The claims, by the rules fixed before test:**
+
+- **Good answers.** The chosen router, nearest neighbours, minus always-Opus: -0.7 points (95%
+  interval -6.7 to +4.7), at 81% of Opus's cost. The lower end is below the -5 point margin, so "as
+  good for less" is **not** claimed. Against always-Haiku it is +21.5 points (+11.4 to +31.5,
+  McNemar p = 0.0001), so it **is** better than Haiku alone. It sent 108 of the 149 questions to
+  Opus, 33 to Sonnet and 8 to Haiku, so most of that gain is the larger models' own.
+- **Correct.** The chosen router, the cascade, minus always-Opus: +2.7 points (-0.7 to +6.7), at
+  11% of Opus's cost, so "as good for less" **is** claimed. Against always-Haiku it is +0.7 points
+  (0.0 to +2.0, p = 1.0), so it is **not** better than Haiku alone. It escalated 17 of the 150
+  questions, each one a Haiku abstention.
+- **The good-answer numbers for Sonnet and Opus are provisional** until the spot check: the judge
+  was validated on Haiku's answers only.
+
+**What it means.** On correctness, Haiku alone is as good as any model or router here, at 3.5% of
+Opus's cost: always-best on dev, Opus, was not best on test. On support, the larger models are
+clearly better: Opus gives good answers 22 points more often than Haiku, at 30 times the cost per
+answer. The router keeps most of that gain at 81% of Opus's cost, but 150 questions cannot
+show it is as good as Opus. The oracle, at 0.819, shows room that no router here found.
+
+**Spent:** $18.12 on the agent ($8.59 dev, $9.53 test) and about $2.40 on the judge (505 answers
+at its measured $0.0048), about $20.50 of the $45 cap.
 
 ## Part 3: `model: auto` in the service
 

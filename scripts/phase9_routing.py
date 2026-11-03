@@ -6,11 +6,12 @@ fit       Dev only. Builds the attempt-1 matrix of the three models, fits every 
 evaluate  Test. Refuses without dev-fit.json, refits the frozen settings on all of dev, and writes
           results/routing/test-result.json.
 spot      Prints each new model's 30-answer spot-check sample and its label command.
+spot-score  Scores the labeled samples against the judge by the plan's rule.
 
 Costs are compared at list price with no prompt cache, since Haiku's runs predate the cache. The
 billed cost of each run is reported beside.
 
-Usage: uv run python -I -X utf8 scripts/phase9_routing.py fit|evaluate|spot
+Usage: uv run python -I -X utf8 scripts/phase9_routing.py fit|evaluate|spot|spot-score
 """
 
 import hashlib
@@ -58,14 +59,15 @@ RUNS = {
     },
     "test": {
         "haiku": "docs-20261016-222256-04f0f4",
-        "sonnet": "SONNET_TEST",
-        "opus": "OPUS_TEST",
+        "sonnet": "docs-20261103-050320-f0a393",
+        "opus": "docs-20261103-050826-6eb2fc",
     },
 }
 SUITES = {"dev": Path("suites/docs/dev.jsonl"), "test": Path("suites/docs/test.jsonl")}
 JUDGE = "judge"  # the validated judge's grader name
 TARGETS: tuple[Target, ...] = ("good", "correct")
 SPOT_SALT = "phase-9-spot-check:"
+LABELER = "aleena"
 OUT = Path("results/routing")
 DEV_FIT = OUT / "dev-fit.json"
 TEST_RESULT = OUT / "test-result.json"
@@ -73,12 +75,17 @@ TEST_N = 150
 MARGIN = -0.05  # non-inferiority margin against always-best, in rate
 
 
-def load(split: str) -> tuple[list[Question], dict[str, dict[str, Outcome]], dict[str, Any]]:
-    """Attempt 1 of each model on one split, plus what the matrix table reports."""
+def load(
+    split: str,
+) -> tuple[list[Question], dict[str, dict[str, Outcome]], dict[str, Any], dict[str, str]]:
+    """Attempt 1 of each model on one split, what the matrix table reports, and the questions
+    whose good-answer outcome is unknown for some model: an answer the judge failed to grade. Those
+    leave the good-answer comparison for every model, so it stays paired. They keep `correct`."""
     cases = sorted(load_suite(SUITES[split]), key=lambda c: c.id)
     questions = [Question(c.id, c.question, c.type) for c in cases]
     matrix: dict[str, dict[str, Outcome]] = {c.id: {} for c in cases}
     extra: dict[str, Any] = {}
+    unjudged: dict[str, str] = {}
     store = ResultsStore(Path("results/evals.duckdb"))
     try:
         for model in MODELS:
@@ -125,7 +132,9 @@ def load(split: str) -> tuple[list[Question], dict[str, dict[str, Outcome]], dic
                 answered = not a["error"] and not abstained
                 supported = judged.get((q.case_id, 1), {}).get("judge_supported")
                 if answered and supported is None:
-                    raise SystemExit(f"{run_id}: {q.case_id} #1 is answered but not judged")
+                    if judged.get((q.case_id, 1), {}).get("grader_error") != 1.0:
+                        raise SystemExit(f"{run_id}: {q.case_id} #1 is answered but not judged")
+                    unjudged[q.case_id] = f"{model}: the judge returned no verdict ({run_id})"
                 escalate = bool(
                     a["error"]
                     or abstained
@@ -167,7 +176,13 @@ def load(split: str) -> tuple[list[Question], dict[str, dict[str, Outcome]], dic
             }
     finally:
         store.close()
-    return questions, matrix, extra
+    return questions, matrix, extra, unjudged
+
+
+def scoped(questions: list[Question], target: Target, unjudged: dict[str, str]) -> list[Question]:
+    """The questions a target is compared on: all of them for `correct`, and for good answers
+    those whose outcome is known for every model."""
+    return [q for q in questions if target == "correct" or q.case_id not in unjudged]
 
 
 def _share(flags: list[bool]) -> dict[str, Any] | None:
@@ -192,14 +207,16 @@ def summary(r: Result) -> dict[str, Any]:
 
 
 def by_type_table(
-    questions: list[Question], matrix: dict[str, dict[str, Outcome]]
+    questions: list[Question], matrix: dict[str, dict[str, Outcome]], unjudged: dict[str, str]
 ) -> dict[str, Any]:
     table: dict[str, Any] = {}
     for t in sorted({q.type for q in questions}):
         qs = [q for q in questions if q.type == t]
         table[t] = {
             m: {
-                target: _share([matrix[q.case_id][m].value(target) for q in qs])
+                target: _share(
+                    [matrix[q.case_id][m].value(target) for q in scoped(qs, target, unjudged)]
+                )
                 for target in TARGETS
             }
             for m in MODELS
@@ -208,10 +225,11 @@ def by_type_table(
 
 
 def fit() -> None:
-    questions, matrix, extra = load("dev")
+    all_questions, matrix, extra, unjudged = load("dev")
     choices: dict[str, Any] = {}
     report: dict[str, Any] = {}
     for target in TARGETS:
+        questions = scoped(all_questions, target, unjudged)
         single = {m: evaluate(SingleModel(m), questions, matrix, target) for m in MODELS}
         by_type = fit_by_type(questions, matrix, MODELS, target)
         cascade = evaluate(Cascade("haiku", "sonnet"), questions, matrix, target)
@@ -251,8 +269,9 @@ def fit() -> None:
                 "choices": choices,
                 "choices_sha256": hashlib.sha256(frozen.encode()).hexdigest(),
                 "dev": report,
-                "matrix_by_type": by_type_table(questions, matrix),
+                "matrix_by_type": by_type_table(all_questions, matrix, unjudged),
                 "models": extra,
+                "unjudged": unjudged,
             },
             indent=1,
         )
@@ -270,10 +289,16 @@ def evaluate_test() -> None:
     frozen = json.dumps(fitted["choices"], sort_keys=True)
     if hashlib.sha256(frozen.encode()).hexdigest() != fitted["choices_sha256"]:
         raise SystemExit("dev-fit.json's choices do not match their hash")
-    dev_q, dev_m, _ = load("dev")
-    questions, matrix, extra = load("test")
-    out: dict[str, Any] = {"runs": RUNS["test"], "choices_sha256": fitted["choices_sha256"]}
+    dev_q, dev_m, _, dev_unjudged = load("dev")
+    assert not dev_unjudged, "the frozen fit was made with every dev answer judged"
+    all_questions, matrix, extra, unjudged = load("test")
+    out: dict[str, Any] = {
+        "runs": RUNS["test"],
+        "choices_sha256": fitted["choices_sha256"],
+        "unjudged": unjudged,
+    }
     for target in TARGETS:
+        questions = scoped(all_questions, target, unjudged)
         c = fitted["choices"][target]
         knn = NearestNeighbours(dev_q, dev_m, MODELS, target, k=c["knn"]["k"], tau=c["knn"]["tau"])
         by_type = fit_by_type(dev_q, dev_m, MODELS, target)
@@ -313,7 +338,7 @@ def evaluate_test() -> None:
             },
             "better_than_haiku": vs_haiku.low > 0,
         }
-    out["matrix_by_type"] = by_type_table(questions, matrix)
+    out["matrix_by_type"] = by_type_table(all_questions, matrix, unjudged)
     out["models"] = extra
     TEST_RESULT.write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
     print(
@@ -324,28 +349,67 @@ def evaluate_test() -> None:
     print(f"wrote {TEST_RESULT}")
 
 
+def spot_sample(store: ResultsStore, model: str) -> list[str]:
+    """The pre-registered 30: answered attempt-1 dev answers, in sha256 order of salt, model and
+    case id."""
+    pool = sorted(
+        (a for a in store.answered_attempts(RUNS["dev"][model]) if a["attempt"] == 1),
+        key=lambda a: hashlib.sha256((SPOT_SALT + model + ":" + a["case_id"]).encode()).hexdigest(),
+    )
+    return [a["case_id"] for a in pool[:30]]
+
+
 def spot() -> None:
     store = ResultsStore(Path("results/evals.duckdb"))
     try:
         for model in ("sonnet", "opus"):
-            run_id = RUNS["dev"][model]
-            pool = sorted(
-                (a for a in store.answered_attempts(run_id) if a["attempt"] == 1),
-                key=lambda a: hashlib.sha256(
-                    (SPOT_SALT + model + ":" + a["case_id"]).encode()
-                ).hexdigest(),
-            )[:30]
-            ids = [a["case_id"] for a in pool]
+            ids = spot_sample(store, model)
             print(f"{model} spot-check sample ({len(ids)}): {ids}")
             print(
                 "  uv run evals label "
-                + run_id
-                + " --labeler aleena "
+                + RUNS["dev"][model]
+                + f" --labeler {LABELER} "
                 + " ".join(f"--case {c}" for c in ids)
             )
     finally:
         store.close()
 
 
+def spot_score() -> None:
+    """The plan's rule: a model's judge numbers hold if the judge passes at most 2 of its 30
+    answers that the labeler fails on fully supported."""
+    out: dict[str, Any] = {}
+    store = ResultsStore(Path("results/evals.duckdb"))
+    try:
+        for model in ("sonnet", "opus"):
+            run_id = RUNS["dev"][model]
+            ids = spot_sample(store, model)
+            labels = {
+                x["case_id"]: x["supported"]
+                for x in store.labels(run_id, LABELER)
+                if x["attempt"] == 1 and x["supported"] is not None
+            }
+            missing = [c for c in ids if c not in labels]
+            if missing:
+                raise SystemExit(
+                    f"{model}: {len(missing)} of 30 not labeled yet ({missing[0]}, ...)"
+                )
+            judged = store.grades_for(run_id, JUDGE)
+            pairs = [(judged[(c, 1)]["judge_supported"] == 1.0, bool(labels[c])) for c in ids]
+            false_passes = sum(j and not h for j, h in pairs)
+            out[model] = {
+                "run": run_id,
+                "false_passes": false_passes,
+                "false_fails": sum(h and not j for j, h in pairs),
+                "agreement": sum(j == h for j, h in pairs),
+                "n": len(pairs),
+                "trusted": false_passes <= 2,
+            }
+    finally:
+        store.close()
+    (OUT / "spot-check.json").write_text(json.dumps(out, indent=1) + "\n", encoding="utf-8")
+    print(json.dumps(out, indent=1))
+
+
 if __name__ == "__main__":
-    {"fit": fit, "evaluate": evaluate_test, "spot": spot}[sys.argv[1]]()
+    {"fit": fit, "evaluate": evaluate_test, "spot": spot, "spot-score": spot_score}[sys.argv[1]]()

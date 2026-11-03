@@ -17,6 +17,26 @@ Format:
 - Runs: baseline <run id>, candidate <run id>
 ```
 
+## Measured (2026-11-03): the same agent on Sonnet and Opus, and routers between them (phase 9)
+
+- Change: none to the shipped agent. Prompt v3 ran unchanged on Sonnet 5.5 and Opus 5.5, attempt 1
+  on dev and on the frozen test split, and routers were fitted on dev
+  (`docs/plans/phase-9-routing.md`, ADR 0012). The choices were committed (21da08b) before any test
+  run, and test was read once. No champion moved.
+- Good answer (correct, and an abstention or fully supported by the judge), test, 149 questions:
+  Haiku 0.389, Sonnet 0.557, Opus 0.611. Nearest neighbours, the chosen router, 0.604 at 81% of
+  Opus's cost: -0.7 points against Opus (95% CI -6.7 to +4.7), so "as good for less" is not
+  claimed, and +21.5 against Haiku (+11.4 to +31.5, p = 0.0001). Provisional until a blind spot
+  check of the judge on the new models' answers.
+- Correct, test, 150 questions: Haiku 0.980, Sonnet 0.953, Opus 0.960. The Haiku-to-Sonnet
+  cascade, the chosen router, 0.987 at 11% of Opus's cost: +2.7 against Opus (CI -0.7 to +6.7), so
+  "as good for less" is claimed, and +0.7 against Haiku (CI 0.0 to +2.0, p = 1.0), no detectable
+  change.
+- Disclosed: one Haiku test answer the judge failed to grade on 2026-10-16 (`docs-int-003`) leaves
+  the good-answer comparison for all three models; and four Opus dev attempts lost to connection
+  errors were retried by a rerun that replayed every other call from the cache.
+- Cost: $18.12 for the agent runs and about $2.40 for the judge.
+
 ## Instrument (2026-11-02): one dev case fixed, an output contract added; ten dev runs regraded
 
 - Case: `docs-chg-025` no longer requires a price clause its question never asks about. The clause
